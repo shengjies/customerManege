@@ -1,6 +1,7 @@
 package com.ruoyi.project.device.devList.service;
 
 import com.ruoyi.common.constant.DevConstants;
+import com.ruoyi.common.feign.devList.DevListApi;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.security.ShiroUtils;
@@ -13,6 +14,9 @@ import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.device.devModel.domain.DevModel;
 import com.ruoyi.project.device.devModel.mapper.DevModelMapper;
 import com.ruoyi.project.system.user.domain.User;
+import feign.Feign;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -184,6 +188,8 @@ public class DevListServiceImpl implements IDevListService
 	 */
 	@Override
 	public int deviceValidate(String code) {
+		Feign.builder().decoder(new GsonDecoder()).encoder(new GsonEncoder()).target(DevListApi.class,code);
+		// 查询主服务器的硬件信息
 		DevList devList = devListMapper.selectDevListByCode(code);
 		if(devList == null){
 			return DevConstants.DEV_NOT_EXSIT;

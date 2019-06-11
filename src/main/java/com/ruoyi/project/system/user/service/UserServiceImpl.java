@@ -169,17 +169,28 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public int deleteUserByIds(String ids,HttpServletRequest request) throws BusinessException {
-        Long sysUserId = JwtUtil.getTokenUser(request).getUserId();
-        Long[] userIds = Convert.toLongArray(ids);
-        for (Long userId : userIds) {
-            if (userId == sysUserId) {
-                throw new BusinessException("不允许删除本人");
-            }
-            if (User.isAdmin(userId)) {
-                throw new BusinessException("不允许删除超级管理员用户");
-            }
+        // 调用用户删除接口api
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String,Object> result = userApi.removeUser(ids,JwtUtil.getToken(request));
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            //Long sysUserId = JwtUtil.getTokenUser(request).getUserId();
+            Long[] userIds = Convert.toLongArray(ids);
+            //for (Long userId : userIds) {
+            //    if (userId == sysUserId) {
+            //        throw new BusinessException("不允许删除本人");
+            //    }
+            //    if (User.isAdmin(userId)) {
+            //        throw new BusinessException("不允许删除超级管理员用户");
+            //    }
+            //}
+            return userMapper.deleteUserByIds(userIds);
+        } else {
+            throw new BusinessException(result.get("msg").toString());
         }
-        return userMapper.deleteUserByIds(userIds);
+
     }
 
     /**
@@ -212,8 +223,9 @@ public class UserServiceImpl implements IUserService {
         // 接口保存成功通过
         if (Double.valueOf(result.get("code").toString()) == 0) {
             // 获取到服务器端传回的用户信息
-            User user1 = JSONObject.parseObject(result.get("data").toString(), User.class);
-            System.out.println(user1);
+            Double data = Double.valueOf(result.get("data").toString().trim());
+            Long userId = new Double(data).longValue();
+            user.setUserId(userId);
             // 新增用户信息
             int rows = userMapper.insertUser(user);
             // 新增用户岗位关联
@@ -234,23 +246,23 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public int updateUser(User user,HttpServletRequest request) {
+        Long userId = user.getUserId();
+        User tokenUser = JwtUtil.getTokenUser(request);
+        user.setUpdateBy(tokenUser.getLoginName());
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
         HashMap<String,Object> result = userApi.editUserInfo(user,JwtUtil.getToken(request));
         if(Double.valueOf(result.get("code").toString()) == 0) {
-            Long userId = user.getUserId();
-            User tokenUser = JwtUtil.getTokenUser(request);
-            user.setUpdateBy(tokenUser.getLoginName());
             // 删除用户与角色关联
             userRoleMapper.deleteUserRoleByUserId(userId);
             // 新增用户与角色管理
             insertUserRole(user);
-            // 删除用户与岗位关联
-            userPostMapper.deleteUserPostByUserId(userId);
-            // 新增用户与岗位管理
-            insertUserPost(user);
+            //// 删除用户与岗位关联
+            //userPostMapper.deleteUserPostByUserId(userId);
+            //// 新增用户与岗位管理
+            //insertUserPost(user);
             if (null == userId) {
                 user.setCompanyId(tokenUser.getCompanyId());
                 userMapper.updateUserByLoginName(user);

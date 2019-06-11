@@ -55,10 +55,9 @@
                     <div class="ibox-content">
                         <div class="nav-tabs-custom">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#user_info" data-toggle="tab"
-                                                      aria-expanded="true">修改个人信息</a></li>
-                                <li shiro:hasPermission="device:devCompany:edit">
-                                    <a href="#modify_company" data-toggle="tab" aria-expanded="false" shiro:hasPermission="device:devCompany:edit">修改公司信息</a>
+                                <li class="active"><a href="#user_info" data-toggle="tab" aria-expanded="true">修改个人信息</a></li>
+                                <li th:if="${user.loginName == user.createBy}">
+                                    <a href="#modify_company" data-toggle="tab" aria-expanded="false">修改公司信息</a>
                                 </li>
                                 <li><a href="#modify_password" data-toggle="tab" aria-expanded="false">修改密码</a></li>
                             </ul>
@@ -119,7 +118,7 @@
                                 </div>
 
                                 <!--修改公司信息-->
-                                <div class="tab-pane" id="modify_company" shiro:hasPermission="device:devCompany:edit">
+                                <div class="tab-pane" id="modify_company">
                                     <form class="form-horizontal" id="form-company-edit">
                                         <input type="hidden" id="companyId" name="companyId"
                                                th:value="${company.companyId}">

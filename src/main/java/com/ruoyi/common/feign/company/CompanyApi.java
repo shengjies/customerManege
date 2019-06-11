@@ -25,7 +25,7 @@ public interface CompanyApi {
      * @param token token 验证
      * @return 结果
      */
-    @RequestLine("POST /system/user/api/edit")
+    @RequestLine("POST /company/api/edit")
     @Headers({"Content-Type: application/json","Cookie: token={token}"})
     HashMap<String,Object> editCompanyInfo(DevCompany company, @Param("token") String token);
 }
