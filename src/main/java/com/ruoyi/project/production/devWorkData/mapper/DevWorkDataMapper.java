@@ -39,7 +39,7 @@ public interface DevWorkDataMapper
      * @param devWorkData 工单数据信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int insertDevWorkData(DevWorkData devWorkData);
 	
 	/**
@@ -75,7 +75,7 @@ public interface DevWorkDataMapper
 	 * @param io_id io口编号
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	DevWorkData selectWorkDataByCompanyLineWorkDev(@Param("company_id")int company_id,@Param("line_id")int line_id,@Param("work_id")int work_id,
 												   @Param("dev_id")int dev_id,@Param("io_id")int io_id);
 
@@ -85,7 +85,7 @@ public interface DevWorkDataMapper
 	 * @param initial_data 工单开始时硬件第一次上传的数据
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	int initWorkData(@Param("id")int id,@Param("initial_data")int initial_data,@Param("sign")int sign);
 
 	/**
@@ -94,7 +94,7 @@ public interface DevWorkDataMapper
 	 * @param total 累计产量
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	int saveTotalWorkData(@Param("id")int id,@Param("total")int total,@Param("sign")int sign);
 
 	/**
@@ -102,7 +102,7 @@ public interface DevWorkDataMapper
 	 * @param work_id
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	int updateWorkSigInit(@Param("work_id")int work_id);
 
 	/**
@@ -113,7 +113,7 @@ public interface DevWorkDataMapper
 	 * @param devId 硬件id
 	 * @return 结果
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	DevWorkData selectWorkDataByIosign(@Param("companyId") Integer companyId,
 									   @Param("workId") Integer workId,
 									   @Param("lineId") Integer lineId,

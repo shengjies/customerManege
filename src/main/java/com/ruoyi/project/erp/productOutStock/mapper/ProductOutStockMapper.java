@@ -22,7 +22,7 @@ public interface ProductOutStockMapper {
      * @param id 产品出库ID
      * @return 产品出库信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public ProductOutStock selectProductOutStockById(Integer id);
 
     /**
@@ -31,7 +31,7 @@ public interface ProductOutStockMapper {
      * @param productOutStock 产品出库信息
      * @return 产品出库集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<ProductOutStock> selectProductOutStockList(ProductOutStock productOutStock);
 
     /**
@@ -40,7 +40,7 @@ public interface ProductOutStockMapper {
      * @param productOutStock 产品出库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertProductOutStock(ProductOutStock productOutStock);
 
     /**
@@ -49,7 +49,7 @@ public interface ProductOutStockMapper {
      * @param productOutStock 产品出库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateProductOutStock(ProductOutStock productOutStock);
 
     /**
@@ -58,7 +58,7 @@ public interface ProductOutStockMapper {
      * @param id 产品出库ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductOutStockById(Integer id);
 
     /**
@@ -67,7 +67,7 @@ public interface ProductOutStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductOutStockByIds(String[] ids);
 
     /**
@@ -77,7 +77,7 @@ public interface ProductOutStockMapper {
      * @param customerId 客户id
      * @return 产品出库单信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     ProductOutStock selectProductOutStockByOutCodeAndCusId(@Param("outCode") String outCode, @Param("customerId") Integer customerId);
 
     /**
@@ -87,7 +87,7 @@ public interface ProductOutStockMapper {
      * @param companyId 公司id
      * @return
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     ProductOutStock checkProductOutCodeUnique(@Param("outCode") String outCode, @Param("companyId") Integer companyId);
 
 

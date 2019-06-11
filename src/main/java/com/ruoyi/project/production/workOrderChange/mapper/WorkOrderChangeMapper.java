@@ -28,7 +28,7 @@ public interface WorkOrderChangeMapper
      * @param workOrderChange 工单变更信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int insertWorkOrderChange(WorkOrderChange workOrderChange);
 
 	

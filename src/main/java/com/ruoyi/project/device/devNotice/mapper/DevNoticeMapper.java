@@ -21,7 +21,7 @@ public interface DevNoticeMapper
      * @param id 公司消息通知ID
      * @return 公司消息通知信息
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public DevNotice selectDevNoticeById(Integer id);
 	
 	/**
@@ -30,7 +30,7 @@ public interface DevNoticeMapper
      * @param devNotice 公司消息通知信息
      * @return 公司消息通知集合
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public List<DevNotice> selectDevNoticeList(DevNotice devNotice);
 	
 	/**
@@ -39,7 +39,7 @@ public interface DevNoticeMapper
      * @param devNotice 公司消息通知信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int insertDevNotice(DevNotice devNotice);
 	
 	/**
@@ -48,7 +48,7 @@ public interface DevNoticeMapper
      * @param devNotice 公司消息通知信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int updateDevNotice(DevNotice devNotice);
 	
 	/**
@@ -57,7 +57,7 @@ public interface DevNoticeMapper
      * @param id 公司消息通知ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteDevNoticeById(Integer id);
 	
 	/**
@@ -66,7 +66,7 @@ public interface DevNoticeMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteDevNoticeByIds(String[] ids);
 
 	/**
@@ -74,6 +74,6 @@ public interface DevNoticeMapper
 	 * @param companyId
 	 * @return
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
     List<DevNotice> selectAllNotice(@Param("companyId") Integer companyId);
 }

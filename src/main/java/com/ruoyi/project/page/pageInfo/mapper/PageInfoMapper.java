@@ -21,7 +21,7 @@ public interface PageInfoMapper
      * @param id 页面管理ID
      * @return 页面管理信息
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public PageInfo selectPageInfoById(Integer id);
 
 	/**
@@ -29,7 +29,7 @@ public interface PageInfoMapper
 	 * @param code 页面编号
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	PageInfo selectPageInfoByCode(@Param("code")String code);
 	
 	/**
@@ -38,7 +38,7 @@ public interface PageInfoMapper
      * @param pageInfo 页面管理信息
      * @return 页面管理集合
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public List<PageInfo> selectPageInfoList(PageInfo pageInfo);
 	
 	/**
@@ -47,7 +47,7 @@ public interface PageInfoMapper
      * @param pageInfo 页面管理信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int insertPageInfo(PageInfo pageInfo);
 	
 	/**
@@ -56,7 +56,7 @@ public interface PageInfoMapper
      * @param pageInfo 页面管理信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int updatePageInfo(PageInfo pageInfo);
 	
 	/**
@@ -65,7 +65,7 @@ public interface PageInfoMapper
      * @param id 页面管理ID
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int deletePageInfoById(Integer id);
 	
 	/**
@@ -74,7 +74,7 @@ public interface PageInfoMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int deletePageInfoByIds(String[] ids);
 
 	/**
@@ -82,7 +82,7 @@ public interface PageInfoMapper
 	 * @param com_id
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	List<PageInfo> selectAllPage(@Param("com_id")int com_id);
 	
 }

@@ -22,7 +22,7 @@ public interface MaterielLedgerDetailMapper
      * @param materielLedgerDetail 物料对账明细信息
      * @return 结果
      */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int insertMaterielLedgerDetail(MaterielLedgerDetail materielLedgerDetail);
 
 	/**
@@ -30,7 +30,7 @@ public interface MaterielLedgerDetailMapper
 	 * @param ledger_id 主表id
 	 * @return
 	 */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	List<MaterielLedgerDetail> selectDetailsByLedgerId(@Param("ledger_id")int ledger_id);
 	
 }

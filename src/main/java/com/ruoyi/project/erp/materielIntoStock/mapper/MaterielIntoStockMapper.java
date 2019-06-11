@@ -20,7 +20,7 @@ public interface MaterielIntoStockMapper {
      * @param id 物料入库ID
      * @return 物料入库信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public MaterielIntoStock selectMaterielIntoStockById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface MaterielIntoStockMapper {
      * @param materielIntoStock 物料入库信息
      * @return 物料入库集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<MaterielIntoStock> selectMaterielIntoStockList(MaterielIntoStock materielIntoStock);
 
     /**
@@ -38,7 +38,7 @@ public interface MaterielIntoStockMapper {
      * @param materielIntoStock 物料入库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertMaterielIntoStock(MaterielIntoStock materielIntoStock);
 
     /**
@@ -47,7 +47,7 @@ public interface MaterielIntoStockMapper {
      * @param materielIntoStock 物料入库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateMaterielIntoStock(MaterielIntoStock materielIntoStock);
 
     /**
@@ -56,7 +56,7 @@ public interface MaterielIntoStockMapper {
      * @param id 物料入库ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielIntoStockById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface MaterielIntoStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielIntoStockByIds(String[] ids);
 
     /**
@@ -74,7 +74,7 @@ public interface MaterielIntoStockMapper {
      * @param intoCode 物料入库单号
      * @return 物料入库信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     MaterielIntoStock selectMaterielIntoStockByIntoCode(@Param("intoCode") String intoCode);
 
 }

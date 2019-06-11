@@ -19,7 +19,7 @@ public interface ProductLedgerMapper
      * @param id 产品对账ID
      * @return 产品对账信息
      */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public ProductLedger selectProductLedgerById(Integer id);
 	
 	/**
@@ -37,7 +37,7 @@ public interface ProductLedgerMapper
      * @return 结果
      */
 
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int insertProductLedger(ProductLedger productLedger);
 	
 	/**
@@ -46,7 +46,7 @@ public interface ProductLedgerMapper
      * @param productLedger 产品对账信息
      * @return 结果
      */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int updateProductLedger(ProductLedger productLedger);
 	
 	/**

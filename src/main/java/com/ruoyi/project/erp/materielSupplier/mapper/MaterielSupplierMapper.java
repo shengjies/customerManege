@@ -20,7 +20,7 @@ public interface MaterielSupplierMapper {
      * @param id 物料供应商关联ID
      * @return 物料供应商关联信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public MaterielSupplier selectMaterielSupplierById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface MaterielSupplierMapper {
      * @param materielSupplier 物料供应商关联信息
      * @return 物料供应商关联集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<MaterielSupplier> selectMaterielSupplierList(MaterielSupplier materielSupplier);
 
     /**
@@ -38,7 +38,7 @@ public interface MaterielSupplierMapper {
      * @param materielSupplier 物料供应商关联信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertMaterielSupplier(MaterielSupplier materielSupplier);
 
     /**
@@ -47,7 +47,7 @@ public interface MaterielSupplierMapper {
      * @param materielSupplier 物料供应商关联信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateMaterielSupplier(MaterielSupplier materielSupplier);
 
     /**
@@ -56,7 +56,7 @@ public interface MaterielSupplierMapper {
      * @param id 物料供应商关联ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielSupplierById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface MaterielSupplierMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielSupplierByIds(String[] ids);
 
     /**
@@ -74,7 +74,7 @@ public interface MaterielSupplierMapper {
      * @param materielId
      * @return 关联列表
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<MaterielSupplier> selectMaterielSupplierListByMaterielId(@Param("materielId") Integer materielId);
 
     /**
@@ -84,7 +84,7 @@ public interface MaterielSupplierMapper {
      * @param supplierCode 供应商编码
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int checkSupplierCodeUnique(@Param("supplierId") Integer supplierId, @Param("supplierCode") String supplierCode);
 
     /**
@@ -94,7 +94,7 @@ public interface MaterielSupplierMapper {
      * @param supplierId 供应商id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<MaterielSupplier> selectMaterielSupplierListByMatIdAndSupId(@Param("materielId") Integer materielId, @Param("supplierId") Integer supplierId);
 
     /**
@@ -104,7 +104,7 @@ public interface MaterielSupplierMapper {
      * @param supplierId 供应商主键id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int checkMaterielUnique(@Param("materielId") Integer materielId, @Param("supplierId") Integer supplierId);
 
     /**
@@ -113,6 +113,6 @@ public interface MaterielSupplierMapper {
      * @param sid 供应商id
      * @return
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     MaterielSupplier findSupplierCodeByMaterielId(@Param("mid") int mid,@Param("sid") int sid);
 }

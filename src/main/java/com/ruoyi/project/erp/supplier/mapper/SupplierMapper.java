@@ -19,7 +19,7 @@ public interface SupplierMapper {
      * @param id 供应商数据ID
      * @return 供应商数据信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public Supplier selectSupplierById(Integer id);
 
     /**
@@ -28,7 +28,7 @@ public interface SupplierMapper {
      * @param supplier 供应商数据信息
      * @return 供应商数据集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<Supplier> selectSupplierList(Supplier supplier);
 
     /**
@@ -37,7 +37,7 @@ public interface SupplierMapper {
      * @param supplier 供应商数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertSupplier(Supplier supplier);
 
     /**
@@ -46,7 +46,7 @@ public interface SupplierMapper {
      * @param supplier 供应商数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateSupplier(Supplier supplier);
 
     /**
@@ -55,7 +55,7 @@ public interface SupplierMapper {
      * @param id 供应商数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteSupplierById(Integer id);
 
     /**
@@ -64,7 +64,7 @@ public interface SupplierMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteSupplierByIds(String[] ids);
 
 }

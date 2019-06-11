@@ -88,7 +88,7 @@ public class MaterielLedgerServiceImpl implements IMaterielLedgerService {
      * @return 物料对账集合
      */
     @Override
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     public List<MaterielLedger> selectMaterielLedgerList(MaterielLedger materielLedger,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return Collections.emptyList();
@@ -185,7 +185,7 @@ public class MaterielLedgerServiceImpl implements IMaterielLedgerService {
      * @return
      */
     @Override
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     public int cancel(MaterielLedger materielLedger,HttpServletRequest request) {
         User u = JwtUtil.getTokenUser(request);
         if (u == null) return 0;

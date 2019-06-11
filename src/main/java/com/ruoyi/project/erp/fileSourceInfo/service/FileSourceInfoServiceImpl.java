@@ -39,7 +39,7 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
      * @return 文件素材管理集合
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public List<FileSourceInfo> selectFileSourceInfoList(FileSourceInfo fileSourceInfo, HttpServletRequest request)
 	{
 		if(fileSourceInfo.getCompanyId() == null) {
@@ -57,7 +57,7 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
      * @return 结果
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int insertFileSourceInfo(FileSourceInfo fileSourceInfo)
 	{
 	    return fileSourceInfoMapper.insertFileSourceInfo(fileSourceInfo);
@@ -70,7 +70,7 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
      * @return 结果
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int deleteFileSourceInfoByIds(String ids)
 	{
 		FileSourceInfo info = fileSourceInfoMapper.selectFileSourceInfoById(Integer.parseInt(ids));

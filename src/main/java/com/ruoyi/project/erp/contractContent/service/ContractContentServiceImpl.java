@@ -42,7 +42,7 @@ public class ContractContentServiceImpl implements IContractContentService
      * @return 合同内容信息
      */
     @Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public ContractContent selectContractContentById(Integer id)
 	{
 	    return contractContentMapper.selectContractContentById(id);
@@ -55,7 +55,7 @@ public class ContractContentServiceImpl implements IContractContentService
      * @return 合同内容集合
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public List<ContractContent> selectContractContentList(ContractContent contractContent)
 	{
 	    return contractContentMapper.selectContractContentList(contractContent);
@@ -68,7 +68,7 @@ public class ContractContentServiceImpl implements IContractContentService
      * @return 结果
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int insertContractContent(ContractContent contractContent, HttpServletRequest request)
 	{
 		User user = JwtUtil.getTokenUser(request);
@@ -87,7 +87,7 @@ public class ContractContentServiceImpl implements IContractContentService
      * @return 结果
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int updateContractContent(ContractContent contractContent)
 	{
 	    return contractContentMapper.updateContractContent(contractContent);
@@ -100,7 +100,7 @@ public class ContractContentServiceImpl implements IContractContentService
      * @return 结果
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int deleteContractContentByIds(String ids)
 	{
 		return contractContentMapper.deleteContractContentByIds(Convert.toStrArray(ids));

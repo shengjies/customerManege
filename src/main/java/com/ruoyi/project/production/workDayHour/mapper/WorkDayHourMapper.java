@@ -19,7 +19,7 @@ public interface WorkDayHourMapper {
      * @param hourId 工单各个IO口每天每小时数据ID
      * @return 工单各个IO口每天每小时数据信息
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public WorkDayHour selectWorkDayHourById(Integer hourId);
 
     /**
@@ -28,7 +28,7 @@ public interface WorkDayHourMapper {
      * @param workDayHour 工单各个IO口每天每小时数据信息
      * @return 工单各个IO口每天每小时数据集合
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<WorkDayHour> selectWorkDayHourList(WorkDayHour workDayHour);
 
     /**
@@ -37,7 +37,7 @@ public interface WorkDayHourMapper {
      * @param workDayHour 工单各个IO口每天每小时数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int insertWorkDayHour(WorkDayHour workDayHour);
 
     /**
@@ -46,7 +46,7 @@ public interface WorkDayHourMapper {
      * @param workDayHour 工单各个IO口每天每小时数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int updateWorkDayHour(WorkDayHour workDayHour);
 
     /**
@@ -55,7 +55,7 @@ public interface WorkDayHourMapper {
      * @param hourId 工单各个IO口每天每小时数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int deleteWorkDayHourById(Integer hourId);
 
     /**
@@ -64,7 +64,7 @@ public interface WorkDayHourMapper {
      * @param hourIds 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int deleteWorkDayHourByIds(String[] hourIds);
 
 }

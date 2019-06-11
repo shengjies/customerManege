@@ -23,7 +23,7 @@ public interface PartsMapper
      * @param id 半成品ID
      * @return 半成品信息
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public Parts selectPartsById(Integer id);
 	
 	/**
@@ -32,7 +32,7 @@ public interface PartsMapper
      * @param parts 半成品信息
      * @return 半成品集合
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public List<Parts> selectPartsList(Parts parts);
 	
 	/**
@@ -41,7 +41,7 @@ public interface PartsMapper
      * @param parts 半成品信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int insertParts(Parts parts);
 	
 	/**
@@ -50,7 +50,7 @@ public interface PartsMapper
      * @param parts 半成品信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int updateParts(Parts parts);
 	
 	/**
@@ -59,7 +59,7 @@ public interface PartsMapper
      * @param id 半成品ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deletePartsById(Integer id);
 	
 	/**
@@ -68,7 +68,7 @@ public interface PartsMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deletePartsByIds(String[] ids);
 
 	/**
@@ -77,7 +77,7 @@ public interface PartsMapper
 	 * @param detIntoCode 编码
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	Parts selectPartsByCode(@Param("companyId") Integer companyId, @Param("detIntoCode") String detIntoCode);
 
 	/**
@@ -85,6 +85,6 @@ public interface PartsMapper
 	 * @param companyId 公司id
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	List<Parts> selectAllPartsNameByComId(@Param("companyId") Integer companyId);
 }

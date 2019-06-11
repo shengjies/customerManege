@@ -38,7 +38,7 @@ public interface DevDataLogMapper {
      * @param devDataLog 数据上报日志信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int insertDevDataLog(DevDataLog devDataLog);
 
     /**
@@ -51,7 +51,7 @@ public interface DevDataLogMapper {
      * @param sysDateTime    当前时间
      * @return 结果包装类
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     DataLogTask selectDataLogBeInOrFinish(@Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("workId") Integer workId,
                                           @Param("sysDateTimeOld") Date sysDateTimeOld, @Param("sysDateTime") Date sysDateTime);
 
@@ -63,7 +63,7 @@ public interface DevDataLogMapper {
      * @param companyId 公司Id主键
      * @return 数据上报日志信息
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<DevDataLog> selectDevDataLogByWorkId(@Param("workId") Integer workId, @Param("companyId") Integer companyId);
 
     /**
@@ -75,7 +75,7 @@ public interface DevDataLogMapper {
      * @param io_id   IO口编号
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevDataLog selectLineWorkDevIo(@Param("line_id") int line_id, @Param("work_id") int work_id, @Param("dev_id") int dev_id,
                                    @Param("io_id") int io_id);
 

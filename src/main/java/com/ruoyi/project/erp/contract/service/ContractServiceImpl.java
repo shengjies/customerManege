@@ -50,7 +50,7 @@ public class ContractServiceImpl implements IContractService
 	 * @return
 	 */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public Contract selectContractByCompanyId(HttpServletRequest request) {
 		User user = JwtUtil.getTokenUser(request);
 		if(user ==null) return  null;
@@ -82,7 +82,7 @@ public class ContractServiceImpl implements IContractService
 	 * @throws Exception
 	 */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public Contract insertContract(Contract contract,HttpServletRequest request) throws Exception {
 		User user = JwtUtil.getTokenUser(request);
 		if(user ==null)
@@ -100,7 +100,7 @@ public class ContractServiceImpl implements IContractService
      * @return 结果
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public Contract updateContract(Contract contract)
 	{
 		contractMapper.updateContract(contract);

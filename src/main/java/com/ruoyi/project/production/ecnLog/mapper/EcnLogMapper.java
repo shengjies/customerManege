@@ -21,7 +21,7 @@ public interface EcnLogMapper
 	 * @param id ECN 变更记录ID
 	 * @return ECN 变更记录信息
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public EcnLog selectEcnLogById(Integer id);
 
 	/**
@@ -38,7 +38,7 @@ public interface EcnLogMapper
      * @param ecnLog ECN 变更记录信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int insertEcnLog(EcnLog ecnLog);
 
 	/**
@@ -47,7 +47,7 @@ public interface EcnLogMapper
 	 * @param productId 产品id
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	EcnLog findByCompanyIdAndProductId(@Param("companyId")int companyId,
 									   @Param("productId")int productId);
 
@@ -57,7 +57,7 @@ public interface EcnLogMapper
 	 * @param ecnLog ECN 变更记录信息
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int updateEcnLog(EcnLog ecnLog);
 
 	/**
@@ -66,7 +66,7 @@ public interface EcnLogMapper
 	 * @param id ECN 变更记录ID
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteEcnLogById(Integer id);
 
 	/**
@@ -75,6 +75,6 @@ public interface EcnLogMapper
 	 * @param ids 需要删除的数据ID
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteEcnLogByIds(String[] ids);
 }

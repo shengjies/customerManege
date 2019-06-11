@@ -20,7 +20,7 @@ public interface MaterielOutStockMapper {
      * @param id 物料出库ID
      * @return 物料出库信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public MaterielOutStock selectMaterielOutStockById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface MaterielOutStockMapper {
      * @param materielOutStock 物料出库信息
      * @return 物料出库集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<MaterielOutStock> selectMaterielOutStockList(MaterielOutStock materielOutStock);
 
     /**
@@ -38,7 +38,7 @@ public interface MaterielOutStockMapper {
      * @param materielOutStock 物料出库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertMaterielOutStock(MaterielOutStock materielOutStock);
 
     /**
@@ -47,7 +47,7 @@ public interface MaterielOutStockMapper {
      * @param materielOutStock 物料出库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateMaterielOutStock(MaterielOutStock materielOutStock);
 
     /**
@@ -56,7 +56,7 @@ public interface MaterielOutStockMapper {
      * @param id 物料出库ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielOutStockById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface MaterielOutStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielOutStockByIds(String[] ids);
 
     /**
@@ -73,6 +73,6 @@ public interface MaterielOutStockMapper {
      * @param outCode 出库单号
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     MaterielOutStock selectMaterielOutStockByOutCode(@Param("outCode") String outCode);
 }

@@ -21,7 +21,7 @@ public interface PartStockHandleDetailsMapper
      * @param id 半成品库存内部调整清单ID
      * @return 半成品库存内部调整清单信息
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public PartStockHandleDetails selectPartStockHandleDetailsById(Integer id);
 	
 	/**
@@ -30,7 +30,7 @@ public interface PartStockHandleDetailsMapper
      * @param partStockHandleDetails 半成品库存内部调整清单信息
      * @return 半成品库存内部调整清单集合
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public List<PartStockHandleDetails> selectPartStockHandleDetailsList(PartStockHandleDetails partStockHandleDetails);
 	
 	/**
@@ -39,7 +39,7 @@ public interface PartStockHandleDetailsMapper
      * @param partStockHandleDetails 半成品库存内部调整清单信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int insertPartStockHandleDetails(PartStockHandleDetails partStockHandleDetails);
 	
 	/**
@@ -48,7 +48,7 @@ public interface PartStockHandleDetailsMapper
      * @param partStockHandleDetails 半成品库存内部调整清单信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int updatePartStockHandleDetails(PartStockHandleDetails partStockHandleDetails);
 	
 	/**
@@ -57,7 +57,7 @@ public interface PartStockHandleDetailsMapper
      * @param id 半成品库存内部调整清单ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deletePartStockHandleDetailsById(Integer id);
 	
 	/**
@@ -66,7 +66,7 @@ public interface PartStockHandleDetailsMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deletePartStockHandleDetailsByIds(String[] ids);
 	
 }

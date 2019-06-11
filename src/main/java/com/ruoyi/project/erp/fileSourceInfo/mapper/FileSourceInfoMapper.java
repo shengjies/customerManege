@@ -53,6 +53,6 @@ public interface FileSourceInfoMapper
 	 * @param companyId 公司id
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
     List<FileSourceInfo> selectFileSourceInfoBySaveIdAndComId(@Param("saveId") Integer saveId, @Param("companyId") Integer companyId);
 }

@@ -21,7 +21,7 @@ public interface WorkExceptionTypeMapper
      * @param id 工单工单异常类型ID
      * @return 工单工单异常类型信息
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public WorkExceptionType selectWorkExceptionTypeById(Integer id);
 	
 	/**
@@ -30,7 +30,7 @@ public interface WorkExceptionTypeMapper
      * @param workExceptionType 工单工单异常类型信息
      * @return 工单工单异常类型集合
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public List<WorkExceptionType> selectWorkExceptionTypeList(WorkExceptionType workExceptionType);
 	
 	/**
@@ -39,7 +39,7 @@ public interface WorkExceptionTypeMapper
      * @param workExceptionType 工单工单异常类型信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int insertWorkExceptionType(WorkExceptionType workExceptionType);
 	
 	/**
@@ -48,7 +48,7 @@ public interface WorkExceptionTypeMapper
      * @param workExceptionType 工单工单异常类型信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int updateWorkExceptionType(WorkExceptionType workExceptionType);
 	
 	/**
@@ -57,7 +57,7 @@ public interface WorkExceptionTypeMapper
      * @param id 工单工单异常类型ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteWorkExceptionTypeById(Integer id);
 	
 	/**
@@ -66,7 +66,7 @@ public interface WorkExceptionTypeMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteWorkExceptionTypeByIds(String[] ids);
 
 	/**
@@ -74,7 +74,7 @@ public interface WorkExceptionTypeMapper
 	 * @param companyId
 	 * @return
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	List<WorkExceptionType> findExceTypeAll(@Param("companyId") Integer companyId);
 
 
@@ -84,7 +84,7 @@ public interface WorkExceptionTypeMapper
 	 * @param work_id 工单编号
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	List<WorkExceptionType> selectCompanyWork(@Param("company_id")int company_id,@Param("work_id")int work_id);
 
 	/**
@@ -93,6 +93,6 @@ public interface WorkExceptionTypeMapper
 	 * @param tname 异常类型名称
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	WorkExceptionType selectByCompanyAndTypeName(@Param("company_id")int company_id,@Param("type_name")String tname);
 }

@@ -33,7 +33,7 @@ public interface PurchaseDetailsMapper
      * @param purchaseDetails 采购清单信息
      * @return 采购清单集合
      */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public List<PurchaseDetails> selectPurchaseDetailsList(PurchaseDetails purchaseDetails);
 
 	/**
@@ -42,7 +42,7 @@ public interface PurchaseDetailsMapper
      * @param purchaseDetails 采购清单信息
      * @return 结果
      */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int insertPurchaseDetails(PurchaseDetails purchaseDetails);
 
 
@@ -52,7 +52,7 @@ public interface PurchaseDetailsMapper
 	 * @param sign 标记状态  0 或 1
 	 * @return
 	 */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	int editPurchaseSign(@Param("pid")int pid,@Param("sign") int sign);
 
 	/**
@@ -60,7 +60,7 @@ public interface PurchaseDetailsMapper
 	 * @param pid 采购id
 	 * @return
 	 */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	int deletePurchaseDetailsBySign(@Param("pid")int pid);
 
 	/**
@@ -69,7 +69,7 @@ public interface PurchaseDetailsMapper
 	 * @param mcode 物料编码
 	 * @return
 	 */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	PurchaseDetails selectDetailByPidAndMCode(@Param("pid")int pid,@Param("mcode")String mcode);
 
 	/**
@@ -78,7 +78,7 @@ public interface PurchaseDetailsMapper
      * @param purchaseDetails 采购清单信息
      * @return 结果
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
 	public int updatePurchaseDetails(PurchaseDetails purchaseDetails);
 
 	/**
@@ -105,7 +105,7 @@ public interface PurchaseDetailsMapper
 	 * @param materielCode 物料编码
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
     List<PurchaseDetails> selectPurchaseDetailsListBySidAndMatCode(@Param("companyId") Integer companyId,
 																   @Param("supplierId") Integer supplierId,
 																   @Param("purchaseId") Integer purchaseId,
@@ -119,7 +119,7 @@ public interface PurchaseDetailsMapper
 	 * @param materielCode 物料编码
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
     PurchaseDetails selectPurchaseDetailsByCode(@Param("purchaseId") Integer purchaseId,
 												@Param("purchaseCode") String purchaseCode,
 												@Param("supplierCode") String supplierCode,
@@ -131,6 +131,6 @@ public interface PurchaseDetailsMapper
 	 * @param purchaseId 采购单
 	 * @return 结果
 	 */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	List<PurchaseDetails> selectDetailsHavePreByPurId(@Param("companyId") Integer companyId, @Param("purchaseId") Integer purchaseId);
 }

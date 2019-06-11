@@ -64,7 +64,7 @@ public class OrderInfoServiceImpl implements IOrderInfoService
      * @return 订单数据集合
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public List<OrderInfo> selectOrderInfoList(OrderInfo orderInfo,HttpServletRequest request)
 	{
 		User user = JwtUtil.getTokenUser(request);

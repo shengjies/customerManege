@@ -19,7 +19,7 @@ public interface StockHandleMapper
      * @param id 库存内部处理主ID
      * @return 库存内部处理主信息
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public StockHandle selectStockHandleById(Integer id);
 	
 	/**
@@ -28,7 +28,7 @@ public interface StockHandleMapper
      * @param stockHandle 库存内部处理主信息
      * @return 库存内部处理主集合
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public List<StockHandle> selectStockHandleList(StockHandle stockHandle);
 	
 	/**
@@ -37,7 +37,7 @@ public interface StockHandleMapper
      * @param stockHandle 库存内部处理主信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int insertStockHandle(StockHandle stockHandle);
 	
 	/**
@@ -46,7 +46,7 @@ public interface StockHandleMapper
      * @param stockHandle 库存内部处理主信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int updateStockHandle(StockHandle stockHandle);
 	
 	/**
@@ -55,7 +55,7 @@ public interface StockHandleMapper
      * @param id 库存内部处理主ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deleteStockHandleById(Integer id);
 	
 	/**
@@ -64,7 +64,7 @@ public interface StockHandleMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deleteStockHandleByIds(String[] ids);
 	
 }

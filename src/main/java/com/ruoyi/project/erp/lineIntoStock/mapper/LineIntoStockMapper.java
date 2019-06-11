@@ -20,7 +20,7 @@ public interface LineIntoStockMapper {
      * @param id 产线入库ID
      * @return 产线入库信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public LineIntoStock selectLineIntoStockById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface LineIntoStockMapper {
      * @param lineIntoStock 产线入库信息
      * @return 产线入库集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<LineIntoStock> selectLineIntoStockList(LineIntoStock lineIntoStock);
 
     /**
@@ -38,7 +38,7 @@ public interface LineIntoStockMapper {
      * @param lineIntoStock 产线入库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertLineIntoStock(LineIntoStock lineIntoStock);
 
     /**
@@ -47,7 +47,7 @@ public interface LineIntoStockMapper {
      * @param lineIntoStock 产线入库信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateLineIntoStock(LineIntoStock lineIntoStock);
 
     /**
@@ -56,7 +56,7 @@ public interface LineIntoStockMapper {
      * @param id 产线入库ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteLineIntoStockById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface LineIntoStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteLineIntoStockByIds(String[] ids);
 
     /**
@@ -74,6 +74,6 @@ public interface LineIntoStockMapper {
      * @param intoCode 入库单号
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     LineIntoStock selectLineIntoStockByCode(@Param("companyId") Integer companyId,@Param("intoCode") String intoCode);
 }

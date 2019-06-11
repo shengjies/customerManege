@@ -87,7 +87,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return 产品管理信息
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public DevProductList selectDevProductListById(Integer id) {
         return devProductListMapper.selectDevProductListById(id);
     }
@@ -280,7 +280,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public DevProductList findProductInfo(Integer productId,HttpServletRequest request) {
         DevProductList productInfo = devProductListMapper.findProductInfo(productId);
         EcnLog ecnLog = ecnLogMapper.findByCompanyIdAndProductId(JwtUtil.getTokenUser(request).getCompanyId(), productId);

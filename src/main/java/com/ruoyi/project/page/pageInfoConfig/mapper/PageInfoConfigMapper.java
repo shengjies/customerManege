@@ -37,7 +37,7 @@ public interface PageInfoConfigMapper
      * @param pageInfoConfig 页面配置信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int insertPageInfoConfig(PageInfoConfig pageInfoConfig);
 	
 	/**
@@ -69,7 +69,7 @@ public interface PageInfoConfigMapper
 	 * @param page_id
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	List<PageInfoConfig> selectPageConfigByPageId(@Param("page_id")int page_id);
 
 	/**
@@ -77,7 +77,7 @@ public interface PageInfoConfigMapper
 	 * @param pids 页面编号
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	int deletePageInfoConfigByPIds(String[] pids);
 
 	/**
@@ -86,6 +86,6 @@ public interface PageInfoConfigMapper
 	 * @param other_id 其他页面编号
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	PageInfoConfig selectPageConfigOtherPage(@Param("p_id")int p_id,@Param("other_id")int other_id);
 }

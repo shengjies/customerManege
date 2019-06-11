@@ -35,7 +35,7 @@ public class WorkOrderChangeServiceImpl implements IWorkOrderChangeService
      * @return 工单变更集合
      */
 	@Override
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public List<WorkOrderChange> selectWorkOrderChangeList(WorkOrderChange workOrderChange, HttpServletRequest request)
 	{
 		User u = JwtUtil.getTokenUser(request);

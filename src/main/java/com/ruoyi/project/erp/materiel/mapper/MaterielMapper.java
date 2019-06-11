@@ -20,7 +20,7 @@ public interface MaterielMapper {
      * @param id 物料ID
      * @return 物料信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public Materiel selectMaterielById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface MaterielMapper {
      * @param materiel 物料信息
      * @return 物料集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<Materiel> selectMaterielList(Materiel materiel);
 
     /**
@@ -38,7 +38,7 @@ public interface MaterielMapper {
      * @param materiel 物料信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertMateriel(Materiel materiel);
 
     /**
@@ -47,7 +47,7 @@ public interface MaterielMapper {
      * @param materiel 物料信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateMateriel(Materiel materiel);
 
     /**
@@ -56,7 +56,7 @@ public interface MaterielMapper {
      * @param id 物料ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface MaterielMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielByIds(String[] ids);
 
     /**
@@ -75,7 +75,7 @@ public interface MaterielMapper {
      * @param companyId    公司id
      * @return
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public Materiel selectMaterielByMaterielCode(@Param("materielCode") String materielCode, @Param("companyId") Integer companyId);
 
     /**
@@ -83,7 +83,7 @@ public interface MaterielMapper {
      *
      * @param materiel
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int updateMaterielByMaterielCode(Materiel materiel);
 
     /**
@@ -100,7 +100,7 @@ public interface MaterielMapper {
      * @param companyId 公司id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<Materiel> selectAllMatByComId(@Param("companyId") Integer companyId);
 
     /**
@@ -109,6 +109,6 @@ public interface MaterielMapper {
      * @param companyId 公司id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<Materiel> selectAllMatNameByComId(@Param("companyId") Integer companyId);
 }

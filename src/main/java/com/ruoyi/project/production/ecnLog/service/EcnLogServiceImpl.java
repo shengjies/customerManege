@@ -49,7 +49,7 @@ public class EcnLogServiceImpl implements IEcnLogService
      * @return ECN 变更记录集合
      */
 	@Override
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public List<EcnLog> selectEcnLogList(EcnLog ecnLog, HttpServletRequest request)
 	{
 		User u = JwtUtil.getTokenUser(request);

@@ -22,7 +22,7 @@ public interface ProductLedgerDetailMapper
      * @param productLedgerDetail 产品对账明细信息
      * @return 结果
      */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public int insertProductLedgerDetail(ProductLedgerDetail productLedgerDetail);
 
 	/**
@@ -30,6 +30,6 @@ public interface ProductLedgerDetailMapper
 	 * @param legder_id 主表id
 	 * @return
 	 */
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	List<ProductLedgerDetail> findDetailByLedgerId(@Param("legder_id")int legder_id);
 }

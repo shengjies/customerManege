@@ -85,7 +85,7 @@ public class ProductLedgerServiceImpl implements IProductLedgerService
      * @return 产品对账集合
      */
 	@Override
-	@DataSource(DataSourceType.ERP)
+//	@DataSource(DataSourceType.ERP)
 	public List<ProductLedger> selectProductLedgerList(ProductLedger productLedger, HttpServletRequest request)
 	{
 		User u = JwtUtil.getTokenUser(request);

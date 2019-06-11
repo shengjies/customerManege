@@ -20,7 +20,7 @@ public interface PartsStockMapper {
      * @param id 半成品库存ID
      * @return 半成品库存信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public PartsStock selectPartsStockById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface PartsStockMapper {
      * @param partsStock 半成品库存信息
      * @return 半成品库存集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<PartsStock> selectPartsStockList(PartsStock partsStock);
 
     /**
@@ -38,7 +38,7 @@ public interface PartsStockMapper {
      * @param partsStock 半成品库存信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertPartsStock(PartsStock partsStock);
 
     /**
@@ -47,7 +47,7 @@ public interface PartsStockMapper {
      * @param partsStock 半成品库存信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updatePartsStock(PartsStock partsStock);
 
     /**
@@ -56,7 +56,7 @@ public interface PartsStockMapper {
      * @param id 半成品库存ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deletePartsStockById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface PartsStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deletePartsStockByIds(String[] ids);
 
     /**
@@ -74,7 +74,7 @@ public interface PartsStockMapper {
      * @param detIntoCode 半成品编码
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     PartsStock selectPartsStockByProCode(@Param("companyId") Integer companyId,@Param("detIntoCode") String detIntoCode);
 
     /**
@@ -82,6 +82,6 @@ public interface PartsStockMapper {
      * @param partId 半成品id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     PartsStock selectPartsStockByPartsId(@Param("partId") Integer partId);
 }

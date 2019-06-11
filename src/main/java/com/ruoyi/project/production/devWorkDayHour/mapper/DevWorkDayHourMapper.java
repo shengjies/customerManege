@@ -21,7 +21,7 @@ public interface DevWorkDayHourMapper {
      * @param hourId 工单各个IO口每天每小时数据ID
      * @return 工单各个IO口每天每小时数据信息
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public DevWorkDayHour selectDevWorkDayHourById(Integer hourId);
 
     /**
@@ -30,7 +30,7 @@ public interface DevWorkDayHourMapper {
      * @param devWorkDayHour 工单各个IO口每天每小时数据信息
      * @return 工单各个IO口每天每小时数据集合
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public List<DevWorkDayHour> selectDevWorkDayHourList(DevWorkDayHour devWorkDayHour);
 
     /**
@@ -39,7 +39,7 @@ public interface DevWorkDayHourMapper {
      * @param devWorkDayHour 工单各个IO口每天每小时数据信息
      * @return 结果
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public int insertDevWorkDayHour(DevWorkDayHour devWorkDayHour);
 
     /**
@@ -48,7 +48,7 @@ public interface DevWorkDayHourMapper {
      * @param devWorkDayHour 工单各个IO口每天每小时数据信息
      * @return 结果
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public int updateDevWorkDayHour(DevWorkDayHour devWorkDayHour);
 
     /**
@@ -61,7 +61,7 @@ public interface DevWorkDayHourMapper {
      * @param dataTime 规定时间
      * @return 结果
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     int updateDevWorkDayHour2(@Param("hour") int hour, @Param("data") int data, @Param("workId") Integer workId,
                               @Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("dataTime") Date dataTime);
 
@@ -71,7 +71,7 @@ public interface DevWorkDayHourMapper {
      * @param hourId 工单各个IO口每天每小时数据ID
      * @return 结果
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public int deleteDevWorkDayHourById(Integer hourId);
 
     /**
@@ -80,7 +80,7 @@ public interface DevWorkDayHourMapper {
      * @param hourIds 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public int deleteDevWorkDayHourByIds(String[] hourIds);
 
     /**
@@ -94,7 +94,7 @@ public interface DevWorkDayHourMapper {
      * @param hour       对应上一个小时
      * @return 结果
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     int sumCompanyLineWorkDevIoHour(@Param("company_id") int company_id, @Param("line_id") int line_id, @Param("work_id") int work_id,
                                     @Param("dev_id") int dev_id, @Param("io_id") int io_id, @Param("hour") int hour);
 
@@ -108,7 +108,7 @@ public interface DevWorkDayHourMapper {
      * @param io_id      io口编号
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevWorkDayHour selectInfoByCompanyLineWorkDevIo(@Param("company_id") int company_id, @Param("line_id") int line_id, @Param("work_id") int work_id,
                                                     @Param("dev_id") int dev_id, @Param("io_id") int io_id);
 
@@ -118,7 +118,7 @@ public interface DevWorkDayHourMapper {
      * @param workId 工单所属id
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public List<DevWorkDayHour> selectWorkDayHourListBeInOrFinish(@Param("workId") Integer workId);
 
     /**
@@ -130,6 +130,6 @@ public interface DevWorkDayHourMapper {
      * @param dataTime 时间
      * @return IO口24小时记录
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevWorkDayHour selectWorkDayHourListByDate(@Param("workId") Integer workId, @Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("dataTime") Date dataTime);
 }

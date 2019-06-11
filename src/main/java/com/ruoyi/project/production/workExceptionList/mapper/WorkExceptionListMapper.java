@@ -21,7 +21,7 @@ public interface WorkExceptionListMapper
      * @param id 各个工单异常情况记录ID
      * @return 各个工单异常情况记录信息
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public WorkExceptionList selectWorkExceptionListById(Integer id);
 	
 	/**
@@ -30,7 +30,7 @@ public interface WorkExceptionListMapper
      * @param workExceptionList 各个工单异常情况记录信息
      * @return 各个工单异常情况记录集合
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public List<WorkExceptionList> selectWorkExceptionListList(WorkExceptionList workExceptionList);
 	
 	/**
@@ -39,7 +39,7 @@ public interface WorkExceptionListMapper
      * @param workExceptionList 各个工单异常情况记录信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int insertWorkExceptionList(WorkExceptionList workExceptionList);
 	
 	/**
@@ -48,7 +48,7 @@ public interface WorkExceptionListMapper
      * @param workExceptionList 各个工单异常情况记录信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int updateWorkExceptionList(WorkExceptionList workExceptionList);
 	
 	/**
@@ -57,7 +57,7 @@ public interface WorkExceptionListMapper
      * @param id 各个工单异常情况记录ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteWorkExceptionListById(Integer id);
 	
 	/**
@@ -66,14 +66,14 @@ public interface WorkExceptionListMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteWorkExceptionListByIds(String[] ids);
 
 	/**
 	 * 查看当前公司当天的异常记录
 	 * @return
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
     List<WorkExceptionList> selectWorkExcToday(@Param("companyId") Integer companyId);
 
 	/**
@@ -81,6 +81,6 @@ public interface WorkExceptionListMapper
 	 * @param workIds 工单编号数组
 	 * @return
 	 */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	List<WorkExceptionList> selectWorkExceByWorkId(@Param("workIds")String workIds);
 }

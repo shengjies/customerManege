@@ -22,7 +22,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param id 产品入库清单ID
      * @return 产品入库清单信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public ProductIntoStockDetails selectProductIntoStockDetailsById(Integer id);
 
     /**
@@ -31,7 +31,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param productIntoStockDetails 产品入库清单信息
      * @return 产品入库清单集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<ProductIntoStockDetails> selectProductIntoStockDetailsList(ProductIntoStockDetails productIntoStockDetails);
 
     /**
@@ -40,7 +40,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param productIntoStockDetails 产品入库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertProductIntoStockDetails(ProductIntoStockDetails productIntoStockDetails);
 
     /**
@@ -49,7 +49,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param productIntoStockDetails 产品入库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateProductIntoStockDetails(ProductIntoStockDetails productIntoStockDetails);
 
     /**
@@ -58,7 +58,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param id 产品入库清单ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductIntoStockDetailsById(Integer id);
 
     /**
@@ -67,7 +67,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductIntoStockDetailsByIds(String[] ids);
 
     /**
@@ -75,7 +75,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param intoId 退货单主键
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<ProductIntoStockDetails> selectProductIntoStockDetailsByIntoId(Integer intoId);
 
     /**
@@ -86,7 +86,7 @@ public interface ProductIntoStockDetailsMapper {
      * @param eTime 结束时间
      * @return
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     List<ProductIntoStockDetails> selectProductIntoStockDetailsByCompanyIdAndCid(@Param("company_id")int company_id, @Param("cid")int cid,
                                                                                  @Param("bTime")Date bTime,@Param("eTime")Date eTime);
 }

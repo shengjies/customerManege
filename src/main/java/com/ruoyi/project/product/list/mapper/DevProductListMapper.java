@@ -20,7 +20,7 @@ public interface DevProductListMapper {
      * @param id 产品管理ID
      * @return 产品管理信息
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public DevProductList selectDevProductListById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface DevProductListMapper {
      * @param code
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     DevProductList selectDevProductByCode(@Param("company_id") int company_id, @Param("code") String code);
 
     /**
@@ -38,7 +38,7 @@ public interface DevProductListMapper {
      * @param devProductList 产品管理信息
      * @return 产品管理集合
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<DevProductList> selectDevProductListList(DevProductList devProductList);
 
     /**
@@ -47,7 +47,7 @@ public interface DevProductListMapper {
      * @param devProductList 产品管理信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int insertDevProductList(DevProductList devProductList);
 
     /**
@@ -56,7 +56,7 @@ public interface DevProductListMapper {
      * @param devProductList 产品管理信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int updateDevProductList(DevProductList devProductList);
 
     /**
@@ -73,7 +73,7 @@ public interface DevProductListMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int deleteDevProductListByIds(String[] ids);
 
     /**
@@ -81,7 +81,7 @@ public interface DevProductListMapper {
      *
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevProductList> selectProductAllByCompanyId(@Param("companyId") Integer companyId);
 
     /**
@@ -96,7 +96,7 @@ public interface DevProductListMapper {
      * @param productCode 产品编码
      * @return 产品信息
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     DevProductList selectProductByCode(@Param("productCode") String productCode);
 
     /**
@@ -105,7 +105,7 @@ public interface DevProductListMapper {
      * @param companyId 公司id
      * @return 查询结果数量
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     DevProductList checkProductCodeUnique(@Param("productCode") String productCode, @Param("companyId") Integer companyId);
 
     /**
@@ -113,7 +113,7 @@ public interface DevProductListMapper {
      * @param pid 产品编号集合
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevProductList> findCustomerProduct(@Param("array") List<Integer> pid);
 
     /**
@@ -121,7 +121,7 @@ public interface DevProductListMapper {
      * @param orderId 订单id
      * @return
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     List<DevProductList> findProductByOrderId(@Param("orderId")int orderId);
 
     /**
@@ -130,7 +130,7 @@ public interface DevProductListMapper {
      * @param productCode 产品编码
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevProductList findByCompanyIdAndProductCode(@Param("companyId")int companyId,
                                                  @Param("productCode")String productCode);
 
@@ -139,7 +139,7 @@ public interface DevProductListMapper {
      * @param companyId 公司id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevProductList> selectProNameAllByComId(@Param("companyId") Integer companyId);
 
 }

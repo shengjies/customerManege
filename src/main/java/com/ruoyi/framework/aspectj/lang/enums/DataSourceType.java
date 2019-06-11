@@ -17,9 +17,5 @@ public enum DataSourceType
      */
     SLAVE,
 
-    /**
-     * ERP库
-     */
-    ERP
 
 }

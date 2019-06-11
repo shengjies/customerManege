@@ -85,7 +85,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @return 结果
      */
     @Override
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public int insertProductionLine(ProductionLine productionLine,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user != null) {
@@ -103,7 +103,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @return 结果
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int updateProductionLine(ProductionLine productionLine,HttpServletRequest request) {
         ProductionLine line = productionLineMapper.selectProductionLineById(productionLine.getId());
         User sysUser = JwtUtil.getTokenUser(request); // 在线用户
@@ -204,7 +204,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @return
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<ProductionLine> selectAllProductionLineByCompanyId(Cookie[] cookies) {
         User user = JwtUtil.getTokenCookie(cookies);
         if (user == null) return Collections.emptyList();
@@ -218,7 +218,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @return
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public Map findDeviceLiableByLineId(Integer lineId) {
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(lineId);
         Map<String,Object> map = new HashMap<>(16);

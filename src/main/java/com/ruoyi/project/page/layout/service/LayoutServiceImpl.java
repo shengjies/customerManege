@@ -23,33 +23,33 @@ public class LayoutServiceImpl implements ILayoutService {
     private LayoutMapper layoutMapper;
 
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<Layout> selectLayoutList(Layout layout) {
 
         return layoutMapper.selectLayoutList(layout);
     }
 
     @Override
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     public List<Layout> selectLayoutAll(int a) {
         return layoutMapper.selectLayoutAll(a);
     }
 
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int addLayoutInfo(Layout layout) {
         return layoutMapper.addLayoutInfo(layout);
     }
 
 
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int updateUser(Layout layout) {
         return layoutMapper.updateUser(layout);
     }
 
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int delLayoutById(int id) {
         return layoutMapper.delLayoutById(id);
     }
@@ -60,7 +60,7 @@ public class LayoutServiceImpl implements ILayoutService {
      * @return
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int changeStatus(Layout layout) {
         return layoutMapper.changeStatus(layout);
     }
@@ -71,7 +71,7 @@ public class LayoutServiceImpl implements ILayoutService {
      * @return
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public Layout selectLayoutById(int id) {
         return layoutMapper.selectLayoutById(id);
     }

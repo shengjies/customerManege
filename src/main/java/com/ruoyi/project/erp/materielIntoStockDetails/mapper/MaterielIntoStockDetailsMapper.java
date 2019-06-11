@@ -21,7 +21,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param id 物料入库清单ID
      * @return 物料入库清单信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public MaterielIntoStockDetails selectMaterielIntoStockDetailsById(Integer id);
 
     /**
@@ -30,7 +30,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param materielIntoStockDetails 物料入库清单信息
      * @return 物料入库清单集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<MaterielIntoStockDetails> selectMaterielIntoStockDetailsList(MaterielIntoStockDetails materielIntoStockDetails);
 
     /**
@@ -39,7 +39,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param materielIntoStockDetails 物料入库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertMaterielIntoStockDetails(MaterielIntoStockDetails materielIntoStockDetails);
 
     /**
@@ -48,7 +48,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param materielIntoStockDetails 物料入库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateMaterielIntoStockDetails(MaterielIntoStockDetails materielIntoStockDetails);
 
     /**
@@ -57,7 +57,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param id 物料入库清单ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielIntoStockDetailsById(Integer id);
 
     /**
@@ -66,7 +66,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielIntoStockDetailsByIds(String[] ids);
 
     /**
@@ -77,7 +77,7 @@ public interface MaterielIntoStockDetailsMapper {
      * @param eTime 结束时间
      * @return
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     List<MaterielIntoStockDetails>  selectIntoStockDetailsByCompanyIdAndSid(@Param("company_id")int company_id, @Param("sid")int sid,
                                                                             @Param("bTime")Date bTime,@Param("eTime")Date eTime);
 

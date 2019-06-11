@@ -300,7 +300,7 @@ public class MaterielServiceImpl implements IMaterielService {
      * @return
      */
     @Override
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     public List<Materiel> selectMaterielBySupplierId(int sid,HttpServletRequest request) {
         return materielMapper.selectMaterielBySupplierId(JwtUtil.getTokenUser(request).getCompanyId(), sid);
     }

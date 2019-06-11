@@ -20,7 +20,7 @@ public interface LineIntoStockDetailsMapper {
      * @param id 产线入库明细ID
      * @return 产线入库明细信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public LineIntoStockDetails selectLineIntoStockDetailsById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface LineIntoStockDetailsMapper {
      * @param lineIntoStockDetails 产线入库明细信息
      * @return 产线入库明细集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<LineIntoStockDetails> selectLineIntoStockDetailsList(LineIntoStockDetails lineIntoStockDetails);
 
     /**
@@ -38,7 +38,7 @@ public interface LineIntoStockDetailsMapper {
      * @param lineIntoStockDetails 产线入库明细信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertLineIntoStockDetails(LineIntoStockDetails lineIntoStockDetails);
 
     /**
@@ -47,7 +47,7 @@ public interface LineIntoStockDetailsMapper {
      * @param lineIntoStockDetails 产线入库明细信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateLineIntoStockDetails(LineIntoStockDetails lineIntoStockDetails);
 
     /**
@@ -56,7 +56,7 @@ public interface LineIntoStockDetailsMapper {
      * @param id 产线入库明细ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteLineIntoStockDetailsById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface LineIntoStockDetailsMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteLineIntoStockDetailsByIds(String[] ids);
 
     /**
@@ -73,6 +73,6 @@ public interface LineIntoStockDetailsMapper {
      * @param lineIntoId 生产入库主键id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<LineIntoStockDetails> selectLineIntoStockDetailsByLineIntoId(@Param("lineIntoId") Integer lineIntoId);
 }

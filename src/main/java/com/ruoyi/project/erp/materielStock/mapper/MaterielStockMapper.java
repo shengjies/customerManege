@@ -20,7 +20,7 @@ public interface MaterielStockMapper {
      * @param id 物料库存ID
      * @return 物料库存信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public MaterielStock selectMaterielStockById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface MaterielStockMapper {
      * @param materielStock 物料库存信息
      * @return 物料库存集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<MaterielStock> selectMaterielStockList(MaterielStock materielStock);
 
     /**
@@ -38,7 +38,7 @@ public interface MaterielStockMapper {
      * @param materielStock 物料库存信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertMaterielStock(MaterielStock materielStock);
 
     /**
@@ -47,7 +47,7 @@ public interface MaterielStockMapper {
      * @param materielStock 物料库存信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateMaterielStock(MaterielStock materielStock);
 
     /**
@@ -56,7 +56,7 @@ public interface MaterielStockMapper {
      * @param id 物料库存ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielStockById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface MaterielStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteMaterielStockByIds(String[] ids);
 
     /**
@@ -73,7 +73,7 @@ public interface MaterielStockMapper {
      * @param materielId 物料id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     MaterielStock selectMaterielStockByMaterielId(@Param("materielId") Integer materielId);
 
     /**
@@ -82,6 +82,6 @@ public interface MaterielStockMapper {
      * @param companyId 公司id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     MaterielStock selectMaterielStockByMatCodeAndComId(@Param("materielCode") String materielCode, @Param("companyId") Integer companyId);
 }

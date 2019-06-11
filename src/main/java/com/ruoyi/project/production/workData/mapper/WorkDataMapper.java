@@ -19,7 +19,7 @@ public interface WorkDataMapper {
      * @param dataId 工单数据ID
      * @return 工单数据信息
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public WorkData selectWorkDataById(Integer dataId);
 
     /**
@@ -28,7 +28,7 @@ public interface WorkDataMapper {
      * @param workData 工单数据信息
      * @return 工单数据集合
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<WorkData> selectWorkDataList(WorkData workData);
 
     /**
@@ -37,7 +37,7 @@ public interface WorkDataMapper {
      * @param workData 工单数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int insertWorkData(WorkData workData);
 
     /**
@@ -46,7 +46,7 @@ public interface WorkDataMapper {
      * @param workData 工单数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int updateWorkData(WorkData workData);
 
     /**
@@ -55,7 +55,7 @@ public interface WorkDataMapper {
      * @param dataId 工单数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int deleteWorkDataById(Integer dataId);
 
     /**
@@ -64,7 +64,7 @@ public interface WorkDataMapper {
      * @param dataIds 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int deleteWorkDataByIds(String[] dataIds);
 
 }

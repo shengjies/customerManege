@@ -22,7 +22,7 @@ public interface ProductionLineMapper
      * @param id 生产线ID
      * @return 生产线信息
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public ProductionLine selectProductionLineById(Integer id);
 	
 	/**
@@ -31,7 +31,7 @@ public interface ProductionLineMapper
      * @param productionLine 生产线信息
      * @return 生产线集合
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public List<ProductionLine> selectProductionLineList(ProductionLine productionLine);
 	
 	/**
@@ -48,7 +48,7 @@ public interface ProductionLineMapper
      * @param productionLine 生产线信息
      * @return 结果
      */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	public int updateProductionLine(ProductionLine productionLine);
 	
 	/**
@@ -65,7 +65,7 @@ public interface ProductionLineMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.SLAVE)
+//	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteProductionLineByIds(String[] ids);
 
 	/**
@@ -102,14 +102,14 @@ public interface ProductionLineMapper
 	 * @param com_id 公司编号
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
 	List<ProductionLine> selectAllDef0(@Param("com_id")int com_id);
 
 	/**
 	 * 查询对应公司的所有生产线
 	 * @return
 	 */
-	@DataSource(DataSourceType.SLAVE)
+//	@DataSource(DataSourceType.SLAVE)
     List<ProductionLine> selectAllProductionLineByCompanyId(@Param("companyId") Integer companyId);
 
 }

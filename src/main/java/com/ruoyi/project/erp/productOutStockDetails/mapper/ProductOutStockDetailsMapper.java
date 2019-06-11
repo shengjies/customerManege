@@ -22,7 +22,7 @@ public interface ProductOutStockDetailsMapper {
      * @param id 产品出库清单ID
      * @return 产品出库清单信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public ProductOutStockDetails selectProductOutStockDetailsById(Integer id);
 
     /**
@@ -31,7 +31,7 @@ public interface ProductOutStockDetailsMapper {
      * @param productOutStockDetails 产品出库清单信息
      * @return 产品出库清单集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<ProductOutStockDetails> selectProductOutStockDetailsList(ProductOutStockDetails productOutStockDetails);
 
     /**
@@ -40,7 +40,7 @@ public interface ProductOutStockDetailsMapper {
      * @param productOutStockDetails 产品出库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertProductOutStockDetails(ProductOutStockDetails productOutStockDetails);
 
     /**
@@ -49,7 +49,7 @@ public interface ProductOutStockDetailsMapper {
      * @param productOutStockDetails 产品出库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateProductOutStockDetails(ProductOutStockDetails productOutStockDetails);
 
     /**
@@ -58,7 +58,7 @@ public interface ProductOutStockDetailsMapper {
      * @param id 产品出库清单ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductOutStockDetailsById(Integer id);
 
     /**
@@ -67,7 +67,7 @@ public interface ProductOutStockDetailsMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductOutStockDetailsByIds(String[] ids);
 
     /**
@@ -75,7 +75,7 @@ public interface ProductOutStockDetailsMapper {
      * @param outCode
      * @return
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<ProductOutStockDetails> selectProductOutStockDetailsByOutCode(String outCode);
 
     /**
@@ -84,7 +84,7 @@ public interface ProductOutStockDetailsMapper {
      * @param productOutStockDetail 产品出库清单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int updateProductOutStockDetailsByCode(ProductOutStockDetails productOutStockDetail);
 
     /**
@@ -92,7 +92,7 @@ public interface ProductOutStockDetailsMapper {
      * @param outId 出库单id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int deleteProductOutStockDetailsByOutId(@Param("outId") Integer outId);
 
     /**
@@ -103,7 +103,7 @@ public interface ProductOutStockDetailsMapper {
      * @param eTime 结束时间
      * @return
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     List<ProductOutStockDetails> selectOutStockByCIdAndCompanyId(@Param("cid")int cid, @Param("company_id")int company_id,
                                                           @Param("bTime") Date bTime, @Param("eTime")Date eTime);
 }

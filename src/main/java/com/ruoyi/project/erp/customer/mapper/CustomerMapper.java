@@ -19,7 +19,7 @@ public interface CustomerMapper {
      * @param id 客户数据ID
      * @return 客户数据信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public Customer selectCustomerById(Integer id);
 
     /**
@@ -28,7 +28,7 @@ public interface CustomerMapper {
      * @param customer 客户数据信息
      * @return 客户数据集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<Customer> selectCustomerList(Customer customer);
 
     /**
@@ -37,7 +37,7 @@ public interface CustomerMapper {
      * @param customer 客户数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertCustomer(Customer customer);
 
     /**
@@ -46,7 +46,7 @@ public interface CustomerMapper {
      * @param customer 客户数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateCustomer(Customer customer);
 
     /**
@@ -55,7 +55,7 @@ public interface CustomerMapper {
      * @param id 客户数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteCustomerById(Integer id);
 
     /**
@@ -64,7 +64,7 @@ public interface CustomerMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteCustomerByIds(String[] ids);
 
 }

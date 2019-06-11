@@ -19,7 +19,7 @@ public interface MaterielFeedMapper
      * @param id 物料发料ID
      * @return 物料发料信息
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public MaterielFeed selectMaterielFeedById(Integer id);
 	
 	/**
@@ -28,7 +28,7 @@ public interface MaterielFeedMapper
      * @param materielFeed 物料发料信息
      * @return 物料发料集合
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public List<MaterielFeed> selectMaterielFeedList(MaterielFeed materielFeed);
 	
 	/**
@@ -37,7 +37,7 @@ public interface MaterielFeedMapper
      * @param materielFeed 物料发料信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int insertMaterielFeed(MaterielFeed materielFeed);
 	
 	/**
@@ -46,7 +46,7 @@ public interface MaterielFeedMapper
      * @param materielFeed 物料发料信息
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int updateMaterielFeed(MaterielFeed materielFeed);
 	
 	/**
@@ -55,7 +55,7 @@ public interface MaterielFeedMapper
      * @param id 物料发料ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deleteMaterielFeedById(Integer id);
 	
 	/**
@@ -64,7 +64,7 @@ public interface MaterielFeedMapper
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	@DataSource(value = DataSourceType.ERP)
+//	@DataSource(value = DataSourceType.ERP)
 	public int deleteMaterielFeedByIds(String[] ids);
 	
 }

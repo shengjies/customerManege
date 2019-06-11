@@ -1,8 +1,6 @@
 package com.ruoyi.project.system.user.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.google.gson.JsonObject;
+
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.feign.FeignUtils;
@@ -13,11 +11,9 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.project.erp.partsStock.domain.PartsStock;
 import com.ruoyi.project.system.config.service.IConfigService;
 import com.ruoyi.project.system.post.domain.Post;
 import com.ruoyi.project.system.post.mapper.PostMapper;
@@ -68,9 +64,6 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IConfigService configService;
 
-//    @Autowired
-//    private PasswordService passwordService;
-
     @Autowired
     private DevCompanyMapper companyMapper;
 
@@ -87,12 +80,7 @@ public class UserServiceImpl implements IUserService {
         User sysUser = JwtUtil.getTokenUser(request);
         Map<String, Object> map = new HashMap<>();
         map.put("user", user);
-        if (User.isSys(sysUser) && user.getCompanyId() != null && (user.getCompanyId()) != -1) { // 系统查询对应公司成员
-            map.put("companyId", user.getCompanyId());
-        }
-        if (!User.isSys(sysUser)) { //非系统用户
-            map.put("companyId", sysUser.getCompanyId());
-        }
+        map.put("companyId", sysUser.getCompanyId());
         List<User> userList = userMapper.selectUserListByCompanyId(map);
         List<Role> userRoles = null;
         for (User user1 : userList) {

@@ -21,7 +21,7 @@ public interface DevWorkOrderMapper {
      * @param id 工单ID
      * @return 工单信息
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public DevWorkOrder selectDevWorkOrderById(Integer id);
 
     /**
@@ -30,7 +30,7 @@ public interface DevWorkOrderMapper {
      * @param devWorkOrder 工单信息
      * @return 工单集合
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public List<DevWorkOrder> selectDevWorkOrderList(DevWorkOrder devWorkOrder);
 
     /**
@@ -39,7 +39,7 @@ public interface DevWorkOrderMapper {
      * @param devWorkOrder 工单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int insertDevWorkOrder(DevWorkOrder devWorkOrder);
 
     /**
@@ -48,7 +48,7 @@ public interface DevWorkOrderMapper {
      * @param devWorkOrder 工单信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int updateDevWorkOrder(DevWorkOrder devWorkOrder);
 
     /**
@@ -81,10 +81,10 @@ public interface DevWorkOrderMapper {
      * @param line_id    产线编号
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevWorkOrder selectWorkByCompandAndLine(@Param("compand_id") int compand_id, @Param("line_id") int line_id);
 
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevWorkOrder selectWorkByCompandAndLine2(@Param("compand_id") int compand_id, @Param("line_id") int line_id);
 
     /**
@@ -94,7 +94,7 @@ public interface DevWorkOrderMapper {
      * @param line_id    查询编号
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     List<String> selectDayWorkOrder(@Param("company_id") int company_id, @Param("line_id") int line_id);
 
 
@@ -104,7 +104,7 @@ public interface DevWorkOrderMapper {
      * @param lineId
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     Long checkWorkLineUnique(@Param("lineId") Integer lineId);
 
     /**
@@ -112,7 +112,7 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllBeIn(@Param("companyId") Integer companyId);
 
     /**
@@ -120,7 +120,7 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllToday(@Param("companyId") Integer companyId);
 
     /**
@@ -131,7 +131,7 @@ public interface DevWorkOrderMapper {
      * @param endTime   结束时间
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     List<DevWorkOrder> selectOrderByLineIsSubmit(@Param("company_id") int company_id,
                                                  @Param("productCode")String productCode,
                                                  @Param("line_id") int line_id,
@@ -144,7 +144,7 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllYesterday(@Param("companyId") Integer companyId);
 
     /**
@@ -152,7 +152,7 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderTodayBeInOrFinish();
 
     /**
@@ -160,7 +160,7 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllBeInOrFinish();
 
     /**
@@ -171,7 +171,7 @@ public interface DevWorkOrderMapper {
      * @param workOrderId 工单id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderFinishByLineIdOrWorkOrderId(@Param("companyId") Integer companyId,
                                                                   @Param("lineId") Integer lineId,
                                                                   @Param("workOrderId") Integer workOrderId);
@@ -182,7 +182,7 @@ public interface DevWorkOrderMapper {
      * @param productCode 产品编码
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     int editCompanyProductWorkOrderEcn(@Param("companyId")int companyId,@Param("productCode")String productCode);
 
     /**
@@ -191,7 +191,7 @@ public interface DevWorkOrderMapper {
      * @param lineId 产线id
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkDataByCompanyIdAndLineId(@Param("companyId")int companyId,@Param("lineId")int lineId);
 
     /**
@@ -200,7 +200,7 @@ public interface DevWorkOrderMapper {
      * @param line_id 产线id
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     DevWorkOrder selectLatelyCompleteWork(@Param("compand_id") int compand_id, @Param("line_id") int line_id);
 
     /**
@@ -208,6 +208,6 @@ public interface DevWorkOrderMapper {
      * @param workid
      * @return
      */
-    @DataSource(DataSourceType.SLAVE)
+//    @DataSource(DataSourceType.SLAVE)
     int editLatelyCompleteWorkSign(@Param("workid")int workid);
 }

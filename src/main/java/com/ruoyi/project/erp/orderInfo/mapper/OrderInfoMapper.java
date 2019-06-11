@@ -23,7 +23,7 @@ public interface OrderInfoMapper {
      * @param id 订单数据ID
      * @return 订单数据信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public OrderInfo selectOrderInfoById(Integer id);
 
     /**
@@ -40,7 +40,7 @@ public interface OrderInfoMapper {
      * @param orderInfo 订单数据信息
      * @return 结果
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     public int insertOrderInfo(OrderInfo orderInfo);
 
     /**
@@ -49,7 +49,7 @@ public interface OrderInfoMapper {
      * @param orderInfo 订单数据信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateOrderInfo(OrderInfo orderInfo);
 
     /**
@@ -75,7 +75,7 @@ public interface OrderInfoMapper {
      * @param customerId 客户id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     List<OrderInfo> selectOrderInfoByCusId(@Param("companyId") Integer companyId, @Param("customerId") Integer customerId);
 
     /**
@@ -85,7 +85,7 @@ public interface OrderInfoMapper {
      * @param orderCode 订单号
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     OrderInfo selectOrderInfoListByOrderCode(@Param("companyId") Integer companyId, @Param("orderCode") String orderCode);
 
     /**
@@ -96,7 +96,7 @@ public interface OrderInfoMapper {
      * @param customerCode 客户产品编码
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     OrderInfoResult selectOrderInfoByCusIdAndCusCode(@Param("companyId") Integer companyId,
                                                      @Param("customerId") Integer customerId,
                                                      @Param("customerCode") String customerCode);
@@ -113,7 +113,7 @@ public interface OrderInfoMapper {
      * @param createTime      创建时间
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int updateOrderInfoByCusIdAndCusCode(
             @Param("deliverNum") int deliverNum,
             @Param("companyId") Integer companyId,
@@ -133,7 +133,7 @@ public interface OrderInfoMapper {
      * @param orderStatus 订单状态
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     int updateOrderInfogOrderDeliverNum(@Param("companyId") Integer companyId,
                                         @Param("intoNumber") int intoNumber,
                                         @Param("customerId") Integer customerId,
@@ -146,6 +146,6 @@ public interface OrderInfoMapper {
      * @param companyId 公司id
      * @return
      */
-    @DataSource(DataSourceType.ERP)
+//    @DataSource(DataSourceType.ERP)
     List<OrderInfo> selectAllOrder(@Param("companyId")int companyId);
 }

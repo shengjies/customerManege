@@ -217,7 +217,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return 结果
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public int deleteDevWorkOrderByIds(String ids) {
         return devWorkOrderMapper.deleteDevWorkOrderByIds(Convert.toStrArray(ids));
     }
@@ -228,7 +228,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return
      */
     @Override
-    @DataSource(value = DataSourceType.SLAVE)
+//    @DataSource(value = DataSourceType.SLAVE)
     public String checkWorkOrderNumber(DevWorkOrder devWorkOrder,HttpServletRequest request) {
         Integer companyId = JwtUtil.getTokenUser(request).getCompanyId();
         Long count = devWorkOrderMapper.checkWorkOrderNumber(devWorkOrder.getWorkorderNumber(), companyId);

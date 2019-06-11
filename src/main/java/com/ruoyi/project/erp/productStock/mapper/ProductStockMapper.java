@@ -20,7 +20,7 @@ public interface ProductStockMapper {
      * @param id 产品库存ID
      * @return 产品库存信息
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public ProductStock selectProductStockById(Integer id);
 
     /**
@@ -29,7 +29,7 @@ public interface ProductStockMapper {
      * @param productStock 产品库存信息
      * @return 产品库存集合
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public List<ProductStock> selectProductStockList(ProductStock productStock);
 
     /**
@@ -38,7 +38,7 @@ public interface ProductStockMapper {
      * @param productStock 产品库存信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int insertProductStock(ProductStock productStock);
 
     /**
@@ -47,7 +47,7 @@ public interface ProductStockMapper {
      * @param productStock 产品库存信息
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int updateProductStock(ProductStock productStock);
 
     /**
@@ -56,7 +56,7 @@ public interface ProductStockMapper {
      * @param id 产品库存ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductStockById(Integer id);
 
     /**
@@ -65,7 +65,7 @@ public interface ProductStockMapper {
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     public int deleteProductStockByIds(String[] ids);
 
     /**
@@ -75,7 +75,7 @@ public interface ProductStockMapper {
      * @param productCode 产品编码
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     ProductStock selectProductStockByProCode(@Param("companyId") Integer companyId, @Param("productCode") String productCode);
 
     /**
@@ -83,6 +83,6 @@ public interface ProductStockMapper {
      * @param productId 产品id
      * @return 结果
      */
-    @DataSource(value = DataSourceType.ERP)
+//    @DataSource(value = DataSourceType.ERP)
     ProductStock selectProductStockByProId(@Param("productId") Integer productId);
 }
