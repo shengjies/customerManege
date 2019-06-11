@@ -92,7 +92,7 @@ public interface IUserService
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUserInfo(User user);
+    public int updateUserInfo(User user,HttpServletRequest request);
 
     /**
      * 修改用户密码信息
@@ -100,7 +100,7 @@ public interface IUserService
      * @param user 用户信息
      * @return 结果
      */
-    public int resetUserPwd(User user);
+    public int resetUserPwd(User user,HttpServletRequest request);
 
     /**
      * 校验用户名称是否唯一
@@ -164,7 +164,7 @@ public interface IUserService
      * @param user 用户信息
      * @return 结果
      */
-    public int register(User user);
+    public int register(User user,HttpServletRequest request);
 
     /**
      * 查询对应的公司的所有的员工信息

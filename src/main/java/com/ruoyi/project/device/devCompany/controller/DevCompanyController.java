@@ -125,8 +125,13 @@ public class DevCompanyController extends BaseController {
     @Log(title = "公司", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(DevCompany devCompany) {
-        return toAjax(devCompanyService.updateDevCompany(devCompany));
+    public AjaxResult editSave(DevCompany devCompany,HttpServletRequest request) {
+        try {
+            return toAjax(devCompanyService.updateDevCompany(devCompany,request));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return error();
     }
 
     /**
@@ -170,7 +175,7 @@ public class DevCompanyController extends BaseController {
             if (!file.isEmpty()) {
                 String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
                 company.setComLogo(imgUrl+avatar); // 设置LOGO
-                if (devCompanyService.updateDevCompany(company) > 0) {
+                if (devCompanyService.updateDevCompany(company,request) > 0) {
                     setSysUser(userService.selectUserById(currentUser.getUserId()));
                     return success();
                 }
@@ -223,6 +228,17 @@ public class DevCompanyController extends BaseController {
     public AjaxResult updateComPicture(String comPicture,HttpServletRequest request){
         DevCompany company = devCompanyService.selectDevCompanyById(JwtUtil.getTokenUser(request).getCompanyId());
         company.setComPicture(comPicture);
-        return toAjax(devCompanyService.updateDevCompany(company));
+        return toAjax(devCompanyService.updateDevCompany(company,request));
+    }
+
+    /**
+     * 校验公司名称是否唯一
+     * @param company
+     * @return
+     */
+    @PostMapping("/checkComNameUnique")
+    @ResponseBody
+    public String checkComNameUnique(DevCompany company){
+        return devCompanyService.checkComNameUnique(company);
     }
 }

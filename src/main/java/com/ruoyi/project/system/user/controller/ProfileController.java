@@ -2,6 +2,7 @@ package com.ruoyi.project.system.user.controller;
 
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
@@ -75,17 +76,17 @@ public class ProfileController extends BaseController {
 
     @GetMapping("/checkPassword")
     @ResponseBody
-    public boolean checkPassword(String password) {
-        User user = getSysUser();
-//        if (passwordService.matches(user, password)) {
-//            return true;
-//        }
+    public boolean checkPassword(String password,HttpServletRequest request) {
+        User user = JwtUtil.getTokenUser(request);
+        if (PasswordUtil.matches(user, password)) {
+            return true;
+        }
         return false;
     }
 
     @GetMapping("/resetPwd")
-    public String resetPwd(ModelMap mmap) {
-        User user = getSysUser();
+    public String resetPwd(ModelMap mmap,HttpServletRequest request) {
+        User user = JwtUtil.getTokenUser(request);
         mmap.put("user", userService.selectUserById(user.getUserId()));
         return prefix + "/resetPwd";
     }
@@ -93,27 +94,26 @@ public class ProfileController extends BaseController {
     @Log(title = "重置密码", businessType = BusinessType.UPDATE)
     @PostMapping("/resetPwd")
     @ResponseBody
-    public AjaxResult resetPwd(String oldPassword, String newPassword) {
-        User user = getSysUser();
-//        if (StringUtils.isNotEmpty(newPassword) && passwordService.matches(user, oldPassword)) {
-//            user.setPassword(newPassword);
-//            if (userService.resetUserPwd(user) > 0) {
-//                setSysUser(userService.selectUserById(user.getUserId()));
-//                return success();
-//            }
-//            return error();
-//        } else {
-//            return error("修改密码失败，旧密码错误");
-//        }
-        return error("修改密码失败，旧密码错误");
+    public AjaxResult resetPwd(String oldPassword, String newPassword,HttpServletRequest request) {
+        User user = JwtUtil.getTokenUser(request);
+        if (StringUtils.isNotEmpty(newPassword) && PasswordUtil.matches(user, oldPassword)) {
+            user.setPassword(newPassword);
+            if (userService.resetUserPwd(user,request) > 0) {
+                setSysUser(userService.selectUserById(user.getUserId()));
+                return success();
+            }
+            return error();
+        } else {
+            return error("修改密码失败，旧密码错误");
+        }
     }
 
     /**
      * 修改用户
      */
     @GetMapping("/edit")
-    public String edit(ModelMap mmap) {
-        User user = getSysUser();
+    public String edit(ModelMap mmap,HttpServletRequest request) {
+        User user = JwtUtil.getTokenUser(request);
         mmap.put("user", userService.selectUserById(user.getUserId()));
         return prefix + "/edit";
     }
@@ -122,8 +122,8 @@ public class ProfileController extends BaseController {
      * 修改头像
      */
     @GetMapping("/avatar")
-    public String avatar(ModelMap mmap) {
-        User user = getSysUser();
+    public String avatar(ModelMap mmap,HttpServletRequest request) {
+        User user = JwtUtil.getTokenUser(request);
         mmap.put("user", userService.selectUserById(user.getUserId()));
         return prefix + "/avatar";
     }
@@ -134,22 +134,21 @@ public class ProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/update")
     @ResponseBody
-    public AjaxResult update(User user) {
-        User currentUser = getSysUser();
+    public AjaxResult update(User user,HttpServletRequest request) {
+        User currentUser = JwtUtil.getTokenUser(request);
         currentUser.setUserName(user.getUserName());
         currentUser.setEmail(user.getEmail());
         currentUser.setSex(user.getSex());
         currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 设置用户标记为0 已经完成初始化设置
         // 设置公司名称
-        DevCompany devCompany = devCompanyService.selectDevCompanyById(currentUser.getCompanyId());
-        String newComName = user.getDevCompany().getComName();
-        if (user.getLoginName().equals(currentUser.getCreateBy()) == false && newComName.equals(devCompany.getComName()) == false) { // 不是自己创建的公司不能修改名字
-            return error("不允许修改非自己创建的公司");
-        }
-        devCompany.setComName(user.getDevCompany().getComName());
-        devCompanyService.updateDevCompany(devCompany);
-
-        if (userService.updateUserInfo(currentUser) > 0) {
+        //DevCompany devCompany = devCompanyService.selectDevCompanyById(currentUser.getCompanyId());
+        //String newComName = user.getDevCompany().getComName();
+        //if (user.getLoginName().equals(currentUser.getCreateBy()) == false && newComName.equals(devCompany.getComName()) == false) { // 不是自己创建的公司不能修改名字
+        //    return error("不允许修改非自己创建的公司");
+        //}
+        //devCompany.setComName(user.getDevCompany().getComName());
+        //devCompanyService.updateDevCompany(devCompany);
+        if (userService.updateUserInfo(currentUser,request) > 0) {
             setSysUser(userService.selectUserById(currentUser.getUserId()));
             return success();
         }
@@ -162,14 +161,14 @@ public class ProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/updateAvatar")
     @ResponseBody
-    public AjaxResult updateAvatar(@RequestParam("avatarfile") MultipartFile file) {
-        User currentUser = getSysUser();
+    public AjaxResult updateAvatar(@RequestParam("avatarfile") MultipartFile file,HttpServletRequest request) {
+        User currentUser = JwtUtil.getTokenUser(request);
         try {
             if (!file.isEmpty()) {
                 String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
                 currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 设置登录标记已经完成初始化
                 currentUser.setAvatar(imgUrl + avatar);
-                if (userService.updateUserInfo(currentUser) > 0) {
+                if (userService.updateUserInfo(currentUser,request) > 0) {
                     setSysUser(userService.selectUserById(currentUser.getUserId()));
                     return success();
                 }

@@ -171,9 +171,9 @@ public class UserController extends BaseController {
     @Log(title = "重置密码", businessType = BusinessType.UPDATE)
     @PostMapping("/resetPwd")
     @ResponseBody
-    public AjaxResult resetPwd(User user) {
+    public AjaxResult resetPwd(User user,HttpServletRequest request) {
         try {
-            return toAjax(userService.resetUserPwd(user));
+            return toAjax(userService.resetUserPwd(user,request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.logging.Handler;
 
 /**
  * 用户注册
@@ -51,9 +53,9 @@ public class RegisterController extends BaseController {
      */
     @PostMapping("/addUser")
     @ResponseBody
-    public AjaxResult addUser(User user) {
+    public AjaxResult addUser(User user, HttpServletRequest request) {
         try {
-            return toAjax(userService.register(user));
+            return toAjax(userService.register(user,request));
         } catch (Exception e) {
             return error("注册失败");
         }

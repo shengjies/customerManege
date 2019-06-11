@@ -252,9 +252,10 @@ public class MenuServiceImpl implements IMenuService {
      * @return 结果
      */
     @Override
-    public int insertMenu(Menu menu) {
-        menu.setCreateBy(ShiroUtils.getLoginName());
-        ShiroUtils.clearCachedAuthorizationInfo();
+    public int insertMenu(Menu menu,HttpServletRequest request) {
+        User tokenUser = JwtUtil.getTokenUser(request);
+        menu.setCreateBy(tokenUser.getLoginName());
+        //ShiroUtils.clearCachedAuthorizationInfo();
         return menuMapper.insertMenu(menu);
     }
 

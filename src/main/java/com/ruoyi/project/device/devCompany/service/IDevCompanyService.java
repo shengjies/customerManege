@@ -2,7 +2,7 @@ package com.ruoyi.project.device.devCompany.service;
 
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 
-import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public interface IDevCompanyService
      * @param devCompany 公司信息
      * @return 结果
      */
-	public int updateDevCompany(DevCompany devCompany);
+	public int updateDevCompany(DevCompany devCompany, HttpServletRequest request);
 		
 	/**
      * 删除公司信息
@@ -66,5 +66,11 @@ public interface IDevCompanyService
 	 * @return
 	 */
 	public DevCompany selectDevCompanyByComName(String comName);
-	
+
+	/**
+	 * 校验公司名称是否唯一
+	 * @param company 公司信息
+	 * @return 结果
+	 */
+	String checkComNameUnique(DevCompany company);
 }

@@ -1,17 +1,23 @@
 package com.ruoyi.project.system.user.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.gson.JsonObject;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.feign.FeignUtils;
 import com.ruoyi.common.feign.user.UserApi;
 import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
+import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
+import com.ruoyi.project.erp.partsStock.domain.PartsStock;
 import com.ruoyi.project.system.config.service.IConfigService;
 import com.ruoyi.project.system.post.domain.Post;
 import com.ruoyi.project.system.post.mapper.PostMapper;
@@ -64,6 +70,9 @@ public class UserServiceImpl implements IUserService {
 
 //    @Autowired
 //    private PasswordService passwordService;
+
+    @Autowired
+    private DevCompanyMapper companyMapper;
 
     /**
      * 根据条件分页查询用户对象
@@ -189,21 +198,32 @@ public class UserServiceImpl implements IUserService {
             user.setUserName(user.getLoginName()); // 设置用户名为登录手机号
         }
         user.setPhonenumber(user.getLoginName()); // 设置用户手机号
-//        user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
+        user.setPassword(PasswordUtil.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
         user.setCreateBy(sysUser.getLoginName());
         // 用户公司设置,通过获取系统登录用户设置系统id
         user.setCompanyId(sysUser.getCompanyId());
-
         // 设置用户标记
         user.setTag(User.COMPANY_OTHER);
-
-        // 新增用户信息
-        int rows = userMapper.insertUser(user);
-        // 新增用户岗位关联
-        insertUserPost(user);
-        // 新增用户与角色管理
-        insertUserRole(user);
-        return rows;
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String,Object> result = userApi.addUser(user,JwtUtil.getToken(request));
+        // 接口保存成功通过
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            // 获取到服务器端传回的用户信息
+            User user1 = JSONObject.parseObject(result.get("data").toString(), User.class);
+            System.out.println(user1);
+            // 新增用户信息
+            int rows = userMapper.insertUser(user);
+            // 新增用户岗位关联
+            //insertUserPost(user);
+            // 新增用户与角色管理
+            insertUserRole(user);
+            return rows;
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -247,8 +267,19 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int updateUserInfo(User user) {
-        return userMapper.updateUser(user);
+    public int updateUserInfo(User user,HttpServletRequest request) {
+        user.setDevCompany(null);
+        user.setCreateTime(null);
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String,Object> result = userApi.editUserInfo(user,JwtUtil.getToken(request));
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            return userMapper.updateUser(user);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -258,10 +289,22 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int resetUserPwd(User user) {
-        user.randomSalt();
-//        user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
-        return updateUserInfo(user);
+    public int resetUserPwd(User user,HttpServletRequest request) {
+        user.setDevCompany(null);
+        user.setCreateTime(null);
+        user.randomSalt(); // 生成盐
+        user.setPassword(PasswordUtil.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
+        // 更新用户服务器密码
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String,Object> result = userApi.editUserInfo(user,JwtUtil.getToken(request));
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            return userMapper.updateUser(user);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -473,7 +516,7 @@ public class UserServiceImpl implements IUserService {
     private IDevCompanyService devCompanyService;
 
     @Override
-    public int register(User user) {
+    public int register(User user,HttpServletRequest request) {
         // 注册用户设置用户登录标记为1
         user.setLoginTag(UserConstants.LOGIN_TAG_REG);
         // 部门
@@ -493,16 +536,14 @@ public class UserServiceImpl implements IUserService {
         devCompany.setComName(name);
         devCompany.setCreateTime(new Date());
         devCompanyService.insertDevCompany(devCompany);
-        // 获取公司id
-        DevCompany company = devCompanyService.selectDevCompanyByComName(name);
         // 重新修改公司名称
-        company.setComName("普通群" + company.getCompanyId());
-        devCompanyService.updateDevCompany(company);
+        devCompany.setComName("普通群" + devCompany.getCompanyId());
+        devCompanyService.updateDevCompany(devCompany,request);
         // 设置用户所属公司id
-        user.setCompanyId(company.getCompanyId());
+        user.setCompanyId(devCompany.getCompanyId());
 
         user.randomSalt();
-//        user.setPassword(passwordService.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
+        user.setPassword(PasswordUtil.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
 
         // 新增用户信息
         int rows = userMapper.insertUser(user);
@@ -548,7 +589,7 @@ public class UserServiceImpl implements IUserService {
            company.setComName(comName); // 更新公司名称
 
            company.setComAddress(user.getDevCompany().getComAddress()); // 更新公司地址
-           devCompanyService.updateDevCompany(company);
+           companyMapper.updateDevCompany(company);
        }
         //判断邮箱是否存在
         if (!StringUtils.isEmpty(user.getEmail())) {

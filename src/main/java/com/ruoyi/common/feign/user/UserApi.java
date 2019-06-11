@@ -1,6 +1,5 @@
 package com.ruoyi.common.feign.user;
 
-import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.system.user.domain.User;
 import feign.Headers;
 import feign.Param;
@@ -21,4 +20,14 @@ public interface UserApi {
     @RequestLine("POST /system/user/api/edit")
     @Headers({"Content-Type: application/json","Cookie: token={token}"})
     HashMap<String,Object> editUserInfo(User user, @Param("token") String token);
+
+    /**
+     * 新增用户信息
+     * @param user 用户信息
+     * @param token token 验证
+     * @return
+     */
+    @RequestLine("POST /system/user/api/add")
+    @Headers({"Content-Type: application/json","Cookie: token={token}"})
+    HashMap<String,Object> addUser(User user, @Param("token") String token);
 }

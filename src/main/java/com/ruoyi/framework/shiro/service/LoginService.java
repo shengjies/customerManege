@@ -1,6 +1,7 @@
 package com.ruoyi.framework.shiro.service;
 
 import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import org.aspectj.weaver.loadtime.Aj;
@@ -107,6 +108,10 @@ public class LoginService
 
 //        passwordService.validate(user, password);
 //        new PasswordService().validate(user,password);
+        // 用户名或者密码错误
+        //if (!PasswordUtil.matches(user,password)) {
+        //    throw new UserPasswordNotMatchException();
+        //}
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
 //        recordLoginInfo(user);
         Map<String,Object> map = new HashMap<>();
@@ -139,7 +144,7 @@ public class LoginService
     {
         user.setLoginIp(ShiroUtils.getIp());
         user.setLoginDate(DateUtils.getNowDate());
-        userService.updateUserInfo(user);
+        userService.updateUserInfo(user,null);
     }
 
     public AjaxResult loginOut(User user){

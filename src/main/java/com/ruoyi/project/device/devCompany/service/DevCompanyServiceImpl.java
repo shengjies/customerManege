@@ -1,14 +1,22 @@
 package com.ruoyi.project.device.devCompany.service;
 
-import java.util.List;
-
+import com.ruoyi.common.constant.CompanyConstants;
+import com.ruoyi.common.feign.FeignUtils;
+import com.ruoyi.common.feign.company.CompanyApi;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.device.devCompany.domain.DevCompany;
+import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
+import feign.Feign;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
-import com.ruoyi.project.device.devCompany.domain.DevCompany;
-import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.common.support.Convert;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 公司 服务层实现
@@ -70,9 +78,17 @@ public class DevCompanyServiceImpl implements IDevCompanyService
      * @return 结果
      */
 	@Override
-	public int updateDevCompany(DevCompany devCompany)
+	public int updateDevCompany(DevCompany devCompany, HttpServletRequest request)
 	{
-	    return devCompanyMapper.updateDevCompany(devCompany);
+		CompanyApi companyApi = Feign.builder()
+				.encoder(new GsonEncoder())
+				.decoder(new GsonDecoder())
+				.target(CompanyApi.class,FeignUtils.MAIN_PATH);
+		HashMap<String,Object> result = companyApi.editCompanyInfo(devCompany, JwtUtil.getToken(request));
+		if (Double.valueOf(result.get("code").toString()) == 0) {
+			return devCompanyMapper.updateDevCompany(devCompany);
+		}
+	   return 0;
 	}
 
 	/**
@@ -95,5 +111,19 @@ public class DevCompanyServiceImpl implements IDevCompanyService
 	@Override
 	public DevCompany selectDevCompanyByComName(String comName) {
 		return devCompanyMapper.selectDevCompanyByComName(comName);
+	}
+
+	/**
+	 * 校验公司名称是否存在
+	 * @param company 公司信息
+	 * @return 结果
+	 */
+	@Override
+	public String checkComNameUnique(DevCompany company) {
+		DevCompany companyInfo = devCompanyMapper.selectDevCompanyByComName(company.getComName());
+		if (!StringUtils.isNull(companyInfo) && company.getCompanyId() != companyInfo.getCompanyId()) { // 数据库存在记录
+			return CompanyConstants.COM_NAME_NOT_UNIQUE;
+		}
+		return CompanyConstants.COM_NAME_UNIQUE;
 	}
 }

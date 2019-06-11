@@ -43,9 +43,9 @@ public class UserDetailController extends BaseController {
         List<Menu> menus = menuService.selectMenusByUser(user);
         // 根据用户id查询出公司信息
         DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
-        user.setDevCompany(devCompany);
         mmap.put("menus", menus);
         mmap.put("user", user);
+        mmap.put("company", devCompany);
         mmap.put("copyrightYear", ruoYiConfig.getCopyrightYear());
         return prefix +"/userDetail";
     }
