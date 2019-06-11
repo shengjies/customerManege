@@ -44,20 +44,4 @@ public class RegisterController extends BaseController {
         return "register";
     }
 
-
-    /**
-     * 注册新增保存用户
-     *
-     * @param user
-     * @return
-     */
-    @PostMapping("/addUser")
-    @ResponseBody
-    public AjaxResult addUser(User user, HttpServletRequest request) {
-        try {
-            return toAjax(userService.register(user,request));
-        } catch (Exception e) {
-            return error("注册失败");
-        }
-    }
 }

@@ -528,34 +528,7 @@ public class UserServiceImpl implements IUserService {
     private IDevCompanyService devCompanyService;
 
     @Override
-    public int register(User user,HttpServletRequest request) {
-        // 注册用户设置用户登录标记为1
-        user.setLoginTag(UserConstants.LOGIN_TAG_REG);
-        // 部门
-        user.setDeptId(103L);
-        // 设置首次注册用户为普通管理员权限
-        Long[] roleIds = {2L};
-        user.setRoleIds(roleIds);
-        // 设置用户标记
-        user.setTag(User.COMPANY_OTHER);
-        // 用户首次注册，创建者应该为自己
-        user.setCreateBy(user.getLoginName());
-        // 设置用户注册时的初始名字
-        user.setUserName("普通用户");
-        // 注册默认创立公司
-        DevCompany devCompany = new DevCompany();
-        String name = "普通公司" + ((Math.random() * 9 + 1) * 100000);
-        devCompany.setComName(name);
-        devCompany.setCreateTime(new Date());
-        devCompanyService.insertDevCompany(devCompany);
-        // 重新修改公司名称
-        devCompany.setComName("普通群" + devCompany.getCompanyId());
-        devCompanyService.updateDevCompany(devCompany,request);
-        // 设置用户所属公司id
-        user.setCompanyId(devCompany.getCompanyId());
-
-        user.randomSalt();
-        user.setPassword(PasswordUtil.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
+    public int register(User user) {
 
         // 新增用户信息
         int rows = userMapper.insertUser(user);

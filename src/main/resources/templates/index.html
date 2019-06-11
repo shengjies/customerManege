@@ -181,7 +181,7 @@
      function logout() {
          $.post("/logout",function (data) {
              document.cookie ="token=";
-             window.location.href="/login"
+             window.location.href=data.data
          })
      }
 </script>

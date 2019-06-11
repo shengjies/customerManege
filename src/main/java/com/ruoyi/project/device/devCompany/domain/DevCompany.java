@@ -39,6 +39,8 @@ public class DevCompany extends BaseEntity
 	/** 公司所属行业 */
 	private Integer industry;
 
+	private String totalIso;//iso 文件总文件夹
+
 	public Integer getIndustry() {
 		return industry;
 	}
@@ -111,15 +113,24 @@ public class DevCompany extends BaseEntity
 		return comPicture;
 	}
 
+	public String getTotalIso() {
+		return totalIso;
+	}
+
+	public void setTotalIso(String totalIso) {
+		this.totalIso = totalIso;
+	}
+
+	@Override
 	public String toString() {
-		return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-				.append("companyId", getCompanyId())
-				.append("comName", getComName())
-				.append("createTime", getCreateTime())
-				.append("comAddress", getComAddress())
-				.append("comType", getComType())
-				.append("comLogo", getComLogo())
-				.append("comPicture", getComPicture())
-				.toString();
+		return "DevCompany{" +
+				"companyId=" + companyId +
+				", comName='" + comName + '\'' +
+				", comAddress='" + comAddress + '\'' +
+				", comType=" + comType +
+				", comLogo='" + comLogo + '\'' +
+				", comPicture='" + comPicture + '\'' +
+				", industry=" + industry +
+				'}';
 	}
 }

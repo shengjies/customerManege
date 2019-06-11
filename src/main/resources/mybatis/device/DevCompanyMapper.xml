@@ -12,10 +12,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="comType"    column="com_type"    />
         <result property="comLogo"    column="com_logo"    />
         <result property="comPicture"    column="com_picture"    />
+        <result property="industry"    column="industry"    />
+        <result property="totalIso"    column="total_iso"    />
     </resultMap>
 
     <sql id="selectDevCompanyVo">
-        select company_id, com_name, create_time, com_address, com_type, com_logo, com_picture from dev_company
+        select company_id, com_name, create_time, com_address, com_type, com_logo, com_picture,industry,total_iso from dev_company
     </sql>
 
     <select id="selectDevCompanyList" parameterType="DevCompany" resultMap="DevCompanyResult">
@@ -40,20 +42,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertDevCompany" parameterType="DevCompany" useGeneratedKeys="true" keyProperty="companyId">
         insert into dev_company
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            company_id,
             <if test="comName != null  and comName != ''  ">com_name,</if>
             <if test="createTime != null  ">create_time,</if>
             <if test="comAddress != null  and comAddress != ''  ">com_address,</if>
             <if test="comType != null  and comType != ''  ">com_type,</if>
             <if test="comLogo != null  and comLogo != ''  ">com_logo,</if>
             <if test="comPicture != null  and comPicture != ''  ">com_picture,</if>
+            <if test="industry != null  and industry != ''  ">industry,</if>
+            <if test="totalIso != null  and industry != ''  ">total_iso,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{companyId},
             <if test="comName != null  and comName != ''  ">#{comName},</if>
             <if test="createTime != null  ">#{createTime},</if>
             <if test="comAddress != null  and comAddress != ''  ">#{comAddress},</if>
             <if test="comType != null  and comType != ''  ">#{comType},</if>
             <if test="comLogo != null  and comLogo != ''  ">#{comLogo},</if>
             <if test="comPicture != null  and comPicture != ''  ">#{comPicture},</if>
+            <if test="industry != null  and industry != ''  ">#{industry},</if>
+            <if test="totalIso != null  and totalIso != ''  ">#{totalIso},</if>
         </trim>
     </insert>
 

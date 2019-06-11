@@ -1,6 +1,7 @@
 package com.ruoyi.framework.shiro.service;
 
 import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.feign.FeignUtils;
 import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
@@ -154,6 +155,6 @@ public class LoginService
             // 记录用户退出日志
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success")));
         }
-        return AjaxResult.success();
+        return AjaxResult.success("退出登录", FeignUtils.MAIN_LOGIN_PATH);
     }
 }

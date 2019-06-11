@@ -1,9 +1,11 @@
 package com.ruoyi.common.feign.company;
 
+import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 
@@ -28,4 +30,5 @@ public interface CompanyApi {
     @RequestLine("POST /company/api/edit")
     @Headers({"Content-Type: application/json","Cookie: token={token}"})
     HashMap<String,Object> editCompanyInfo(DevCompany company, @Param("token") String token);
+
 }
