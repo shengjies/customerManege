@@ -58,7 +58,7 @@ public class LoginController extends BaseController {
     @PostMapping("/logout")
     @ResponseBody
     public AjaxResult loginOut(HttpServletRequest request){
-        return loginService.loginOut(JwtUtil.getTokenUser(request));
+        return loginService.loginOut(JwtUtil.getTokenUser(request),JwtUtil.getToken(request));
     }
 
     @GetMapping("/unauth")

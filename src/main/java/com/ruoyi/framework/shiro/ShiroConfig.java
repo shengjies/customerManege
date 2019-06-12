@@ -73,15 +73,16 @@ public class ShiroConfig {
         filterRuleMap.put("/druid/**", "anon");
         filterRuleMap.put("/captcha/captchaImage**", "anon");
         // 不需要拦截的访问
-        filterRuleMap.put("/login", "anon");
-        filterRuleMap.put("/system/user/checkLoginNameUnique", "anon");
+//        filterRuleMap.put("/login", "anon");
+//        filterRuleMap.put("/system/user/checkLoginNameUnique", "anon");
         filterRuleMap.put("/t/**", "anon");
         filterRuleMap.put("/c/**", "anon");
         filterRuleMap.put("/u/**", "anon");
-        filterRuleMap.put("/profile/**", "anon");
-        filterRuleMap.put("/register", "anon");
-        filterRuleMap.put("/addUser", "anon");
-        filterRuleMap.put("/device/devList/validate", "anon");
+        filterRuleMap.put("/s", "anon");
+//        filterRuleMap.put("/profile/**", "anon");
+//        filterRuleMap.put("/register", "anon");
+//        filterRuleMap.put("/addUser", "anon");
+//        filterRuleMap.put("/device/devList/validate", "anon");
         filterRuleMap.put("/api/**", "anon");
         filterRuleMap.put("/**", "jwt");
         filterFactoryBean.setFilterChainDefinitionMap(filterRuleMap);

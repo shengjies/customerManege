@@ -2,6 +2,7 @@ package com.ruoyi.framework.jwt.filter;
 
 
 
+import com.ruoyi.common.feign.FeignUtils;
 import com.ruoyi.common.utils.PathUtils;
 import com.ruoyi.framework.jwt.JwtToken;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -87,7 +88,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     private void responseindex(ServletRequest req, ServletResponse resp) {
         try {
             HttpServletResponse httpServletResponse = (HttpServletResponse) resp;
-            httpServletResponse.sendRedirect(PathUtils.path);
+            httpServletResponse.sendRedirect(FeignUtils.MAIN_LOGIN_PATH);
         } catch (IOException e) {
             e.printStackTrace();
         }

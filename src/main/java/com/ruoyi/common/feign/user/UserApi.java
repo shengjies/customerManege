@@ -50,4 +50,13 @@ public interface UserApi {
     @RequestLine("POST /system/user/api/remove")
     @Headers({"Content-Type: application/json","Cookie: token={token}"})
     HashMap<String,Object> removeUser(String ids, @Param("token") String token);
+
+    /**
+     * 用户退出
+     * @param token
+     * @return
+     */
+    @RequestLine("POST /logout")
+    @Headers({"Content-Type: application/json","Cookie: token={token}"})
+    HashMap<String,Object> loginOut(@Param("token")String token);
 }

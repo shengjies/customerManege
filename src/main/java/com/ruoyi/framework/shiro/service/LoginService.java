@@ -2,8 +2,14 @@ package com.ruoyi.framework.shiro.service;
 
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.feign.FeignUtils;
+import com.ruoyi.common.feign.user.UserApi;
+import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import feign.Feign;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -148,6 +154,15 @@ public class LoginService
     public AjaxResult loginOut(User user){
         if (com.ruoyi.common.utils.StringUtils.isNotNull(user))
         {
+            try {
+                UserApi userApi = Feign.builder()
+                        .encoder(new GsonEncoder())
+                        .decoder(new GsonDecoder())
+                        .target(UserApi.class,FeignUtils.MAIN_PATH);
+                userApi.loginOut(token);
+            }catch (Exception e){
+
+            }
             String loginName = user.getLoginName();
             // 记录用户退出日志
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginName, Constants.LOGOUT, MessageUtils.message("user.logout.success")));
