@@ -75,6 +75,7 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
      */
     @Override
     public int updateDevCompany(DevCompany devCompany, HttpServletRequest request) {
+        devCompany.setCreateTime(null);
         CompanyApi companyApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())

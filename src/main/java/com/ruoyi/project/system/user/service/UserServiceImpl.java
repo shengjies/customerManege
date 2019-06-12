@@ -450,7 +450,7 @@ public class UserServiceImpl implements IUserService {
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
         String operName = JwtUtil.getTokenUser(request).getLoginName();
-        String password = configService.selectConfigByKey("system.user.initPassword");
+        String password = configService.selectConfigByKey("sys.user.initPassword");
         for (User user : userList) {
             try {
                 if (!user.getLoginName().matches(UserConstants.MOBILE_PHONE_NUMBER_PATTERN)) { // 不是手机格式

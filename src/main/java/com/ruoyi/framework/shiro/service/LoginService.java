@@ -151,7 +151,7 @@ public class LoginService
         userService.updateUserInfo(user,null);
     }
 
-    public AjaxResult loginOut(User user){
+    public AjaxResult loginOut(User user,String token){
         if (com.ruoyi.common.utils.StringUtils.isNotNull(user))
         {
             try {

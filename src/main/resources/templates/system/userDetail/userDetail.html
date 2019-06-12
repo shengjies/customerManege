@@ -13,7 +13,7 @@
                     </div>
                     <div class="ibox-content">
                         <div class="text-center">
-                            <p><img width="120" height="120" alt="image" class="img-circle"
+                            <p><img id="c_img" width="120" height="120" alt="image" class="img-circle"
                                     th:src="${user.avatar == ''?'/img/profile.jpg':user.avatar}">
                             </p>
                             <p><a href="javascript:avatar()">修改头像</a></p>
@@ -39,10 +39,10 @@
                                 <b class="font-noraml">邮箱地址：</b>
                                 <p class="pull-right">[[${user.email}]]</p>
                             </li>
-                            <li class="list-group-item"><i class="fa fa-envelope-o"></i>
-                                <b class="font-noraml">最后登录时间：</b>
-                                <p class="pull-right">[[${#dates.format(user.loginDate, 'yyyy-MM-dd HH:mm:ss')}]]
-                            </li>
+                            <!--<li class="list-group-item"><i class="fa fa-envelope-o"></i>-->
+                                <!--<b class="font-noraml">最后登录时间：</b>-->
+                                <!--<p class="pull-right">[[${#dates.format(user.loginDate, 'yyyy-MM-dd HH:mm:ss')}]]-->
+                            <!--</li>-->
                         </ul>
                     </div>
                 </div>

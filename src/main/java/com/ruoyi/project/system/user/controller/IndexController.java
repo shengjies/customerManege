@@ -53,14 +53,15 @@ public class IndexController extends BaseController {
     @GetMapping("/index")
     public String index(ModelMap mmap, HttpServletRequest request) {
         // 取身份信息
-        User user = JwtUtil.getTokenUser(request);
+        User tokenUser = JwtUtil.getTokenUser(request);
+        User user = userService.selectUserById(tokenUser.getUserId());
         // 根据用户id取出菜单
         List<Menu> menus = menuService.selectMenusByUser(user);
         DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
         user.setDevCompany(company);
 
         mmap.put("menus", menus);
-        mmap.put("user", user);
+        mmap.put("user",user);
         mmap.put("copyrightYear", ruoYiConfig.getCopyrightYear());
         return "index";
     }
@@ -69,7 +70,8 @@ public class IndexController extends BaseController {
     @GetMapping("/system/main")
     public String main(ModelMap mmap,HttpServletRequest request) {
         // 取身份信息
-        User user = JwtUtil.getTokenUser(request);
+        User tokenUser = JwtUtil.getTokenUser(request);
+        User user = userService.selectUserById(tokenUser.getUserId());
         // 根据用户id取出菜单
         List<Menu> menus = menuService.selectMenusByUser(user);
         DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
@@ -79,7 +81,7 @@ public class IndexController extends BaseController {
         }else {
             mmap.put("comPictures", null);
         }
-        mmap.put("user", user);
+        mmap.put("user",user);
         mmap.put("version", ruoYiConfig.getVersion());
 
         return "main";

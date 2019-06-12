@@ -5,9 +5,11 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
+import com.ruoyi.project.device.devUser.service.IDevUserService;
 import com.ruoyi.project.system.menu.domain.Menu;
 import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -33,6 +35,9 @@ public class UserDetailController extends BaseController {
     @Autowired
     private IDevCompanyService devCompanyService;
 
+    @Autowired
+    private IUserService userService;
+
     private String prefix = "system/userDetail";
 
     @GetMapping("/userDetail")
@@ -44,7 +49,7 @@ public class UserDetailController extends BaseController {
         // 根据用户id查询出公司信息
         DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
         mmap.put("menus", menus);
-        mmap.put("user", user);
+        mmap.put("user", userService.selectUserById(user.getUserId()));
         mmap.put("company", devCompany);
         mmap.put("copyrightYear", ruoYiConfig.getCopyrightYear());
         return prefix +"/userDetail";

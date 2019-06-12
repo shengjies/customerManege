@@ -131,7 +131,8 @@ public class ProfileController extends BaseController {
     @PostMapping("/update")
     @ResponseBody
     public AjaxResult update(User user,HttpServletRequest request) {
-        User currentUser = JwtUtil.getTokenUser(request);
+        User tokenUser = JwtUtil.getTokenUser(request);
+        User currentUser = userService.selectUserById(tokenUser.getUserId());
         currentUser.setUserName(user.getUserName());
         currentUser.setEmail(user.getEmail());
         currentUser.setSex(user.getSex());
@@ -164,9 +165,10 @@ public class ProfileController extends BaseController {
                 String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
                 currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 设置登录标记已经完成初始化
                 currentUser.setAvatar(imgUrl + avatar);
+                String imgurl = imgUrl + avatar;
                 if (userService.updateUserInfo(currentUser,request) > 0) {
                     setSysUser(userService.selectUserById(currentUser.getUserId()));
-                    return success();
+                    return AjaxResult.success("success",imgurl);
                 }
             }
             return error();
@@ -188,7 +190,7 @@ public class ProfileController extends BaseController {
         try {
             if (userService.changeLoginTag(user,request) > 0) {
                 setSysUser(userService.selectUserById(JwtUtil.getTokenUser(request).getUserId()));
-                return success();
+                return AjaxResult.success("success",user);
             }
             return error();
         } catch (BusinessException e) {
