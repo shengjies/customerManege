@@ -1,27 +1,21 @@
 package com.ruoyi.project.erp.productCustomer.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.customer.mapper.CustomerMapper;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
-import com.ruoyi.project.erp.orderInfo.domain.OrderInfo;
 import com.ruoyi.project.erp.orderInfo.mapper.OrderInfoMapper;
-import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.productCustomer.mapper.ProductCustomerMapper;
 import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
-import com.ruoyi.project.erp.productCustomer.service.IProductCustomerService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

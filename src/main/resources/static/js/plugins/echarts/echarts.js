@@ -27522,7 +27522,7 @@ var updateMethods = {
         updateStreamModes(this, ecModel);
 
         // We update stream modes before coordinate system updated, then the modes info
-        // can be fetched when coord sys updating (consider the barGrid extent fix). But
+        // can be fetched when coord system updating (consider the barGrid extent fix). But
         // the drawback is the full coord info can not be fetched. Fortunately this full
         // coord is not requied in stream mode updater currently.
         coordSysMgr.update(ecModel, api);
@@ -58779,7 +58779,7 @@ function getPanelByCover(controller, cover) {
         return true; // Global panel
     }
     var panelId = cover.__brushOption.panelId;
-    // User may give cover without coord sys info,
+    // User may give cover without coord system info,
     // which is then treated as global panel.
     return panelId != null ? panels[panelId] : true;
 }
@@ -77467,8 +77467,8 @@ var INCLUDE_FINDER_MAIN_TYPES = [
  * }
  * or {
  *     panelId: ...,
- *     coordSys: <geo coord sys>
- *     coordSyses: [<geo coord sys>]
+ *     coordSys: <geo coord system>
+ *     coordSyses: [<geo coord system>]
  *     geoModel: <geo component>
  * }
  *

@@ -6,10 +6,8 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.constant.StockConstants;
-import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.lineIntoStockDetails.domain.LineIntoStockDetails;
 import com.ruoyi.project.erp.lineIntoStockDetails.mapper.LineIntoStockDetailsMapper;
@@ -19,7 +17,6 @@ import com.ruoyi.project.erp.partsStock.domain.PartsStock;
 import com.ruoyi.project.erp.partsStock.mapper.PartsStockMapper;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
-import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
@@ -28,12 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.lineIntoStock.mapper.LineIntoStockMapper;
 import com.ruoyi.project.erp.lineIntoStock.domain.LineIntoStock;
-import com.ruoyi.project.erp.lineIntoStock.service.ILineIntoStockService;
 import com.ruoyi.common.support.Convert;
-import springfox.documentation.spring.web.json.Json;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.html.HTML;
 
 /**
  * 产线入库 服务层实现

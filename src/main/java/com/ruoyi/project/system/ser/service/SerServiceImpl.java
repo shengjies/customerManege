@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.system.ser.mapper.SerMapper;
 import com.ruoyi.project.system.ser.domain.Ser;
-import com.ruoyi.project.system.ser.service.ISerService;
 import com.ruoyi.common.support.Convert;
 
 /**

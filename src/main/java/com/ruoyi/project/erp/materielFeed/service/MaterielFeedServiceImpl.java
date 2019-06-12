@@ -6,7 +6,6 @@ import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.materielFeedDetails.domain.MaterielFeedDetails;
 import com.ruoyi.project.erp.materielFeedDetails.mapper.MaterielFeedDetailsMapper;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.materielFeed.mapper.MaterielFeedMapper;
 import com.ruoyi.project.erp.materielFeed.domain.MaterielFeed;
-import com.ruoyi.project.erp.materielFeed.service.IMaterielFeedService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

@@ -3,11 +3,8 @@ package com.ruoyi.project.system.user.controller;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.PasswordUtil;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import org.aspectj.weaver.loadtime.Aj;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +22,6 @@ import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.config.RuoYiConfig;
-import com.ruoyi.framework.shiro.service.PasswordService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.service.DictService;
@@ -190,7 +186,7 @@ public class ProfileController extends BaseController {
     @ResponseBody
     public AjaxResult changeLoginTag(User user, HttpServletRequest request) {
         try {
-            if (userService.changeLoginTag(user) > 0) {
+            if (userService.changeLoginTag(user,request) > 0) {
                 setSysUser(userService.selectUserById(JwtUtil.getTokenUser(request).getUserId()));
                 return success();
             }

@@ -5,17 +5,14 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
 import com.ruoyi.project.erp.orderInfo.domain.OrderInfo;
-import com.ruoyi.project.erp.orderInfo.domain.OrderInfoResult;
 import com.ruoyi.project.erp.orderInfo.mapper.OrderInfoMapper;
 import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
 import com.ruoyi.project.erp.productCustomer.mapper.ProductCustomerMapper;
@@ -30,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.productIntoStock.mapper.ProductIntoStockMapper;
 import com.ruoyi.project.erp.productIntoStock.domain.ProductIntoStock;
-import com.ruoyi.project.erp.productIntoStock.service.IProductIntoStockService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

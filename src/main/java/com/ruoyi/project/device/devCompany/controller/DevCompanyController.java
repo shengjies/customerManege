@@ -1,17 +1,11 @@
 package com.ruoyi.project.device.devCompany.controller;
 
-import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.utils.file.FileUploadUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.system.user.controller.ProfileController;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.service.IUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;

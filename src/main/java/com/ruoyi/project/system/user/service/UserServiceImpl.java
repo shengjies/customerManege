@@ -10,6 +10,8 @@ import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
+import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
+import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
@@ -75,7 +77,7 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     @DataScope(tableAlias = "u")
-    public List<User> selectUserList(User user,HttpServletRequest request) {
+    public List<User> selectUserList(User user, HttpServletRequest request) {
         // 生成数据权限过滤条件
         User sysUser = JwtUtil.getTokenUser(request);
         Map<String, Object> map = new HashMap<>();
@@ -97,6 +99,7 @@ public class UserServiceImpl implements IUserService {
      * @return 用户对象信息
      */
     @Override
+    @DataSource(value = DataSourceType.SLAVE)
     public User selectUserByLoginName(String userName) {
         return userMapper.selectUserByLoginName(userName);
     }
@@ -156,24 +159,15 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int deleteUserByIds(String ids,HttpServletRequest request) throws BusinessException {
+    public int deleteUserByIds(String ids, HttpServletRequest request) throws BusinessException {
         // 调用用户删除接口api
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String,Object> result = userApi.removeUser(ids,JwtUtil.getToken(request));
+        HashMap<String, Object> result = userApi.removeUser(ids, JwtUtil.getToken(request));
         if (Double.valueOf(result.get("code").toString()) == 0) {
-            //Long sysUserId = JwtUtil.getTokenUser(request).getUserId();
             Long[] userIds = Convert.toLongArray(ids);
-            //for (Long userId : userIds) {
-            //    if (userId == sysUserId) {
-            //        throw new BusinessException("不允许删除本人");
-            //    }
-            //    if (User.isAdmin(userId)) {
-            //        throw new BusinessException("不允许删除超级管理员用户");
-            //    }
-            //}
             return userMapper.deleteUserByIds(userIds);
         } else {
             throw new BusinessException(result.get("msg").toString());
@@ -188,7 +182,7 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int insertUser(User user,HttpServletRequest request) {
+    public int insertUser(User user, HttpServletRequest request) {
         User sysUser = JwtUtil.getTokenUser(request);
         // 用户导入设置登录标记为
         user.setDeptId(103L);
@@ -207,7 +201,7 @@ public class UserServiceImpl implements IUserService {
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String,Object> result = userApi.addUser(user,JwtUtil.getToken(request));
+        HashMap<String, Object> result = userApi.addUser(user, JwtUtil.getToken(request));
         // 接口保存成功通过
         if (Double.valueOf(result.get("code").toString()) == 0) {
             // 获取到服务器端传回的用户信息
@@ -233,7 +227,7 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int updateUser(User user,HttpServletRequest request) {
+    public int updateUser(User user, HttpServletRequest request) {
         Long userId = user.getUserId();
         User tokenUser = JwtUtil.getTokenUser(request);
         user.setUpdateBy(tokenUser.getLoginName());
@@ -241,8 +235,8 @@ public class UserServiceImpl implements IUserService {
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String,Object> result = userApi.editUserInfo(user,JwtUtil.getToken(request));
-        if(Double.valueOf(result.get("code").toString()) == 0) {
+        HashMap<String, Object> result = userApi.editUserInfo(user, JwtUtil.getToken(request));
+        if (Double.valueOf(result.get("code").toString()) == 0) {
             // 删除用户与角色关联
             userRoleMapper.deleteUserRoleByUserId(userId);
             // 新增用户与角色管理
@@ -267,14 +261,14 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int updateUserInfo(User user,HttpServletRequest request) {
+    public int updateUserInfo(User user, HttpServletRequest request) {
         user.setDevCompany(null);
         user.setCreateTime(null);
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String,Object> result = userApi.editUserInfo(user,JwtUtil.getToken(request));
+        HashMap<String, Object> result = userApi.editUserInfo(user, JwtUtil.getToken(request));
         if (Double.valueOf(result.get("code").toString()) == 0) {
             return userMapper.updateUser(user);
         } else {
@@ -289,17 +283,18 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int resetUserPwd(User user,HttpServletRequest request) {
+    public int resetUserPwd(User user, HttpServletRequest request) {
         user.setDevCompany(null);
         user.setCreateTime(null);
         user.randomSalt(); // 生成盐
+        user.setLoginTag(UserConstants.LOGIN_TAG_ADD);
         user.setPassword(PasswordUtil.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
         // 更新用户服务器密码
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String,Object> result = userApi.editUserInfo(user,JwtUtil.getToken(request));
+        HashMap<String, Object> result = userApi.editUserInfo(user, JwtUtil.getToken(request));
         if (Double.valueOf(result.get("code").toString()) == 0) {
             return userMapper.updateUser(user);
         } else {
@@ -427,7 +422,7 @@ public class UserServiceImpl implements IUserService {
     public String selectUserPostGroup(Long userId) {
         List<Post> list = postMapper.selectPostsByUserId(userId);
         StringBuffer idsStr = new StringBuffer();
-        if(list != null){
+        if (list != null) {
             for (Post post : list) {
                 idsStr.append(post.getPostName()).append(",");
             }
@@ -446,7 +441,7 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public String importUser(List<User> userList, Boolean isUpdateSupport,HttpServletRequest request) {
+    public String importUser(List<User> userList, Boolean isUpdateSupport, HttpServletRequest request) {
         if (StringUtils.isNull(userList) || userList.size() == 0) {
             throw new BusinessException("导入用户数据不能为空！");
         }
@@ -455,7 +450,7 @@ public class UserServiceImpl implements IUserService {
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
         String operName = JwtUtil.getTokenUser(request).getLoginName();
-        String password = configService.selectConfigByKey("sys.user.initPassword");
+        String password = configService.selectConfigByKey("system.user.initPassword");
         for (User user : userList) {
             try {
                 if (!user.getLoginName().matches(UserConstants.MOBILE_PHONE_NUMBER_PATTERN)) { // 不是手机格式
@@ -466,12 +461,12 @@ public class UserServiceImpl implements IUserService {
                 if (StringUtils.isNull(u)) {
                     user.setPassword(password);
                     user.setCreateBy(operName);
-                    this.insertUser(user,request);
+                    this.insertUser(user, request);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
                 } else if (isUpdateSupport) {
                     user.setUpdateBy(operName);
-                    this.updateUser(user,request);
+                    this.updateUser(user, request);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 更新成功");
                 } else {
@@ -502,7 +497,7 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int changeStatus(User user,HttpServletRequest request) {
+    public int changeStatus(User user, HttpServletRequest request) {
         if (User.isAdmin(user.getUserId())) {
             throw new BusinessException("不允许修改超级管理员用户");
         }
@@ -547,32 +542,25 @@ public class UserServiceImpl implements IUserService {
      * @return
      */
     @Override
-    public int changeLoginTag(User user) {
+    public int changeLoginTag(User user, HttpServletRequest request) {
         user.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 更新用户登录标记
-        String comName = null;
-       if(user.getDevCompany() != null && !org.springframework.util.StringUtils.isEmpty(user.getDevCompany().getComName())){
-            comName = user.getDevCompany().getComName();
-           // 判断公司名称是否已经存在
-           DevCompany devCompany = devCompanyService.selectDevCompanyByComName(comName);
-           if (StringUtils.isNotNull(devCompany) && devCompany.getCompanyId() != user.getCompanyId()) {
-               throw new BusinessException("该公司名称已经存在，请重新输入");
-           }
-
-           DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
-           company.setComName(comName); // 更新公司名称
-
-           company.setComAddress(user.getDevCompany().getComAddress()); // 更新公司地址
-           companyMapper.updateDevCompany(company);
-       }
-        //判断邮箱是否存在
-        if (!StringUtils.isEmpty(user.getEmail())) {
-            User user1 = userMapper.checkEmailUnique(user.getEmail());
-            if (user1 != null && user.getUserId() != user1.getUserId()) {
-                throw new BusinessException("邮箱已存在，请重新输入");
+        // 更新用户服务器密码
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String, Object> result = userApi.changeLoginTag(user, JwtUtil.getToken(request));
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
+            if (StringUtils.isNotNull(user.getDevCompany())) {
+                company.setComName(user.getDevCompany().getComName()); // 更新公司名称
+                company.setComAddress(user.getDevCompany().getComAddress()); // 更新公司地址
+                companyMapper.updateDevCompany(company);
             }
+            return userMapper.updateUser(user);
+        } else {
+            throw new BusinessException(result.get("msg").toString());
         }
-
-        return userMapper.updateUser(user);
     }
 
     /**

@@ -183,5 +183,5 @@ public interface IUserService
      * @param user
      * @return
      */
-    public int changeLoginTag(User user);
+    public int changeLoginTag(User user,HttpServletRequest request);
 }

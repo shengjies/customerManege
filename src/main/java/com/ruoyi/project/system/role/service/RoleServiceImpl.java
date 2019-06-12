@@ -4,7 +4,6 @@ import java.util.*;
 
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.domain.User;
-import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.common.constant.UserConstants;

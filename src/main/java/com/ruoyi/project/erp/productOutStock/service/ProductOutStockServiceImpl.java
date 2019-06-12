@@ -5,9 +5,7 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.erp.customer.mapper.CustomerMapper;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
 import com.ruoyi.project.erp.orderInfo.domain.OrderInfo;
@@ -20,7 +18,6 @@ import com.ruoyi.project.erp.productOutStockDetails.domain.ProductOutStockDetail
 import com.ruoyi.project.erp.productOutStockDetails.mapper.ProductOutStockDetailsMapper;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
-import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

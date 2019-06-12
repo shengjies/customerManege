@@ -9,7 +9,6 @@ import java.util.List;
 import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -17,19 +16,10 @@ import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
-import com.ruoyi.project.erp.lineIntoStockDetails.mapper.LineIntoStockDetailsMapper;
-import com.ruoyi.project.erp.materiel.domain.Materiel;
-import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
 import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
 import com.ruoyi.project.erp.productCustomer.mapper.ProductCustomerMapper;
-import com.ruoyi.project.erp.productIntoStockDetails.domain.ProductIntoStockDetails;
-import com.ruoyi.project.erp.productIntoStockDetails.mapper.ProductIntoStockDetailsMapper;
-import com.ruoyi.project.erp.productOutStockDetails.domain.ProductOutStockDetails;
-import com.ruoyi.project.erp.productOutStockDetails.mapper.ProductOutStockDetailsMapper;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
-import com.ruoyi.project.erp.stockHandleDetails.domain.StockHandleDetails;
-import com.ruoyi.project.erp.stockHandleDetails.mapper.StockHandleDetailsMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
@@ -87,7 +77,6 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return 产品管理信息
      */
     @Override
-//    @DataSource(value = DataSourceType.SLAVE)
     public DevProductList selectDevProductListById(Integer id) {
         return devProductListMapper.selectDevProductListById(id);
     }

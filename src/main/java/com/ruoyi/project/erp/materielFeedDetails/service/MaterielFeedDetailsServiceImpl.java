@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.materielFeedDetails.mapper.MaterielFeedDetailsMapper;
 import com.ruoyi.project.erp.materielFeedDetails.domain.MaterielFeedDetails;
-import com.ruoyi.project.erp.materielFeedDetails.service.IMaterielFeedDetailsService;
 import com.ruoyi.common.support.Convert;
 
 /**

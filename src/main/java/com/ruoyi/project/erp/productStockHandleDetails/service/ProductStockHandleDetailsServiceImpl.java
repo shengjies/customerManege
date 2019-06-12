@@ -2,11 +2,9 @@ package com.ruoyi.project.erp.productStockHandleDetails.service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UnknownFormatConversionException;
 
 import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.productStockHandleDetails.mapper.ProductStockHandleDetailsMapper;
 import com.ruoyi.project.erp.productStockHandleDetails.domain.ProductStockHandleDetails;
-import com.ruoyi.project.erp.productStockHandleDetails.service.IProductStockHandleDetailsService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

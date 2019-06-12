@@ -5,17 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.domain.User;
-import org.apache.regexp.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
-import com.ruoyi.project.erp.fileSourceInfo.service.IFileSourceInfoService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

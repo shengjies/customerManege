@@ -3,14 +3,12 @@ package com.ruoyi.project.erp.stockHandleDetails.service;
 import java.util.Collections;
 import java.util.List;
 
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.stockHandleDetails.mapper.StockHandleDetailsMapper;
 import com.ruoyi.project.erp.stockHandleDetails.domain.StockHandleDetails;
-import com.ruoyi.project.erp.stockHandleDetails.service.IStockHandleDetailsService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

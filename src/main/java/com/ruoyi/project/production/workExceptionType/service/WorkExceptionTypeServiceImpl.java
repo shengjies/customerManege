@@ -3,14 +3,12 @@ package com.ruoyi.project.production.workExceptionType.service;
 import java.util.Date;
 import java.util.List;
 
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
 import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
-import com.ruoyi.project.production.workExceptionType.service.IWorkExceptionTypeService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.Cookie;

@@ -2,8 +2,6 @@ package com.ruoyi.project.system.role.mapper;
 
 import java.util.List;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.system.role.domain.RoleDept;
 
 /**

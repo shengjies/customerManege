@@ -32,6 +32,16 @@ public interface UserApi {
     HashMap<String,Object> addUser(User user, @Param("token") String token);
 
     /**
+     * 用户登录初始化设置
+     * @param user 用户信息
+     * @param token token 验证
+     * @return 结果
+     */
+    @RequestLine("POST /system/user/api/changeLoginTag")
+    @Headers({"Content-Type: application/json","Cookie: token={token}"})
+    HashMap<String,Object> changeLoginTag(User user, @Param("token") String token);
+
+    /**
      * 删除用户信息
      * @param ids 用户id列表
      * @param token token 验证

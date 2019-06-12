@@ -1,8 +1,6 @@
 package com.ruoyi.project.production.productionLine.service;
 
-import com.ruoyi.project.device.devIo.domain.DevIo;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
-import com.ruoyi.project.system.user.domain.User;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;

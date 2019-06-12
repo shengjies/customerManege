@@ -1,23 +1,14 @@
 package com.ruoyi.project.erp.materielLedger.service;
 
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.utils.poi.ExcelUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
-import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
 import com.ruoyi.project.erp.materielIntoStockDetails.domain.MaterielIntoStockDetails;
 import com.ruoyi.project.erp.materielIntoStockDetails.mapper.MaterielIntoStockDetailsMapper;
 import com.ruoyi.project.erp.materielLedgerDetail.domain.MaterielLedgerDetail;
@@ -27,16 +18,12 @@ import com.ruoyi.project.erp.materielOutStockDetails.mapper.MaterielOutStockDeta
 import com.ruoyi.project.erp.supplier.domain.Supplier;
 import com.ruoyi.project.erp.supplier.mapper.SupplierMapper;
 import com.ruoyi.project.system.user.domain.User;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.materielLedger.mapper.MaterielLedgerMapper;
 import com.ruoyi.project.erp.materielLedger.domain.MaterielLedger;
-import com.ruoyi.project.erp.materielLedger.service.IMaterielLedgerService;
-import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;
 

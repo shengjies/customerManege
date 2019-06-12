@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class Threads
 {
-    private static final Logger logger = LoggerFactory.getLogger("sys-user");
+    private static final Logger logger = LoggerFactory.getLogger("system-user");
 
     /**
      * sleep等待,单位为毫秒

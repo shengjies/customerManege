@@ -15,7 +15,7 @@ import javax.annotation.PreDestroy;
 @Component
 public class ShutdownManager
 {
-    private static final Logger logger = LoggerFactory.getLogger("sys-user");
+    private static final Logger logger = LoggerFactory.getLogger("system-user");
 
     @Autowired(required = false)
     private SpringSessionValidationScheduler springSessionValidationScheduler;

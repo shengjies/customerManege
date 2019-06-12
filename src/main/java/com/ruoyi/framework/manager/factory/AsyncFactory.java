@@ -26,7 +26,7 @@ import eu.bitwalker.useragentutils.UserAgent;
  */
 public class AsyncFactory
 {
-    private static final Logger sys_user_logger = LoggerFactory.getLogger("sys-user");
+    private static final Logger sys_user_logger = LoggerFactory.getLogger("system-user");
 
     /**
      * 同步session到数据库

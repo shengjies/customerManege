@@ -1,7 +1,6 @@
 package com.ruoyi.project.system.indexSetting;
 
 import com.alibaba.fastjson.JSON;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;

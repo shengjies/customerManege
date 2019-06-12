@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.project.system.notice.mapper.NoticeMapper;
 import com.ruoyi.project.system.notice.domain.Notice;
-import com.ruoyi.project.system.notice.service.INoticeService;
 import com.ruoyi.common.support.Convert;
 
 /**

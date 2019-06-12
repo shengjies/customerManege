@@ -4,13 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.device.devModel.service.IDevModelService;
 import com.ruoyi.project.system.user.domain.User;
-import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,9 +116,9 @@ public class DevListController extends BaseController
 	@Log(title = "硬件", businessType = BusinessType.UPDATE)
 	@PostMapping("/edit")
 	@ResponseBody
-	public AjaxResult editSave(DevList devList)
+	public AjaxResult editSave(DevList devList,HttpServletRequest request)
 	{		
-		return toAjax(devListService.updateDevList(devList));
+		return toAjax(devListService.updateDevList(devList,request));
 	}
 	
 	/**
@@ -132,9 +128,9 @@ public class DevListController extends BaseController
 	@Log(title = "硬件", businessType = BusinessType.DELETE)
 	@PostMapping( "/remove")
 	@ResponseBody
-	public AjaxResult remove(String ids)
+	public AjaxResult remove(String ids,HttpServletRequest request)
 	{		
-		return toAjax(devListService.deleteDevListByIds(ids));
+		return toAjax(devListService.deleteDevListByIds(ids,request));
 	}
 
 
@@ -143,8 +139,8 @@ public class DevListController extends BaseController
 	@ResponseBody
 	@Transactional(rollbackFor = Exception.class)
 	@RequiresPermissions("device:devList:edit")
-	public AjaxResult changeStatus(DevList devList){
-		return toAjax(devListService.updateDevList(devList));
+	public AjaxResult changeStatus(DevList devList,HttpServletRequest request){
+		return toAjax(devListService.updateDevList(devList,request));
 	}
 	/**
 	 * 获取所有没有配置的硬件编号
@@ -164,8 +160,8 @@ public class DevListController extends BaseController
 	@PostMapping("/configDev")
 	@ResponseBody
 	@RequiresPermissions("device:devList:configDev")
-	public AjaxResult configDev(DevList devList){
-		return toAjax(devListService.updateDevList(devList));
+	public AjaxResult configDev(DevList devList,HttpServletRequest request){
+		return toAjax(devListService.updateDevList(devList,request));
 	}
 
 	/**
@@ -195,8 +191,8 @@ public class DevListController extends BaseController
 	 */
 	@ResponseBody
 	@PostMapping("/validate")
-	public int deviceValidate(String code){
-		return  devListService.deviceValidate(code);
+	public int deviceValidate(String code,HttpServletRequest request){
+		return  devListService.deviceValidate(code,request);
 	}
 
 	/**
@@ -213,7 +209,7 @@ public class DevListController extends BaseController
 			return  toAjax(0);
 		}
 		devList.setCompanyId(user.getCompanyId());
-		return toAjax(devListService.addSave(devList));
+		return toAjax(devListService.addSave(devList,request));
 	}
 
 	@RequiresPermissions("production:productionLine:devconfig")

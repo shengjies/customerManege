@@ -3,14 +3,11 @@ package com.ruoyi.project.system.user.controller;
 import java.util.List;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
-import com.ruoyi.project.device.devCompany.service.DevCompanyServiceImpl;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
 import com.ruoyi.project.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;

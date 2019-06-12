@@ -1,20 +1,12 @@
 package com.ruoyi.project.erp.materielIntoStock.controller;
 
-import java.util.Date;
 import java.util.List;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.project.erp.materiel.domain.Materiel;
-import com.ruoyi.project.erp.materielIntoStockDetails.domain.MaterielIntoStockDetails;
 import com.ruoyi.project.erp.materielStockIqc.domain.MaterielStockIqc;
 import com.ruoyi.project.erp.materielStockIqc.service.IMaterielStockIqcService;
-import com.ruoyi.project.erp.materielStockIqc.service.MaterielStockIqcServiceImpl;
-import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

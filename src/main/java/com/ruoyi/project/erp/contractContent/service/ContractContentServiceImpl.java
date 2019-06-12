@@ -1,12 +1,8 @@
 package com.ruoyi.project.erp.contractContent.service;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.contract.domain.Contract;
 import com.ruoyi.project.erp.contract.mapper.ContractMapper;
@@ -15,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.contractContent.mapper.ContractContentMapper;
 import com.ruoyi.project.erp.contractContent.domain.ContractContent;
-import com.ruoyi.project.erp.contractContent.service.IContractContentService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.HttpServletRequest;

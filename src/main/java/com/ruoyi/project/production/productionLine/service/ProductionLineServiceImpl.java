@@ -3,21 +3,15 @@ package com.ruoyi.project.production.productionLine.service;
 import java.util.*;
 
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
-import com.ruoyi.project.device.devIo.domain.DevIo;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
-import org.apache.regexp.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
-import com.ruoyi.project.production.productionLine.service.IProductionLineService;
 import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.Cookie;

@@ -8,9 +8,6 @@ import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
@@ -19,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.orderInfo.mapper.OrderInfoMapper;
 import com.ruoyi.project.erp.orderInfo.domain.OrderInfo;
-import com.ruoyi.project.erp.orderInfo.service.IOrderInfoService;
 import com.ruoyi.common.support.Convert;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 

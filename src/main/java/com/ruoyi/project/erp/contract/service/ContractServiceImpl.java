@@ -1,12 +1,8 @@
 package com.ruoyi.project.erp.contract.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.contractContent.domain.ContractContent;
 import com.ruoyi.project.erp.contractContent.mapper.ContractContentMapper;

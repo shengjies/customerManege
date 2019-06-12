@@ -16,8 +16,8 @@ import java.util.Map;
  */
 public class LogUtils
 {
-    public static final Logger ERROR_LOG = LoggerFactory.getLogger("sys-error");
-    public static final Logger ACCESS_LOG = LoggerFactory.getLogger("sys-access");
+    public static final Logger ERROR_LOG = LoggerFactory.getLogger("system-error");
+    public static final Logger ACCESS_LOG = LoggerFactory.getLogger("system-access");
 
     /**
      * 记录访问日志 [username][jsessionid][ip][accept][UserAgent][url][params][Referer]

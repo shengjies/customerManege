@@ -45,14 +45,14 @@ public interface IDevListService
      * @param devList 硬件信息
      * @return 结果
      */
-	public int updateDevList(DevList devList);
+	public int updateDevList(DevList devList,HttpServletRequest request);
 
 	/**
 	 * 用户添加硬件
 	 * @param devList 硬件信息
 	 * @return
 	 */
-	int addSave(DevList devList);
+	int addSave(DevList devList,HttpServletRequest request);
 		
 	/**
      * 删除硬件信息
@@ -60,7 +60,7 @@ public interface IDevListService
      * @param ids 需要删除的数据ID
      * @return 结果
      */
-	public int deleteDevListByIds(String ids);
+	public int deleteDevListByIds(String ids,HttpServletRequest request);
 
 	/**
 	 * 查询对应的硬件信息和对应的IO数据
@@ -83,5 +83,12 @@ public interface IDevListService
 	/**
 	 * 验证硬件
 	 */
-	int  deviceValidate(String code);
+	int  deviceValidate(String code,HttpServletRequest request);
+
+	/**
+	 * 主服务器修改硬件信息
+	 * @param devList
+	 * @return
+	 */
+	int apiEdit(DevList devList);
 }

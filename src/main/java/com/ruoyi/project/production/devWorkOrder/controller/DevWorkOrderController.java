@@ -1,27 +1,19 @@
 package com.ruoyi.project.production.devWorkOrder.controller;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TimeUtil;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.product.list.service.IDevProductListService;
-import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
 import com.ruoyi.project.system.user.domain.User;
-import com.sun.jna.platform.win32.OaIdl;
-import com.sun.org.apache.regexp.internal.RE;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

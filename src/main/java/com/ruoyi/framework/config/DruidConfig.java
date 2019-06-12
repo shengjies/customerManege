@@ -47,7 +47,6 @@ public class DruidConfig
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put(DataSourceType.MASTER.name(), masterDataSource);
         targetDataSources.put(DataSourceType.SLAVE.name(), slaveDataSource);
-//        targetDataSources.put(DataSourceType.ERP.name(), erpDataSource);
         return new DynamicDataSource(masterDataSource, targetDataSources);
     }
 }
