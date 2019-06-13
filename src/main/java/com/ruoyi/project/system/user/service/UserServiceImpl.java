@@ -562,6 +562,7 @@ public class UserServiceImpl implements IUserService {
                     iso.setCId(user.getUserId().intValue());
                     iso.setEName(company.getTotalIso());
                     iso.setCTime(new Date());
+                    iso.setCompanyId(company.getCompanyId());
                     isoMapper.updateIso(iso);
                     //查询对应的子目录
                     List<Iso> list = isoMapper.selectByPid(iso.getId());
@@ -573,6 +574,7 @@ public class UserServiceImpl implements IUserService {
                             i.setDiskPath(iso.getDiskPath()+File.separator+i.getEName());
                             i.setCId(user.getUserId().intValue());
                             i.setCTime(new Date());
+                            i.setCompanyId(company.getCompanyId());
                             isoMapper.updateIso(i);
                             List<Iso> isos = isoMapper.selectByPid(i.getId());
                             if(isos != null){
@@ -583,6 +585,7 @@ public class UserServiceImpl implements IUserService {
                                     i2.setDiskPath(i.getDiskPath()+File.separator+i2.getEName());
                                     i2.setCId(user.getUserId().intValue());
                                     i2.setCTime(new Date());
+                                    i2.setCompanyId(company.getCompanyId());
                                     isoMapper.updateIso(i2);
                                 }
                             }
