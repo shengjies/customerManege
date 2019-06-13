@@ -15,7 +15,7 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务端口
-  port: 81
+  port: 84
   servlet:
     # 项目contextPath
     context-path: /
@@ -126,22 +126,26 @@ xss:
 # 代码生成
 gen: 
   # 作者
-  author: zqm
+  author: sj
   # 默认生成包路径 system 需改成自己的模块名称 如 system monitor tool
-  packageName: com.ruoyi.project.erp
+  packageName: com.ruoyi.project.iso
   # 自动去除表前缀，默认是true
   autoRemovePre: true
   # 表前缀(类名不会包含表前缀)
   tablePrefix: tab_
 
 page:
-  url: http://127.0.0.1/t/
+#  url: http://127.0.0.1/t/
 #  url: http://39.108.187.126:8088/t/
+  url: http://127.0.0.1:84/t/
 
 img:
-  url: http://127.0.0.1/profile/avatar/
+#  url: http://127.0.0.1/profile/avatar/
 #  url: http://39.108.187.126:8088/profile/avatar/
-  
+  url: http://127.0.0.1:84/profile/avatar/
+
 file:
-  url: http://127.0.0.1/profile/upload/
+#  url: http://127.0.0.1/profile/upload/
 #  url: http://39.108.187.126:8088/profile/upload/
+  url: http://127.0.0.1:84/profile/upload/
+  iso: http://127.0.0.1:84/profile/

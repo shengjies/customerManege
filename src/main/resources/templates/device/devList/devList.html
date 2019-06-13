@@ -26,25 +26,6 @@
 								</select>
 							</li>
 
-							<li>
-								型号：<select name="devModelId" th:with="type=${@devModel.selectDevModelList(null)}">
-									<option value="-1">所有</option>
-									<option th:each="dict : ${type}" th:text="${dict.modelName}" th:value="${dict.id}"></option>
-								</select>
-							</li>
-							<li th:if="${@product.isSys(#httpServletRequest.getCookies())}">
-								所属公司：<select name="companyId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
-								<option value="-1">所有</option>
-								<option th:each="com : ${Company}" th:text="${com.comName}" th:value="${com.companyId}"></option>
-							</select>
-							</li>
-							<li th:if="${@product.isSys(#httpServletRequest.getCookies())}">
-								是否配置：<select name="configStatus" >
-								<option value="-1">所有</option>
-								<option value="0">否</option>
-								<option value="1">是</option>
-							</select>
-							</li>
 							<li class="select-time">
 								<label>创建时间： </label>
 								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
@@ -118,11 +99,6 @@
 					}
 				},
 				{
-					field : 'devModel',
-					title : '型号',
-					sortable: true
-				},
-				{
 					field : 'deviceStatus', 
 					title : '可用状态',
 					sortable: true,
@@ -141,24 +117,8 @@
 				// 	sortable: true
 				// },
 				{
-					field : 'companyId', 
-					title : '所属公司',
-					sortable: true,
-					formatter:function (value,row,index) {
-						if(row.comName){
-							return row.comName;
-						}
-						return "-";
-					}
-				},
-				{
 					field : 'remark', 
 					title : '备注信息',
-					sortable: true
-				},
-				{
-					field : 'configDate', 
-					title : '归属时间',
 					sortable: true
 				},
 				{

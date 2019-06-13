@@ -81,7 +81,7 @@ public class LogAspect
             OperLog operLog = new OperLog();
             operLog.setStatus(BusinessStatus.SUCCESS.ordinal());
             // 请求的地址
-            String ip = ShiroUtils.getIp();
+            String ip = ServletUtils.getRequest().getRemoteAddr();
             operLog.setOperIp(ip);
 
             operLog.setOperUrl(ServletUtils.getRequest().getRequestURI());

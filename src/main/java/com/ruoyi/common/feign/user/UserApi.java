@@ -59,4 +59,9 @@ public interface UserApi {
     @RequestLine("POST /logout")
     @Headers({"Content-Type: application/json","Cookie: token={token}"})
     HashMap<String,Object> loginOut(@Param("token")String token);
+
+
+    @RequestLine("POST /system/user/api/updateUserDelFlag")
+    @Headers({"Content-Type: application/json","Cookie: token={token}"})
+    HashMap<String,Object> updateUserDelFlag(User user,@Param("token") String token);
 }

@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-iso-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">中文名称：</label>
+				<div class="col-sm-8">
+					<input id="cName" name="cName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">英文名称：</label>
+				<div class="col-sm-8">
+					<input id="eName" name="eName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">文件夹路径：</label>
+				<div class="col-sm-8">
+					<input id="disk" name="disk" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">访问路径：</label>
+				<div class="col-sm-8">
+					<input id="path" name="path" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">文件类型，0、文件夹 1、文件：</label>
+				<div class="col-sm-8">
+					<input id="iType" name="iType" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">类别 0、普通文件 1、SOP 2、ECN 3、DCN：</label>
+				<div class="col-sm-8">
+					<input id="category" name="category" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">公司id：</label>
+				<div class="col-sm-8">
+					<input id="companyId" name="companyId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">父类别id：</label>
+				<div class="col-sm-8">
+					<input id="pId" name="pId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">创建者id：</label>
+				<div class="col-sm-8">
+					<input id="cId" name="cId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">创建时间：</label>
+				<div class="col-sm-8">
+					<input id="cTime" name="cTime" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "iso/iso"
+		$("#form-iso-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-iso-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

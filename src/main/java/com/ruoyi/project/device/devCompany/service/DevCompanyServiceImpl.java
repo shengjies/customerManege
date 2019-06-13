@@ -5,6 +5,7 @@ import com.ruoyi.common.feign.FeignUtils;
 import com.ruoyi.common.feign.company.CompanyApi;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -64,7 +66,8 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
      */
     @Override
     public int insertDevCompany(DevCompany devCompany) {
-        return devCompanyMapper.insertDevCompany(devCompany);
+        int row = devCompanyMapper.insertDevCompany(devCompany);
+        return  row;
     }
 
     /**

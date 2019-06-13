@@ -163,9 +163,9 @@ public class DevListServiceImpl implements IDevListService {
         devListResult.setDeviceName(devList.getDeviceName());
         devListResult.setRemark(devList.getRemark());
         HashMap<String, Object> result = devListApi.addSaveDevList(devListResult, JwtUtil.getToken(request));
-        System.out.println(result);
+        devList.setCreateDate(new Date());
         if (Double.valueOf(result.get("code").toString()) == 0) {
-            return devListMapper.addSave(devList);
+            return devListMapper.insertDevList(devList);
         }
         return 0;
     }
@@ -235,7 +235,7 @@ public class DevListServiceImpl implements IDevListService {
         if (Double.valueOf(result.get("code").toString()) == 0) {
             return DevConstants.DEV_VALIDATE_TRUE;
         } else {
-            throw new BusinessException(result.get("msg").toString());
+            return  1;//硬件不存在或者真正使用
         }
     }
 

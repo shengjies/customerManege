@@ -12,10 +12,13 @@ import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
+import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
+import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.iso.iso.mapper.IsoMapper;
 import com.ruoyi.project.system.config.service.IConfigService;
 import com.ruoyi.project.system.post.domain.Post;
 import com.ruoyi.project.system.post.mapper.PostMapper;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -254,6 +258,21 @@ public class UserServiceImpl implements IUserService {
         return 0;
     }
 
+    public int updateUserDelFlag(User  user,String token){
+        user.setDevCompany(null);
+        user.setCreateTime(null);
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String, Object> result = userApi.updateUserDelFlag(user,token);
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            return  userMapper.updateUserDelFlag(user.getUserId().intValue(),user.getCompanyId());
+        }
+
+        return 0;
+    }
+
     /**
      * 修改用户个人详细信息
      *
@@ -464,6 +483,12 @@ public class UserServiceImpl implements IUserService {
                     this.insertUser(user, request);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
+                }else if(u.getDelFlag().equals("2")){
+                    user.setUpdateBy(operName);
+                    u.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
+                    this.updateUserDelFlag(u,JwtUtil.getToken(request));
+                    successNum++;
+                    successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
                 } else if (isUpdateSupport) {
                     user.setUpdateBy(operName);
                     this.updateUser(user, request);
@@ -510,6 +535,9 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private IDevCompanyService devCompanyService;
 
+    @Autowired
+    private IsoMapper isoMapper;
+
     @Override
     public int register(User user) {
 
@@ -519,10 +547,60 @@ public class UserServiceImpl implements IUserService {
         insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
-
+        //初始化文件
+        if(rows >0){
+            //查询对应公司
+            DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
+            if(company != null){
+                //查询总文件管理信息
+                Iso iso = isoMapper.selectIsoById(1);
+                if(iso != null){
+                    String disk = RuoYiConfig.getProfile()+company.getTotalIso();
+                    createFile(disk);
+                    iso.setDisk(disk);
+                    iso.setDiskPath(company.getTotalIso());
+                    iso.setCId(user.getUserId().intValue());
+                    iso.setEName(company.getTotalIso());
+                    iso.setCTime(new Date());
+                    isoMapper.updateIso(iso);
+                    //查询对应的子目录
+                    List<Iso> list = isoMapper.selectByPid(iso.getId());
+                    if(list != null){
+                        for (Iso i : list) {
+                            String d1 = iso.getDisk() + File.separator+i.getEName();
+                            createFile(d1);
+                            i.setDisk(d1);
+                            i.setDiskPath(iso.getDiskPath()+File.separator+i.getEName());
+                            i.setCId(user.getUserId().intValue());
+                            i.setCTime(new Date());
+                            isoMapper.updateIso(i);
+                            List<Iso> isos = isoMapper.selectByPid(i.getId());
+                            if(isos != null){
+                                for (Iso i2 : isos) {
+                                    String d2 = i.getDisk()+File.separator+i2.getEName();
+                                    createFile(d2);
+                                    i2.setDisk(d2);
+                                    i2.setDiskPath(i.getDiskPath()+File.separator+i2.getEName());
+                                    i2.setCId(user.getUserId().intValue());
+                                    i2.setCTime(new Date());
+                                    isoMapper.updateIso(i2);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return rows;
     }
-
+    private void createFile(String path){
+        //创建对应的总文件夹
+        File file = new File(path);
+        if (file.exists()){
+            file.delete();
+        }
+        file.mkdir();
+    }
     /**
      * 查询对应的公司的所以的员工信息
      *

@@ -115,7 +115,6 @@ public class DevCompanyController extends BaseController {
     /**
      * 修改保存公司
      */
-    @RequiresPermissions("device:devCompany:edit")
     @Log(title = "公司", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody

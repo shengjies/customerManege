@@ -33,10 +33,11 @@ public class UserDetailController extends BaseController {
     private RuoYiConfig ruoYiConfig;
 
     @Autowired
-    private IDevCompanyService devCompanyService;
+    private IUserService userService;
 
     @Autowired
-    private IUserService userService;
+    private IDevCompanyService devCompanyService;
+
 
     private String prefix = "system/userDetail";
 
@@ -44,6 +45,7 @@ public class UserDetailController extends BaseController {
     public String userDetail(ModelMap mmap, HttpServletRequest request){
         // 取身份信息
         User user = JwtUtil.getTokenUser(request);
+        user = userService.selectUserById(user.getUserId());
         // 根据用户id取出菜单
         List<Menu> menus = menuService.selectMenusByUser(user);
         // 根据用户id查询出公司信息

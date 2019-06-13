@@ -95,6 +95,13 @@ public interface UserMapper
     public int updateUserByLoginName(User user);
 
     /**
+     * 修改用户删除状态
+     * @param id
+     * @return
+     */
+    int updateUserDelFlag(@Param("id")int id,@Param("companyId")int companyId);
+
+    /**
      * 新增用户信息
      * 
      * @param user 用户信息

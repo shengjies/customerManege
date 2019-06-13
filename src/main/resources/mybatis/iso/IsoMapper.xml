@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.iso.iso.mapper.IsoMapper">
+    
+    <resultMap type="Iso" id="IsoResult">
+        <result property="id"    column="id"    />
+        <result property="cName"    column="c_name"    />
+        <result property="eName"    column="e_name"    />
+        <result property="disk"    column="disk"    />
+        <result property="diskPath"    column="disk_path"    />
+        <result property="path"    column="path"    />
+        <result property="iType"    column="i_type"    />
+        <result property="category"    column="category"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="pId"    column="p_id"    />
+        <result property="cId"    column="c_id"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="defId"    column="def_id"    />
+    </resultMap>
+	
+	<sql id="selectIsoVo">
+        select id, c_name, e_name, disk, disk_path, path, i_type, category, company_id, p_id, c_id, c_time, def_id from tab_iso
+    </sql>
+	
+    <select id="selectIsoList" parameterType="Iso" resultMap="IsoResult">
+        <include refid="selectIsoVo"/>
+        <where>
+             <if test="cName != null  and cName != '' ">  c_name like concat('%',#{cName},'%')</if>
+         </where>
+    </select>
+    
+    <select id="selectIsoById" parameterType="Integer" resultMap="IsoResult">
+        <include refid="selectIsoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertIso" parameterType="Iso" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_iso
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="cName != null  and cName != ''  ">c_name,</if>
+			<if test="eName != null  and eName != ''  ">e_name,</if>
+			<if test="disk != null  and disk != ''  ">disk,</if>
+			<if test="diskPath != null  and diskPath != ''  ">disk_path,</if>
+			<if test="path != null  and path != ''  ">path,</if>
+			<if test="iType != null  ">i_type,</if>
+			<if test="category != null  ">category,</if>
+			<if test="companyId != null  ">company_id,</if>
+			<if test="pId != null  ">p_id,</if>
+			<if test="cId != null  ">c_id,</if>
+			<if test="cTime != null  ">c_time,</if>
+			<if test="defId != null  ">def_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="cName != null  and cName != ''  ">#{cName},</if>
+			<if test="eName != null  and eName != ''  ">#{eName},</if>
+			<if test="disk != null  and disk != ''  ">#{disk},</if>
+			<if test="diskPath != null  and diskPath != ''  ">#{diskPath},</if>
+			<if test="path != null  and path != ''  ">#{path},</if>
+			<if test="iType != null  ">#{iType},</if>
+			<if test="category != null  ">#{category},</if>
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="pId != null  ">#{pId},</if>
+			<if test="cId != null  ">#{cId},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+			<if test="defId != null  ">#{defId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateIso" parameterType="Iso">
+        update tab_iso
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cName != null  and cName != ''  ">c_name = #{cName},</if>
+            <if test="eName != null  and eName != ''  ">e_name = #{eName},</if>
+            <if test="disk != null  and disk != ''  ">disk = #{disk},</if>
+            <if test="diskPath != null  and diskPath != ''  ">disk_path = #{diskPath},</if>
+            <if test="path != null  and path != ''  ">path = #{path},</if>
+            <if test="iType != null  ">i_type = #{iType},</if>
+            <if test="category != null  ">category = #{category},</if>
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="pId != null  ">p_id = #{pId},</if>
+            <if test="cId != null  ">c_id = #{cId},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="defId != null  ">def_id = #{defId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteIsoById" parameterType="Integer">
+        delete from tab_iso where id = #{id}
+    </delete>
+	
+    <delete id="deleteIsoByIds" parameterType="String">
+        delete from tab_iso where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <!--根据父id查询对应的子目录-->
+    <select id="selectByPid" resultMap="IsoResult">
+        <include refid="selectIsoVo"/>
+        <where>
+             p_id = #{pid}
+        </where>
+    </select>
+</mapper>
