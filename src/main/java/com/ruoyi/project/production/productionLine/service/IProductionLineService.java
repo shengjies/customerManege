@@ -47,12 +47,6 @@ public interface IProductionLineService
      */
 	public int updateProductionLine(ProductionLine productionLine,HttpServletRequest request);
 
-	/**
-	 * 修改产线作业指导书配置
-	 * @param line 产线信息
-	 * @return
-	 */
-	public int editProductionLineSop(ProductionLine line);
 		
 	/**
      * 删除生产线信息

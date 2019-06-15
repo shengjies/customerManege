@@ -1,6 +1,13 @@
 package com.ruoyi.project.iso.sopLine.controller;
 
 import java.util.List;
+
+import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.product.list.service.IDevProductListService;
+import com.ruoyi.project.production.workData.service.IWorkDataService;
+import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +26,8 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 作业指导书  产线 配置 信息操作处理
  * 
@@ -33,6 +42,15 @@ public class SopLineController extends BaseController
 	
 	@Autowired
 	private ISopLineService sopLineService;
+
+	@Autowired
+	private IIsoService iIsoService;
+
+	@Autowired
+	private IDevProductListService productListService;
+
+	@Autowired
+	private IWorkstationService workstationService;
 	
 	@RequiresPermissions("iso:sopLine:view")
 	@GetMapping()
@@ -123,5 +141,32 @@ public class SopLineController extends BaseController
 	{		
 		return toAjax(sopLineService.deleteSopLineByIds(ids));
 	}
-	
+
+	/******************    产线SOP 配置 *************************/
+
+	@RequiresPermissions("iso:sopLine:list")
+	@GetMapping("/config/{id}")
+	public String sopLineConfig(@PathVariable("id")int id,ModelMap mmap)
+	{
+		mmap.put("line",id);
+		return prefix + "/sopLineConfig";
+	}
+
+
+	/**
+	 * 新增作业指导书  产线 配置
+	 */
+	@GetMapping("/addConfig")
+	@RequiresPermissions("iso:sopLine:add")
+	public String addConfig(int lineId, ModelMap mmap, HttpServletRequest request)
+	{
+		//查询该产线所有未配置的SOP书
+		mmap.put("iso",iIsoService.selectNotConfigByPidAndLineId(FileConstants.FOLDER_SOP,lineId));
+		//根据产线id查询所以未配置的产品信息
+		mmap.put("pns",productListService.selectNotConfigByLineId(lineId, JwtUtil.getTokenUser(request).getCompanyId()));
+		//查询对应产线的所以工位信息
+		mmap.put("work",workstationService.selectAllByLineId(lineId));
+		mmap.put("line",lineId);
+		return prefix + "/add1";
+	}
 }

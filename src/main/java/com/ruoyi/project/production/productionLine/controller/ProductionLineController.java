@@ -206,19 +206,4 @@ public class ProductionLineController extends BaseController {
         return prefix + "/lineLive";
     }
 
-    /**
-     * 配置作业指导书
-     * @param line
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping("/configSop")
-    public AjaxResult configSop(ProductionLine line){
-        try {
-            productionLineService.editProductionLineSop(line);
-            return AjaxResult.success();
-        }catch (Exception e){
-            return AjaxResult.error();
-        }
-    }
 }

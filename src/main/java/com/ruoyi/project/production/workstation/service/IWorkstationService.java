@@ -50,5 +50,12 @@ public interface IWorkstationService
      * @return 结果
      */
 	public int deleteWorkstationById(Integer id);
+
+	/**
+	 * 根据产线查询所以工位信息
+	 * @param lineId 产线id
+	 * @return
+	 */
+	List<Workstation> selectAllByLineId(Integer lineId);
 	
 }

@@ -4,80 +4,38 @@
 <head th:include="include :: header"></head>
 <link th:href="@{/ajax/libs/layer/laydate/laydate.css}" rel="stylesheet"/>
 <body class="white-bg">
-<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+<div class="container-div">
 	<div class="row">
-		<div class="col-sm-12 select-table">
-			<div class="row">
-				<div class="col-sm-3">
-					<div class="ibox float-e-margins">
-						<div class="ibox-title">
-							<h5>作业指导书(SOP)配置</h5>
-						</div>
-						<div class="ibox-content">
-							<form  id="form-purchase-add" th:object="${line}">
-								<div class="form-group" >
-									<label class="col-sm-12 control-label" style="margin-top: 10px;">作业指导书(SOP)：</label>
-									<div class="col-sm-12">
-										<select style="width: 100%" th:field="*{sopId}" id="sopId" class="form-control"
-												name="sopId"
-												th:with="supplier = ${@supplier.selectSupplierAllByCompanyId(#httpServletRequest.getCookies())}">
-											<option value="0">请选择</option>
-											<option th:each="item : ${supplier}" th:data-id="${item.id}" th:text="${item.supplierName}"
-													th:value="${item.id}"></option>
-										</select>
-									</div>
-								</div>
-								<div class="form-group">
-									<label class="col-sm-12 control-label" style="margin-top: 10px;">产品编码：</label>
-									<div class="col-sm-12">
-										<select style="width: 100%"  multiple="multiple" class="form-control"
-												id="productCodes" name="productCodes"
-												th:with="product = ${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}">
-											<option th:each="item : ${product}"  th:text="${item.productCode}"
-													th:value="${item.id}"></option>
-										</select>
-									</div>
-								</div>
-								<div class="form-group">
-									<div style="width: 100%;text-align: center;">
-										<a class="btn btn-primary btn-rounded btn-sm"  style="margin-top: 15px"
-										   shiro:hasPermission="production:workstation:add" onclick="add()">
-											<i class="fa fa-plus"></i>&nbsp;添加工位</a>
-										<a class="btn btn-primary btn-rounded btn-sm"  onclick="save()"
-										   style="margin-top: 15px" shiro:hasPermission="production:workstation:add">
-											<i class="fa fa-save"></i>&nbsp;保存</a>
-										<a class="btn btn-primary btn-rounded btn-sm" style="margin-top: 15px" shiro:hasPermission="production:workstation:add">
-											<i class="fa fa-copy"></i>&nbsp;复制配置</a>
-									</div>
-								</div>
-							</form>
-						</div>
-					</div>
+		<div class="col-sm-12 search-collapse">
+			<form id="formId">
+				<div class="select-list">
+					<ul>
+						<li>
+							工位名称：<input type="text" name="wName"/>
+							<input type="hidden" name="lineId" th:value="${line}"/>
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+						</li>
+					</ul>
 				</div>
-				<div class="col-sm-9">
-					<div class="ibox float-e-margins">
-						<div class="ibox-title">
-							<h5>工位配置</h5>
-						</div>
-						<div class="ibox-content">
-							<form id="formId" role="form">
-								<div class="select-list">
-									<ul>
-										<li>
-											工位名称：<input type="text" name="wName"/>
-											<input type="hidden" name="lineId" th:value="${line.id}"/>
-										</li>
-										<li>
-											<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search('formId')"><i class="fa fa-search"></i>&nbsp;搜索</a>
-										</li>
-									</ul>
-								</div>
-							</form>
-							<table id="bootstrap-table" data-mobile-responsive="true"></table>
-						</div>
-					</div>
-				</div>
-			</div>
+			</form>
+		</div>
+
+		<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+			<a class="btn btn-success" onclick="add()" shiro:hasPermission="production:productionLine:add">
+				<i class="fa fa-plus"></i> 添加
+			</a>
+			<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="production:productionLine:edit">
+				<i class="fa fa-edit"></i> 修改
+			</a>
+			<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:productionLine:export">
+				<i class="fa fa-download"></i> 导出
+			</a>
+		</div>
+		<div class="col-sm-12 select-table table-striped">
+			<table id="bootstrap-table" data-mobile-responsive="true"></table>
 		</div>
 	</div>
 </div>
@@ -182,14 +140,12 @@
 		};
 		$.table.init(options);
 		$.table.search('formId');
-		var arr =[[${line.productCodes}]].split(",");
-		$('#productCodes').val(arr).trigger('change')
 	});
 	/** 添加生产线 */
 	function add() {
-		var lineId =[[${line.id}]]
+		var lineId =[[${line}]]
 		var sopId=$("#sopId option:selected").val();
-		$.modal.open("添加工位",prefix+"/add?line="+lineId+"&sopid="+sopId,800,480);
+		$.modal.open("添加工位",prefix+"/add?line="+lineId,800,480);
 	}
 
 	/**
@@ -200,38 +156,7 @@
 		var url = prefix+"/edit/"+id;
 		$.modal.open("修改工位",url,800,480);
 	}
-	/**
-	 * 保存指定书配置
-	 */
-	function save() {
-		var sopId = $("#sopId option:selected").val();
-		// if(sopId && sopId != 0){
-		// 	$.modal.alertWarning("请选择作业指导书");
-		// 	return;
-		// }
-		var codes = $("#productCodes option:selected");
-		if($(codes).size() <= 0){
-			$.modal.alertWarning("请选择产品编码");
-			return;
-		}
-		var all ="";
-		for(var i =0;i<$(codes).size();i++){
-			all += $(codes[i]).val() +",";
-		}
-		all = all.substr(0, all.length - 1);
-		var data ={
-			id:[[${line.id}]],
-			sopId:sopId,
-			productCodes:all
-		}
-		$.post("/production/productionLine/configSop",data,function (res) {
-			if(res.code == 0){
-				$.modal.alertWarning("配置成功");
-			}else{
-				$.modal.alertWarning("操作异常");
-			}
-		})
-	}
+
 
 	/**
 	 * 删除工位

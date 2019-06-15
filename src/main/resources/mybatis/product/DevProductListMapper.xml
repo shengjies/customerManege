@@ -163,4 +163,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectProNameAllByComId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
         select distinct product_name as productName from dev_product_list where company_id = #{companyId} and def_id = 0;
     </select>
+
+    <!--根据产线id查询所以未配置的产品信息-->
+    <select id="selectNotConfigByLineId" resultMap="DevProductListResult">
+      SELECT p.id,p.product_code FROM dev_product_list as p left join  (select * from tab_sop_line where  line_id = #{lineId})
+        as l on p.id = l.pn_id where p.def_id =0 and p.company_id = #{companyid} and l.pn_id is null;
+    </select>
 </mapper>

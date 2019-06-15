@@ -431,4 +431,14 @@ public class DevProductListServiceImpl implements IDevProductListService {
     public DevProductList selectProductByCompanyIdAndCode(int companyId, String code) {
         return devProductListMapper.checkProductCodeUnique(code,companyId);
     }
+
+    /**
+     * 根据产线id查询所以未配置的产品信息
+     * @param lineId 产线id
+     * @return
+     */
+    @Override
+    public List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid) {
+        return devProductListMapper.selectNotConfigByLineId(lineId,companyid);
+    }
 }

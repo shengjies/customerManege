@@ -121,16 +121,6 @@ public class ProductionLineServiceImpl implements IProductionLineService {
         return productionLineMapper.updateProductionLine(productionLine);
     }
 
-    /**
-     * 修改产线作业指导书配置
-     *
-     * @param line 产线信息
-     * @return
-     */
-    @Override
-    public int editProductionLineSop(ProductionLine line) {
-        return productionLineMapper.updateProductionLine(line);
-    }
 
     /**
      * 删除生产线对象

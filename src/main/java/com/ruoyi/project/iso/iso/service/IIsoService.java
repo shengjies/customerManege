@@ -72,6 +72,14 @@ public interface IIsoService
 	List<Iso> selectIsoByParentId(Integer parentId);
 
 	/**
+	 * 根据父id和产线id查询对应产线所以未配置的SOP指导书
+	 * @param pid 父id
+	 * @param lineId 产线id
+	 * @return
+	 */
+	List<Iso> selectNotConfigByPidAndLineId(Integer pid,Integer lineId);
+
+	/**
 	 * 上传sop文件
 	 * @param file 文件
 	 * @param parentId 父id

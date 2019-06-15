@@ -142,4 +142,11 @@ public interface DevProductListMapper {
 //    @DataSource(value = DataSourceType.SLAVE)
     List<DevProductList> selectProNameAllByComId(@Param("companyId") Integer companyId);
 
+    /**
+     * 根据产线id查询所以未配置的产品信息
+     * @param lineId 产线id
+     * @return
+     */
+    List<DevProductList> selectNotConfigByLineId(@Param("lineId")int lineId,@Param("companyid")int companyid);
+
 }

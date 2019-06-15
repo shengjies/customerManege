@@ -163,4 +163,21 @@ public class IsoController extends BaseController {
         return AjaxResult.success("success",isoService.selectIsoById(isoId));
     }
 
+    /**
+     * 根据文件id查询对应子文件
+     * @param pid
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/findByPid")
+    @RequiresPermissions("iso:iso:list")
+    public AjaxResult findIsoByPid(int pid){
+        try {
+            return AjaxResult.success(isoService.selectIsoByParentId(pid));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AjaxResult.error();
+    }
+
 }

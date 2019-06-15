@@ -91,7 +91,14 @@ public class AjaxResult extends HashMap<String, Object>
         super.put(key, value);
         return this;
     }
-    
+    public static AjaxResult success(Object data)
+    {
+        AjaxResult json = new AjaxResult();
+        json.put("code", 0);
+        json.put("data", data);
+        return json;
+    }
+
     public static AjaxResult success(String msg,Object data)
     {
         AjaxResult json = new AjaxResult();

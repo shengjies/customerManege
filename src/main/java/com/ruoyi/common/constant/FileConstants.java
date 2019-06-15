@@ -39,4 +39,10 @@ public class FileConstants {
     public static final Integer CATEGORY_SOP_FOLDER = 4;
     public static final Integer CATEGORY_SOP_FILE = 5;
 
+    /**
+     * 各个主要文件夹id
+     * 作业指导书 7
+     */
+    public static final Integer FOLDER_SOP = 7;
+
 }

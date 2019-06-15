@@ -41,13 +41,11 @@ public class WorkstationController extends BaseController
 	@Autowired
 	private IWorkstationService workstationService;
 
-	@Autowired
-	private IProductionLineService productionLineService;
 
 	@GetMapping("/{id}")
 	public String workstation(@PathVariable("id") int id, ModelMap mmap)
 	{
-		mmap.put("line",productionLineService.selectProductionLineById(id));
+		mmap.put("line",id);
 	    return prefix + "/workstation";
 	}
 	
@@ -68,10 +66,9 @@ public class WorkstationController extends BaseController
 	 * 新增工位配置
 	 */
 	@GetMapping("/add")
-	public String add(int line,int sopid,ModelMap mmap)
+	public String add(int line,ModelMap mmap)
 	{
 		mmap.put("line",line);
-		mmap.put("sopid",sopid);
 	    return prefix + "/add";
 	}
 	

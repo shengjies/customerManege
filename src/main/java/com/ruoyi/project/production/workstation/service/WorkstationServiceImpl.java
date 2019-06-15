@@ -209,5 +209,14 @@ public class WorkstationServiceImpl implements IWorkstationService
 		}
 		return row;
 	}
-	
+
+	/**
+	 * 根据产线查询所以工位信息
+	 * @param lineId 产线id
+	 * @return
+	 */
+	@Override
+	public List<Workstation> selectAllByLineId(Integer lineId) {
+		return workstationMapper.selectAllByLineId(lineId);
+	}
 }

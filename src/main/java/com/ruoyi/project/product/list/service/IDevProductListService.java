@@ -131,4 +131,11 @@ public interface IDevProductListService
 	 * @return
 	 */
 	DevProductList selectProductByCompanyIdAndCode(int companyId,String code);
+
+	/**
+	 * 根据产线id查询所以未配置的产品信息
+	 * @param lineId 产线id
+	 * @return
+	 */
+	List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid);
 }

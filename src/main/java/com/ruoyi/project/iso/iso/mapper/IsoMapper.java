@@ -69,6 +69,14 @@ public interface IsoMapper
 	List<Iso> selectByPid(@Param("parentId")int pid);
 
 	/**
+	 * 根据父id和产线id查询对应产线所以未配置的SOP指导书
+	 * @param pid 父id
+	 * @param lineId 产线id
+	 * @return
+	 */
+	List<Iso> selectNotConfigByPidAndLineId(@Param("pid")int pid,@Param("lineId")int lineId);
+
+	/**
 	 * 根据祖父id查询对应的子目录 注册生成文件夹
 	 * @param grParentId 祖父id
 	 * @return 结果

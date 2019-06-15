@@ -18,19 +18,6 @@
 					<input id="wName" name="wName" th:field="*{wName}" class="form-control" type="text">
 				</div>
 			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">指导书页数id：</label>
-				<div class="col-sm-8">
-					<select style="width: 100%" id="sopId" th:field="*{sopId}" class="form-control"
-							name="sopId"
-							th:with="supplier = ${@supplier.selectSupplierAllByCompanyId(#httpServletRequest.getCookies())}">
-						<option value="0">请选择</option>
-						<option th:each="item : ${supplier}"  th:text="${item.supplierName}"
-								th:value="${item.id}"></option>
-
-					</select>
-				</div>
-			</div>
 			<div class="form-group">
 				<label class="col-sm-3 control-label">计数器硬件编码：</label>
 				<div class="col-sm-8">
@@ -102,7 +89,6 @@
                 var data={};
                 data.id = $('#id').val();
                 data.wName = $('#wName').val();
-                data.sopId = $('#sopId option:selected').val();
                 data.devId = $('#devId option:selected').val();
                 data.cId = $('#cId option:selected').val();
                 data.eId = $('#eId option:selected').val();

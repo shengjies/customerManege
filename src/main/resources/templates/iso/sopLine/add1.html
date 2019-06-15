@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-sopLine-add">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">SOP：</label>
+                <div class="col-sm-8">
+                    <input id="lineId" name="lineId" th:value="${line}" class="form-control" type="hidden">
+                    <select style="width: 100%" id="sopId" onchange="sopChange(this)" class="form-control" name="sopId">
+                        <option value="0">请选择</option>
+                        <option th:each="item : ${iso}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品编码：</label>
+                <div class="col-sm-8">
+                    <select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
+                        <option th:each="item : ${pns}"  th:text="${item.productCode}" th:value="${item.id}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <table class="table table-striped table-bordered table-hover " id="add-order-table">
+                <thead>
+                <tr>
+                    <th>工位</th>
+                    <th>作业指导书[页]</th>
+                </tr>
+                </thead>
+                <tbody id="add-sop-w-table-body">
+                    <tr th:each="item:${work}">
+                        <td th:utext="${item.wName}" th:data-w-id="${item.id}"></td>
+                        <td>
+                            <select style="width: 100%"   class="form-control" name="wId">
+                                <option value="0">请选择</option>
+                                <option th:each="item : ${iso}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
+                        </select></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    $(function () {
+        $("#pnId").select2({
+            placeholder:'请选择'
+        });
+    })
+    var prefix = ctx + "iso/sopLine"
+    $("#form-sopLine-add").validate({
+        rules:{
+            sopId:{
+                required:true,
+            },
+        },
+        messages:{
+            sopId:{
+                required:"请选择SOP",
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            alert("验证通过")
+            // $.operate.save(prefix + "/add", $('#form-sopLine-add').serialize());
+        }
+    }
+
+    function sopChange(val) {
+        var id = $(val).find("option:selected").val();
+        if(id > 0){
+            //获取对应书下的页
+
+        }else{
+            var data=[{id:0,text:'请选择'}];
+            $("#add-sop-w-table-body select option").remove();
+            $("#add-sop-w-table-body select").select2({
+                data:data
+            });
+        }
+    }
+</script>
+</body>
+</html>
