@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.iso.sopLine.mapper.SopLineMapper">
+    
+    <resultMap type="SopLine" id="SopLineResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="pnId"    column="pn_id"    />
+        <result property="pnCode"    column="pn_code"    />
+        <result property="cId"    column="c_id"    />
+        <result property="cTime"    column="c_time"    />
+    </resultMap>
+	
+	<sql id="selectSopLineVo">
+        select id, company_id, sop_id, line_id, pn_id, pn_code, c_id, c_time from tab_sop_line
+    </sql>
+	
+    <select id="selectSopLineList" parameterType="SopLine" resultMap="SopLineResult">
+        <include refid="selectSopLineVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="sopId != null "> and sop_id = #{sopId}</if>
+             <if test="lineId != null "> and line_id = #{lineId}</if>
+             <if test="pnId != null "> and pn_id = #{pnId}</if>
+             <if test="pnCode != null  and pnCode != '' "> and pn_code = #{pnCode}</if>
+             <if test="cId != null "> and c_id = #{cId}</if>
+             <if test="cTime != null "> and c_time = #{cTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectSopLineById" parameterType="Integer" resultMap="SopLineResult">
+        <include refid="selectSopLineVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSopLine" parameterType="SopLine" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_sop_line
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="sopId != null  ">sop_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="pnId != null  ">pn_id,</if>
+			<if test="pnCode != null  and pnCode != ''  ">pn_code,</if>
+			<if test="cId != null  ">c_id,</if>
+			<if test="cTime != null  ">c_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="sopId != null  ">#{sopId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="pnId != null  ">#{pnId},</if>
+			<if test="pnCode != null  and pnCode != ''  ">#{pnCode},</if>
+			<if test="cId != null  ">#{cId},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSopLine" parameterType="SopLine">
+        update tab_sop_line
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="sopId != null  ">sop_id = #{sopId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="pnId != null  ">pn_id = #{pnId},</if>
+            <if test="pnCode != null  and pnCode != ''  ">pn_code = #{pnCode},</if>
+            <if test="cId != null  ">c_id = #{cId},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteSopLineById" parameterType="Integer">
+        delete from tab_sop_line where id = #{id}
+    </delete>
+	
+    <delete id="deleteSopLineByIds" parameterType="String">
+        delete from tab_sop_line where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
