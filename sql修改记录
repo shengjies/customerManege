@@ -152,3 +152,29 @@ ADD COLUMN `product_codes` VARCHAR(545) NULL COMMENT '产品编码' AFTER `sop_i
 ALTER TABLE `octopus`.`dev_production_line`
 CHANGE COLUMN `sop_id` `sop_id` INT(11) NULL DEFAULT 0 COMMENT '作业指导书编号' ;
 
+#2019-06-15 zsj 添加SOP 产线 工位配置
+#SOP 产线配置
+CREATE TABLE `tab_sop_line` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) DEFAULT NULL COMMENT '公司id',
+  `sop_id` int(11) DEFAULT NULL COMMENT '作业指定数id，文件夹',
+  `line_id` int(11) DEFAULT NULL COMMENT '产线id',
+  `pn_id` int(11) DEFAULT NULL COMMENT '产品id',
+  `pn_code` varchar(145) DEFAULT NULL COMMENT '产品编码',
+  `c_id` int(11) DEFAULT NULL COMMENT '修改者id',
+  `c_time` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='作业指导书  产线 配置';
+
+#SOP 产线 工位配置
+CREATE TABLE `tab_sop_line_work` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `company_id` int(11) DEFAULT NULL COMMENT '公司id',
+  `line_id` int(11) DEFAULT NULL COMMENT '产线id',
+  `sop_id` int(11) DEFAULT NULL COMMENT '作业指导书id',
+  `w_id` int(11) DEFAULT NULL COMMENT '工位id',
+  `page_id` int(11) DEFAULT NULL COMMENT '作业指导书页id',
+  `c_id` int(11) DEFAULT NULL COMMENT '修改者id',
+  `c_time` datetime DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产线工位配置指导书页';
