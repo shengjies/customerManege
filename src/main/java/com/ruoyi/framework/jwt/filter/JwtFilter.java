@@ -3,7 +3,6 @@ package com.ruoyi.framework.jwt.filter;
 
 
 import com.ruoyi.common.feign.FeignUtils;
-import com.ruoyi.common.utils.PathUtils;
 import com.ruoyi.framework.jwt.JwtToken;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.domain.User;

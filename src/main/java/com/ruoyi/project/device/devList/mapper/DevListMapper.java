@@ -53,6 +53,13 @@ public interface DevListMapper
 	public int updateDevList(DevList devList);
 
 	/**
+	 * 修改硬件配置标记
+	 * @param devList
+	 * @return
+	 */
+	int updateDevSign(DevList devList);
+
+	/**
 	 * 用户添加硬件信息
 	 * @param devList 硬件信息
 	 * @return
@@ -99,4 +106,11 @@ public interface DevListMapper
 	 * @return
 	 */
 	DevList selectDevListByCode(@Param("code")String code);
+
+	/**
+	 * 查询所以未配置
+	 * @return
+	 */
+	List<DevList> selectDevNotConfig();
+
 }

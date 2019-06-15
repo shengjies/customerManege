@@ -91,4 +91,10 @@ public interface IDevListService
 	 * @return
 	 */
 	int apiEdit(DevList devList);
+
+	/**
+	 * 查询所以未配置的硬件
+	 * @return
+	 */
+	List<DevList> selectDevNotConfig();
 }

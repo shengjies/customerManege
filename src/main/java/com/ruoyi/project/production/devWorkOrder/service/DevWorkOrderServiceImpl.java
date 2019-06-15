@@ -32,6 +32,7 @@ import com.ruoyi.project.production.workDayHour.domain.WorkDayHour;
 import com.ruoyi.project.production.workDayHour.mapper.WorkDayHourMapper;
 import com.ruoyi.project.production.workOrderChange.domain.WorkOrderChange;
 import com.ruoyi.project.production.workOrderChange.mapper.WorkOrderChangeMapper;
+import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +89,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     @Autowired
     private OrderDetailsMapper orderDetailsMapper;
+
+    @Autowired
+    private WorkstationMapper workstationMapper;
 
 
 
@@ -287,41 +291,41 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
 
             // 通过产线id获取io口集合信息
-            List<DevIo> devIos = devIoMapper.selectLineDevIO(devWorkOrder.getLineId()); // 对应产线IO口列表
-            DevList devList = null;
-            WorkData workData = null;
-            WorkDayHour workDayHour = null;
-            for (DevIo io : devIos) {
-                // 通过io口id查询硬件信息
-                //devDevice = devDeviceMapper.selectDevDeviceById(io.getDevId());
-                devList = devListMapper.selectDevListById(io.getDevId());
-                // 初始化工单数据
-                workData = new WorkData();
-                workData.setWorkId(devWorkOrder.getId()); // 所属工单
-                workData.setCompanyId(devWorkOrder.getCompanyId()); // 所属公司
-                workData.setLineId(devWorkOrder.getLineId()); // 所属产线
-                workData.setDevId(devList.getId()); // 所属硬件
-                workData.setDevName(devList.getDeviceName()); // 硬件名称
-                workData.setIoId(io.getId()); // 所属IO口id
-                workData.setIoName(io.getIoName()); // 所属IO口名称
-                workData.setIoOrder(io.getIoOrder()); // 所属IO的排序
-                workData.setCreateTime(new Date()); // 创建时间
-                workDataMapper.insertWorkData(workData);// 保存工单数据
-
-                // 初始化工单各个IO口每小时数据
-                workDayHour = new WorkDayHour();
-                workDayHour.setWorkId(devWorkOrder.getId()); // 所属工单
-                workDayHour.setCompanyId(devWorkOrder.getCompanyId()); // 所属公司
-                workDayHour.setLineId(devWorkOrder.getLineId()); // 所属产线
-                workDayHour.setDevId(devList.getId()); // 所属硬件
-                workDayHour.setDevName(devList.getDeviceName()); // 硬件名称
-                workDayHour.setIoId(io.getId()); // 所属IO口id
-                workDayHour.setIoName(io.getIoName()); // 所属IO口名称
-                workDayHour.setIoOrder(io.getIoOrder()); // 所属IO的排序
-                workDayHour.setDataTime(new Date()); // 创建时间年月日
-                workDayHour.setCreateTime(new Date()); // 创建时间年月日时分秒
-                workDayHourMapper.insertWorkDayHour(workDayHour); // 保存工单各个IO口每小时数据
-            }
+//            List<DevIo> devIos = devIoMapper.selectLineDevIO(devWorkOrder.getLineId()); // 对应产线IO口列表
+//            DevList devList = null;
+//            WorkData workData = null;
+//            WorkDayHour workDayHour = null;
+//            for (DevIo io : devIos) {
+//                // 通过io口id查询硬件信息
+//                //devDevice = devDeviceMapper.selectDevDeviceById(io.getDevId());
+//                devList = devListMapper.selectDevListById(io.getDevId());
+//                // 初始化工单数据
+//                workData = new WorkData();
+//                workData.setWorkId(devWorkOrder.getId()); // 所属工单
+//                workData.setCompanyId(devWorkOrder.getCompanyId()); // 所属公司
+//                workData.setLineId(devWorkOrder.getLineId()); // 所属产线
+//                workData.setDevId(devList.getId()); // 所属硬件
+//                workData.setDevName(devList.getDeviceName()); // 硬件名称
+//                workData.setIoId(io.getId()); // 所属IO口id
+//                workData.setIoName(io.getIoName()); // 所属IO口名称
+//                workData.setIoOrder(io.getIoOrder()); // 所属IO的排序
+//                workData.setCreateTime(new Date()); // 创建时间
+//                workDataMapper.insertWorkData(workData);// 保存工单数据
+//
+//                // 初始化工单各个IO口每小时数据
+//                workDayHour = new WorkDayHour();
+//                workDayHour.setWorkId(devWorkOrder.getId()); // 所属工单
+//                workDayHour.setCompanyId(devWorkOrder.getCompanyId()); // 所属公司
+//                workDayHour.setLineId(devWorkOrder.getLineId()); // 所属产线
+//                workDayHour.setDevId(devList.getId()); // 所属硬件
+//                workDayHour.setDevName(devList.getDeviceName()); // 硬件名称
+//                workDayHour.setIoId(io.getId()); // 所属IO口id
+//                workDayHour.setIoName(io.getIoName()); // 所属IO口名称
+//                workDayHour.setIoOrder(io.getIoOrder()); // 所属IO的排序
+//                workDayHour.setDataTime(new Date()); // 创建时间年月日
+//                workDayHour.setCreateTime(new Date()); // 创建时间年月日时分秒
+//                workDayHourMapper.insertWorkDayHour(workDayHour); // 保存工单各个IO口每小时数据
+//            }
         }
 
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);

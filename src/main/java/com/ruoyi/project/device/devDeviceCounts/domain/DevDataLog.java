@@ -15,21 +15,21 @@ public class DevDataLog extends BaseEntity
 {
 	private static final long serialVersionUID = 1L;
 	
-	/**  */
+	/** 编号 */
 	private Integer id;
-	/**  */
+	/** 公司id */
 	private Integer companyId;
-	/**  */
+	/** 查询id */
 	private Integer lineId;
-	/**  */
+	/** 工单id */
 	private Integer workId;
-	/**  */
+	/** 硬件id */
 	private Integer devId;
-	/**  */
+	/** 工位id */
 	private Integer ioId;
 	/**  */
 	private Integer ioOrder;
-	/**  */
+	/** 上报总数 */
 	private Integer dataTotal;
 	/**  */
 	private Date createDate;

@@ -6,6 +6,12 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
+import com.ruoyi.project.device.devList.domain.DevList;
+import com.ruoyi.project.device.devList.mapper.DevListMapper;
+import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
+import com.ruoyi.project.production.workstation.domain.Workstation;
+import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +40,15 @@ public class ProductionLineServiceImpl implements IProductionLineService {
 
     @Autowired
     private DevCompanyMapper devCompanyMapper;
+
+    @Autowired
+    private DevWorkOrderMapper devWorkOrderMapper;
+
+    @Autowired
+    private WorkstationMapper workstationMapper;
+
+    @Autowired
+    private DevListMapper devListMapper;
 
     /**
      * 查询生产线信息
@@ -80,7 +96,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      */
     @Override
 //    @DataSource(DataSourceType.SLAVE)
-    public int insertProductionLine(ProductionLine productionLine,HttpServletRequest request) {
+    public int insertProductionLine(ProductionLine productionLine, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user != null) {
             productionLine.setCompanyId(user.getCompanyId());
@@ -98,7 +114,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      */
     @Override
 //    @DataSource(value = DataSourceType.SLAVE)
-    public int updateProductionLine(ProductionLine productionLine,HttpServletRequest request) {
+    public int updateProductionLine(ProductionLine productionLine, HttpServletRequest request) {
         ProductionLine line = productionLineMapper.selectProductionLineById(productionLine.getId());
         User sysUser = JwtUtil.getTokenUser(request); // 在线用户
         checkDeviceLiable(sysUser, line);
@@ -106,24 +122,71 @@ public class ProductionLineServiceImpl implements IProductionLineService {
     }
 
     /**
+     * 修改产线作业指导书配置
+     *
+     * @param line 产线信息
+     * @return
+     */
+    @Override
+    public int editProductionLineSop(ProductionLine line) {
+        return productionLineMapper.updateProductionLine(line);
+    }
+
+    /**
      * 删除生产线对象
      *
-     * @param ids 需要删除的数据ID
+     * @param id 需要删除的数据ID
      * @return 结果
      */
     @Override
-    public int deleteProductionLineByIds(String ids,HttpServletRequest request) {
+    @Transactional
+    public int deleteProductionLineById(Integer id, HttpServletRequest request) {
         User sysUser = JwtUtil.getTokenUser(request); // 在线用户
-        String[] lineIds = Convert.toStrArray(ids);
-        ProductionLine productionLine = null;
-        if (!User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) { // 非系统用户或者非注册用户
+        ProductionLine  productionLine = productionLineMapper.selectProductionLineById(id);
+        if (productionLine != null && !User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) { // 非系统用户或者非注册用户
             // 删除的时候判断是否为该工单的负责人
-            for (String lineId : lineIds) {
-                productionLine = productionLineMapper.selectProductionLineById(Integer.parseInt(lineId)); // 查询产线信息
-                checkDeviceLiable(sysUser,productionLine);
+             // 查询产线信息
+            checkDeviceLiable(sysUser, productionLine);
+        }
+        if(productionLine != null){
+            //查询是否有工单信息
+            DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByLineId(id);
+            if(workOrder != null){
+                throw new BusinessException("该产线有未完成工单，不能删除...");
             }
         }
-        return productionLineMapper.deleteProductionLineByIds(Convert.toStrArray(ids));
+        //查询对应产线的工位信息
+        List<Workstation> workstations = workstationMapper.selectAllByLineId(id);
+        if(workstations != null && workstations.size() >0){
+            DevList devList = null;
+            for (Workstation workstation : workstations) {
+                //将对应硬件设置为未配置
+                if(workstation.getDevId() >0){
+                    devList = devListMapper.selectDevListById(workstation.getDevId());
+                    if(devList != null){
+                        devList.setSign(0);
+                        devListMapper.updateDevSign(devList);
+                    }
+                }
+                if(workstation.getcId() >0){
+                    devList = devListMapper.selectDevListById(workstation.getcId());
+                    if(devList != null){
+                        devList.setSign(0);
+                        devListMapper.updateDevSign(devList);
+                    }
+                }
+                if(workstation.geteId() >0){
+                    devList = devListMapper.selectDevListById(workstation.geteId());
+                    if(devList != null){
+                        devList.setSign(0);
+                        devListMapper.updateDevSign(devList);
+                    }
+                }
+                //删除工位
+                workstationMapper.deleteWorkstationById(workstation.getId());
+            }
+        }
+        return productionLineMapper.deleteProductionLineById(id);
     }
 
     @Override
@@ -138,7 +201,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @return
      */
     @Override
-    public int updateLineConfigClear(ProductionLine line,HttpServletRequest request) {
+    public int updateLineConfigClear(ProductionLine line, HttpServletRequest request) {
         User sysUser = JwtUtil.getTokenUser(request); // 在线用户
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(line.getId()); // 查询产线信息
         checkDeviceLiable(sysUser, productionLine);
@@ -176,6 +239,7 @@ public class ProductionLineServiceImpl implements IProductionLineService {
 
     /**
      * 校验登录用户是否为生产线的责任人
+     *
      * @param sysUser
      * @param productionLine
      */
@@ -215,9 +279,9 @@ public class ProductionLineServiceImpl implements IProductionLineService {
 //    @DataSource(value = DataSourceType.SLAVE)
     public Map findDeviceLiableByLineId(Integer lineId) {
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(lineId);
-        Map<String,Object> map = new HashMap<>(16);
-        map.put("user1",findName(productionLine.getDeviceLiable()));
-        map.put("user2",findName(productionLine.getDeviceLiableTow()));
+        Map<String, Object> map = new HashMap<>(16);
+        map.put("user1", findName(productionLine.getDeviceLiable()));
+        map.put("user2", findName(productionLine.getDeviceLiableTow()));
         return map;
     }
 

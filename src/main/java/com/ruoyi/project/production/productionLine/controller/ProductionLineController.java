@@ -119,9 +119,9 @@ public class ProductionLineController extends BaseController {
     @Log(title = "生产线", businessType = BusinessType.DELETE)
     @PostMapping("/remove")
     @ResponseBody
-    public AjaxResult remove(String ids,HttpServletRequest request) {
+    public AjaxResult remove(Integer id,HttpServletRequest request) {
         try {
-            return toAjax(productionLineService.deleteProductionLineByIds(ids,request));
+            return toAjax(productionLineService.deleteProductionLineById(id,request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -204,5 +204,21 @@ public class ProductionLineController extends BaseController {
         }
         mmap.put("line", productionLine);
         return prefix + "/lineLive";
+    }
+
+    /**
+     * 配置作业指导书
+     * @param line
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/configSop")
+    public AjaxResult configSop(ProductionLine line){
+        try {
+            productionLineService.editProductionLineSop(line);
+            return AjaxResult.success();
+        }catch (Exception e){
+            return AjaxResult.error();
+        }
     }
 }

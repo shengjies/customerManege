@@ -31,7 +31,7 @@
                                 <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId" class="form-control"
                                         th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
                                     <option value="">请选择</option>
-                                    <option th:each="line : ${productionLine}" th:text="${line.lineName}"
+                                    <option th:if="${line.defId == 0}" th:each="line : ${productionLine}" th:text="${line.lineName}"
                                             th:value="${line.Id}"></option>
                                 </select>
                             </div>

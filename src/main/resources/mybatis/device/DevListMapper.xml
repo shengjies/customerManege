@@ -17,16 +17,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="defId"    column="def_id"    />
         <result property="configDate"    column="config_date"    />
         <result property="createDate"    column="create_date"    />
+        <result property="sign"    column="sign"    />
         <association property="devModel" select="selectDevModel" column="dev_model_id">
             <result property="devModel" column="model_name"/>
-        </association>
-        <association property="comName" select="selectDevComName" column="company_id">
-            <result property="comName" column="com_name"/>
         </association>
     </resultMap>
 	
 	<sql id="selectDevListVo">
-        select id, device_id, device_status,config_status, device_name, dev_model_id, device_upload_time, company_id, remark, def_id, config_date, create_date from dev_list
+        select id, device_id, device_status,config_status, device_name, dev_model_id, device_upload_time,
+         company_id, remark, def_id, config_date, create_date,sign from dev_list
     </sql>
 	
     <select id="selectDevListList" parameterType="DevList" resultMap="DevListResult">
@@ -39,6 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
              <if test="deviceName != null  and deviceName != '' "> and device_name like concat(#{deviceName}, '%')</if>
              <if test="devModelId > 0 "> and dev_model_id = #{devModelId}</if>
+             <if test="sign > 0 "> and sign = #{sign}</if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(create_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
             </if>
@@ -49,11 +49,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectDevModel" resultType="java.lang.String">
-        SELECT model_name FROM devicemanage.dev_model where id =#{dev_model_id}
+        SELECT model_name FROM dev_model where id =#{dev_model_id}
     </select>
-    <select id="selectDevComName" resultType="java.lang.String">
-        SELECT com_name FROM devicemanage.dev_company where company_id=#{company_id};
-    </select>
+
     <select id="selectDevListById" parameterType="Integer" resultMap="DevListResult">
         <include refid="selectDevListVo"/>
         where id = #{id}
@@ -103,6 +101,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="configDate != null  ">config_date = #{configDate},</if>
         </trim>
         where id = #{id}
+    </update>
+    <update id="updateDevSign" parameterType="DevList">
+        update dev_list set sign = #{sign} where id = #{id}
     </update>
 
 	<update id="deleteDevListById" parameterType="Integer">
@@ -171,4 +172,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="addSave">
         update dev_list set company_id = #{companyId},device_name=#{deviceName},remark=#{remark},config_date=now()  where device_id = #{deviceId};
     </update>
+
+    <!--查询所以未配置的硬件信息-->
+    <select id="selectDevNotConfig" resultMap="DevListResult">
+        <include refid="selectDevListVo"/>
+        <where>
+            and def_id = 0  and sign = 0 and device_status = 1
+        </where>
+    </select>
 </mapper>

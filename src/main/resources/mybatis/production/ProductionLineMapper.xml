@@ -16,10 +16,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="deviceLiableTow"    column="device_liable1"    />
         <result property="manual"    column="manual"    />
         <result property="paramConfig"    column="param_config"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="productCodes"    column="product_codes"    />
     </resultMap>
 	
 	<sql id="selectProductionLineVo">
-        select id, line_name, device_liable, remark, def_id, company_id, create_time, create_by,device_liable1,manual,param_config from dev_production_line
+        select id, line_name, device_liable, remark, def_id, company_id, create_time,
+        create_by,device_liable1,manual,param_config,sop_id,product_codes from dev_production_line
     </sql>
 
     <select id="selectProductionLineList" parameterType="ProductionLine" resultMap="ProductionLineResult">
@@ -55,6 +58,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="deviceLiableTow != null  ">device_liable1,</if>
 			<if test="manual != null  ">manual,</if>
 			<if test="paramConfig != null  ">param_config,</if>
+			<if test="sopId != null and sopId != '' ">sop_id,</if>
+			<if test="productCodes != null and productCodes != '' ">product_codes,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="lineName != null  and lineName != ''  ">#{lineName},</if>
@@ -67,6 +72,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="deviceLiableTow != null  ">#{deviceLiableTow},</if>
 			<if test="manual != null  ">#{manual},</if>
 			<if test="paramConfig != null  ">#{paramConfig},</if>
+            <if test="sopId != null and sopId != '' ">#{sopId},</if>
+            <if test="productCodes != null and productCodes != '' ">#{productCodes},</if>
          </trim>
     </insert>
 	 
@@ -79,6 +86,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="manual != null  ">manual = #{manual},</if>
             <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
             <if test="paramConfig != null    ">param_config = #{paramConfig},</if>
+            <if test="sopId != null and sopId != '' ">sop_id = #{sopId},</if>
+            <if test="productCodes != null and productCodes != '' ">product_codes = #{productCodes},</if>
         </trim>
         where id = #{id}
     </update>
@@ -122,7 +131,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询对应公司所有的产线信息-->
     <select id="selectAllProductionLineByCompanyId" resultType="com.ruoyi.project.production.productionLine.domain.ProductionLine">
-        select id as Id, line_name as lineName from dev_production_line
+        select id as Id, line_name as lineName,def_id as defId from dev_production_line
         where 1=1
         <if test="companyId != null and companyId !='' "> and company_id = #{companyId}</if>
     </select>

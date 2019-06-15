@@ -58,6 +58,8 @@ public class DevList extends BaseEntity
 
 	private List<DevIo> devIos;
 
+	private Integer sign;//标记硬件是否配置 0、未配置 1、已经配置
+
 
 	public void setId(Integer id) 
 	{
@@ -191,24 +193,11 @@ public class DevList extends BaseEntity
 		this.configStatus = configStatus;
 	}
 
-	@Override
-	public String toString() {
-		return "DevList{" +
-				"id=" + id +
-				", deviceId='" + deviceId + '\'' +
-				", devModel='" + devModel + '\'' +
-				", deviceStatus=" + deviceStatus +
-				", configStatus=" + configStatus +
-				", deviceName='" + deviceName + '\'' +
-				", devModelId=" + devModelId +
-				", deviceUploadTime=" + deviceUploadTime +
-				", companyId=" + companyId +
-				", comName='" + comName + '\'' +
-				", remark='" + remark + '\'' +
-				", defId=" + defId +
-				", configDate=" + configDate +
-				", createDate=" + createDate +
-				", devIos=" + devIos +
-				'}';
+	public Integer getSign() {
+		return sign;
+	}
+
+	public void setSign(Integer sign) {
+		this.sign = sign;
 	}
 }

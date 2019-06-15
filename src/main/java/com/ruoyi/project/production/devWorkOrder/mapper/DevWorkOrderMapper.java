@@ -210,4 +210,11 @@ public interface DevWorkOrderMapper {
      */
 //    @DataSource(DataSourceType.SLAVE)
     int editLatelyCompleteWorkSign(@Param("workid")int workid);
+
+    /**
+     * 根据查询id查询是否存在未完成工单信息
+     * @param lineId
+     * @return
+     */
+    DevWorkOrder selectWorkByLineId(@Param("lineId")int lineId);
 }

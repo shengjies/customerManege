@@ -46,14 +46,21 @@ public interface IProductionLineService
      * @return 结果
      */
 	public int updateProductionLine(ProductionLine productionLine,HttpServletRequest request);
+
+	/**
+	 * 修改产线作业指导书配置
+	 * @param line 产线信息
+	 * @return
+	 */
+	public int editProductionLineSop(ProductionLine line);
 		
 	/**
      * 删除生产线信息
      * 
-     * @param ids 需要删除的数据ID
+     * @param id 需要删除的数据ID
      * @return 结果
      */
-	public int deleteProductionLineByIds(String ids,HttpServletRequest request);
+	public int deleteProductionLineById(Integer id,HttpServletRequest request);
 
 	/**
 	 * 查询对应产线已经配置的硬件信息

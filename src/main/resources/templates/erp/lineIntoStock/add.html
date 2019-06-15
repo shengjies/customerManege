@@ -21,7 +21,7 @@
 								<label class="col-sm-12 control-label" style="margin-top: 10px;">产线：</label>
 								<div class="col-sm-12">
 									<select style="width: 200px" name="lineName" id="lineName"  onchange="lineChange(this)"
-											th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+											th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
 										<option value="-1">全部</option>
 										<option th:each="line : ${productionLine}" th:text="${line.lineName}" th:data-id="${line.id}"
 												th:value="${line.lineName}"></option>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.workstation.mapper.WorkstationMapper">
+    
+    <resultMap type="Workstation" id="WorkstationResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="wName"    column="w_name"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="devCode"    column="dev_code"    />
+        <result property="cId"    column="c_id"    />
+        <result property="cCode"    column="c_code"    />
+        <result property="eId"    column="e_id"    />
+        <result property="eCode"    column="e_code"    />
+        <result property="sign"    column="sign"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="defId"    column="def_id"    />
+    </resultMap>
+	
+	<sql id="selectWorkstationVo">
+        select id, company_id, line_id, w_name, sop_id, dev_id, dev_code, c_id, c_code, e_id, e_code, sign, c_time, def_id from tab_workstation
+    </sql>
+	
+    <select id="selectWorkstationList" parameterType="Workstation" resultMap="WorkstationResult">
+        <include refid="selectWorkstationVo"/>
+        <where>  
+             and line_id = #{lineId}
+             <if test="wName != null  and wName != '' "> and w_name like concat('%', #{wName}, '%')</if>
+         </where>
+    </select>
+    
+    <select id="selectWorkstationById" parameterType="Integer" resultMap="WorkstationResult">
+        <include refid="selectWorkstationVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertWorkstation" parameterType="Workstation" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_workstation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="wName != null  and wName != ''  ">w_name,</if>
+			<if test="sopId != null  ">sop_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="devCode != null  and devCode != ''  ">dev_code,</if>
+			<if test="cId != null  ">c_id,</if>
+			<if test="cCode != null  and cCode != ''  ">c_code,</if>
+			<if test="eId != null  ">e_id,</if>
+			<if test="eCode != null  and eCode != ''  ">e_code,</if>
+			<if test="sign != null  ">sign,</if>
+			<if test="cTime != null  ">c_time,</if>
+			<if test="defId != null  ">def_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="wName != null  and wName != ''  ">#{wName},</if>
+			<if test="sopId != null  ">#{sopId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="devCode != null  and devCode != ''  ">#{devCode},</if>
+			<if test="cId != null  ">#{cId},</if>
+			<if test="cCode != null  and cCode != ''  ">#{cCode},</if>
+			<if test="eId != null  ">#{eId},</if>
+			<if test="eCode != null  and eCode != ''  ">#{eCode},</if>
+			<if test="sign != null  ">#{sign},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+			<if test="defId != null  ">#{defId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateWorkstation" parameterType="Workstation">
+        update tab_workstation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="wName != null  and wName != ''  ">w_name = #{wName},</if>
+            <if test="sopId != null  ">sop_id = #{sopId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="devCode != null  and devCode != ''  ">dev_code = #{devCode},</if>
+            <if test="cId != null  ">c_id = #{cId},</if>
+            <if test="cCode != null  and cCode != ''  ">c_code = #{cCode},</if>
+            <if test="eId != null  ">e_id = #{eId},</if>
+            <if test="eCode != null  and eCode != ''  ">e_code = #{eCode},</if>
+            <if test="sign != null  ">sign = #{sign},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="defId != null  ">def_id = #{defId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteWorkstationById" parameterType="Integer">
+        delete from tab_workstation where id = #{id}
+    </delete>
+	
+    <delete id="deleteWorkstationByIds" parameterType="String">
+        delete from tab_workstation where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--根据对应的产线id和公司id查询对应产线是否存在工位配置信息-->
+    <select id="selectWorkstationByLineId" resultMap="WorkstationResult">
+        <include refid="selectWorkstationVo"/>
+        <where>
+            and company_id = #{companyId}  and line_id = #{lineId} limit 1;
+        </where>
+    </select>
+    <!--根据对应产线、公司修改工位的数据标识-->
+    <update id="editWorkstationSign">
+        update tab_workstation set sign = #{sign}  where  company_id = #{companyId} and  line_id = #{lineId} ;
+    </update>
+    <!--将第一个工位修改为数据唯一标识-->
+    <update id="editFirstWorkstionSign">
+        update tab_workstation set sign =1 where company_id = #{companyId} and line_id = #{lineId} order by c_time asc limit 1;
+    </update>
+    <!--根据查询信息查询对应工位信息-->
+    <select id="selectAllByLineId" resultMap="WorkstationResult">
+        <include refid="selectWorkstationVo"/>
+        <where>
+             and line_id = #{lineId} ;
+        </where>
+    </select>
+
+    <!--根据硬件id查询对应工位是否存在-->
+    <select id="selectInfoByDevice" resultMap="WorkstationResult">
+        SELECT * FROM tab_workstation
+        <where>
+            <if test="devId > 0">and dev_id = #{devId}</if>
+            <if test="cid > 0">and c_id = #{cid}</if>
+            <if test="eid > 0">and e_id = #{eid}</if>
+        </where>
+        limit 1;
+    </select>
+</mapper>

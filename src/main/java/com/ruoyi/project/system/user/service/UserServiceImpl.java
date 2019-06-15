@@ -283,6 +283,7 @@ public class UserServiceImpl implements IUserService {
     public int updateUserInfo(User user, HttpServletRequest request) {
         user.setDevCompany(null);
         user.setCreateTime(null);
+        user.setLoginDate(null);
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
@@ -650,7 +651,7 @@ public class UserServiceImpl implements IUserService {
      * @return
      */
     @Override
-    public User getSysUser() {
-        return ShiroUtils.getSysUser();
+    public User getSysUser(Cookie[] cookies) {
+        return JwtUtil.getTokenCookie(cookies);
     }
 }

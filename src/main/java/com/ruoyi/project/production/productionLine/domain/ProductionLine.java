@@ -65,6 +65,13 @@ public class ProductionLine extends BaseEntity
 
 	private List<String> paramArray;//自定义数据数组
 
+	/** 作业指导书
+	 * */
+	private Integer sopId;
+	/**产品编码配置
+	 * */
+	private String productCodes;
+
 	public Integer getManual() {
 		return manual;
 	}
@@ -220,6 +227,22 @@ public class ProductionLine extends BaseEntity
 		this.paramArray = paramArray;
 	}
 
+	public Integer getSopId() {
+		return sopId;
+	}
+
+	public void setSopId(Integer sopId) {
+		this.sopId = sopId;
+	}
+
+	public String getProductCodes() {
+		return productCodes;
+	}
+
+	public void setProductCodes(String productCodes) {
+		this.productCodes = productCodes;
+	}
+
 	@Override
 	public String toString() {
 		return "ProductionLine{" +
@@ -240,6 +263,8 @@ public class ProductionLine extends BaseEntity
 				", devIo=" + Arrays.toString(devIo) +
 				", paramConfig='" + paramConfig + '\'' +
 				", paramArray=" + paramArray +
+				", sopId=" + sopId +
+				", productCodes='" + productCodes + '\'' +
 				", isSign=" + isSign +
 				'}';
 	}

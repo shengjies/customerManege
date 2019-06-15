@@ -248,4 +248,13 @@ public class DevListServiceImpl implements IDevListService {
     public int apiEdit(DevList devList) {
         return devListMapper.updateDevList(devList);
     }
+
+    /**
+     * 查询所以未配置的硬件
+     * @return
+     */
+    @Override
+    public List<DevList> selectDevNotConfig() {
+        return devListMapper.selectDevNotConfig();
+    }
 }

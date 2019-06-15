@@ -176,7 +176,7 @@ public interface IUserService
      * 获取系统登录用户
      * @return
      */
-    User getSysUser();
+    User getSysUser(Cookie[] cookies);
 
     /**
      * 更新用户的登录标记为0

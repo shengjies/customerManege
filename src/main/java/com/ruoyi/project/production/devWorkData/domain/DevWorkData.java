@@ -27,7 +27,7 @@ public class DevWorkData extends BaseEntity
 	private Integer devId;
 	/** 硬件名称 */
 	private String devName;
-	/** IO主键ID */
+	/** 工位id */
 	private Integer ioId;
 	/** IO名称 */
 	private String ioName;

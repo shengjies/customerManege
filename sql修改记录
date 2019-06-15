@@ -118,3 +118,37 @@ ALTER TABLE `octopus`.`tab_iso`
 ADD COLUMN `file_size` VARCHAR(45) NULL DEFAULT '--' COMMENT '文件大小' AFTER `i_type`;
 
 
+
+
+#========2019-06-13 添加工位
+CREATE TABLE `octopus`.`tab_workstation` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `company_id` INT NULL COMMENT '公司id',
+  `line_id` INT NULL COMMENT '产线id',
+  `w_name` VARCHAR(145) NULL COMMENT '工位名称',
+  `sop_id` INT NULL DEFAULT 0 COMMENT '指导书页数id',
+  `dev_id` INT NULL DEFAULT 0 COMMENT '计数器id',
+  `dev_code` VARCHAR(45) NULL COMMENT '计数器编码',
+  `c_id` INT NULL DEFAULT 0 COMMENT '看板硬件id',
+  `c_code` VARCHAR(45) NULL COMMENT '看板硬件编码',
+  `e_id` INT NULL DEFAULT 0 COMMENT 'ECM 扫描枪硬件id',
+  `e_code` VARCHAR(45) NULL COMMENT 'EMC 扫码枪编码',
+  `sign` INT NULL DEFAULT 0 COMMENT '计数器数据判断依据0、不是 1、是',
+  `c_time` DATETIME NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+
+#========2019-06-14
+#添加硬件配置标识
+ALTER TABLE `octopus`.`dev_list`
+ADD COLUMN `sign` INT(1) NULL DEFAULT 0 AFTER `config_status`;
+
+
+ALTER TABLE `octopus`.`dev_production_line`
+ADD COLUMN `sop_id` INT NULL COMMENT '作业指导书编号' AFTER `param_config`,
+ADD COLUMN `product_codes` VARCHAR(545) NULL COMMENT '产品编码' AFTER `sop_id`;
+
+ALTER TABLE `octopus`.`dev_production_line`
+CHANGE COLUMN `sop_id` `sop_id` INT(11) NULL DEFAULT 0 COMMENT '作业指导书编号' ;
+
