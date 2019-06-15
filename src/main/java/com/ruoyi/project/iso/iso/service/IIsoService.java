@@ -1,6 +1,12 @@
 package com.ruoyi.project.iso.iso.service;
 
+import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.iso.iso.domain.Iso;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -25,7 +31,7 @@ public interface IIsoService
      * @param iso 文件管理信息
      * @return 文件管理集合
      */
-	public List<Iso> selectIsoList(Iso iso);
+	public List<Iso> selectIsoList(Iso iso,HttpServletRequest request);
 	
 	/**
      * 新增文件管理
@@ -33,7 +39,7 @@ public interface IIsoService
      * @param iso 文件管理信息
      * @return 结果
      */
-	public int insertIso(Iso iso);
+	public int insertIso(Iso iso, HttpServletRequest request);
 	
 	/**
      * 修改文件管理
@@ -50,5 +56,27 @@ public interface IIsoService
      * @return 结果
      */
 	public int deleteIsoByIds(String ids);
-	
+
+	/**
+	 * 删除文件管理信息
+	 * @param isoId 文件管理id
+	 * @return 结果
+	 */
+	int deleteIsoById(Integer isoId);
+
+	/**
+	 * 通过父文件id查询子文件列表
+	 * @param parentId 父菜单id
+	 * @return 结果
+	 */
+	List<Iso> selectIsoByParentId(Integer parentId);
+
+	/**
+	 * 上传sop文件
+	 * @param file 文件
+	 * @param parentId 父id
+	 * @param request 请求
+	 * @return 结果
+	 */
+	int uploadSop(MultipartFile file, int parentId, HttpServletRequest request) throws IOException;
 }

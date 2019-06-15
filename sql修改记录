@@ -76,27 +76,45 @@ ADD COLUMN `sign` INT NULL DEFAULT 1 AFTER `ecn_text`;
 #2019-06-13 创建文件体系表和初始化文件体系数据
 
 CREATE TABLE `tab_iso` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `iso_id` int(11) NOT NULL AUTO_INCREMENT,
   `c_name` varchar(145) DEFAULT NULL COMMENT '中文名称',
   `e_name` varchar(145) DEFAULT NULL COMMENT '英文名称',
   `disk` varchar(245) DEFAULT NULL COMMENT '文件夹路径',
   `disk_path` varchar(245) DEFAULT NULL COMMENT '访问拼接地址',
-  `path` varchar(45) DEFAULT NULL COMMENT '访问路径',
+  `path` varchar(245) DEFAULT NULL COMMENT '访问路径',
   `i_type` int(11) DEFAULT '0' COMMENT '文件类型，0、文件夹 1、文件',
+  `file_size` VARCHAR(45) NULL DEFAULT '--' COMMENT '文件大小'
   `category` int(11) DEFAULT '0' COMMENT '类别 0、普通文件 1、SOP 2、ECN 3、DCN',
   `company_id` int(11) DEFAULT NULL COMMENT '公司id',
-  `p_id` int(11) DEFAULT '0' COMMENT '父类别id',
+  `parent_id` int(11) DEFAULT '0' COMMENT '父类别id',
+  `grparent_id` INT(11) NULL DEFAULT 0 COMMENT '祖父id',
   `c_id` int(11) DEFAULT '0' COMMENT '创建者id',
   `c_time` datetime DEFAULT NULL COMMENT '创建时间',
   `def_id` int(11) DEFAULT '1' COMMENT '是否可以删除 0、不能 1、可以',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='文件管理';
 
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `i_type`, `category`, `company_id`, `p_id`, `def_id`) VALUES ('文件管理', '0', '0', '0', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('一级文件', 'yjwj1', '0', '0', '0', '1', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('二级文件', 'ejwj2', '0', '0', '0', '1', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('三级文件', 'sjwj3', '0', '0', '0', '1', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('四级文件', 'sjwj4', '0', '0', '0', '1', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('作业指导书(SOP)', 'sop', '0', '1', '0', '4', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('ECN', 'ecn', '0', '2', '0', '4', '0', '0');
-INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `p_id`, `c_id`, `def_id`) VALUES ('DCN', 'dcn', '0', '3', '0', '4', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `def_id`) VALUES ('文件管理', '0', '0', '0', '0', '0', '0');
+
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('一级文件', 'yjwj1', '0', '0', '0', '1', '0', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('二级文件', 'ejwj2', '0', '0', '0', '1', '0', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('三级文件', 'sjwj3', '0', '0', '0', '1', '0', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('四级文件', 'sjwj4', '0', '0', '0', '1', '0', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('共享文件', 'gxwj5', '0', '0', '0', '1', '0', '0', '0');
+
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('作业指导书(SOP)', 'sop', '0', '1', '0', '4', '1', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('ECN', 'ecn', '0', '2', '0', '4', '1', '0', '0');
+INSERT INTO `octopus`.`tab_iso` (`c_name`, `e_name`, `i_type`, `category`, `company_id`, `parent_id`, `grparent_id`, `c_id`, `def_id`) VALUES ('DCN', 'dcn', '0', '3', '0', '4', '1', '0', '0');
+
+# 2019-06-13 修改tab_iso字段
+ALTER TABLE `octopus`.`tab_iso`
+CHANGE COLUMN `id` `iso_id` INT(11) NOT NULL AUTO_INCREMENT ,
+CHANGE COLUMN `p_id` `parent_id` INT(11) NULL DEFAULT '0' COMMENT '父类别id' ;
+ALTER TABLE `octopus`.`tab_iso`
+ADD COLUMN `grparent_id` INT(11) NULL DEFAULT 0 COMMENT '祖父id' AFTER `parent_id`;
+ALTER TABLE `octopus`.`tab_iso`
+CHANGE COLUMN `path` `path` VARCHAR(245) NULL DEFAULT NULL COMMENT '访问路径' ;
+ALTER TABLE `octopus`.`tab_iso`
+ADD COLUMN `file_size` VARCHAR(45) NULL DEFAULT '--' COMMENT '文件大小' AFTER `i_type`;
+
+

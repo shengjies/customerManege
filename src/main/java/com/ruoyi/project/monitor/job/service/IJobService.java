@@ -1,7 +1,12 @@
 package com.ruoyi.project.monitor.job.service;
 
+import java.net.HttpCookie;
+import java.net.HttpRetryException;
+import java.util.HashMap;
 import java.util.List;
 import com.ruoyi.project.monitor.job.domain.Job;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 定时任务调度信息信息 服务层
@@ -32,7 +37,7 @@ public interface IJobService
      * @param job 调度信息
      * @return 结果
      */
-    public int pauseJob(Job job);
+    public int pauseJob(Job job,HttpServletRequest request);
 
     /**
      * 恢复任务
@@ -40,7 +45,7 @@ public interface IJobService
      * @param job 调度信息
      * @return 结果
      */
-    public int resumeJob(Job job);
+    public int resumeJob(Job job,HttpServletRequest request);
 
     /**
      * 删除任务后，所对应的trigger也将被删除
@@ -64,7 +69,7 @@ public interface IJobService
      * @param job 调度信息
      * @return 结果
      */
-    public int changeStatus(Job job);
+    public int changeStatus(Job job, HttpServletRequest request);
 
     /**
      * 立即运行任务
@@ -80,7 +85,7 @@ public interface IJobService
      * @param job 调度信息
      * @return 结果
      */
-    public int insertJobCron(Job job);
+    public int insertJobCron(Job job,HttpServletRequest request);
 
     /**
      * 更新任务的时间表达式

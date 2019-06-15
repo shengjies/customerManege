@@ -19,6 +19,8 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.monitor.job.domain.Job;
 import com.ruoyi.project.monitor.job.service.IJobService;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 调度任务信息操作处理
  * 
@@ -95,9 +97,9 @@ public class JobController extends BaseController
     @RequiresPermissions("monitor:job:changeStatus")
     @PostMapping("/changeStatus")
     @ResponseBody
-    public AjaxResult changeStatus(Job job)
+    public AjaxResult changeStatus(Job job, HttpServletRequest request)
     {
-        return toAjax(jobService.changeStatus(job));
+        return toAjax(jobService.changeStatus(job,request));
     }
 
     /**
@@ -128,9 +130,9 @@ public class JobController extends BaseController
     @RequiresPermissions("monitor:job:add")
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(Job job)
+    public AjaxResult addSave(Job job,HttpServletRequest request)
     {
-        return toAjax(jobService.insertJobCron(job));
+        return toAjax(jobService.insertJobCron(job,request));
     }
 
     /**

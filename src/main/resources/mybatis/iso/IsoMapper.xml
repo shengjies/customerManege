@@ -5,63 +5,77 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.project.iso.iso.mapper.IsoMapper">
     
     <resultMap type="Iso" id="IsoResult">
-        <result property="id"    column="id"    />
+        <result property="isoId"    column="iso_id"    />
         <result property="cName"    column="c_name"    />
         <result property="eName"    column="e_name"    />
         <result property="disk"    column="disk"    />
         <result property="diskPath"    column="disk_path"    />
         <result property="path"    column="path"    />
         <result property="iType"    column="i_type"    />
+        <result property="fileSize"    column="file_size"    />
         <result property="category"    column="category"    />
         <result property="companyId"    column="company_id"    />
-        <result property="pId"    column="p_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="grParentId"    column="grparent_id"    />
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
         <result property="defId"    column="def_id"    />
     </resultMap>
 	
 	<sql id="selectIsoVo">
-        select id, c_name, e_name, disk, disk_path, path, i_type, category, company_id, p_id, c_id, c_time, def_id from tab_iso
+        select iso_id, c_name, e_name, disk, disk_path, path, i_type,file_size, category, company_id, parent_id,grparent_id, c_id, c_time, def_id from tab_iso
     </sql>
 	
     <select id="selectIsoList" parameterType="Iso" resultMap="IsoResult">
-        <include refid="selectIsoVo"/>
-        <where>
-             <if test="cName != null  and cName != '' ">  c_name like concat('%',#{cName},'%')</if>
-         </where>
+        SELECT * FROM tab_iso where 1=1
+        <if test="companyId != null and companyId != ''">
+            AND company_id = #{companyId}
+        </if>
+        <if test="isoId != null and isoId != ''">
+            AND parent_id = #{isoId}
+        </if>
+        <if test="cName != null and cName != ''">
+            AND c_name like concat('%', #{cName}, '%')
+        </if>
     </select>
     
     <select id="selectIsoById" parameterType="Integer" resultMap="IsoResult">
         <include refid="selectIsoVo"/>
-        where id = #{id}
+        where iso_id = #{isoId}
     </select>
         
     <insert id="insertIso" parameterType="Iso" useGeneratedKeys="true" keyProperty="id">
         insert into tab_iso
 		<trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="isoId != null and isoId != 0">iso_id,</if>
 			<if test="cName != null  and cName != ''  ">c_name,</if>
 			<if test="eName != null  and eName != ''  ">e_name,</if>
 			<if test="disk != null  and disk != ''  ">disk,</if>
 			<if test="diskPath != null  and diskPath != ''  ">disk_path,</if>
 			<if test="path != null  and path != ''  ">path,</if>
 			<if test="iType != null  ">i_type,</if>
+            <if test="fileSize != null  ">file_size,</if>
 			<if test="category != null  ">category,</if>
 			<if test="companyId != null  ">company_id,</if>
-			<if test="pId != null  ">p_id,</if>
+			<if test="parentId != null and parentId != 0">parent_id,</if>
+            <if test="grParentId != null and grParentId != 0">grparent_id,</if>
 			<if test="cId != null  ">c_id,</if>
 			<if test="cTime != null  ">c_time,</if>
 			<if test="defId != null  ">def_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="isoId != null and isoId != 0">#{isoId},</if>
 			<if test="cName != null  and cName != ''  ">#{cName},</if>
 			<if test="eName != null  and eName != ''  ">#{eName},</if>
 			<if test="disk != null  and disk != ''  ">#{disk},</if>
 			<if test="diskPath != null  and diskPath != ''  ">#{diskPath},</if>
 			<if test="path != null  and path != ''  ">#{path},</if>
 			<if test="iType != null  ">#{iType},</if>
+            <if test="fileSize != null  ">#{fileSize},</if>
 			<if test="category != null  ">#{category},</if>
 			<if test="companyId != null  ">#{companyId},</if>
-			<if test="pId != null  ">#{pId},</if>
+			<if test="parentId != null and parentId != 0">#{parentId},</if>
+            <if test="grParentId != null and grParentId != 0">#{grParentId},</if>
 			<if test="cId != null  ">#{cId},</if>
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="defId != null  ">#{defId},</if>
@@ -77,31 +91,50 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="diskPath != null  and diskPath != ''  ">disk_path = #{diskPath},</if>
             <if test="path != null  and path != ''  ">path = #{path},</if>
             <if test="iType != null  ">i_type = #{iType},</if>
+            <if test="fileSize != null  ">file_size = #{fileSize},</if>
             <if test="category != null  ">category = #{category},</if>
             <if test="companyId != null  ">company_id = #{companyId},</if>
-            <if test="pId != null  ">p_id = #{pId},</if>
+            <if test="parentId != null  ">parent_id = #{parentId},</if>
+            <if test="grParentId != null  ">grparent_id = #{grParentId},</if>
             <if test="cId != null  ">c_id = #{cId},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="defId != null  ">def_id = #{defId},</if>
         </trim>
-        where id = #{id}
+        where iso_id = #{isoId}
     </update>
 
 	<delete id="deleteIsoById" parameterType="Integer">
-        delete from tab_iso where id = #{id}
+        delete from tab_iso where iso_id = #{isoId}
     </delete>
 	
     <delete id="deleteIsoByIds" parameterType="String">
-        delete from tab_iso where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
+        delete from tab_iso where iso_id in
+        <foreach item="isoId" collection="array" open="(" separator="," close=")">
+            #{isoId}
         </foreach>
     </delete>
     <!--根据父id查询对应的子目录-->
     <select id="selectByPid" resultMap="IsoResult">
         <include refid="selectIsoVo"/>
         <where>
-             p_id = #{pid}
+             parent_id = #{parentId}
         </where>
+    </select>
+    <!--根据祖父id查询子目录注册初始化文件夹-->
+    <select id="selectByGPid" resultMap="IsoResult">
+        <include refid="selectIsoVo"/>
+        <where>
+            grparent_id = #{grParentId}
+        </where>
+    </select>
+
+    <!--通过文件名查询文件信息-->
+    <select id="selectIsoByName" resultMap="IsoResult">
+        SELECT * FROM tab_iso where disk_path = #{diskPath} and c_name = #{cName} limit 1;
+    </select>
+
+    <!--校验文件名是否重复-->
+    <select id="selectIsoByRandomName" resultMap="IsoResult">
+        SELECT * FROM tab_iso where c_name = #{cName} limit 1;
     </select>
 </mapper>

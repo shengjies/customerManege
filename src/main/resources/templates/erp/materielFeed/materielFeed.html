@@ -23,6 +23,7 @@
 							<li>
 								收料人姓名：
 								<select id="lineReceive" name="lineReceive" style="width: 150px" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+									<option value="">请选择</option>
 									<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userName}"></option>
 								</select>
 							</li>
@@ -38,6 +39,7 @@
 							<li>
 								创建者：
 								<select id="createId" name="createId" style="width: 150px" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+									<option value="">请选择</option>
 									<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
 								</select>
 							</li>
@@ -147,14 +149,14 @@
          * 添加生产发料
          */
         function add() {
-            createMenuItem(prefix+"/add","生产发料")
+            createMenuItem(prefix+"/add","生产投料")
         }
 
         /**
          * 作废物料入库单
          */
         function remove(id) {
-            $.modal.confirm("确认作废该生产发料单吗？", function () {
+            $.modal.confirm("确认作废该生产投料单吗？", function () {
                 $.ajax({
                     type: 'POST',
                     url: prefix + '/nullify',
@@ -174,7 +176,7 @@
         /** 查看生产发料明细 */
         function details(id) {
             var url = prefix+"/details/" + id;
-            $.modal.open("查看生产发料明细",url,1000,580);
+            $.modal.open("查看生产投料明细",url,1000,580);
         }
         /**
          * 查看文件

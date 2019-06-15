@@ -99,4 +99,19 @@ public class CodeUtils {
     public static String getRandom(){
         return String.valueOf((int)((Math.random()*9+1)*100));
     }
+
+    /**
+     * 获取四位随机英文字母
+     * @return 结果
+     */
+    public static String getRandomChar(){
+        String randomChar = "";
+        for (int i = 0; i < 6; i++) {
+            // 得到随机字母
+            char c = (char) ((Math.random() * 26) + 97);
+            randomChar += (c + "");
+        }
+        return String.valueOf(randomChar);
+    }
+
 }

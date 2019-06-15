@@ -2,6 +2,9 @@ package com.ruoyi.project.monitor.job.service;
 
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+
+import com.ruoyi.framework.jwt.JwtUtil;
 import org.quartz.CronTrigger;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,10 +83,10 @@ public class JobServiceImpl implements IJobService
      * @param job 调度信息
      */
     @Override
-    public int pauseJob(Job job)
+    public int pauseJob(Job job,HttpServletRequest request)
     {
         job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
-        job.setUpdateBy(ShiroUtils.getLoginName());
+        job.setUpdateBy(JwtUtil.getTokenUser(request).getLoginName());
         int rows = jobMapper.updateJob(job);
         if (rows > 0)
         {
@@ -98,10 +101,10 @@ public class JobServiceImpl implements IJobService
      * @param job 调度信息
      */
     @Override
-    public int resumeJob(Job job)
+    public int resumeJob(Job job,HttpServletRequest request)
     {
         job.setStatus(ScheduleConstants.Status.NORMAL.getValue());
-        job.setUpdateBy(ShiroUtils.getLoginName());
+        job.setUpdateBy(JwtUtil.getTokenUser(request).getLoginName());
         int rows = jobMapper.updateJob(job);
         if (rows > 0)
         {
@@ -149,17 +152,17 @@ public class JobServiceImpl implements IJobService
      * @param job 调度信息
      */
     @Override
-    public int changeStatus(Job job)
+    public int changeStatus(Job job, HttpServletRequest request)
     {
         int rows = 0;
         String status = job.getStatus();
         if (ScheduleConstants.Status.NORMAL.getValue().equals(status))
         {
-            rows = resumeJob(job);
+            rows = resumeJob(job,request);
         }
         else if (ScheduleConstants.Status.PAUSE.getValue().equals(status))
         {
-            rows = pauseJob(job);
+            rows = pauseJob(job,request);
         }
         return rows;
     }
@@ -181,9 +184,9 @@ public class JobServiceImpl implements IJobService
      * @param job 调度信息 调度信息
      */
     @Override
-    public int insertJobCron(Job job)
+    public int insertJobCron(Job job,HttpServletRequest request)
     {
-        job.setCreateBy(ShiroUtils.getLoginName());
+        job.setCreateBy(JwtUtil.getTokenUser(request).getLoginName());
         job.setStatus(ScheduleConstants.Status.PAUSE.getValue());
         int rows = jobMapper.insertJob(job);
         if (rows > 0)

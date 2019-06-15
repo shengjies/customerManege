@@ -559,32 +559,32 @@ public class UserServiceImpl implements IUserService {
                     createFile(disk);
                     iso.setDisk(disk);
                     iso.setDiskPath(company.getTotalIso());
-                    iso.setCId(user.getUserId().intValue());
-                    iso.setEName(company.getTotalIso());
-                    iso.setCTime(new Date());
+                    iso.setcId(user.getUserId().intValue());
+                    iso.seteName(company.getTotalIso());
+                    iso.setcTime(new Date());
                     iso.setCompanyId(company.getCompanyId());
                     isoMapper.updateIso(iso);
                     //查询对应的子目录
-                    List<Iso> list = isoMapper.selectByPid(iso.getId());
+                    List<Iso> list = isoMapper.selectByGPid(iso.getIsoId());
                     if(list != null){
                         for (Iso i : list) {
-                            String d1 = iso.getDisk() + File.separator+i.getEName();
+                            String d1 = iso.getDisk() + File.separator+i.geteName();
                             createFile(d1);
                             i.setDisk(d1);
-                            i.setDiskPath(iso.getDiskPath()+File.separator+i.getEName());
-                            i.setCId(user.getUserId().intValue());
-                            i.setCTime(new Date());
+                            i.setDiskPath(iso.getDiskPath()+File.separator+i.geteName());
+                            i.setcId(user.getUserId().intValue());
+                            i.setcTime(new Date());
                             i.setCompanyId(company.getCompanyId());
                             isoMapper.updateIso(i);
-                            List<Iso> isos = isoMapper.selectByPid(i.getId());
+                            List<Iso> isos = isoMapper.selectByGPid(i.getIsoId());
                             if(isos != null){
                                 for (Iso i2 : isos) {
-                                    String d2 = i.getDisk()+File.separator+i2.getEName();
+                                    String d2 = i.getDisk()+File.separator+i2.geteName();
                                     createFile(d2);
                                     i2.setDisk(d2);
-                                    i2.setDiskPath(i.getDiskPath()+File.separator+i2.getEName());
-                                    i2.setCId(user.getUserId().intValue());
-                                    i2.setCTime(new Date());
+                                    i2.setDiskPath(i.getDiskPath()+File.separator+i2.geteName());
+                                    i2.setcId(user.getUserId().intValue());
+                                    i2.setcTime(new Date());
                                     i2.setCompanyId(company.getCompanyId());
                                     isoMapper.updateIso(i2);
                                 }

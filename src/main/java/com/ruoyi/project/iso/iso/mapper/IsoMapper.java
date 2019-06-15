@@ -66,6 +66,27 @@ public interface IsoMapper
 	 * @param pid
 	 * @return
 	 */
-	List<Iso> selectByPid(@Param("pid")int pid);
-	
+	List<Iso> selectByPid(@Param("parentId")int pid);
+
+	/**
+	 * 根据祖父id查询对应的子目录 注册生成文件夹
+	 * @param grParentId 祖父id
+	 * @return 结果
+	 */
+	List<Iso> selectByGPid(@Param("grParentId")int grParentId);
+
+	/**
+	 * 通过文件名已经文件夹路径查询文件信息
+	 * @param diskPath 文件路径
+	 * @param fileName 文件名
+	 * @return 结果
+	 */
+    Iso selectIsoByName(@Param("diskPath") String diskPath,@Param("cName") String fileName);
+
+	/**
+	 * 校验随机生成的英文文件夹名是否存在
+	 * @param randomPath 文件名
+	 * @return 结果
+	 */
+	Iso selectIsoByRandomName(@Param("cName") String randomPath);
 }

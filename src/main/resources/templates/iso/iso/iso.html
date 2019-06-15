@@ -3,115 +3,243 @@
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <body class="gray-bg">
-    
-     <div class="container-div">
-		<div class="row">
-			<div class="col-sm-12 search-collapse">
-				<form id="formId">
-					<div class="select-list">
-						<ul>
-							<li>
-								名称：<input type="text" name="cName"/>
-							</li>
-							<li>
-								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-							</li>
-						</ul>
-					</div>
-				</form>
-			</div>
-			
-	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="iso:iso:add">
-					<i class="fa fa-plus"></i> 添加
-				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="iso:iso:edit">
-					<i class="fa fa-edit"></i> 修改
-				</a>
-			</div>
-			<div class="col-sm-12 select-table table-striped">
-				<table id="bootstrap-table" data-mobile-responsive="true"></table>
-			</div>
-		</div>
-	</div>
-    <div th:include="include :: footer"></div>
-    <script th:inline="javascript">
-        var editFlag = [[${@permission.hasPermi('iso:iso:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('iso:iso:remove')}]];
-        var prefix = ctx + "iso/iso";
 
-        $(function() {
-            var options = {
-                url: prefix + "/list",
-                createUrl: prefix + "/add",
-                updateUrl: prefix + "/edit/{id}",
-                removeUrl: prefix + "/remove",
-				exportUrl: prefix + "/export",
-                modalName: "文件管理",
-				search: false,
-		        showExport: true,
-                columns: [{
-		            checkbox: true
-		        },
-				{
-					field : 'id', 
-					title : '',
-					visible: false
-				},
-				{
-					field : 'cname',
-					title : '名称',
-					sortable: true
-				},
-				{
-					field : 'disk', 
-					title : '文件夹路径',
-					sortable: true
-				},
-				{
-					field : 'path', 
-					title : '访问路径',
-					sortable: true
-				},
-				{
-					field : 'iType', 
-					title : '类型',
-					sortable: true,
-					formatter:function (value, row, index) {
-						if(value == 0){
-							return "文件夹";
-						}
-						return　"文件";
-					}
-				},
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" id="isoId" name="isoId" th:value="${id}">
+                <!--记录返回id-->
+                <input type="hidden" id="backId" th:value="${id}">
+                <!--初始id-->
+                <input type="hidden" id="initId" th:value="${id}">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            名称：<input type="text" id="cName" name="cName"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
 
-				{
-					field : 'pId', 
-					title : '父类别id',
-					sortable: true
-				},
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a id="addFolder" class="btn btn-success" onclick="add()" shiro:hasPermission="iso:iso:add">
+                <i class="fa fa-plus"></i> 新增文件夹
+            </a>
+            <a class="btn btn-primary" onclick="upload()" shiro:hasPermission="iso:iso:add">
+                <i class="fa fa-arrow-up"></i> 上传文件
+            </a>
+            <a id="goBackTag" class="btn btn-default" onclick="goBack()" style="display: none">
+                <i class="fa fa-mail-reply"></i> 返回上一级
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var listFlag = [[${@permission.hasPermi('iso:iso:list')}]];
+    var addFlag = [[${@permission.hasPermi('iso:iso:add')}]];
+    var editFlag = [[${@permission.hasPermi('iso:iso:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('iso:iso:remove')}]];
+    var prefix = ctx + "iso/iso";
 
-				{
-					field : 'ctime',
-					title : '创建时间',
-					sortable: true
-				},
-		        {
-		            title: '操作',
-		            align: 'center',
-		            formatter: function(value, row, index) {
-		            	var actions = [];
-		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        if(row.defId == 1){
-							actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
-						}
-						return actions.join('');
-		            }
-		        }]
-            };
-            $.table.init(options);
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add/{id}",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove/{id}",
+            createUploadUrl: prefix + "/fileupload/{id}",
+            search: false,
+            showExport: false,
+            showSearch:false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            modalName: "文件管理",
+            columns: [
+                {
+                    title: '名称',
+                    field: 'cName',
+                    width: '20%',
+                    formatter: function (value, row, index) {
+                        if (row.iType == 0) { // 文件
+                            return '<i class="fa fa-folder-open"></i> <a class="nav-label" onclick="intoNext(\'' + row.isoId + '\')"><span style="font-weight: bold;color: blue;">' + row.cName + '</span></a>';
+                        } else {
+                            return '<span style="color: green">' + row.cName + '</span>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    width: '30%',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.iType == 0) {
+                            if (row.category >= 4) { // 只能上传文件不能新增文件夹
+                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.isoId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                            } else {
+                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.isoId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                            }
+                        } else {
+                            actions.push('<a class="btn btn-primary btn-xs ' + listFlag + '" href="#" onclick="showFile(\'' + row.path + '\')"><i class="fa fa-eye"></i>查看</a> ');
+                        }
+                        if (row.defId == 1) {
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.isoId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    title: '类型',
+                    field: 'iType',
+                    width: '10%',
+                    align: "left",
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return "文件夹";
+                        }
+                        return "文件";
+                    }
+                },
+                {
+                    field: 'fileSize',
+                    title: '文件大小',
+                    width: '30%',
+                    align: "left",
+                },
+                {
+                    field: 'cTime',
+                    title: '最后更新时间',
+                    width: '30%',
+                    align: "left",
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId");
+    });
+
+    /**
+     * 跳转添加页面
+     */
+    function add() {
+        var parentId = $("#isoId").val();
+        var url = $.common.isEmpty(parentId) ? $.table._option.createUrl : $.table._option.createUrl.replace("{id}", parentId);
+        $.modal.open("添加" + $.table._option.modalName, url, 400, 300);
+    }
+
+    /**
+     * 返回上一级
+     */
+    function goBack() {
+        var backIsoId = $("#backId").val();
+        var initId = $("#initId").val(); // 初始id
+        var isoId = $("#isoId").val(); // 查询id
+        if (isoId == initId) {
+            return;
+        }
+        $("#isoId").val(backIsoId); // 赋值
+        // 查询上一级的id
+        $.post( prefix + "/findBackId",{isoId:backIsoId},function (res) {
+            if (res.code == web_status.SUCCESS) {
+                if (res.data.category != 4) { // sop文件夹下的文件夹只能上传文件不能添加文件夹
+                    // 隐藏新增文件夹按钮
+                    $("#addFolder").show();
+                }
+                if (res.data.isoId == initId) {
+                    $("#goBackTag").hide();
+                }
+                $("#backId").val(res.data.parentId);
+            }
+        })
+        $.form.reset();
+        $.table.search("formId");
+    }
+
+    /**
+     * 进入下级文件
+     */
+    function intoNext(isoId) {
+        $("#goBackTag").show();
+        $.post( prefix + "/findBackId",{isoId:isoId},function (res) {
+            if (res.code == web_status.SUCCESS) {
+                if (res.data.category == 4) { // sop文件夹下的文件夹只能上传文件不能添加文件夹
+                    // 隐藏新增文件夹按钮
+                    $("#addFolder").hide();
+                }
+            }
+        })
+        $("#backId").val($("#isoId").val());
+        $("#isoId").val(isoId); // 赋值
+        $.form.reset();
+        $.table.search("formId");
+    }
+
+
+    /**
+     * 跳转修改页面
+     */
+    function edit(id) {
+        var url = "/404.html";
+        if ($.common.isNotEmpty(id)) {
+            url = $.table._option.updateUrl.replace("{id}", id);
+        } else {
+            var id = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+            if (id.length == 0) {
+                $.modal.alertWarning("请至少选择一条记录");
+                return;
+            }
+            url = $.table._option.updateUrl.replace("{id}", id);
+        }
+        $.modal.open("修改" + $.table._option.modalName, url, 400, 300);
+    }
+
+    /**
+     * 删除
+     */
+    function remove(id) {
+        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗？", function() {
+            $.ajax({
+                type : 'post',
+                url: prefix + "/remove/" + id,
+                success : function(result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.modal.msgSuccess(result.msg);
+                        $.table.refresh();
+                    } else {
+                        $.modal.msgError(result.msg);
+                    }
+                }
+            });
         });
-    </script>
+    }
+
+    /**
+     * 跳转上传文件页面
+     */
+    function upload() {
+        var parentId = $("#isoId").val();
+        var url = $.common.isEmpty(parentId) ? $.table._option.createUploadUrl : $.table._option.createUploadUrl.replace("{id}", parentId);
+        $.modal.open("上传作业指导书", url,400,300);
+    }
+
+    /**
+     * 点击查看文件
+     */
+    function showFile(path) {
+        window.open(path);
+    }
+</script>
 </body>
 </html>

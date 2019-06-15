@@ -27,7 +27,7 @@ public class User extends BaseEntity
     public static final String COMPANY_ADMIN ="1";
 
     /** 用户ID */
-    @Excel(name = "用户序号",type = Type.EXPORT)
+    //@Excel(name = "用户序号",type = Type.EXPORT)
     private Long userId;
 
     /** 部门ID */
@@ -73,11 +73,11 @@ public class User extends BaseEntity
     private String delFlag;
 
     /** 最后登陆IP */
-    @Excel(name = "最后登陆IP", type = Type.EXPORT)
+    //@Excel(name = "最后登陆IP", type = Type.EXPORT)
     private String loginIp;
 
     /** 最后登陆时间 */
-    @Excel(name = "最后登陆时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
+    //@Excel(name = "最后登陆时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Type.EXPORT)
     private Date loginDate;
 
     /** 部门对象 */
@@ -113,7 +113,7 @@ public class User extends BaseEntity
     private Integer companyId;
 
     /** 公司对象 */
-    @Excel(name = "公司名称", targetAttr = "comName", type = Type.EXPORT)
+    //@Excel(name = "公司名称", targetAttr = "comName", type = Type.EXPORT)
     private DevCompany devCompany;
 
     public String getLoginTag() {
