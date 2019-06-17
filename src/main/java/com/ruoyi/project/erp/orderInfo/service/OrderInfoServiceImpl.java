@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.orderInfo.mapper.OrderInfoMapper;
 import com.ruoyi.project.erp.orderInfo.domain.OrderInfo;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 
@@ -75,6 +76,7 @@ public class OrderInfoServiceImpl implements IOrderInfoService
      * @return 结果
      */
 	@Override
+	@Transactional
 	public int insertOrderInfo(OrderInfo orderInfo, HttpServletRequest request)
 	{
 		User user = JwtUtil.getTokenUser(request);
@@ -111,6 +113,7 @@ public class OrderInfoServiceImpl implements IOrderInfoService
      * @return 结果
      */
 	@Override
+	@Transactional
 	public int updateOrderInfo(OrderInfo orderInfo)
 	{
 		//将对应订单的详情进行标记 为1

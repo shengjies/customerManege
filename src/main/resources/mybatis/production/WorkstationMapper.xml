@@ -112,7 +112,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     <!--根据对应产线、公司修改工位的数据标识-->
     <update id="editWorkstationSign">
-        update tab_workstation set sign = #{sign}  where  company_id = #{companyId} and  line_id = #{lineId} ;
+        update tab_workstation set sign = #{sign} where company_id = #{companyId} and  line_id = #{lineId} ;
     </update>
     <!--将第一个工位修改为数据唯一标识-->
     <update id="editFirstWorkstionSign">

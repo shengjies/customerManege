@@ -166,14 +166,18 @@ public class MaterielSupplierServiceImpl implements IMaterielSupplierService {
         Purchase purchase = new Purchase();
         purchase.setSupplierId(sid);
         purchase.setCompanyId(companyId);
+        List<Purchase> purchaseList = purchaseMapper.selectPurchaseList(purchase);
+        if (StringUtils.isEmpty(purchaseList)) { // 没有采购单信息
+            throw new BusinessException("没有采购单信息");
+        }
         /**
          * 先查询还没交付的订单
          */
         List<PurchaseDetails> purchaseDetails = null; // 采购单明细
         purchase.setPurchaseStatut(StockConstants.ORDER_STATUS_TWO);
-        List<Purchase> purchaseList1 = purchaseMapper.selectPurchaseList(purchase);
-        if (!StringUtils.isEmpty(purchaseList1)) {
-            for (Purchase purchase1 : purchaseList1) {
+        purchaseList = purchaseMapper.selectPurchaseList(purchase);
+        if (!StringUtils.isEmpty(purchaseList)) {
+            for (Purchase purchase1 : purchaseList) {
                 // 查询对应供应商对应物料的所有采购单信息
                 purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsListBySidAndMatCode(companyId,sid,purchase1.getId(),materiel.getMaterielCode());
                 materielSupplier.setPurchaseDetailsList(purchaseDetails);

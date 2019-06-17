@@ -27,7 +27,7 @@ public interface WorkstationMapper
 	 * @param companyId 公司id
 	 * @return
 	 */
-	public Workstation selectWorkstationByLineId(Integer lineId,Integer companyId);
+	public Workstation selectWorkstationByLineId(@Param("lineId") Integer lineId, @Param("companyId") Integer companyId);
 
 	/**
 	 * 根据公司id 产线id 查询对应数据标识工位
@@ -84,7 +84,7 @@ public interface WorkstationMapper
      * @param sign 数据标识
      * @return
      */
-	int editWorkstationSign(Integer lineId,Integer companyId,int sign);
+	int editWorkstationSign(@Param("lineId") Integer lineId,@Param("companyId") Integer companyId,@Param("sign") int sign);
 
 	/**
 	 * 将第一个工位修改为数据唯一标识
@@ -92,7 +92,7 @@ public interface WorkstationMapper
 	 * @param companyId 公司
 	 * @return
 	 */
-	int editFirstWorkstionSign(Integer lineId,Integer companyId);
+	int editFirstWorkstionSign(@Param("lineId") Integer lineId,@Param("companyId") Integer companyId);
 
 	/**
 	 * 根据产线id查询对应工位信息

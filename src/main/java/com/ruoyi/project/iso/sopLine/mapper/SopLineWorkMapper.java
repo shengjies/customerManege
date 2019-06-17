@@ -1,6 +1,7 @@
 package com.ruoyi.project.iso.sopLine.mapper;
 
 
+import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 import org.apache.ibatis.annotations.Param;
 
@@ -63,4 +64,12 @@ public interface SopLineWorkMapper
 	SopLineWork selectInfoByApi(@Param("companyId") int companyId,
 								@Param("lineId") int lineId,@Param("sopId") int sopId,
 								@Param("wId") int wId);
+
+	/**
+	 * 根据公司id作业指导书id查询工位配置列表
+	 * @param companyId 公司id
+	 * @param pageId 作业指导书页id
+	 * @return 结果
+	 */
+	List<SopLineWork> selectSopLineWorkListBySopId(@Param("companyId") Integer companyId, @Param("pageId") Integer pageId);
 }

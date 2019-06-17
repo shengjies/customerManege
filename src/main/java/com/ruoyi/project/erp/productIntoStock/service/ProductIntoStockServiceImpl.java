@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.productIntoStock.mapper.ProductIntoStockMapper;
 import com.ruoyi.project.erp.productIntoStock.domain.ProductIntoStock;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -97,6 +98,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertProductIntoStock(ProductIntoStock productIntoStock,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) {
@@ -245,6 +247,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int nullifyProductIntoStockByIds(Integer intoId,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;

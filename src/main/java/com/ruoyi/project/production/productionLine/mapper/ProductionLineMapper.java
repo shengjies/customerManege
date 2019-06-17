@@ -4,6 +4,7 @@ import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -112,4 +113,11 @@ public interface ProductionLineMapper
 //	@DataSource(DataSourceType.SLAVE)
     List<ProductionLine> selectAllProductionLineByCompanyId(@Param("companyId") Integer companyId);
 
+	/**
+	 * 通过作业指导书id查询未配置的产线信息
+	 * @param isoId 作业指导书id
+	 * @param companyId 公司id
+	 * @return 结果
+	 */
+	List<ProductionLine> selectLineNotConfigByIsoId(@Param("isoId") Integer isoId,@Param("companyId") Integer companyId);
 }

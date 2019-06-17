@@ -22,6 +22,7 @@ import com.ruoyi.project.erp.purchaseDetails.mapper.PurchaseDetailsMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -106,6 +107,7 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertMaterielIntoStock(MaterielIntoStock materielIntoStock,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;
@@ -256,6 +258,7 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int nullifyMaterielIntoStockByIds(Integer id,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null ) {

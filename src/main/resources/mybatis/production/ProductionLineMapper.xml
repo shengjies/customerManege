@@ -132,7 +132,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--查询对应公司所有的产线信息-->
     <select id="selectAllProductionLineByCompanyId" resultType="com.ruoyi.project.production.productionLine.domain.ProductionLine">
         select id as Id, line_name as lineName,def_id as defId from dev_production_line
-        where 1=1
+        where 1=1 and def_id = 0
         <if test="companyId != null and companyId !='' "> and company_id = #{companyId}</if>
+    </select>
+
+    <!--查询所有未配置指定sop的产线信息-->
+    <select id="selectLineNotConfigByIsoId" resultMap="ProductionLineResult">
+        SELECT * FROM dev_production_line  as l left join
+       (SELECT * FROM tab_sop_line where sop_id = #{isoId}) as sl on l.id = sl.line_id where sl.line_id is null and l.company_id = #{companyId};
     </select>
 </mapper>

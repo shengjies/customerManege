@@ -47,7 +47,7 @@ public interface IIsoService
      * @param iso 文件管理信息
      * @return 结果
      */
-	public int updateIso(Iso iso);
+	public int updateIso(Iso iso,HttpServletRequest request) throws IOException;
 		
 	/**
      * 删除文件管理信息

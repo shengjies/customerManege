@@ -1,15 +1,19 @@
 package com.ruoyi.project.iso.iso.controller;
 
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.iso.sopLine.service.ISopLineService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,6 +39,10 @@ public class IsoController extends BaseController {
 
     @Autowired
     private IIsoService isoService;
+
+    @Autowired
+    private ISopLineService sopLineService;
+
 
     @RequiresPermissions("iso:iso:view")
     @GetMapping("/{id}")
@@ -110,8 +119,14 @@ public class IsoController extends BaseController {
     @Log(title = "文件管理", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(Iso iso) {
-        return toAjax(isoService.updateIso(iso));
+    public AjaxResult editSave(Iso iso,HttpServletRequest request) {
+        try {
+            return toAjax(isoService.updateIso(iso,request));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        } catch (IOException e) {
+            return error("修改失败");
+        }
     }
 
     /**
@@ -121,7 +136,19 @@ public class IsoController extends BaseController {
     @Log(title = "文件管理", businessType = BusinessType.DELETE)
     @PostMapping("/remove/{isoId}")
     @ResponseBody
-    public AjaxResult remove(@PathVariable("isoId") Integer isoId) {
+    public AjaxResult remove(@PathVariable("isoId") Integer isoId,HttpServletRequest request) {
+        User user = JwtUtil.getTokenUser(request);
+        Iso iso = isoService.selectIsoById(isoId);
+        if (FileConstants.CATEGORY_SOP_FOLDER.equals(iso.getCategory())) { // sop文件夹判断是否配置了产线信息
+            if (sopLineService.selectSopLineListBySopId(user.getCompanyId(),isoId).size() > 0) {
+                return error(1, "存在产线配置,不允许删除");
+            }
+        }
+        if (FileConstants.CATEGORY_SOP_FILE.equals(iso.getCategory())) { // sop文件夹下的作业指导书
+            if (sopLineService.selectSopLineWorkListBySopId(user.getCompanyId(),isoId).size() > 0) {
+                return error(1, "存在工位配置,不允许删除");
+            }
+        }
         if (isoService.selectIsoByParentId(isoId).size() > 0) {
             return error(1, "存在子文件,不允许删除");
         }

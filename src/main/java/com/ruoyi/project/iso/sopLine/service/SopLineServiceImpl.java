@@ -185,4 +185,26 @@ public class SopLineServiceImpl implements ISopLineService
 	public List<SopLineWork> selectWorkstionByCompanyAndLineIdAndSopId(int companyId, int lineId, int sopId) {
 		return sopLineWorkMapper.selectWorkstionByCompanyAndLineIdAndSopId(companyId,lineId,sopId);
 	}
+
+	/**
+	 * 查询作业指导书产线配置列表
+	 * @param isoId 作业指导书id
+	 * @param companyId 公司id
+	 * @return 结果
+	 */
+	@Override
+	public List<SopLine> selectSopLineListBySopId(Integer companyId,Integer isoId) {
+		return sopLineMapper.selectSopLineListBySopId(companyId,isoId);
+	}
+
+	/**
+	 * 查询作业指导书工位配置列表
+	 * @param companyId 公司id
+	 * @param isoId 作业指导书id
+	 * @return 结果
+	 */
+	@Override
+	public List<SopLineWork> selectSopLineWorkListBySopId(Integer companyId, Integer isoId) {
+		return sopLineWorkMapper.selectSopLineWorkListBySopId(companyId,isoId);
+	}
 }

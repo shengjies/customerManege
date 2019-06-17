@@ -56,6 +56,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT * FROM tab_sop_line_work where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
     </select>
 
+    <!--通过作业指导书id查询工位配置列表信息-->
+    <select id="selectSopLineWorkListBySopId" resultMap="SopLineWorkResult">
+        SELECT * FROM tab_sop_line_work where company_id = #{companyId} and page_id = #{pageId};
+    </select>
+
     <!--根据公司id 产线id SOP id 工位id查询对应工位配置的手册-->
     <select id="selectInfoByApi" resultMap="SopLineWorkResult">
       SELECT * FROM tab_sop_line_work where company_id = #{companyId} and line_id= #{lineId}

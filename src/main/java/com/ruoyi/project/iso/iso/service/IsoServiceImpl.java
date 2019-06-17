@@ -22,6 +22,7 @@ import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -108,7 +109,10 @@ public class IsoServiceImpl implements IIsoService {
         if (tokenUser == null) {
             return 0;
         }
-        DevCompany company = companyMapper.selectDevCompanyById(tokenUser.getCompanyId());
+        Iso uniqueIso = isoMapper.selectIsoByFolderNameUnique(iso.getiType(), iso.getParentId(), iso.getcName());
+        if (StringUtils.isNotNull(uniqueIso)) {
+            throw new BusinessException("文件名称重复，请重新输入");
+        }
         // 查询父文件信息
         Iso isoParent = isoMapper.selectIsoById(iso.getParentId());
         if (StringUtils.isNotNull(isoParent)) {
@@ -124,15 +128,14 @@ public class IsoServiceImpl implements IIsoService {
                 // 重新生成随机英文名
                 randomPath = CodeUtils.getRandomChar() + CodeUtils.getRandom();
             }
-            String filePath = isoParent.getDisk() + File.separator + randomPath;
+            String filePath = isoParent.getDisk() + "/" + randomPath;
             File myPath = new File(filePath);
             if (!myPath.exists()) {//若此目录不存在，则创建之
                 myPath.mkdir();
             }
             iso.seteName(randomPath);
-            String disPath = (isoParent.getDiskPath() + File.separator + randomPath).replace("\\", "/");
-            iso.setDiskPath(disPath);
-            iso.setDisk(filePath.replace("\\", "/"));
+            iso.setDiskPath(isoParent.getDiskPath() + "/" + randomPath);
+            iso.setDisk(filePath);
             iso.setcId(tokenUser.getUserId().intValue());
             iso.setcTime(new Date());
             iso.setCompanyId(tokenUser.getCompanyId());
@@ -162,9 +165,45 @@ public class IsoServiceImpl implements IIsoService {
      * @return 结果
      */
     @Override
-    public int updateIso(Iso iso) {
-        iso.setcTime(new Date()); // 更新修改时间
-        return isoMapper.updateIso(iso);
+    public int updateIso(Iso iso,HttpServletRequest request) throws IOException {
+        User user = JwtUtil.getTokenUser(request);
+        if (user == null ) {
+            return 0;
+        }
+        Iso isoData = isoMapper.selectIsoById(iso.getIsoId());
+        Iso isoUnique = null;
+        if (StringUtils.isNotNull(isoData)) {
+            // 获取文件的类型
+            Integer iType = iso.getiType();
+            if (FileConstants.ITYPE_FILE.equals(iType)) { // 为文件类型
+                // 判断文件名是否重复
+                isoUnique = isoMapper.selectIsoByEName(isoData.getDiskPath(),iso.geteName());
+                if (StringUtils.isNotNull(isoUnique)) {
+                    throw new BusinessException("文件名称重复，请重新输入");
+                }
+                // 获取旧文件信息
+                File file = new File(isoData.getDisk() + "/" + isoData.getcName());
+                if (file.exists()) { // 文件存在
+                    String suffixName = file.getName();
+                    suffixName = suffixName.substring(suffixName.lastIndexOf("."),suffixName.length()); // 文件名后缀
+                    // 创建新的文件
+                    File newFile = new File(isoData.getDisk() + "/" + iso.geteName() + suffixName);
+                    FileUtils.copyFile(file,newFile);
+                    file.delete();
+                    iso.setcName(iso.geteName() + suffixName);
+                    iso.setPath(isoFileUrl + isoData.getDiskPath() + "/" + iso.geteName() + suffixName);
+                    iso.seteName(iso.geteName());
+                }
+            } else { // 文件夹类型
+                isoUnique = isoMapper.selectIsoByFolderNameUnique(FileConstants.ITYPE_FOLDER,isoData.getParentId(),iso.getcName());
+                if (StringUtils.isNotNull(isoUnique)) {
+                    throw new BusinessException("文件名称重复，请重新输入");
+                }
+            }
+            iso.setcTime(new Date()); // 更新修改时间
+            return isoMapper.updateIso(iso);
+        }
+        return 0;
     }
 
     /**
@@ -252,7 +291,7 @@ public class IsoServiceImpl implements IIsoService {
         if (StringUtils.isNotNull(parentIso)) {
             String fileName = file.getOriginalFilename(); // 文件名
             // 判断相同文件夹下文件名是否存在相同文件
-            Iso isoUnique = isoMapper.selectIsoByName(parentIso.getDiskPath(), fileName);
+            Iso isoUnique = isoMapper.selectIsoByUploadName(parentIso.getDiskPath(),fileName);
             if (StringUtils.isNotNull(isoUnique)) { // 存在相同文件名的文件
                 throw new BusinessException("存在相同文件名的文件");
             }

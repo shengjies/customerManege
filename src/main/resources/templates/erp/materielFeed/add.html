@@ -20,7 +20,7 @@
                                     <div class="col-sm-12">
                                         <select style="width: 100%" id="feedLine" class="form-control"
                                                 name="feedLine" onchange="lineChange(this)"
-                                                th:with="lineList = ${@productionLine.selectAllProductionLineByCompanyId()}">
+                                                th:with="lineList = ${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies() )}">
                                             <option value="-1">请选择</option>
                                             <option th:each="item : ${lineList}" th:data-line-id="${item.id}"
                                                     th:text="${item.lineName}"
@@ -90,7 +90,7 @@
                                     <th>良品数量</th>
                                     <th>型号</th>
                                     <th>名称</th>
-                                    <th>本次投料数量</th>
+                                    <th style="width: 100px;">本次投料数量</th>
                                     <th>操作</th>
                                 </tr>
                                 </thead>

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.stockHandle.mapper.StockHandleMapper;
 import com.ruoyi.project.erp.stockHandle.domain.StockHandle;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -90,6 +91,7 @@ public class StockHandleServiceImpl implements IStockHandleService
      * @return 结果
      */
 	@Override
+    @Transactional
 	public int insertStockHandle(StockHandle stockHandle, HttpServletRequest request)
 	{
 		User user = JwtUtil.getTokenUser(request);
@@ -227,6 +229,7 @@ public class StockHandleServiceImpl implements IStockHandleService
      * @return 结果
      */
     @Override
+    @Transactional
     public int nullifyStockHandleById(Integer id) {
         StockHandleDetails handleDetails = new StockHandleDetails();
         handleDetails.setHandleId(id);

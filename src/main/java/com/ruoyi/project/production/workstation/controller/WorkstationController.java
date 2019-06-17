@@ -1,30 +1,24 @@
 package com.ruoyi.project.production.workstation.controller;
 
-import java.util.List;
-
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.production.productionLine.domain.ProductionLine;
-import com.ruoyi.project.production.productionLine.service.IProductionLineService;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.production.workstation.domain.Workstation;
+import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.production.workstation.domain.Workstation;
-import com.ruoyi.project.production.workstation.service.IWorkstationService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 工位配置 信息操作处理
@@ -40,6 +34,9 @@ public class WorkstationController extends BaseController
 
 	@Autowired
 	private IWorkstationService workstationService;
+
+	@Autowired
+	private IIsoService isoService;
 
 
 	@GetMapping("/{id}")
@@ -86,6 +83,7 @@ public class WorkstationController extends BaseController
             workstationService.insertWorkstation(workstation);
             return AjaxResult.success();
         }catch (Exception e){
+	    	e.printStackTrace();
 	        return AjaxResult.error(e.getMessage());
         }
 
@@ -130,6 +128,18 @@ public class WorkstationController extends BaseController
 	public AjaxResult remove(Integer id)
 	{
 		return toAjax(workstationService.deleteWorkstationById(id));
+	}
+
+	/**
+	 * 通过产线id以及作业指导书id查询所有工位信息以及作业指导书列表
+	 */
+	@PostMapping("/findByLineId")
+	@ResponseBody
+	public AjaxResult findByLineId(Integer lineId,Integer isoId){
+		Map map = new HashMap<String,Object>();
+		map.put("work",workstationService.selectAllByLineId(lineId));
+		map.put("isoList",isoService.selectIsoByParentId(isoId));
+		return AjaxResult.success(map);
 	}
 	
 }

@@ -33,6 +33,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <association property="sopName" column="sop_id" select="selectSopName">
             <result property="sopName" column="c_name"/>
         </association>
+        <association property="lineName" column="line_id" select="selectLineName">
+            <result property="lineName" column="line_name"/>
+        </association>
     </resultMap>
 	
 	<sql id="selectSopLineVo">
@@ -104,5 +107,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--根据公司id 产线id 产品编号查询对应SOP 配置-->
     <select id="selectSopByCompanyAndLineAndCode" resultMap="SopLineResult1">
       SELECT * FROM octopus.tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and pn_code=#{code} limit 1;
+    </select>
+
+    <!--通过作业指导书id查询sop产线配置列表-->
+    <select id="selectSopLineListBySopId" resultType="com.ruoyi.project.iso.sopLine.domain.SopLine">
+        SELECT * FROM tab_sop_line where company_id = #{companyId} and sop_id = #{sopId};
     </select>
 </mapper>

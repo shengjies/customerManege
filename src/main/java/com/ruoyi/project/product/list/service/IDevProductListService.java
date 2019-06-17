@@ -138,4 +138,11 @@ public interface IDevProductListService
 	 * @return
 	 */
 	List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid);
+
+	/**
+	 * 根据作业指导书id查询所以未配置的产品信息
+	 * @param isoId 作业指导书id
+	 * @return 结果
+	 */
+	List<DevProductList> selectNotConfigByIsoId(Integer isoId, Integer companyId);
 }

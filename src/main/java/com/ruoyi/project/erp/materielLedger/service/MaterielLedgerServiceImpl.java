@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.materielLedger.mapper.MaterielLedgerMapper;
 import com.ruoyi.project.erp.materielLedger.domain.MaterielLedger;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -90,6 +91,7 @@ public class MaterielLedgerServiceImpl implements IMaterielLedgerService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertMaterielLedger(MaterielLedger materielLedger, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;

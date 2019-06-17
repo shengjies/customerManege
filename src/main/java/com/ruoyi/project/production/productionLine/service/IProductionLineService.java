@@ -82,4 +82,12 @@ public interface IProductionLineService
 	 * @return
 	 */
 	Map findDeviceLiableByLineId(Integer lineId);
+
+	/**
+	 * 通过作业指导书id查询未配置的产线信息
+	 * @param isoId 作业指导书id
+	 * @param companyId 公司id
+	 * @return 结果
+	 */
+	List<ProductionLine> selectLineNotConfigByIsoId(Integer isoId,Integer companyId);
 }

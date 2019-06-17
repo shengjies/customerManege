@@ -258,16 +258,16 @@ public class UserServiceImpl implements IUserService {
         return 0;
     }
 
-    public int updateUserDelFlag(User  user,String token){
+    public int updateUserDelFlag(User user, String token) {
         user.setDevCompany(null);
         user.setCreateTime(null);
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())
                 .target(UserApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String, Object> result = userApi.updateUserDelFlag(user,token);
+        HashMap<String, Object> result = userApi.updateUserDelFlag(user, token);
         if (Double.valueOf(result.get("code").toString()) == 0) {
-            return  userMapper.updateUserDelFlag(user.getUserId().intValue(),user.getCompanyId());
+            return userMapper.updateUserDelFlag(user.getUserId().intValue(), user.getCompanyId());
         }
 
         return 0;
@@ -484,10 +484,10 @@ public class UserServiceImpl implements IUserService {
                     this.insertUser(user, request);
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
-                }else if(u.getDelFlag().equals("2")){
+                } else if (u.getDelFlag().equals("2")) {
                     user.setUpdateBy(operName);
                     u.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
-                    this.updateUserDelFlag(u,JwtUtil.getToken(request));
+                    this.updateUserDelFlag(u, JwtUtil.getToken(request));
                     successNum++;
                     successMsg.append("<br/>" + successNum + "、账号 " + user.getLoginName() + " 导入成功");
                 } else if (isUpdateSupport) {
@@ -549,14 +549,14 @@ public class UserServiceImpl implements IUserService {
         // 新增用户与角色管理
         insertUserRole(user);
         //初始化文件
-        if(rows >0){
+        if (rows > 0) {
             //查询对应公司
             DevCompany company = devCompanyService.selectDevCompanyById(user.getCompanyId());
-            if(company != null){
+            if (company != null) {
                 //查询总文件管理信息
                 Iso iso = isoMapper.selectIsoById(1);
-                if(iso != null){
-                    String disk = RuoYiConfig.getProfile()+company.getTotalIso();
+                if (iso != null) {
+                    String disk = RuoYiConfig.getProfile() + company.getTotalIso();
                     createFile(disk);
                     iso.setDisk(disk);
                     iso.setDiskPath(company.getTotalIso());
@@ -567,23 +567,23 @@ public class UserServiceImpl implements IUserService {
                     isoMapper.updateIso(iso);
                     //查询对应的子目录
                     List<Iso> list = isoMapper.selectByPid(iso.getIsoId());
-                    if(list != null){
+                    if (list != null) {
                         for (Iso i : list) {
-                            String d1 = iso.getDisk() + File.separator+i.geteName();
+                            String d1 = iso.getDisk() + "/" + i.geteName();
                             createFile(d1);
                             i.setDisk(d1);
-                            i.setDiskPath(iso.getDiskPath()+File.separator+i.geteName());
+                            i.setDiskPath(iso.getDiskPath() + "/" + i.geteName());
                             i.setcId(user.getUserId().intValue());
                             i.setcTime(new Date());
                             i.setCompanyId(company.getCompanyId());
                             isoMapper.updateIso(i);
                             List<Iso> isos = isoMapper.selectByPid(i.getIsoId());
-                            if(isos != null){
+                            if (isos != null) {
                                 for (Iso i2 : isos) {
-                                    String d2 = i.getDisk()+File.separator+i2.geteName();
+                                    String d2 = i.getDisk() + "/" + i2.geteName();
                                     createFile(d2);
                                     i2.setDisk(d2);
-                                    i2.setDiskPath(i.getDiskPath()+File.separator+i2.geteName());
+                                    i2.setDiskPath(i.getDiskPath() + "/" + i2.geteName());
                                     i2.setcId(user.getUserId().intValue());
                                     i2.setcTime(new Date());
                                     i2.setCompanyId(company.getCompanyId());
@@ -597,14 +597,16 @@ public class UserServiceImpl implements IUserService {
         }
         return rows;
     }
-    private void createFile(String path){
+
+    private void createFile(String path) {
         //创建对应的总文件夹
         File file = new File(path);
-        if (file.exists()){
+        if (file.exists()) {
             file.delete();
         }
         file.mkdir();
     }
+
     /**
      * 查询对应的公司的所以的员工信息
      *

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.productLedger.mapper.ProductLedgerMapper;
 import com.ruoyi.project.erp.productLedger.domain.ProductLedger;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -94,6 +95,7 @@ public class ProductLedgerServiceImpl implements IProductLedgerService
      * @return 结果
      */
 	@Override
+	@Transactional
 	public int insertProductLedger(ProductLedger productLedger,HttpServletRequest request)
 	{
 		//查询客户信息

@@ -14,6 +14,7 @@ import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
@@ -297,5 +298,16 @@ public class ProductionLineServiceImpl implements IProductionLineService {
             companyId = user.getCompanyId();
         }
         return productionLineMapper.selectAllProductionLineByCompanyId(companyId);
+    }
+
+    /**
+     * 通过作业指导书id查询未配置的产线信息
+     * @param isoId 作业指导书id
+     * @param companyId 公司id
+     * @return 结果
+     */
+    @Override
+    public List<ProductionLine> selectLineNotConfigByIsoId(Integer isoId, Integer companyId) {
+        return productionLineMapper.selectLineNotConfigByIsoId(isoId,companyId);
     }
 }

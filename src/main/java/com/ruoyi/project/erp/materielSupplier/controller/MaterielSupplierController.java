@@ -81,7 +81,7 @@ public class MaterielSupplierController extends BaseController {
     @ResponseBody
     public AjaxResult addSave(MaterielSupplier materielSupplier, HttpServletRequest request) {
         try {
-            return toAjax(materielSupplierService.insertMaterielSupplier(materielSupplier,request));
+            return toAjax(materielSupplierService.insertMaterielSupplier(materielSupplier, request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -149,25 +149,31 @@ public class MaterielSupplierController extends BaseController {
 
     /**
      * 根据物料id和供应商id查询供应商编码
-     * @param mid  物料id
+     *
+     * @param mid 物料id
      * @param sid 供应商id
      * @return
      */
     @ResponseBody
     @RequestMapping("/findSupplierCodeByMaterielId")
-    public AjaxResult findSupplierCodeByMaterielId(int mid,int sid,HttpServletRequest request){
-            return AjaxResult.success("success",materielSupplierService.findSupplierCodeByMaterielId(mid,sid,request));
+    public AjaxResult findSupplierCodeByMaterielId(int mid, int sid, HttpServletRequest request) {
+        return AjaxResult.success("success", materielSupplierService.findSupplierCodeByMaterielId(mid, sid, request));
     }
 
     /**
      * 查询物料采购单信息
-     * @param mid  物料id
+     *
+     * @param mid 物料id
      * @param sid 供应商id
      * @return
      */
     @RequestMapping("/matOutStockByMatIdAndSupId")
     @ResponseBody
-    public AjaxResult matOutStockByMatIdAndSupId(int mid,int sid,HttpServletRequest request){
-        return AjaxResult.success("success",materielSupplierService.matOutStockByMatIdAndSupId(mid,sid,request));
+    public AjaxResult matOutStockByMatIdAndSupId(int mid, int sid, HttpServletRequest request) {
+        try {
+            return AjaxResult.success("success", materielSupplierService.matOutStockByMatIdAndSupId(mid, sid, request));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
     }
 }

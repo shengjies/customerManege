@@ -48,9 +48,9 @@
 <div th:include="include :: footer"></div>
 <script th:inline="javascript">
     var listFlag = [[${@permission.hasPermi('iso:iso:list')}]];
-    var addFlag = [[${@permission.hasPermi('iso:iso:add')}]];
     var editFlag = [[${@permission.hasPermi('iso:iso:edit')}]];
     var removeFlag = [[${@permission.hasPermi('iso:iso:remove')}]];
+    var sopLineFlag = [[${@permission.hasPermi('iso:sopLine:list')}]];
     var prefix = ctx + "iso/iso";
 
     $(function () {
@@ -60,6 +60,7 @@
             updateUrl: prefix + "/edit/{id}",
             removeUrl: prefix + "/remove/{id}",
             createUploadUrl: prefix + "/fileupload/{id}",
+            createSopLineUrl: "/iso/sopLine/view/{id}",
             search: false,
             showExport: false,
             showSearch:false,
@@ -82,21 +83,19 @@
                 },
                 {
                     title: '操作',
-                    width: '30%',
+                    width: '40%',
                     align: "left",
                     formatter: function (value, row, index) {
                         var actions = [];
-                        if (row.iType == 0) {
-                            if (row.category >= 4) { // 只能上传文件不能新增文件夹
-                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.isoId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                            } else {
-                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.isoId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                            }
-                        } else {
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.isoId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        if (row.iType == 1) {
                             actions.push('<a class="btn btn-primary btn-xs ' + listFlag + '" href="#" onclick="showFile(\'' + row.path + '\')"><i class="fa fa-eye"></i>查看</a> ');
-                        }
+                        } 
                         if (row.defId == 1) {
-                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.isoId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.isoId + '\')"><i class="fa fa-remove"></i>删除</a> ');
+                        }
+                        if (row.category == 4 ) { // 作业指导书目录
+                            actions.push('<a class="btn btn-success btn-xs ' + sopLineFlag + '" href="#" onclick="setLineInfo(\'' + row.isoId + '\')"><i class="fa fa-gear"></i>配置产线</a>');
                         }
                         return actions.join('');
                     }
@@ -116,13 +115,13 @@
                 {
                     field: 'fileSize',
                     title: '文件大小',
-                    width: '30%',
+                    width: '10%',
                     align: "left",
                 },
                 {
                     field: 'cTime',
                     title: '最后更新时间',
-                    width: '30%',
+                    width: '20%',
                     align: "left",
                 }]
         };
@@ -136,7 +135,7 @@
     function add() {
         var parentId = $("#isoId").val();
         var url = $.common.isEmpty(parentId) ? $.table._option.createUrl : $.table._option.createUrl.replace("{id}", parentId);
-        $.modal.open("添加" + $.table._option.modalName, url, 400, 300);
+        $.modal.open("添加" + $.table._option.modalName, url, 500, 400);
     }
 
     /**
@@ -202,7 +201,7 @@
             }
             url = $.table._option.updateUrl.replace("{id}", id);
         }
-        $.modal.open("修改" + $.table._option.modalName, url, 400, 300);
+        $.modal.open("修改" + $.table._option.modalName, url, 500, 400);
     }
 
     /**
@@ -231,7 +230,7 @@
     function upload() {
         var parentId = $("#isoId").val();
         var url = $.common.isEmpty(parentId) ? $.table._option.createUploadUrl : $.table._option.createUploadUrl.replace("{id}", parentId);
-        $.modal.open("上传作业指导书", url,400,300);
+        $.modal.open("上传作业指导书", url,500,400);
     }
 
     /**
@@ -239,6 +238,15 @@
      */
     function showFile(path) {
         window.open(path);
+    }
+
+    /**
+     * 跳转配置产线页面
+     * @param isoId 作业指导书id
+     */
+    function setLineInfo(isoId) {
+        var url = $.common.isEmpty(isoId) ? $.table._option.createSopLineUrl : $.table._option.createSopLineUrl.replace("{id}", isoId);
+        createMenuItem(url,"SOP产线配置");
     }
 </script>
 </body>

@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.constant.StockConstants;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.lineIntoStock.mapper.LineIntoStockMapper;
 import com.ruoyi.project.erp.lineIntoStock.domain.LineIntoStock;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -89,7 +91,7 @@ public class LineIntoStockServiceImpl implements ILineIntoStockService {
     @Override
     public List<LineIntoStock> selectLineIntoStockList(LineIntoStock lineIntoStock, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        if (user == null ) {
+        if (user == null) {
             return Collections.emptyList();
         }
         lineIntoStock.setCompanyId(user.getCompanyId());
@@ -103,111 +105,110 @@ public class LineIntoStockServiceImpl implements ILineIntoStockService {
      * @return 结果
      */
     @Override
-    public int insertLineIntoStock(LineIntoStock lineIntoStock,HttpServletRequest request) {
+    @Transactional
+    public int insertLineIntoStock(LineIntoStock lineIntoStock, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;
         // 产线入库单
-        try {
-            String matIntoStockCode = CodeUtils.getMatIntoStockCode(); // 自动生成生产入库单
-            lineIntoStock.setIntoCode(matIntoStockCode);
-            lineIntoStock.setCompanyId(user.getCompanyId());
-            lineIntoStock.setCreateId(user.getUserId().intValue());
-            lineIntoStock.setCreateName(user.getUserName());
-            lineIntoStock.setCreateTime(new Date());
-            lineIntoStockMapper.insertLineIntoStock(lineIntoStock);
+        String matIntoStockCode = CodeUtils.getMatIntoStockCode(); // 自动生成生产入库单
+        lineIntoStock.setIntoCode(matIntoStockCode);
+        lineIntoStock.setCompanyId(user.getCompanyId());
+        lineIntoStock.setCreateId(user.getUserId().intValue());
+        lineIntoStock.setCreateName(user.getUserName());
+        lineIntoStock.setCreateTime(new Date());
+        lineIntoStockMapper.insertLineIntoStock(lineIntoStock);
 
-            if (!StringUtils.isEmpty(lineIntoStock.getDetails())) {
-                // 成品入库明细
-                List<LineIntoStockDetails> lineIntoStockDetails = JSON.parseArray(lineIntoStock.getDetails(), LineIntoStockDetails.class);
-                for (LineIntoStockDetails lineIntoStockDetail : lineIntoStockDetails) {
-                    Integer workOrderId = lineIntoStockDetail.getWorkOrderId(); // 工单id
-                    if (workOrderId != -1) { // 选择了工单进行入库
-                        /**
-                         * 更新工单的实际入库数量
-                         */
-                        DevWorkOrder workOrder = workOrderMapper.selectDevWorkOrderById(lineIntoStockDetail.getWorkOrderId());
-                        workOrder.setActualWarehouseNum(workOrder.getActualWarehouseNum() + lineIntoStockDetail.getDetIntoNum());
-                        workOrderMapper.updateDevWorkOrder(workOrder);
-                    }
-                    lineIntoStockDetail.setLineIntoId(lineIntoStock.getId());
-                    lineIntoStockDetail.setIntoCode(matIntoStockCode);
-                    lineIntoStockDetail.setCreateTime(new Date());
-
+        if (!StringUtils.isEmpty(lineIntoStock.getDetails())) {
+            List<LineIntoStockDetails> lineIntoStockDetails = JSON.parseArray(lineIntoStock.getDetails(), LineIntoStockDetails.class);
+            for (LineIntoStockDetails lineIntoStockDetail : lineIntoStockDetails) {
+                Integer workOrderId = lineIntoStockDetail.getWorkOrderId(); // 工单id
+                if (workOrderId != -1) { // 选择了工单进行入库
                     /**
-                     * 不同的入库类型不同的库存操作
+                     * 更新工单的实际入库数量
                      */
-                    // 入库类型
-                    Integer intoType = lineIntoStockDetail.getIntoType();
-                    if (StockConstants.DETAILS_TYPE_PRODUCT.equals(intoType)) { // 入库类型属于成品 状态 0
-                        // 判断库存是否存在
-                        ProductStock productStock = productStockMapper.selectProductStockByProCode(user.getCompanyId(), lineIntoStockDetail.getDetIntoCode());
-                        if (StringUtils.isNull(productStock)) { // 不存在记录新增
-                            productStock = new ProductStock();
-                            productStock.setCompanyId(user.getCompanyId());
-                            productStock.setCreateTime(new Date());
-                            productStock.setLastUpdate(new Date());
-                            productStock.setGoodNumber(lineIntoStockDetail.getDetIntoNum()); // 良品数量
-                            productStock.setProductId(lineIntoStockDetail.getDetIntoId()); // 产品id
-                            productStock.setProductCode(lineIntoStockDetail.getDetIntoCode()); // 编码
-                            productStock.setTotalNumber(lineIntoStockDetail.getDetIntoNum()); // 总数
-                            productStock.setProductName(lineIntoStockDetail.getDetIntoName()); // 名称
-                            productStock.setProductModel(lineIntoStockDetail.getDetIntoModel()); // 型号
-
-                            productStockMapper.insertProductStock(productStock); // 新增产品库存
-                        } else {
-                            productStock.setTotalNumber(productStock.getTotalNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新总数
-                            productStock.setGoodNumber(productStock.getGoodNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新良品
-                            productStock.setLastUpdate(new Date());
-
-                            productStockMapper.updateProductStock(productStock); // 更新产品库存
-                        }
-                    } else {  // 入库类型属于半成品
-                        // 判断库存是否存在
-                        PartsStock PartsStock = partsStockMapper.selectPartsStockByProCode(user.getCompanyId(), lineIntoStockDetail.getDetIntoCode());
-                        if (StringUtils.isNull(PartsStock)) { // 不存在半成品库存记录新增
-
-                            // 半成品信息
-                            Parts parts = partsMapper.selectPartsByCode(user.getCompanyId(), lineIntoStockDetail.getDetIntoCode());
-                            if (StringUtils.isNull(parts)) { // 不存在半成品记录
-                                // 新增半成品信息
-                                parts = new Parts();
-                                parts.setCompanyId(user.getCompanyId());
-                                parts.setPartsCode(lineIntoStockDetail.getDetIntoCode());
-                                parts.setPartsName(lineIntoStockDetail.getDetIntoName());
-                                parts.setCreateId(user.getUserId().intValue());
-                                parts.setCreateName(user.getUserName());
-                                parts.setCreateTime(new Date());
-                                partsMapper.insertParts(parts);
-                            }
-                            PartsStock = new PartsStock();
-                            PartsStock.setPartId(parts.getId());
-                            PartsStock.setCompanyId(user.getCompanyId());
-                            PartsStock.setCreateTime(new Date());
-                            PartsStock.setLastUpdate(new Date());
-                            PartsStock.setGoodNumber(lineIntoStockDetail.getDetIntoNum()); // 良品数量
-                            PartsStock.setTotalNumber(lineIntoStockDetail.getDetIntoNum()); // 总数
-                            PartsStock.setPartCode(lineIntoStockDetail.getDetIntoCode()); // 编码
-                            PartsStock.setPartName(lineIntoStockDetail.getDetIntoName()); // 名称
-                            lineIntoStockDetail.setDetIntoId(parts.getId());
-
-                            partsStockMapper.insertPartsStock(PartsStock); // 新增半成品库存
-                        } else {
-                            PartsStock.setTotalNumber(PartsStock.getTotalNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新总数
-                            PartsStock.setGoodNumber(PartsStock.getGoodNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新良品
-                            PartsStock.setLastUpdate(new Date());
-                            lineIntoStockDetail.setDetIntoId(PartsStock.getPartId());
-                            partsStockMapper.updatePartsStock(PartsStock); // 更新半成品库存
-                        }
+                    DevWorkOrder workOrder = workOrderMapper.selectDevWorkOrderById(lineIntoStockDetail.getWorkOrderId());
+                    if (workOrder.getProductNumber() < lineIntoStockDetail.getDetIntoNum()) {
+                        throw new BusinessException("入库数量不能大于工单实际数量");
                     }
-
-                    lineIntoStockDetailsMapper.insertLineIntoStockDetails(lineIntoStockDetail); // 更新生产入库明细
-
+                    workOrder.setActualWarehouseNum(workOrder.getActualWarehouseNum() + lineIntoStockDetail.getDetIntoNum());
+                    workOrderMapper.updateDevWorkOrder(workOrder);
                 }
+                lineIntoStockDetail.setLineIntoId(lineIntoStock.getId());
+                lineIntoStockDetail.setIntoCode(matIntoStockCode);
+                lineIntoStockDetail.setCreateTime(new Date());
+
+                /**
+                 * 不同的入库类型不同的库存操作
+                 */
+                // 入库类型
+                Integer intoType = lineIntoStockDetail.getIntoType();
+                if (StockConstants.DETAILS_TYPE_PRODUCT.equals(intoType)) { // 入库类型属于成品 状态 0
+                    // 判断库存是否存在
+                    ProductStock productStock = productStockMapper.selectProductStockByProCode(user.getCompanyId(), lineIntoStockDetail.getDetIntoCode());
+                    if (StringUtils.isNull(productStock)) { // 不存在记录新增
+                        productStock = new ProductStock();
+                        productStock.setCompanyId(user.getCompanyId());
+                        productStock.setCreateTime(new Date());
+                        productStock.setLastUpdate(new Date());
+                        productStock.setGoodNumber(lineIntoStockDetail.getDetIntoNum()); // 良品数量
+                        productStock.setProductId(lineIntoStockDetail.getDetIntoId()); // 产品id
+                        productStock.setProductCode(lineIntoStockDetail.getDetIntoCode()); // 编码
+                        productStock.setTotalNumber(lineIntoStockDetail.getDetIntoNum()); // 总数
+                        productStock.setProductName(lineIntoStockDetail.getDetIntoName()); // 名称
+                        productStock.setProductModel(lineIntoStockDetail.getDetIntoModel()); // 型号
+
+                        productStockMapper.insertProductStock(productStock); // 新增产品库存
+                    } else {
+                        productStock.setTotalNumber(productStock.getTotalNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新总数
+                        productStock.setGoodNumber(productStock.getGoodNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新良品
+                        productStock.setLastUpdate(new Date());
+
+                        productStockMapper.updateProductStock(productStock); // 更新产品库存
+                    }
+                } else {  // 入库类型属于半成品
+                    // 判断库存是否存在
+                    PartsStock PartsStock = partsStockMapper.selectPartsStockByProCode(user.getCompanyId(), lineIntoStockDetail.getDetIntoCode());
+                    if (StringUtils.isNull(PartsStock)) { // 不存在半成品库存记录新增
+
+                        // 半成品信息
+                        Parts parts = partsMapper.selectPartsByCode(user.getCompanyId(), lineIntoStockDetail.getDetIntoCode());
+                        if (StringUtils.isNull(parts)) { // 不存在半成品记录
+                            // 新增半成品信息
+                            parts = new Parts();
+                            parts.setCompanyId(user.getCompanyId());
+                            parts.setPartsCode(lineIntoStockDetail.getDetIntoCode());
+                            parts.setPartsName(lineIntoStockDetail.getDetIntoName());
+                            parts.setCreateId(user.getUserId().intValue());
+                            parts.setCreateName(user.getUserName());
+                            parts.setCreateTime(new Date());
+                            partsMapper.insertParts(parts);
+                        }
+                        PartsStock = new PartsStock();
+                        PartsStock.setPartId(parts.getId());
+                        PartsStock.setCompanyId(user.getCompanyId());
+                        PartsStock.setCreateTime(new Date());
+                        PartsStock.setLastUpdate(new Date());
+                        PartsStock.setGoodNumber(lineIntoStockDetail.getDetIntoNum()); // 良品数量
+                        PartsStock.setTotalNumber(lineIntoStockDetail.getDetIntoNum()); // 总数
+                        PartsStock.setPartCode(lineIntoStockDetail.getDetIntoCode()); // 编码
+                        PartsStock.setPartName(lineIntoStockDetail.getDetIntoName()); // 名称
+                        lineIntoStockDetail.setDetIntoId(parts.getId());
+
+                        partsStockMapper.insertPartsStock(PartsStock); // 新增半成品库存
+                    } else {
+                        PartsStock.setTotalNumber(PartsStock.getTotalNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新总数
+                        PartsStock.setGoodNumber(PartsStock.getGoodNumber() + lineIntoStockDetail.getDetIntoNum()); // 更新良品
+                        PartsStock.setLastUpdate(new Date());
+                        lineIntoStockDetail.setDetIntoId(PartsStock.getPartId());
+                        partsStockMapper.updatePartsStock(PartsStock); // 更新半成品库存
+                    }
+                }
+
+                lineIntoStockDetailsMapper.insertLineIntoStockDetails(lineIntoStockDetail); // 更新生产入库明细
+
             }
-            return 1;
-        } catch (Exception e) {
-            return 0;
         }
+        return 1;
     }
 
     /**
@@ -239,16 +240,15 @@ public class LineIntoStockServiceImpl implements ILineIntoStockService {
      * @return 结果
      */
     @Override
-    public int nullifyLineIntoStockByIds(Integer id,HttpServletRequest request) {
+    @Transactional
+    public int nullifyLineIntoStockByIds(Integer id, HttpServletRequest request) {
         /**
          * 查询出所有工单，更新实际入库数量以及产品库存信息
          */
         User user = JwtUtil.getTokenUser(request);
-        if (user == null ) {
+        if (user == null) {
             return 0;
         }
-        LineIntoStock lineIntoStock = lineIntoStockMapper.selectLineIntoStockById(id);
-
         List<LineIntoStockDetails> lineIntoStockDetails = lineIntoStockDetailsMapper.selectLineIntoStockDetailsByLineIntoId(id);
         if (!StringUtils.isEmpty(lineIntoStockDetails)) {
             DevWorkOrder devWorkOrder = null;

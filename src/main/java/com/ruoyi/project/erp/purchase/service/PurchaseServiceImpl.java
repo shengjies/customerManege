@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.purchase.mapper.PurchaseMapper;
 import com.ruoyi.project.erp.purchase.domain.Purchase;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -92,6 +93,7 @@ public class PurchaseServiceImpl implements IPurchaseService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int insertPurchase(Purchase purchase,HttpServletRequest request) {
         if (purchase.getSupplierId() == null) return 0;
         User user = JwtUtil.getTokenUser(request);
@@ -138,6 +140,7 @@ public class PurchaseServiceImpl implements IPurchaseService {
      * @return 结果
      */
     @Override
+    @Transactional
     public int updatePurchase(Purchase purchase) {
 
         //将对应的详情数据标记为1

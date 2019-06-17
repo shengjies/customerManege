@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.materielFeed.mapper.MaterielFeedMapper;
 import com.ruoyi.project.erp.materielFeed.domain.MaterielFeed;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -99,6 +100,7 @@ public class MaterielFeedServiceImpl implements IMaterielFeedService
      * @return 结果
      */
 	@Override
+	@Transactional
 	public int insertMaterielFeed(MaterielFeed materielFeed,HttpServletRequest request)
 	{
         User user = JwtUtil.getTokenUser(request);
@@ -207,6 +209,7 @@ public class MaterielFeedServiceImpl implements IMaterielFeedService
 	 * @return 结果
 	 */
 	@Override
+	@Transactional
 	public int nullifyMaterielFeedById(Integer id) {
 		MaterielFeedDetails materielFeedDetails = new MaterielFeedDetails();
 		materielFeedDetails.setFeedId(id);

@@ -149,4 +149,11 @@ public interface DevProductListMapper {
      */
     List<DevProductList> selectNotConfigByLineId(@Param("lineId")int lineId,@Param("companyid")int companyid);
 
+    /**
+     * 根据作业指导书id查询所有配置的产品信息
+     * @param isoId 作业指导书id
+     * @param companyId 公司id
+     * @return 结果
+     */
+    List<DevProductList> selectNotConfigByIsoId(@Param("isoId") Integer isoId,@Param("companyId") Integer companyId);
 }

@@ -83,7 +83,7 @@
 								<th>采购单</th>
 								<th>采购单数量</th>
 								<th>已入库数量</th>
-								<th>本次退货数量</th>
+								<th style="width: 100px;">本次退货数量</th>
 								<th>操作</th>
 							</tr>
 							</thead>
@@ -225,7 +225,7 @@
                         $(val).parent("td").siblings("td").find("input[name='outNumber']").val("0");
                     }
                 } else {
-                    $.modal.alertWarning("操作异常")
+                    $.modal.alertWarning(res.msg);
                 }
             })
         } else {

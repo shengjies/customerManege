@@ -20,7 +20,7 @@
 									 <label class="col-sm-12 control-label" style="margin-top: 10px;">选择产线：</label>
 									 <div class="col-sm-12">
 										 <select  name="lineId" id="lineId" onchange="findDeviceLiableByLineId(this)" class="form-control" th:field="${order.lineId}"
-												 th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+												 th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
 											 <option th:each="line : ${productionLine}" th:text="${line.lineName}"
 													 th:value="${line.Id}"></option>
 										 </select>

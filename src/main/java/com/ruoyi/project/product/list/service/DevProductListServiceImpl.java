@@ -441,4 +441,15 @@ public class DevProductListServiceImpl implements IDevProductListService {
     public List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid) {
         return devProductListMapper.selectNotConfigByLineId(lineId,companyid);
     }
+
+    /**
+     * 根据作业指导id查询所有未配置的产品信息
+     * @param isoId 作业指导书id
+     * @param companyId 公司id
+     * @return 结果
+     */
+    @Override
+    public List<DevProductList> selectNotConfigByIsoId(Integer isoId, Integer companyId) {
+        return devProductListMapper.selectNotConfigByIsoId(isoId,companyId);
+    }
 }
