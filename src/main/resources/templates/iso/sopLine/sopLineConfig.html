@@ -18,12 +18,6 @@
                         <li>
                             产品编码：<input type="text" name="pnCode"/>
                         </li>
-                        <li class="select-time">
-                            <label>修改时间： </label>
-                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
-                            <span>-</span>
-                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
-                        </li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -70,21 +64,22 @@
                 {
                     field : 'lineId',
                     title : '产线',
-                    sortable: true
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return row.lineName;
+                    }
                 },
                 {
                     field : 'sopId',
                     title : 'SOP',
-                    sortable: true
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return row.sopName;
+                    }
                 },
                 {
                     field : 'pnCode',
                     title : '产品编码',
-                    sortable: true
-                },
-                {
-                    field : 'cTime',
-                    title : '修改时间',
                     sortable: true
                 },
                 {
@@ -99,6 +94,7 @@
                 }]
         };
         $.table.init(options);
+        $.table.search();
     });
 
     /**

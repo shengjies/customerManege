@@ -13,6 +13,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pnCode"    column="pn_code"    />
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
+        <association property="lineName" column="line_id" select="selectLineName">
+            <result property="lineName" column="line_name"/>
+        </association>
+        <association property="sopName" column="sop_id" select="selectSopName">
+            <result property="sopName" column="c_name"/>
+        </association>
     </resultMap>
 	
 	<sql id="selectSopLineVo">
@@ -20,19 +26,30 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 	
     <select id="selectSopLineList" parameterType="SopLine" resultMap="SopLineResult">
-        <include refid="selectSopLineVo"/>
-        <where>  
-            <if test="id != null "> and id = #{id}</if>
-             <if test="companyId != null "> and company_id = #{companyId}</if>
-             <if test="sopId != null "> and sop_id = #{sopId}</if>
-             <if test="lineId != null "> and line_id = #{lineId}</if>
-             <if test="pnId != null "> and pn_id = #{pnId}</if>
-             <if test="pnCode != null  and pnCode != '' "> and pn_code = #{pnCode}</if>
-             <if test="cId != null "> and c_id = #{cId}</if>
-             <if test="cTime != null "> and c_time = #{cTime}</if>
-         </where>
+        SELECT
+            `sop_id`,
+            `line_id`,
+          GROUP_CONCAT(pn_code) AS pn_code
+        FROM
+            tab_sop_line
+        <where>
+            <if test="sopId != null "> and sop_id = #{sopId}</if>
+            <if test="lineId != null "> and line_id = #{lineId}</if>
+            <if test="pnCode != null  and pnCode != '' "> and pn_code like concat('%', #{pnCode}, '%')</if>
+        </where>
+          GROUP BY
+        `sop_id`,
+        `line_id`
     </select>
-    
+
+    <!--产线名称-->
+    <select id="selectLineName" resultType="java.lang.String">
+        SELECT line_name  FROM dev_production_line where id = #{line_id};
+    </select>
+    <!--SOP名称-->
+    <select id="selectSopName" resultType="java.lang.String">
+        SELECT c_name FROM tab_iso where iso_id = #{sop_id} ;
+    </select>
     <select id="selectSopLineById" parameterType="Integer" resultMap="SopLineResult">
         <include refid="selectSopLineVo"/>
         where id = #{id}

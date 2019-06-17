@@ -32,89 +32,81 @@ public class SopLineWork extends BaseEntity
 	/** 修改时间 */
 	private Date cTime;
 
-	public void setId(Integer id) 
-	{
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getId() 
-	{
-		return id;
+	public Integer getCompanyId() {
+		return companyId;
 	}
-	public void setCompanyId(Integer companyId) 
-	{
+
+	public void setCompanyId(Integer companyId) {
 		this.companyId = companyId;
 	}
 
-	public Integer getCompanyId() 
-	{
-		return companyId;
+	public Integer getLineId() {
+		return lineId;
 	}
-	public void setLineId(Integer lineId) 
-	{
+
+	public void setLineId(Integer lineId) {
 		this.lineId = lineId;
 	}
 
-	public Integer getLineId() 
-	{
-		return lineId;
+	public Integer getSopId() {
+		return sopId;
 	}
-	public void setSopId(Integer sopId) 
-	{
+
+	public void setSopId(Integer sopId) {
 		this.sopId = sopId;
 	}
 
-	public Integer getSopId() 
-	{
-		return sopId;
+	public Integer getwId() {
+		return wId;
 	}
-	public void setWId(Integer wId) 
-	{
+
+	public void setwId(Integer wId) {
 		this.wId = wId;
 	}
 
-	public Integer getWId() 
-	{
-		return wId;
+	public Integer getPageId() {
+		return pageId;
 	}
-	public void setPageId(Integer pageId) 
-	{
+
+	public void setPageId(Integer pageId) {
 		this.pageId = pageId;
 	}
 
-	public Integer getPageId() 
-	{
-		return pageId;
+	public Integer getcId() {
+		return cId;
 	}
-	public void setCId(Integer cId) 
-	{
+
+	public void setcId(Integer cId) {
 		this.cId = cId;
 	}
 
-	public Integer getCId() 
-	{
-		return cId;
-	}
-	public void setCTime(Date cTime) 
-	{
-		this.cTime = cTime;
-	}
-
-	public Date getCTime() 
-	{
+	public Date getcTime() {
 		return cTime;
 	}
 
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("companyId", getCompanyId())
-            .append("lineId", getLineId())
-            .append("sopId", getSopId())
-            .append("wId", getWId())
-            .append("pageId", getPageId())
-            .append("cId", getCId())
-            .append("cTime", getCTime())
-            .toString();
-    }
+	public void setcTime(Date cTime) {
+		this.cTime = cTime;
+	}
+
+	@Override
+	public String toString() {
+		return "SopLineWork{" +
+				"id=" + id +
+				", companyId=" + companyId +
+				", lineId=" + lineId +
+				", sopId=" + sopId +
+				", wId=" + wId +
+				", pageId=" + pageId +
+				", cId=" + cId +
+				", cTime=" + cTime +
+				'}';
+	}
 }

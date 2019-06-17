@@ -8,15 +8,12 @@ import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.workData.service.IWorkDataService;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.project.iso.sopLine.domain.SopLine;
@@ -71,20 +68,7 @@ public class SopLineController extends BaseController
         List<SopLine> list = sopLineService.selectSopLineList(sopLine);
 		return getDataTable(list);
 	}
-	
-	
-	/**
-	 * 导出作业指导书  产线 配置列表
-	 */
-	@RequiresPermissions("iso:sopLine:export")
-    @PostMapping("/export")
-    @ResponseBody
-    public AjaxResult export(SopLine sopLine)
-    {
-    	List<SopLine> list = sopLineService.selectSopLineList(sopLine);
-        ExcelUtil<SopLine> util = new ExcelUtil<SopLine>(SopLine.class);
-        return util.exportExcel(list, "sopLine");
-    }
+
 	
 	/**
 	 * 新增作业指导书  产线 配置
@@ -102,8 +86,11 @@ public class SopLineController extends BaseController
 	@Log(title = "作业指导书  产线 配置", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(SopLine sopLine)
-	{		
+	public AjaxResult addSave(@RequestBody SopLine sopLine,HttpServletRequest request)
+	{
+		User u = JwtUtil.getTokenUser(request);
+		sopLine.setcId(u.getUserId().intValue());
+		sopLine.setCompanyId(u.getCompanyId());
 		return toAjax(sopLineService.insertSopLine(sopLine));
 	}
 

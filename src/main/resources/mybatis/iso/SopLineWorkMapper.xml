@@ -18,20 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<sql id="selectSopLineWorkVo">
         select id, company_id, line_id, sop_id, w_id, page_id, c_id, c_time from tab_sop_line_work
     </sql>
-	
-    <select id="selectSopLineWorkList" parameterType="SopLineWork" resultMap="SopLineWorkResult">
-        <include refid="selectSopLineWorkVo"/>
-        <where>  
-            <if test="id != null "> and id = #{id}</if>
-             <if test="companyId != null "> and company_id = #{companyId}</if>
-             <if test="lineId != null "> and line_id = #{lineId}</if>
-             <if test="sopId != null "> and sop_id = #{sopId}</if>
-             <if test="wId != null "> and w_id = #{wId}</if>
-             <if test="pageId != null "> and page_id = #{pageId}</if>
-             <if test="cId != null "> and c_id = #{cId}</if>
-             <if test="cTime != null "> and c_time = #{cTime}</if>
-         </where>
-    </select>
+
     
     <select id="selectSopLineWorkById" parameterType="Integer" resultMap="SopLineWorkResult">
         <include refid="selectSopLineWorkVo"/>
@@ -59,30 +46,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cTime != null  ">#{cTime},</if>
          </trim>
     </insert>
-	 
-    <update id="updateSopLineWork" parameterType="SopLineWork">
-        update tab_sop_line_work
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="companyId != null  ">company_id = #{companyId},</if>
-            <if test="lineId != null  ">line_id = #{lineId},</if>
-            <if test="sopId != null  ">sop_id = #{sopId},</if>
-            <if test="wId != null  ">w_id = #{wId},</if>
-            <if test="pageId != null  ">page_id = #{pageId},</if>
-            <if test="cId != null  ">c_id = #{cId},</if>
-            <if test="cTime != null  ">c_time = #{cTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
+
 
 	<delete id="deleteSopLineWorkById" parameterType="Integer">
         delete from tab_sop_line_work where id = #{id}
     </delete>
-	
-    <delete id="deleteSopLineWorkByIds" parameterType="String">
-        delete from tab_sop_line_work where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
-    
+
 </mapper>
