@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.ruoyi.common.constant.StockConstants;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -122,72 +123,128 @@ public class StockHandleServiceImpl implements IStockHandleService
                 /**
                  * 根据不同的处理类型执行不同的操作
                  */
+                Integer handleNumber = stockHandleDetails.getHandleNumber(); // 实际处理数量
+                String attrCode = stockHandleDetails.getAttrCode(); // 处理的产品物料办成编码信息
                 if (StockConstants.DETAILS_TYPE_PRODUCT.equals(handleType)) { // 成品库存管理
                     ProductStock productStock = productStockMapper.selectProductStockByProId(stockHandleDetails.getAttrId());
+                    Integer goodNumber = productStock.getGoodNumber(); // 良品数量
+                    Integer badNumber = productStock.getBadNumber(); // 不良品数量
+                    Integer scrapNumber = productStock.getScrapNumber(); // 报废品数量
                     /**
                      * 通过不同的处理类型更新相对应的库存信息
                      */
                     Integer handleStatus = Integer.parseInt(stockHandleDetails.getHandleStatus());// 获取处理类型
                     if (StockConstants.BAD_TO_GOOD.equals(handleStatus)) { // 不良品到良品
-                        productStock.setGoodNumber(productStock.getGoodNumber() + stockHandleDetails.getHandleNumber());
-                        productStock.setBadNumber(productStock.getBadNumber() - stockHandleDetails.getHandleNumber());
+                        if (badNumber < handleNumber ) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        productStock.setGoodNumber(goodNumber + handleNumber);
+                        productStock.setBadNumber(badNumber - handleNumber);
                     } else if (StockConstants.BAD_TO_SCRAP.equals(handleStatus)) { // 不良品到报废品
-                        productStock.setBadNumber(productStock.getBadNumber() - stockHandleDetails.getHandleNumber());
-                        productStock.setScrapNumber(productStock.getScrapNumber() + stockHandleDetails.getHandleNumber());
+                        if (badNumber < handleNumber ) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        productStock.setBadNumber(badNumber - handleNumber);
+                        productStock.setScrapNumber(scrapNumber + handleNumber);
                     } else if (StockConstants.GOOD_TO_BAD.equals(handleStatus)) { // 良品到不良品
-                        productStock.setGoodNumber(productStock.getGoodNumber() - stockHandleDetails.getHandleNumber());
-                        productStock.setBadNumber(productStock.getBadNumber() + stockHandleDetails.getHandleNumber());
+                        if (goodNumber < handleNumber ) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        productStock.setGoodNumber(goodNumber - handleNumber);
+                        productStock.setBadNumber(badNumber + handleNumber);
                     } else if (StockConstants.GOOD_TO_SCRAP.equals(handleStatus)) { // 良品到报废品
-                        productStock.setGoodNumber(productStock.getGoodNumber() - stockHandleDetails.getHandleNumber());
-                        productStock.setScrapNumber(productStock.getScrapNumber() + stockHandleDetails.getHandleNumber());
+                        if (goodNumber < handleNumber ) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        productStock.setGoodNumber(goodNumber - handleNumber);
+                        productStock.setScrapNumber(scrapNumber + handleNumber);
                     } else if (StockConstants.CLEAN_SCRAP.equals(handleStatus)) {
-                        productStock.setScrapNumber(productStock.getScrapNumber() - stockHandleDetails.getHandleNumber());
+                        if (scrapNumber < handleNumber ) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        productStock.setScrapNumber(scrapNumber - handleNumber);
                     }
                     productStock.setLastUpdate(new Date());
                     productStockMapper.updateProductStock(productStock);
                 } else if (StockConstants.DETAILS_TYPE_MATERIEL.equals(handleType)) { // 物料库存管理
                     MaterielStock materielStock = materielStockMapper.selectMaterielStockByMaterielId(stockHandleDetails.getAttrId());
+                    Integer goodNumber = materielStock.getGoodNumber(); // 良品数量
+                    Integer badNumber = materielStock.getBadNumber(); // 不良品数量
+                    Integer scrapNumber = materielStock.getScrapNumber(); // 报废品数量
                     /**
                      * 通过不同的处理类型更新相对应的库存信息
                      */
                     Integer handleStatus = Integer.parseInt(stockHandleDetails.getHandleStatus());// 获取处理类型
                     if (StockConstants.BAD_TO_GOOD.equals(handleStatus)) { // 不良品到良品
-                        materielStock.setGoodNumber(materielStock.getGoodNumber() + stockHandleDetails.getHandleNumber());
-                        materielStock.setBadNumber(materielStock.getBadNumber() - stockHandleDetails.getHandleNumber());
+                        if (badNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        materielStock.setGoodNumber(goodNumber + handleNumber);
+                        materielStock.setBadNumber(badNumber - handleNumber);
                     } else if (StockConstants.BAD_TO_SCRAP.equals(handleStatus)) { // 不良品到报废品
-                        materielStock.setBadNumber(materielStock.getBadNumber() - stockHandleDetails.getHandleNumber());
-                        materielStock.setScrapNumber(materielStock.getScrapNumber() + stockHandleDetails.getHandleNumber());
+                        if (badNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        materielStock.setBadNumber(badNumber - handleNumber);
+                        materielStock.setScrapNumber(scrapNumber + handleNumber);
                     } else if (StockConstants.GOOD_TO_BAD.equals(handleStatus)) { // 良品到不良品
-                        materielStock.setGoodNumber(materielStock.getGoodNumber() - stockHandleDetails.getHandleNumber());
-                        materielStock.setBadNumber(materielStock.getBadNumber() + stockHandleDetails.getHandleNumber());
+                        if (goodNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        materielStock.setGoodNumber(goodNumber - handleNumber);
+                        materielStock.setBadNumber(badNumber + handleNumber);
                     } else if (StockConstants.GOOD_TO_SCRAP.equals(handleStatus)) { // 良品到报废品
-                        materielStock.setGoodNumber(materielStock.getGoodNumber() - stockHandleDetails.getHandleNumber());
-                        materielStock.setScrapNumber(materielStock.getScrapNumber() + stockHandleDetails.getHandleNumber());
+                        if (goodNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        materielStock.setGoodNumber(goodNumber - handleNumber);
+                        materielStock.setScrapNumber(scrapNumber + handleNumber);
                     } else if (StockConstants.CLEAN_SCRAP.equals(handleStatus)) {
-                        materielStock.setScrapNumber(materielStock.getScrapNumber() - stockHandleDetails.getHandleNumber());
+                        if (scrapNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        materielStock.setScrapNumber(scrapNumber - handleNumber);
                     }
                     materielStock.setLastUpdate(new Date());
                     materielStockMapper.updateMaterielStock(materielStock);
                 } else if (StockConstants.DETAILS_TYPE_PART.equals(handleType)) { // 半成品库存管理
                     PartsStock partsStock = partsStockMapper.selectPartsStockByPartsId(stockHandleDetails.getAttrId());
+                    Integer goodNumber = partsStock.getGoodNumber(); // 良品数量
+                    Integer badNumber = partsStock.getBadNumber(); // 不良品数量
+                    Integer scrapNumber = partsStock.getScrapNumber(); // 报废品数量
                     /**
                      * 通过不同的处理类型更新相对应的库存信息
                      */
                     Integer handleStatus = Integer.parseInt(stockHandleDetails.getHandleStatus());// 获取处理类型
                     if (StockConstants.BAD_TO_GOOD.equals(handleStatus)) { // 不良品到良品
-                        partsStock.setGoodNumber(partsStock.getGoodNumber() + stockHandleDetails.getHandleNumber());
-                        partsStock.setBadNumber(partsStock.getBadNumber() - stockHandleDetails.getHandleNumber());
+                        if (badNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        partsStock.setGoodNumber(goodNumber + handleNumber);
+                        partsStock.setBadNumber(badNumber - handleNumber);
                     } else if (StockConstants.BAD_TO_SCRAP.equals(handleStatus)) { // 不良品到报废品
-                        partsStock.setBadNumber(partsStock.getBadNumber() - stockHandleDetails.getHandleNumber());
-                        partsStock.setScrapNumber(partsStock.getScrapNumber() + stockHandleDetails.getHandleNumber());
+                        if (badNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        partsStock.setBadNumber(badNumber - handleNumber);
+                        partsStock.setScrapNumber(scrapNumber + handleNumber);
                     } else if (StockConstants.GOOD_TO_BAD.equals(handleStatus)) { // 良品到不良品
-                        partsStock.setGoodNumber(partsStock.getGoodNumber() - stockHandleDetails.getHandleNumber());
-                        partsStock.setBadNumber(partsStock.getBadNumber() + stockHandleDetails.getHandleNumber());
+                        if (goodNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        partsStock.setGoodNumber(goodNumber - handleNumber);
+                        partsStock.setBadNumber(badNumber + handleNumber);
                     } else if (StockConstants.GOOD_TO_SCRAP.equals(handleStatus)) { // 良品到报废品
-                        partsStock.setGoodNumber(partsStock.getGoodNumber() - stockHandleDetails.getHandleNumber());
-                        partsStock.setScrapNumber(partsStock.getScrapNumber() + stockHandleDetails.getHandleNumber());
-                    } else if (StockConstants.CLEAN_SCRAP.equals(handleStatus)) {
-                        partsStock.setScrapNumber(partsStock.getScrapNumber() - stockHandleDetails.getHandleNumber());
+                        if (goodNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        partsStock.setGoodNumber(goodNumber - handleNumber);
+                        partsStock.setScrapNumber(scrapNumber + handleNumber);
+                    } else if (StockConstants.CLEAN_SCRAP.equals(handleStatus)) { // 清理报废品
+                        if (scrapNumber < handleNumber) {
+                            throw new BusinessException(attrCode + "实际库存不足");
+                        }
+                        partsStock.setScrapNumber(scrapNumber - handleNumber);
                     }
                     partsStock.setLastUpdate(new Date());
                     partsStockMapper.updatePartsStock(partsStock);

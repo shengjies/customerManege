@@ -3,6 +3,7 @@ package com.ruoyi.project.erp.stockHandle.controller;
 import java.util.List;
 
 import com.ruoyi.common.constant.StockConstants;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
@@ -115,8 +116,12 @@ public class StockHandleController extends BaseController
 	@PostMapping("/add")
 	@ResponseBody
 	public AjaxResult addSave(@RequestBody StockHandle stockHandle, HttpServletRequest request)
-	{		
-		return toAjax(stockHandleService.insertStockHandle(stockHandle,request));
+	{
+		try {
+			return toAjax(stockHandleService.insertStockHandle(stockHandle,request));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 	/**

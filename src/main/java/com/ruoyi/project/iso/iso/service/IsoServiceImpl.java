@@ -284,12 +284,12 @@ public class IsoServiceImpl implements IIsoService {
         iso.setcId(user.getUserId().intValue());
         iso.setcTime(new Date());
         iso.setiType(FileConstants.ITYPE_FILE); // 类型为文件
-        String fileSize = (file.getSize()) / 1024 + "Kb";
+        String fileSize = (file.getSize())/1024 + "Kb";
         iso.setFileSize(fileSize);
         // 查询父文件夹信息
         Iso parentIso = isoMapper.selectIsoById(parentId);
         if (StringUtils.isNotNull(parentIso)) {
-            String fileName = file.getOriginalFilename(); // 文件名
+            String fileName =  file.getOriginalFilename(); // 文件名
             // 判断相同文件夹下文件名是否存在相同文件
             Iso isoUnique = isoMapper.selectIsoByUploadName(parentIso.getDiskPath(),fileName);
             if (StringUtils.isNotNull(isoUnique)) { // 存在相同文件名的文件
@@ -299,7 +299,7 @@ public class IsoServiceImpl implements IIsoService {
                 iso.setCategory(FileConstants.CATEGORY_SOP_FILE); // 分类为sop下的文件
             }
             if (StringUtils.isNotEmpty(parentIso.getDisk())) {
-                String path = parentIso.getDisk() + File.separator;
+                String path = parentIso.getDisk() + "/";
                 File desc = FileUploadUtils.getAbsoluteFile(path, path + fileName);
                 file.transferTo(desc);
             }
@@ -307,9 +307,9 @@ public class IsoServiceImpl implements IIsoService {
             iso.setDisk(parentIso.getDisk());
             iso.setParentId(parentIso.getIsoId());
             iso.setGrParentId(parentIso.getParentId());
-            iso.seteName(parentIso.geteName());
-            iso.setcName(fileName);
-            iso.setPath((isoFileUrl + parentIso.getDiskPath() + File.separator + fileName).replace("\\", "/"));
+            iso.seteName(fileName.substring(0,fileName.lastIndexOf("."))); // 设置文件名
+            iso.setcName(fileName); // 设置文件名包括后缀
+            iso.setPath((isoFileUrl + parentIso.getDiskPath() + "/" + fileName));
             iso.setIsoId(null);
             return isoMapper.insertIso(iso);
         }
