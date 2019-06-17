@@ -20,6 +20,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <result property="sopName" column="c_name"/>
         </association>
     </resultMap>
+
+    <resultMap type="SopLine" id="SopLineResult1">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="pnId"    column="pn_id"    />
+        <result property="pnCode"    column="pn_code"    />
+        <result property="cId"    column="c_id"    />
+        <result property="cTime"    column="c_time"    />
+        <association property="sopName" column="sop_id" select="selectSopName">
+            <result property="sopName" column="c_name"/>
+        </association>
+    </resultMap>
 	
 	<sql id="selectSopLineVo">
         select id, company_id, sop_id, line_id, pn_id, pn_code, c_id, c_time from tab_sop_line
@@ -33,8 +47,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM
             tab_sop_line
         <where>
-            <if test="sopId != null "> and sop_id = #{sopId}</if>
-            <if test="lineId != null "> and line_id = #{lineId}</if>
+            <if test="sopId != null and sopId > 0 "> and sop_id = #{sopId}</if>
+            <if test="lineId != null and lineId > 0 "> and line_id = #{lineId}</if>
             <if test="pnCode != null  and pnCode != '' "> and pn_code like concat('%', #{pnCode}, '%')</if>
         </where>
           GROUP BY
@@ -76,30 +90,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cTime != null  ">#{cTime},</if>
          </trim>
     </insert>
-	 
-    <update id="updateSopLine" parameterType="SopLine">
-        update tab_sop_line
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="companyId != null  ">company_id = #{companyId},</if>
-            <if test="sopId != null  ">sop_id = #{sopId},</if>
-            <if test="lineId != null  ">line_id = #{lineId},</if>
-            <if test="pnId != null  ">pn_id = #{pnId},</if>
-            <if test="pnCode != null  and pnCode != ''  ">pn_code = #{pnCode},</if>
-            <if test="cId != null  ">c_id = #{cId},</if>
-            <if test="cTime != null  ">c_time = #{cTime},</if>
-        </trim>
-        where id = #{id}
-    </update>
 
-	<delete id="deleteSopLineById" parameterType="Integer">
-        delete from tab_sop_line where id = #{id}
+	<!--根据公司id 产线id SOP id删除对应的配置信息-->
+    <delete id="deleteSopLine" >
+      delete from tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
     </delete>
-	
-    <delete id="deleteSopLineByIds" parameterType="String">
-        delete from tab_sop_line where id in 
-        <foreach item="id" collection="array" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </delete>
-    
+
+    <!--根据公司id 产线id SOP id查询所以的产线SOP 配置细心-->
+    <select id="selectLineAllSopConfig" resultMap="SopLineResult1">
+      SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
+    </select>
 </mapper>

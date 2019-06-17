@@ -48,8 +48,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </insert>
 
 
-	<delete id="deleteSopLineWorkById" parameterType="Integer">
-        delete from tab_sop_line_work where id = #{id}
+	<delete id="deleteSopLineWork" >
+        delete from tab_sop_line_work where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
     </delete>
 
+    <select id="selectWorkstionByCompanyAndLineIdAndSopId" resultMap="SopLineWorkResult">
+        SELECT * FROM tab_sop_line_work where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
+    </select>
 </mapper>

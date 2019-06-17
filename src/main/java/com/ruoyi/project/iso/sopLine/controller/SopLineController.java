@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.workData.service.IWorkDataService;
@@ -112,8 +113,11 @@ public class SopLineController extends BaseController
 	@Log(title = "作业指导书  产线 配置", businessType = BusinessType.UPDATE)
 	@PostMapping("/edit")
 	@ResponseBody
-	public AjaxResult editSave(SopLine sopLine)
-	{		
+	public AjaxResult editSave(@RequestBody SopLine sopLine,HttpServletRequest request)
+	{
+		User u = JwtUtil.getTokenUser(request);
+		sopLine.setCompanyId(u.getCompanyId());
+		sopLine.setcId(u.getUserId().intValue());
 		return toAjax(sopLineService.updateSopLine(sopLine));
 	}
 	
@@ -124,9 +128,10 @@ public class SopLineController extends BaseController
 	@Log(title = "作业指导书  产线 配置", businessType = BusinessType.DELETE)
 	@PostMapping( "/remove")
 	@ResponseBody
-	public AjaxResult remove(String ids)
+	public AjaxResult remove(int lineId, int sopId,
+							 HttpServletRequest request)
 	{		
-		return toAjax(sopLineService.deleteSopLineByIds(ids));
+		return toAjax(sopLineService.deleteSopLine(JwtUtil.getTokenUser(request).getCompanyId(),lineId,sopId));
 	}
 
 	/******************    产线SOP 配置 *************************/
@@ -136,6 +141,8 @@ public class SopLineController extends BaseController
 	public String sopLineConfig(@PathVariable("id")int id,ModelMap mmap)
 	{
 		mmap.put("line",id);
+		//查询所以的SOP 作业指导书
+		mmap.put("sops",iIsoService.selectIsoByParentId(FileConstants.FOLDER_SOP));
 		return prefix + "/sopLineConfig";
 	}
 
@@ -155,5 +162,38 @@ public class SopLineController extends BaseController
 		mmap.put("work",workstationService.selectAllByLineId(lineId));
 		mmap.put("line",lineId);
 		return prefix + "/add1";
+	}
+
+	/**
+	 * 修改作业指导书 产线 配置
+	 * @param lineId 产线 id
+	 * @param sopId SOP id
+	 * @return
+	 */
+	@GetMapping("/editConfig/{lineId}/{sopId}")
+	@RequiresPermissions("iso:sopLine:edit")
+	public String editConfig(@PathVariable("lineId")int lineId,@PathVariable("sopId")int sopId,ModelMap mmap, HttpServletRequest request){
+		mmap.put("sopId",sopId);
+		mmap.put("line",lineId);
+		//查询该产线所有未配置的SOP书
+		mmap.put("iso",iIsoService.selectNotConfigByPidAndLineId(FileConstants.FOLDER_SOP,lineId));
+		//根据产线id查询所以未配置的产品信息
+		mmap.put("pns",productListService.selectNotConfigByLineId(lineId, JwtUtil.getTokenUser(request).getCompanyId()));
+		//查询对应产线的所以工位信息
+		mmap.put("work",workstationService.selectAllByLineId(lineId));
+		//查询产线SOP 所以配置信息
+		List<SopLine> sopLines = sopLineService.selectLineAllSopConfig(JwtUtil.getTokenUser(request).getCompanyId(),lineId,sopId);
+		mmap.put("sopLines",sopLines);
+		//查询对应的指导书的页数
+		List<Iso> pages =null;
+		if(sopLines != null && sopLines.size() >0){
+			pages = iIsoService.selectIsoByParentId(sopLines.get(0).getSopId());
+		}
+		mmap.put("pages",pages);
+		//查询所有工位配置信息
+		mmap.put("sopLineWork",sopLineService.selectWorkstionByCompanyAndLineIdAndSopId(
+				JwtUtil.getTokenUser(request).getCompanyId(),lineId,sopId
+		));
+		return prefix+"/edit1";
 	}
 }

@@ -9,8 +9,9 @@
             <div class="form-group">
                 <label class="col-sm-3 control-label">SOP：</label>
                 <div class="col-sm-8">
-                    <select style="width: 100%" id="sopId" onchange="sopChange(this)" class="form-control" name="sopId">
+                    <select style="width: 100%" id="sopId" onchange="sopChange(this)"     class="form-control" name="sopId">
                         <option value="0">请选择</option>
+                        <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" selected  th:text="${sopLines[0].sopName}" th:value="${sopLines[0].sopId}"></option>
                         <option th:each="item : ${iso}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
                     </select>
                 </div>
@@ -19,6 +20,8 @@
                 <label class="col-sm-3 control-label">产品编码：</label>
                 <div class="col-sm-8">
                     <select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
+                        <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" th:each="pn:${sopLines}"
+                                selected  th:text="${pn.pnCode}" th:value="${pn.pnId}"></option>
                         <option th:each="item : ${pns}"  th:text="${item.productCode}" th:value="${item.id}"></option>
                     </select>
                 </div>
@@ -33,24 +36,38 @@
                 </tr>
                 </thead>
                 <tbody id="add-sop-w-table-body">
-                    <tr th:each="item:${work}">
-                        <td th:utext="${item.wName}" th:data-w-id="${item.id}"></td>
-                        <td>
-                            <select style="width: 100%"   class="form-control" name="wId">
-                                <option value="0">请选择</option>
+                <tr th:each="item:${work}">
+                    <td th:utext="${item.wName}" th:data-w-id="${item.id}"></td>
+                    <td th:data-work-id="${item.id}">
+                        <select style="width: 100%"   class="form-control" name="wId">
+                            <option value="0">请选择</option>
+                            <option th:if="${not #lists.isEmpty(pages)}" th:each="item:${pages}"
+                                    th:value="${item.isoId}" th:utext="${item.cName}"></option>
                         </select></td>
-                    </tr>
+                </tr>
                 </tbody>
             </table>
         </div>
     </form>
 </div>
 <div th:include="include::footer"></div>
-<script type="text/javascript">
+<script th:inline="javascript">
     $(function () {
         $("#pnId").select2({
             placeholder:'请选择'
         });
+        $('select').select2();
+        var workConfig =[[${sopLineWork}]];
+        if(workConfig && workConfig.length>0){
+            for(var i =0 ;i < workConfig.length;i++){
+                $("#add-sop-w-table-body").find("tr").each(function () {
+                    var workid = $(this).find("td").attr("data-w-id");
+                    if(workid == workConfig[i].wId){
+                        $(this).find("td").find("select[name='wId']").val(workConfig[i].pageId).trigger('change');
+                    }
+                })
+            }
+        }
     })
     var prefix = ctx + "iso/sopLine"
     $("#form-sopLine-add").validate({
@@ -68,7 +85,7 @@
 
     function submitHandler() {
         if ($.validate.form()) {
-           //先验证书
+            //先验证书
             var id = $("#sopId").find("option:selected").val();
             if(id <=0){
                 $.modal.alertWarning("请选择SOP");
@@ -102,7 +119,7 @@
                 sopLineWorks:sopLineWorks
             }
             var config = {
-                url: prefix + "/add",
+                url: prefix + "/edit",
                 type: "post",
                 dataType: "json",
                 contentType: 'application/json',
@@ -132,11 +149,11 @@
                     var rows=[{id:0,text:'请选择'}];
                     var item = res.data;
                     for(var i =0;i<item.length;i++){
-                           var row ={
-                               id:item[i].isoId,
-                               text:item[i].cName
-                           }
-                           rows.push(row);
+                        var row ={
+                            id:item[i].isoId,
+                            text:item[i].cName
+                        }
+                        rows.push(row);
                     }
                     $("#add-sop-w-table-body select").select2({
                         data:rows

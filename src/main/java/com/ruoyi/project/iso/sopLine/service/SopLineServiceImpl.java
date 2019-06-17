@@ -104,21 +104,85 @@ public class SopLineServiceImpl implements ISopLineService
      * @return 结果
      */
 	@Override
+	@Transactional
 	public int updateSopLine(SopLine sopLine)
 	{
-	    return sopLineMapper.updateSopLine(sopLine);
+		if(sopLine != null){
+			//删除对应公司 对应产线 对应 SOP 配置信息
+			sopLineMapper.deleteSopLine(sopLine.getCompanyId(),sopLine.getLineId(),sopLine.getSopId());
+			//操作对应产品SOP 配置
+			if(sopLine.getPns() != null && sopLine.getPns().length >0){
+				DevProductList productList =null;
+				for (Integer pn : sopLine.getPns()) {
+					//获取对应产品信息
+					productList = productListMapper.selectDevProductListById(pn);
+					if(productList == null){
+						continue;
+					}
+					sopLine.setPnId(pn);
+					sopLine.setPnCode(productList.getProductCode());
+					sopLine.setcTime(new Date());
+					sopLineMapper.insertSopLine(sopLine);
+				}
+			}
+			//删除 工位配置
+			sopLineWorkMapper.deleteSopLineWork(sopLine.getCompanyId(),sopLine.getLineId(),sopLine.getSopId());
+			//操作产线 SOP 工位配置
+			if(sopLine.getSopLineWorks() != null && sopLine.getSopLineWorks().size() >0){
+				for (SopLineWork sopLineWork : sopLine.getSopLineWorks()) {
+					sopLineWork.setcId(sopLine.getcId());
+					sopLineWork.setCompanyId(sopLine.getCompanyId());
+					sopLineWork.setcTime(new Date());
+					sopLineWorkMapper.insertSopLineWork(sopLineWork);
+				}
+			}
+			return 1;
+		}
+	    return 0;
 	}
 
 	/**
-     * 删除作业指导书  产线 配置对象
-     * 
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
+	 * 删除作业指导书  产线 配置对象
+	 * @param lineId 产线id
+	 * @param sopId SOP id
+	 * @return
+	 */
 	@Override
-	public int deleteSopLineByIds(String ids)
-	{
-		return sopLineMapper.deleteSopLineByIds(Convert.toStrArray(ids));
+	@Transactional
+	public int deleteSopLine(int companyId,int lineId, int sopId) {
+		try {
+			//删除对应公司 对应产线 对应 SOP 配置信息
+			sopLineMapper.deleteSopLine(companyId,lineId,sopId);
+			//删除 工位配置
+			sopLineWorkMapper.deleteSopLineWork(companyId,lineId,sopId);
+			return  1;
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return  0;
 	}
-	
+
+	/**
+	 * 根据公司id 产线id SOP id查询所以的产线SOP 配置细心
+	 * @param companyId 公司id
+	 * @param lineId 产线id
+	 * @param sopId SOP id
+	 * @return
+	 */
+	@Override
+	public List<SopLine> selectLineAllSopConfig(int companyId, int lineId, int sopId) {
+		return sopLineMapper.selectLineAllSopConfig(companyId,lineId,sopId);
+	}
+
+	/**
+	 * 根据公司id 产线id SOP id查询所以的工位配置信息
+	 * @param companyId 公司id
+	 * @param lineId 产线 id
+	 * @param sopId SOP id
+	 * @return
+	 */
+	@Override
+	public List<SopLineWork> selectWorkstionByCompanyAndLineIdAndSopId(int companyId, int lineId, int sopId) {
+		return sopLineWorkMapper.selectWorkstionByCompanyAndLineIdAndSopId(companyId,lineId,sopId);
+	}
 }
