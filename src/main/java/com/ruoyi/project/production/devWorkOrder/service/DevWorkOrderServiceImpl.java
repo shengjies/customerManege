@@ -32,6 +32,7 @@ import com.ruoyi.project.production.workDayHour.domain.WorkDayHour;
 import com.ruoyi.project.production.workDayHour.mapper.WorkDayHourMapper;
 import com.ruoyi.project.production.workOrderChange.domain.WorkOrderChange;
 import com.ruoyi.project.production.workOrderChange.mapper.WorkOrderChangeMapper;
+import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
@@ -69,17 +70,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private DevProductListMapper productListMapper; // 产品
 
-    @Autowired
-    private DevIoMapper devIoMapper;  // IO口
 
-    @Autowired
-    private DevListMapper devListMapper;
-
-    @Autowired
-    private WorkDataMapper workDataMapper; // 工单数据
-
-    @Autowired
-    private WorkDayHourMapper workDayHourMapper; // IO口每小时数据
 
     @Autowired
     private WorkOrderChangeMapper orderChangeMapper;
@@ -450,11 +441,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (line.getManual() == 0) {
             order.setCumulativeNumber(0);//默认为0
             //为自动、查询对应的产线的警戒线标记IO口
-            DevIo devIo = devIoMapper.selectLineIsSignDevIo(line.getId());
-            if (devIo != null) {
+            Workstation workstation = workstationMapper.selectWorkstationSignByLineId(line.getId(),line.getCompanyId());
+            if (workstation != null) {
                 //查询对应的累计数据
                 DevWorkData data = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(order.getCompanyId(), line.getId(),
-                        order.getId(), devIo.getDevId(), devIo.getId());
+                        order.getId(), workstation.getDevId(), workstation.getId());
                 if (data != null) order.setCumulativeNumber(data.getCumulativeNum());
             }
         }

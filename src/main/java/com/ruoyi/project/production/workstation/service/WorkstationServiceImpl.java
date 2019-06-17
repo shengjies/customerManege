@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
+import com.ruoyi.project.product.list.mapper.DevProductListMapper;
+import com.ruoyi.project.production.productionLine.domain.ProductionLine;
+import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
@@ -26,6 +29,9 @@ public class WorkstationServiceImpl implements IWorkstationService
 
 	@Autowired
     private DevListMapper devListMapper;
+
+	@Autowired
+	private ProductionLineMapper productionLineMapper;
 
 	/**
      * 查询工位配置信息
@@ -103,7 +109,24 @@ public class WorkstationServiceImpl implements IWorkstationService
             workstationMapper.editWorkstationSign(workstation.getLineId(),workstation.getCompanyId(),0);
         }
         workstation.setcTime(new Date());
-	    return workstationMapper.insertWorkstation(workstation);
+        int row = workstationMapper.insertWorkstation(workstation);
+        //查询是否存在标记数据
+		Workstation w = workstationMapper.selectWorkstationSignByLineId(workstation.getLineId(),workstation.getCompanyId());
+		if(w != null && w.getDevId() !=null && w.getDevId() >0){
+			//将产线修改为自动
+			ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
+			if(line != null){
+				line.setManual(0);
+				productionLineMapper.updateProductionLine(line);
+			}
+		}else{
+			ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
+			if(line != null){
+				line.setManual(1);
+				productionLineMapper.updateProductionLine(line);
+			}
+		}
+	    return row;
 	}
 	
 	/**
@@ -189,7 +212,24 @@ public class WorkstationServiceImpl implements IWorkstationService
 			//将第一个工位修改为数据唯一标识
 			workstationMapper.editFirstWorkstionSign(work.getLineId(),work.getCompanyId());
 		}
-	    return workstationMapper.updateWorkstation(workstation);
+		int row = workstationMapper.updateWorkstation(workstation);
+		//查询是否存在标记数据
+		Workstation w = workstationMapper.selectWorkstationSignByLineId(work.getLineId(),work.getCompanyId());
+		if(w != null && w.getDevId() !=null && w.getDevId() >0){
+			//将产线修改为自动
+			ProductionLine line = productionLineMapper.selectProductionLineById(work.getLineId());
+			if(line != null){
+				line.setManual(0);
+				productionLineMapper.updateProductionLine(line);
+			}
+		}else{
+			ProductionLine line = productionLineMapper.selectProductionLineById(work.getLineId());
+			if(line != null){
+				line.setManual(1);
+				productionLineMapper.updateProductionLine(line);
+			}
+		}
+	    return row;
 	}
 
 	/**

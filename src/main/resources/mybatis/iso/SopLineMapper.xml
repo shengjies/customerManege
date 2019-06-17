@@ -100,4 +100,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectLineAllSopConfig" resultMap="SopLineResult1">
       SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
     </select>
+
+    <!--根据公司id 产线id 产品编号查询对应SOP 配置-->
+    <select id="selectSopByCompanyAndLineAndCode" resultMap="SopLineResult1">
+      SELECT * FROM octopus.tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and pn_code=#{code} limit 1;
+    </select>
 </mapper>

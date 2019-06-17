@@ -87,4 +87,11 @@ public interface IIsoService
 	 * @return 结果
 	 */
 	int uploadSop(MultipartFile file, int parentId, HttpServletRequest request) throws IOException;
+
+	/**
+	 * 根据硬件编码查询对应的作业指导书
+	 * @param code 硬件编码
+	 * @return
+	 */
+	Iso selectSopByDevCode(String code) throws Exception;
 }

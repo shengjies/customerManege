@@ -30,6 +30,14 @@ public interface WorkstationMapper
 	public Workstation selectWorkstationByLineId(Integer lineId,Integer companyId);
 
 	/**
+	 * 根据公司id 产线id 查询对应数据标识工位
+	 * @param lineId
+	 * @param companyId
+	 * @return
+	 */
+	public Workstation selectWorkstationSignByLineId(@Param("lineId") int lineId,@Param("companyId") int companyId);
+
+	/**
      * 查询工位配置列表
      * 
      * @param workstation 工位配置信息
@@ -101,5 +109,12 @@ public interface WorkstationMapper
 	 * @return
 	 */
 	Workstation selectInfoByDevice(@Param("devId")int devId,@Param("cid")int cid,@Param("eid")int eid);
+
+	/**
+	 * 根据硬件编码查询对应的工位信息
+	 * @param code 硬件编码
+	 * @return
+	 */
+	Workstation selectByDevCode(@Param("code")String code);
 	
 }

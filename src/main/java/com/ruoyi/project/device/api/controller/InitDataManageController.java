@@ -6,8 +6,10 @@ import java.util.Map;
 
 import com.ruoyi.project.device.api.form.WorkDataForm;
 import com.ruoyi.project.device.api.service.IInitDataManageService;
+import com.ruoyi.project.iso.iso.service.IIsoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import com.ruoyi.common.utils.DataTurn;
@@ -20,6 +22,8 @@ import com.ruoyi.project.device.devDeviceCounts.service.IDevDeviceCountsService;
 import com.ruoyi.project.device.devDeviceIo.service.IDevDeviceIoService;
 import com.sun.media.jfxmedia.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 用户 信息操作处理
  * 
@@ -30,7 +34,8 @@ import com.sun.media.jfxmedia.logging.Logger;
 @RequestMapping("/api/init")
 public class InitDataManageController extends BaseController
 {
-	
+
+
 	@Autowired
 	private IDevDeviceService devDeviceService;
 	
@@ -145,4 +150,6 @@ public class InitDataManageController extends BaseController
 		map.put("path","http://39.108.187.126:8088");
 		return map;
 	}
+
+
 }

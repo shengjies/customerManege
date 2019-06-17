@@ -115,6 +115,7 @@ public class WorkstationController extends BaseController
 			workstationService.updateWorkstation(workstation);
 			return AjaxResult.success();
 		}catch (Exception e){
+			e.printStackTrace();
 			return AjaxResult.error(e.getMessage());
 		}
 	}

@@ -6,7 +6,7 @@
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <div class="ibox float-e-margins">
         <div class="ibox-title" style="text-align: center;padding: 0px;min-height: 20px">
-           <span style="float: left" th:with="user = ${@user.getSysUser()}" th:utext="${'责任人:'+user.userName}"></span> <span style="font-size: 16px;font-weight: bold;" th:utext="${line.lineName}"></span><span style="float: right" id="now_time"></span>
+           <span style="float: left" th:with="user = ${@user.getSysUser(#httpServletRequest.getCookies())}" th:utext="${'责任人:'+user.userName}"></span> <span style="font-size: 16px;font-weight: bold;" th:utext="${line.lineName}"></span><span style="float: right" id="now_time"></span>
         </div>
         <div >
             <div class="panel-body">
@@ -31,7 +31,7 @@
                                                     工单生产状态：
                                                     <select style="width: 100px" name="workorderStatus" id="workorderStatus">
                                                         <option value="">全部</option>
-                                                        <option value="0">未进行</option>
+                                                        <option selected value="0">未进行</option>
                                                         <option value="1">进行中</option>
                                                         <option value="2">已完成</option>
                                                     </select>
@@ -92,9 +92,6 @@
                                                         </select></label></td>
                                                         <td align="right"><label>用工人数:<input type="number"  id="line-live-work-ygrs" ></label></td>
                                                         <td align="center"><label>工单状态:<span style="color: #1c84c6" id="line-live-work-gdzt">未进行</span></label></td>
-                                                    </tr>
-                                                    <tr th:if="${not #lists.isEmpty(line.paramArray)}" id="param-tr">
-                                                        <td align="right" th:each="item,start:${line.paramArray}"><label><span th:utext="${item+':'}"></span><input type="text" th:name="${'pageName'+start.index}"    ></label></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="4" style="padding: 8px">

@@ -11,6 +11,16 @@ import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.mapper.IsoMapper;
+import com.ruoyi.project.iso.sopLine.domain.SopLine;
+import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
+import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
+import com.ruoyi.project.production.productionLine.domain.ProductionLine;
+import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.workstation.domain.Workstation;
+import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +48,21 @@ public class IsoServiceImpl implements IIsoService {
     @Autowired
     private DevCompanyMapper companyMapper;
 
+    @Autowired
+    private WorkstationMapper workstationMapper;
+
+    @Autowired
+    private ProductionLineMapper productionLineMapper;
+
+    @Autowired
+    private DevWorkOrderMapper devWorkOrderMapper;
+
+    @Autowired
+    private SopLineMapper sopLineMapper;
+
+    @Autowired
+    private SopLineWorkMapper sopLineWorkMapper;
+
     @Value("${file.iso}")
     private String isoFileUrl;
 
@@ -59,9 +84,9 @@ public class IsoServiceImpl implements IIsoService {
      * @return 文件管理集合
      */
     @Override
-    public List<Iso> selectIsoList(Iso iso,HttpServletRequest request) {
+    public List<Iso> selectIsoList(Iso iso, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        if (user == null ) {
+        if (user == null) {
             return Collections.emptyList();
         }
         iso.setCompanyId(user.getCompanyId());
@@ -85,7 +110,7 @@ public class IsoServiceImpl implements IIsoService {
         }
         DevCompany company = companyMapper.selectDevCompanyById(tokenUser.getCompanyId());
         // 查询父文件信息
-        Iso isoParent= isoMapper.selectIsoById(iso.getParentId());
+        Iso isoParent = isoMapper.selectIsoById(iso.getParentId());
         if (StringUtils.isNotNull(isoParent)) {
             // 判断iso文件是否为作业指导书文件夹
             if (FileConstants.CATEGORY_SOP.equals(isoParent.getCategory())) {
@@ -121,6 +146,7 @@ public class IsoServiceImpl implements IIsoService {
 
     /**
      * 设置文件路径创建文件夹
+     *
      * @param iso
      * @param company
      * @param isoParent
@@ -188,26 +214,28 @@ public class IsoServiceImpl implements IIsoService {
 
     /**
      * 根据父id和产线id查询对应产线所以未配置的SOP指导书
-     * @param pid 父id
+     *
+     * @param pid    父id
      * @param lineId 产线id
      * @return
      */
     @Override
     public List<Iso> selectNotConfigByPidAndLineId(Integer pid, Integer lineId) {
-        return isoMapper.selectNotConfigByPidAndLineId(pid,lineId);
+        return isoMapper.selectNotConfigByPidAndLineId(pid, lineId);
     }
 
     /**
      * 上传sop文件
-     * @param file 文件
+     *
+     * @param file     文件
      * @param parentId 父id
-     * @param request 请求
+     * @param request  请求
      * @return 结果
      */
     @Override
     public int uploadSop(MultipartFile file, int parentId, HttpServletRequest request) throws IOException {
         User user = JwtUtil.getTokenUser(request);
-        if (user == null ) {
+        if (user == null) {
             return 0;
         }
 
@@ -217,14 +245,14 @@ public class IsoServiceImpl implements IIsoService {
         iso.setcId(user.getUserId().intValue());
         iso.setcTime(new Date());
         iso.setiType(FileConstants.ITYPE_FILE); // 类型为文件
-        String fileSize = (file.getSize())/1024 + "Kb";
+        String fileSize = (file.getSize()) / 1024 + "Kb";
         iso.setFileSize(fileSize);
         // 查询父文件夹信息
         Iso parentIso = isoMapper.selectIsoById(parentId);
         if (StringUtils.isNotNull(parentIso)) {
-            String fileName =  file.getOriginalFilename(); // 文件名
+            String fileName = file.getOriginalFilename(); // 文件名
             // 判断相同文件夹下文件名是否存在相同文件
-            Iso isoUnique = isoMapper.selectIsoByName(parentIso.getDiskPath(),fileName);
+            Iso isoUnique = isoMapper.selectIsoByName(parentIso.getDiskPath(), fileName);
             if (StringUtils.isNotNull(isoUnique)) { // 存在相同文件名的文件
                 throw new BusinessException("存在相同文件名的文件");
             }
@@ -232,7 +260,7 @@ public class IsoServiceImpl implements IIsoService {
                 iso.setCategory(FileConstants.CATEGORY_SOP_FILE); // 分类为sop下的文件
             }
             if (StringUtils.isNotEmpty(parentIso.getDisk())) {
-                String path = parentIso.getDisk() + File.separator ;
+                String path = parentIso.getDisk() + File.separator;
                 File desc = FileUploadUtils.getAbsoluteFile(path, path + fileName);
                 file.transferTo(desc);
             }
@@ -242,11 +270,46 @@ public class IsoServiceImpl implements IIsoService {
             iso.setGrParentId(parentIso.getParentId());
             iso.seteName(parentIso.geteName());
             iso.setcName(fileName);
-            iso.setPath((isoFileUrl + parentIso.getDiskPath() + File.separator + fileName).replace("\\","/"));
+            iso.setPath((isoFileUrl + parentIso.getDiskPath() + File.separator + fileName).replace("\\", "/"));
             iso.setIsoId(null);
             return isoMapper.insertIso(iso);
         }
         return 0;
     }
 
+
+    /**
+     * 根据硬件编码查询对应的作业指导书
+     *
+     * @param code 硬件编码
+     * @return
+     */
+    @Override
+    public Iso selectSopByDevCode(String code) throws Exception {
+        //根据硬件编码查询对应的工位信息
+        Workstation workstation = workstationMapper.selectByDevCode(code);
+        if (workstation == null) throw new Exception("工位不存在");
+        //查询对应产线
+        ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
+        if (line == null) throw new Exception("产线不存在");
+        //查询正在进行的工单
+        DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId());
+        if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode())) throw new Exception("没有正在进行的工单");
+        //查询对应SOP配置
+        SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(), line.getId(), workOrder.getProductCode());
+        if (sopLine == null) throw new Exception("没有配置SOP");
+        //查询对应的指导书页
+        SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(workstation.getCompanyId(), line.getId(), sopLine.getSopId(), workstation.getId());
+        if (sopLineWork == null) throw new Exception("产线没有配置SOP");
+        //查询对应SOP
+        Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
+        if (iso == null) throw new Exception("工位没有配置SOP");
+        iso.setFileSize(line.getLineName()+" "+ workstation.getwName());
+        iso.setcId(0);
+        String hz = iso.getPath().substring(iso.getPath().lastIndexOf(".")+1,iso.getPath().length());
+        if(hz.equals("pdf")){
+            iso.setcId(1);
+        }
+        return iso;
+    }
 }

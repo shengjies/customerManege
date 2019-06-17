@@ -51,4 +51,16 @@ public interface SopLineWorkMapper
 	 */
 	List<SopLineWork> selectWorkstionByCompanyAndLineIdAndSopId(@Param("companyId") int companyId,
 																@Param("lineId") int lineId,@Param("sopId") int sopId);
+
+	/**
+	 * 根据公司id 产线id SOP id 工位id查询对应工位配置的手册
+	 * @param companyId 公司id
+	 * @param lineId 产线id
+	 * @param sopId SOP  id
+	 * @param wId 工位id
+	 * @return
+	 */
+	SopLineWork selectInfoByApi(@Param("companyId") int companyId,
+								@Param("lineId") int lineId,@Param("sopId") int sopId,
+								@Param("wId") int wId);
 }

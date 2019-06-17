@@ -136,4 +136,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
         limit 1;
     </select>
+
+    <!--根据公司id 产线id 查询对应数据标识工位-->
+    <select id="selectWorkstationSignByLineId" resultMap="WorkstationResult">
+        SELECT * FROM tab_workstation where company_id = #{companyId} and line_id = #{lineId} and sign = 1 limit 1;
+    </select>
+
+    <!--根据硬件编码查询对应的工位信息-->
+    <select id="selectByDevCode" resultMap="WorkstationResult">
+      SELECT * FROM tab_workstation where c_code =#{code} limit 1;
+    </select>
 </mapper>

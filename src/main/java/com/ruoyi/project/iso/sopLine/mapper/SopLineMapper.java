@@ -57,5 +57,15 @@ public interface SopLineMapper
 	 */
 	List<SopLine> selectLineAllSopConfig(@Param("companyId") int companyId,@Param("lineId") int lineId,
 										 @Param("sopId") int sopId);
+
+    /**
+     * 根据公司id 产线id 产品编号查询对应SOP 配置
+     * @param companyId 公司id
+     * @param lineId 产线id
+     * @param code 产品code
+     * @return
+     */
+	SopLine selectSopByCompanyAndLineAndCode(@Param("companyId") int companyId,@Param("lineId") int lineId,
+                                             @Param("code")String code);
 	
 }

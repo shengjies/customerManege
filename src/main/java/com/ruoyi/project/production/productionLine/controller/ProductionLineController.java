@@ -199,9 +199,6 @@ public class ProductionLineController extends BaseController {
     @RequiresPermissions("production:productionLine:live")
     public String lineLive(@PathVariable("id") int id, ModelMap mmap) {
         ProductionLine productionLine = productionLineService.selectProductionLineById(id);
-        if (StringUtils.isNotNull(productionLine) && !StringUtils.isEmpty(productionLine.getParamConfig())) {
-            productionLine.setParamArray(JSON.parseArray(productionLine.getParamConfig(), String.class));
-        }
         mmap.put("line", productionLine);
         return prefix + "/lineLive";
     }

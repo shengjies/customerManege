@@ -72,7 +72,7 @@ public interface DevWorkDataMapper
 	 * @param line_id 产线编号
 	 * @param work_id 工单编号
 	 * @param dev_id 硬件编号
-	 * @param io_id io口编号
+	 * @param io_id 工位id
 	 * @return
 	 */
 //	@DataSource(DataSourceType.SLAVE)
