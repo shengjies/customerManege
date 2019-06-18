@@ -72,6 +72,43 @@ public class ProductionLine extends BaseEntity
 	 * */
 	private String productCodes;
 
+	private Integer edUser; // 工程部责任人
+	private Integer ipqcUser; // 品质管理人
+	private Integer meUser; // 机械工程师
+	private Integer teUser; // 测试员工
+
+	public Integer getEdUser() {
+		return edUser;
+	}
+
+	public void setEdUser(Integer edUser) {
+		this.edUser = edUser;
+	}
+
+	public Integer getIpqcUser() {
+		return ipqcUser;
+	}
+
+	public void setIpqcUser(Integer ipqcUser) {
+		this.ipqcUser = ipqcUser;
+	}
+
+	public Integer getMeUser() {
+		return meUser;
+	}
+
+	public void setMeUser(Integer meUser) {
+		this.meUser = meUser;
+	}
+
+	public Integer getTeUser() {
+		return teUser;
+	}
+
+	public void setTeUser(Integer teUser) {
+		this.teUser = teUser;
+	}
+
 	public Integer getManual() {
 		return manual;
 	}

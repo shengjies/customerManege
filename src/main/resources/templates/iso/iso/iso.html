@@ -230,7 +230,7 @@
     function upload() {
         var parentId = $("#isoId").val();
         var url = $.common.isEmpty(parentId) ? $.table._option.createUploadUrl : $.table._option.createUploadUrl.replace("{id}", parentId);
-        $.modal.open("上传作业指导书", url,500,400);
+        $.modal.open("上传作业指导书", url);
     }
 
     /**

@@ -18,11 +18,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="paramConfig"    column="param_config"    />
         <result property="sopId"    column="sop_id"    />
         <result property="productCodes"    column="product_codes"    />
+        <result property="edUser"    column="ed_user"    />
+        <result property="ipqcUser"    column="ipqc_user"    />
+        <result property="meUser"    column="me_user"    />
+        <result property="teUser"    column="te_user"    />
+
     </resultMap>
 	
 	<sql id="selectProductionLineVo">
         select id, line_name, device_liable, remark, def_id, company_id, create_time,
-        create_by,device_liable1,manual,param_config,sop_id,product_codes from dev_production_line
+        create_by,device_liable1,manual,param_config,sop_id,product_codes,ed_user,ipqc_user,me_user,te_user from dev_production_line
     </sql>
 
     <select id="selectProductionLineList" parameterType="ProductionLine" resultMap="ProductionLineResult">
@@ -60,6 +65,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="paramConfig != null  ">param_config,</if>
 			<if test="sopId != null and sopId != '' ">sop_id,</if>
 			<if test="productCodes != null and productCodes != '' ">product_codes,</if>
+            <if test="edUser != null and edUser != '' ">ed_user,</if>
+            <if test="ipqcUser != null and ipqcUser != '' ">ipqc_user,</if>
+            <if test="meUser != null and meUser != '' ">me_user,</if>
+            <if test="teUser != null and teUser != '' ">te_user,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="lineName != null  and lineName != ''  ">#{lineName},</if>
@@ -74,6 +83,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="paramConfig != null  ">#{paramConfig},</if>
             <if test="sopId != null and sopId != '' ">#{sopId},</if>
             <if test="productCodes != null and productCodes != '' ">#{productCodes},</if>
+            <if test="edUser != null and edUser != '' ">#{edUser},</if>
+            <if test="ipqcUser != null and ipqcUser != '' ">#{ipqcUser},</if>
+            <if test="meUser != null and meUser != '' ">#{meUser},</if>
+            <if test="teUser != null and teUser != '' ">#{teUser},</if>
          </trim>
     </insert>
 	 
@@ -88,6 +101,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="paramConfig != null    ">param_config = #{paramConfig},</if>
             <if test="sopId != null and sopId != '' ">sop_id = #{sopId},</if>
             <if test="productCodes != null and productCodes != '' ">product_codes = #{productCodes},</if>
+            <if test="edUser != null and edUser != '' ">ed_user = #{edUser},</if>
+            <if test="ipqcUser != null and ipqcUser != '' ">ipqc_user = #{ipqcUser},</if>
+            <if test="meUser != null and meUser != '' ">me_user = #{meUser},</if>
+            <if test="teUser != null and teUser != '' ">te_user = #{teUser},</if>
         </trim>
         where id = #{id}
     </update>

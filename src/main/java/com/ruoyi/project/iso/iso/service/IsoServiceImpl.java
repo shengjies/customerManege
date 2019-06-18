@@ -293,7 +293,7 @@ public class IsoServiceImpl implements IIsoService {
             // 判断相同文件夹下文件名是否存在相同文件
             Iso isoUnique = isoMapper.selectIsoByUploadName(parentIso.getDiskPath(),fileName);
             if (StringUtils.isNotNull(isoUnique)) { // 存在相同文件名的文件
-                throw new BusinessException("存在相同文件名的文件");
+                throw new BusinessException("文件" + fileName + "已存在");
             }
             if (FileConstants.CATEGORY_SOP_FOLDER.equals(parentIso.getCategory())) { // 为SOP作业指导书下的文件
                 iso.setCategory(FileConstants.CATEGORY_SOP_FILE); // 分类为sop下的文件

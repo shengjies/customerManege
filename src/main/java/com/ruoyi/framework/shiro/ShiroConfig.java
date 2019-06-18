@@ -3,10 +3,6 @@ package com.ruoyi.framework.shiro;
 
 import com.ruoyi.framework.jwt.filter.JwtFilter;
 import com.ruoyi.framework.shiro.realm.UserRealm;
-import com.ruoyi.framework.shiro.web.filter.LogoutFilter;
-import org.apache.commons.io.IOUtils;
-import org.apache.shiro.config.ConfigurationException;
-import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -20,9 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import javax.servlet.Filter;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -72,7 +65,7 @@ public class ShiroConfig {
         filterRuleMap.put("/ruoyi/**", "anon");
         filterRuleMap.put("/druid/**", "anon");
         filterRuleMap.put("/captcha/captchaImage**", "anon");
-//         不需要拦截的访问
+        // 不需要拦截的访问
         filterRuleMap.put("/login", "anon");
         filterRuleMap.put("/system/user/checkLoginNameUnique", "anon");
         filterRuleMap.put("/t/**", "anon");

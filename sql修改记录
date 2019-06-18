@@ -178,3 +178,17 @@ CREATE TABLE `tab_sop_line_work` (
   `c_time` datetime DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产线工位配置指导书页';
+
+
+# 产线添加工程责任人、品质责任人、机械工程师、测试员字段
+# 2019-6-17
+ALTER TABLE `octopus`.`dev_production_line`
+ADD COLUMN `ed_user` INT NULL COMMENT '工程责任人' AFTER `product_codes`,
+ADD COLUMN `ipqc_user` INT NULL COMMENT '品质管理员' AFTER `ed_user`,
+ADD COLUMN `me_user` INT NULL COMMENT '机械工程师' AFTER `ipqc_user`,
+ADD COLUMN `te_user` INT NULL COMMENT '测试员' AFTER `me_user`;
+
+# 工单添加投入产量字段
+# 2019-6-17
+ALTER TABLE `octopus`.`dev_work_order`
+ADD COLUMN `put_into_number` INT NULL COMMENT '投入产量' AFTER `sign`;

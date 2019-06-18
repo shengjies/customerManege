@@ -2,65 +2,53 @@
 <html  lang="zh" xmlns:th="http://www.thymeleaf.org">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/fileinput/fileinput.css}" rel="stylesheet"/>
 <body class="white-bg">
-    <!--<div class="container-div">-->
-        <!--<div class="row">-->
-            <!--<div class="col-sm-12 search-collapse">-->
-                <!--<form id="add-file-form" enctype="multipart/form-data">-->
-                    <!--<input type="hidden" id="parentId" name="parentId" th:value="${parentId}">-->
-                    <!--<div class="select-list">-->
-                        <!--<ul>-->
-                            <!--<li>-->
-                                <!--<input type="file" id="file" name="file" required>-->
-                            <!--</li>-->
-                        <!--</ul>-->
-                    <!--</div>-->
-                <!--</form>-->
-            <!--</div>-->
-            <!--&lt;!&ndash;<div class="col-sm-12 select-table table-striped">&ndash;&gt;-->
-                <!--&lt;!&ndash;<table id="bootstrap-table" data-mobile-responsive="true"></table>&ndash;&gt;-->
-            <!--&lt;!&ndash;</div>&ndash;&gt;-->
-        <!--</div>-->
-    <!--</div>-->
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form id="add-file-form" enctype="multipart/form-data">
             <input type="hidden" id="parentId" name="parentId" th:value="${parentId}">
             <div class="form-group">
-                <label class="col-sm-3 control-label">上传文件：</label>
-                <div class="col-sm-8">
-                    <input type="file" id="file" name="file" required>
+                <label class="font-noraml">文件上传</label>
+                <div>
+                    <input class="file-loading" id="fileinput" name="file" type="file" multiple>
                 </div>
             </div>
         </form>
     </div>
 <div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/fileinput/fileinput.js}"></script>
 <script type="text/javascript">
-    /**
-     * 添加文件
-     */
-    function toAddFile() {
-
-    }
-
-    function submitHandler() {
-        if(!$('#file')[0].files[0]){
-            $.modal.alertWarning("请选择上传的文件")
-            return;
-        }
-        var formData = new FormData();
-        formData.append("sopfile", $('#file')[0].files[0]);
-        formData.append("parentId", [[${parentId}]]);
-        $.ajax({
-            url: "/iso/iso/uploadSop",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            type: 'POST',
-            success: function (result) {
-                $.operate.successCallback(result);
+    $(document).ready(function () {
+        $("#fileinput").fileinput({
+            'theme': 'explorer-fas',
+            showUpload : true, //显示整体上传的按钮
+            showRemove : true,// 显示整体删除的按钮
+            uploadAsync: true,//默认异步上传
+            uploadUrl: '/iso/iso/uploadSop',
+            overwriteInitial: false,
+            dropZoneEnabled: false,//是否显示拖拽区域
+            maxFileCount: 6, //表示允许同时上传的最大文件个数
+            initialPreviewAsData: true,
+            showBrowse: true,
+            showCaption: true,//是否显示标题
+            uploadExtraData:function(previewId, index) {   //获取额外的参数
+                var obj = {
+                    parentId:$("#parentId").val(),
+                };
+                return obj;
+            }
+        }).on("fileuploaded", function(event, data, previewId, index) {
+            var code = data.response.code;
+            var msg = data.response.msg;
+            if (code == web_status.FAIL) {
+                $.modal.alertError(msg);
             }
         });
+    });
+
+    function submitHandler() {
+        $.modal.close();
+        window.parent.$.table.refresh();
     }
 
 </script>

@@ -15,16 +15,19 @@ import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文件管理 信息操作处理
@@ -170,9 +173,9 @@ public class IsoController extends BaseController {
     @RequiresPermissions("iso:iso:add")
     @PostMapping("/uploadSop")
     @ResponseBody
-    public AjaxResult uploadSop(@RequestParam("sopfile") MultipartFile file,
-                             @RequestParam("parentId") int parentId,HttpServletRequest request){
+    public AjaxResult uploadSop(@RequestParam("file") MultipartFile file,HttpServletRequest request){
         try {
+            int parentId = Integer.parseInt(request.getParameter("parentId"));
             FileUploadUtils.assertAllowed(file);
             isoService.uploadSop(file,parentId,request);
             return success();

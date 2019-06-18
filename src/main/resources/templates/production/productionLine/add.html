@@ -15,6 +15,7 @@
 				<label class="col-sm-3 control-label">责任人1：</label>
 				<div class="col-sm-8">
 					<select id="deviceLiable" name="deviceLiable" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
 						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
 					</select>
 				</div>
@@ -23,6 +24,43 @@
 				<label class="col-sm-3 control-label">责任人2：</label>
 				<div class="col-sm-8">
 					<select id="deviceLiableTow" name="deviceLiableTow" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
+						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">工程责任人：</label>
+				<div class="col-sm-8">
+					<select id="edUser" name="edUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
+						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">品质管理专员：</label>
+				<div class="col-sm-8">
+					<select id="ipqcUser" name="ipqcUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
+						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">机械工程师：</label>
+				<div class="col-sm-8">
+					<select id="meUser" name="meUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
+						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">测试员：</label>
+				<div class="col-sm-8">
+					<select id="teUser" name="teUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
 						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
 					</select>
 				</div>
@@ -43,7 +81,19 @@
 				lineName:{
 					required:true,
 				},
-			}
+                deviceLiable:{
+                    required:true,
+                },
+
+			},
+            messages:{
+                lineName:{
+                    required:"产线名称必填",
+                },
+                deviceLiable:{
+                    required:"责任人1必填",
+                },
+            }
 		});
 		
 		function submitHandler() {
