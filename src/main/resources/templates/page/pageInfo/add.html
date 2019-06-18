@@ -16,9 +16,9 @@
 						<div class="panel-group" id="accordion1">
 							<form role="form" id="form-page-add">
 								<div class="form-group">
-									<label class="col-sm-12 control-label">页面名称</label>
+									<label class="col-sm-12 control-label">看板名称</label>
 									<div class="col-sm-12">
-										<input type="text" name="pageName" placeholder="请输入页面名称" class="form-control">
+										<input type="text" name="pageName" placeholder="请输入看板名称" class="form-control">
 									</div>
 								</div>
 								<div class="form-group">
@@ -57,151 +57,40 @@
 							<!--详情页面-->
 							<div id="detail_pane" th:with="layout =${@layout.selectLayoutAll(0)}">
 								<div th:data-detail="${lay.id}" th:each="lay : ${layout}"  >
-									<div class="col-sm-12" th:if="${lay.layout_type == 1}">
-										<div class="row" th:with="init =${@page.selectPageInitInfo(0,#httpServletRequest.getCookies())}" >
-											<div th:if="${init == null or init['line'] == null or init['ios'] == null}" class="col-sm-6">
-												<h4 style="color: red">请建立相关产线或者产线配置相关硬件...</h4>
-											</div>
-											<div th:if="${init != null and init['line'] != null and init['ios'] != null}" class="col-sm-6" th:each="i:${#numbers.sequence(1,lay.layout_num)}">
-												<div th:style="${i > 2 ? 'margin-top: 15px;':''}" class="panel panel-primary">
-													<div class="panel-heading">
-														宮格<span th:text="${i}"></span>
-													</div>
-													<div class="panel-body">
-														<div class="form-group"  >
-															<label>生产线</label>
-															<select  class="form-control" name="line" >
-																<option th:each="line : ${init['line']}" th:text="${line.lineName}" th:value="${line.id}"></option>
-															</select>
-														</div>
-														<div class="form-group">
-															<label>采样数据名称</label>
-															<select  class="form-control" name="io">
-																<option th:each="ios : ${init['ios']}" th:text="${ios.remark + '-' + ios.ioName}" th:value="${ios.id}"></option>
-															</select>
-														</div>
-														<div class="form-group">
-															<label>采样数据名称</label>
-															<select  class="form-control" name="io1">
-																<option th:each="ios : ${init['ios']}" th:text="${ios.remark + '-' + ios.ioName}" th:value="${ios.id}"></option>
-															</select>
-														</div>
-														<div class="form-group">
-															<div data-checke-info class="col-sm-12">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="gd" checked id="inlineCheckbox1">工单号</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ygrs" checked id="inlineCheckbox3">用工人数</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="zcgs" checked id="inlineCheckbo4">正常工时</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbgs" checked id="inlineCheckbox5">加班工时</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbbl" checked id="inlineCheckbox2">加班倍率</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ycqk" checked id="inlineCheckbox6">异常情况</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="dtgdjh" checked id="inlineCheckbox7">当天工单计划</label>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
+									<div class="col-sm-12" th:if="${lay.layout_type == 1}" th:with="lines=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
+										<div th:if="${#lists.isEmpty(lines)}" class="col-sm-6">
+											<h4 style="color: red">请建立产线...</h4>
 										</div>
-									</div>
-									<div class="col-sm-12" th:if="${lay.layout_type == 2}" th:with="page1=${@page.selectAllPage(0,0,#httpServletRequest.getCookies())}">
-										<div th:if="${page1 == null}" class="col-sm-6">
-											<h4 style="color: red">请建立相关页面...</h4>
-										</div>
-										<div  class="panel panel-primary" th:if="${page1 != null}">
+										<div  class="panel panel-primary" th:if="${not #lists.isEmpty(lines)}">
 											<div class="panel-heading">
-												<span>轮播页面</span>
+												<span>请选择相关产线</span>
 											</div>
 											<div class="panel-body">
 												<div class="form-group">
 													<div data-checke-info class="col-sm-12">
-														<label class="checkbox-inline" th:each="p : ${page1}">
-															<input type="checkbox" th:value="${p.pageUrl}" th:data-id="${p.id}"  id="page1"><span th:text="${p.pageName}"></span>
+														<label class="checkbox-inline" th:data-line-id="${item.id}"  th:each="item,start:${lines}">
+															<input type="checkbox" th:checked="${start.index == 0?true:false}" style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;" th:utext="${item.lineName}"></span>
 														</label>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-									<div class="col-sm-10" th:if="${lay.layout_type == 3}" th:with="ph =${@page.selectPageInitInfo(0,#httpServletRequest.getCookies())}">
-										<div th:if="${ph == null}" class="col-sm-6">
-											<h4 style="color: red">请建立相关产线...</h4>
+									<div class="col-sm-12" th:if="${lay.layout_type == 2}" th:with="lines=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
+										<div th:if="${#lists.isEmpty(lines)}" class="col-sm-6">
+											<h4 style="color: red">请建立产线...</h4>
 										</div>
-										<div  class="panel panel-primary" th:if="${ph != null}">
+										<div  class="panel panel-primary" th:if="${not #lists.isEmpty(lines)}">
 											<div class="panel-heading">
-												<span>生产平衡</span>
+												<span>请选择相关产线</span>
 											</div>
 											<div class="panel-body">
-												<div class="form-group"  >
-													<label>生产线</label>
-													<select  class="form-control m-b" name="line">
-														<option th:each="line : ${ph['line']}" th:text="${line.lineName}" th:value="${line.id}"></option>
-													</select>
-												</div>
-												<div class="row">
-													<div class="col-sm-6">
-														<ul class="list-group" id="gd-info-li">
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="gd" checked >工单号</label>
-															</li>
-															<li class="list-group-item ">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ygrs" checked >用工人数</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="zcgs" checked >正常工时</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbgs" checked >加班工时</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbbl" checked >加班倍率</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ycqk" checked >异常情况</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="dtgdjh" checked >当天工单计划</label>
-															</li>
-														</ul>
+												<div class="form-group">
+													<div data-checke-info class="col-sm-12">
+														<label class="checkbox-inline" th:data-line-id="${item.id}"  th:each="item,start:${lines}">
+															<input type="radio" name="line" th:checked="${start.index == 0?true:false}" style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;" th:utext="${item.lineName}"></span>
+														</label>
 													</div>
-													<div class="col-sm-6" id="dev-io-ul">
-														<ul class="list-group">
-															<li class="list-group-item" th:each="ios : ${ph['ios']}">
-																<label class="checkbox-inline">
-																	<input type="checkbox" th:value="${ios.id}" checked th:text="${ios.remark + '-' + ios.ioName}"></label>
-															</li>
-														</ul>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-10" th:if="${lay.layout_type == 4}" th:with="ph =${@page.selectPageInitInfo(0,#httpServletRequest.getCookies())}">
-										<div th:if="${ph == null}" class="col-sm-6">
-											<h4 style="color: red">请建立相关产线...</h4>
-										</div>
-										<div  class="panel panel-primary" th:if="${ph != null}">
-											<div class="panel-heading">
-												<span>产品文件</span>
-											</div>
-											<div class="panel-body">
-												<div class="form-group"  >
-													<label>生产线</label>
-													<select  class="form-control m-b" name="line">
-														<option th:each="line : ${ph['line']}" th:text="${line.lineName}" th:value="${line.id}"></option>
-													</select>
 												</div>
 											</div>
 										</div>
@@ -319,6 +208,7 @@
 	}
 </script>
 <script>
+	//看板类型改变
 	$(function () {
 		var i = $("#layout_type option:selected").val();
 		var text = $("#layout_type option:selected").text();
@@ -333,44 +223,19 @@
 			$("#layout_title").text(t);
 		})
 	})
-	$(document).on("change","select[name='line']",function () {
-		var line_id = $(this).find("option:selected").val();
-		var than = this;
-		var layoutType = $("#layout_type").find("option:selected").attr("layout-type");
-		$.post("/device/devIo/byLineId",{"lien_id":line_id},function (data) {
-			if(data.rows){
-				if(layoutType ==  1) {
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io']").find("option").remove();
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io1']").find("option").remove();
-					var item = [];
-					data.rows.forEach(function (io) {
-						item.push("<option  value=" + io.id + ">" + io.remark + '-' + io.ioName + "</option>")
-					});
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io']").append(item);
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io1']").append(item);
-				}else if(layoutType == 3){
-					$("#dev-io-ul").find("ul[class='list-group']").find("li").remove();
-					var item = [];
-					data.rows.forEach(function (io) {
-						item.push("<li class=\"list-group-item\"> <label class=\"checkbox-inline\"> <input type=\"checkbox\" value="+io.id+" checked >"+ io.remark + '-' + io.ioName + "</label></li>")
-					});
-					$("#dev-io-ul").find("ul[class='list-group']").append(item);
-				}
-			}else{
-				layer.msg("操作异常……", {icon: $.modal.icon(modal_status.FAIL),
-							time: 500,
-							shade: [0.1, '#8F8F8F']
-						},
-						function () {
-						});
-			}
-		})
-	})
-	/** 数据提交与验证 */
+
+	/**
+	 * 数据提交与验证
+	 * */
 	$("#form-page-add").validate({
 		rules:{
 			pageName:{
 				required:true,
+			},
+		},
+		messages:{
+			pageName:{
+				required:"请输入看板名称",
 			},
 		}
 	});
@@ -392,18 +257,16 @@
 			pageBackImg:pageBackImg
 		}
 		switch (pageType) {
-			case "1"://宫格布局
+			case "1"://产线汇总
 				data.configs = lattice(layout);
 				break;
-			case "2"://轮播布局
+			case "2"://产线详情
 				data.configs = roll(layout);
 				break;
-			case "3"://平衡布局
-				data.configs =balance(layout);
-				break;
-			case "4"://平衡布局
-				data.configs =productFile(layout);
-				break;
+		}
+		if(data.configs.length <= 0){
+			$.modal.alertWarning("请选择相关产线...");
+			return;
 		}
 		$.ajax({
 			cache : true,
@@ -431,111 +294,38 @@
 	 * 宫格布局
 	 */
 	function lattice(layout) {
-		var item =[];
-		 $("div[data-detail="+layout+"]").find("div[class='row']").find("div[class='col-sm-6']").each(function () {
-			var g ={};
-			g.lineId = $(this).find("select[name='line']").find("option:selected").val();
-			g.ioId = $(this).find("select[name='io']").find("option:selected").val();
-			g.ioId1 = $(this).find("select[name='io1']").find("option:selected").val();
-			var c ={};
-			$(this).find("div[data-checke-info]").find("input[type='checkbox']:checked").each(function () {
-				var check = $(this).val();
-				switch (check) {
-					case "gd":
-						c.gd = true;
-						break;
-					case "ygrs":
-						c.ygrs = true;
-						break
-					case "zcgs":
-						c.zcgs = true;
-						break;
-					case "jbgs":
-						c.jbgs = true;
-						break;
-					case "jbbl":
-						c.jbbl = true;
-						break;
-					case "ycqk":
-						c.ycqk = true;
-						break;
-					case "dtgdjh":
-						c.dtgdjh = true;
-						break;
-				}
-			})
-			 g.devIoConfig = JSON.stringify(c);
-			 item.push(g);
+		var rows =[];
+		$("#detail_pane").find("div[data-detail='"+layout+"']").find("div[class='panel-body']")
+				.find("label[class='checkbox-inline']").each(function () {
+			var item = $(this).find("input[type='checkbox']");
+			if($(item).is(':checked')){
+				var row = {
+					lineId:$(this).attr("data-line-id")
+				};
+				rows.push(row);
+			}
 		});
-		 return item;
+		 return rows;
 	}
 
 	/**
 	 * 轮播布局
 	 */
 	function roll(layout) {
-		var item =[];
-		$("div[data-detail="+layout+"]").find("div[class='col-sm-12']").find("input[type='checkbox']:checked").each(function () {
-			var g ={};
-			g.devIoConfig = $(this).val();
-			g.ioId = $(this).attr("data-id");
-			item.push(g)
-		})
-		return item;
-	}
-	/**
-	 * 生产平衡
-	 */
-	function balance(layout) {
-		var item =[];
-		var g = {}
-		var c ={};
-		g.lineId = $("div[data-detail="+layout+"]").find("div[class='col-sm-10']").find("select[name='line']").find("option:selected").val();
-		$("div[data-detail="+layout+"]").find("#gd-info-li").find("input[type='checkbox']:checked").each(function () {
-			var check = $(this).val();
-			switch (check) {
-				case "gd":
-					c.gd = true;
-					break;
-				case "ygrs":
-					c.ygrs = true;
-					break
-				case "zcgs":
-					c.zcgs = true;
-					break;
-				case "jbgs":
-					c.jbgs = true;
-					break;
-				case "jbbl":
-					c.jbbl = true;
-					break;
-				case "ycqk":
-					c.ycqk = true;
-					break;
-				case "dtgdjh":
-					c.dtgdjh = true;
-					break;
+		var rows =[];
+		$("#detail_pane").find("div[data-detail='"+layout+"']").find("div[class='panel-body']")
+				.find("label[class='checkbox-inline']").each(function () {
+			var item = $(this).find("input[type='radio']");
+			if($(item).is(':checked')){
+				var row = {
+					lineId:$(this).attr("data-line-id")
+				};
+				rows.push(row);
 			}
-		})
-		var io=[];
-		$("div[data-detail="+layout+"]").find("#dev-io-ul").find("input[type='checkbox']:checked").each(function () {
-			io.push($(this).val());
-		})
-		c.io = io;
-		g.devIoConfig = JSON.stringify(c);
-		item.push(g);
-		return item;
+		});
+		return rows;
 	}
-	/**
-	 * 产品文件
-	 */
-	function productFile(layout) {
-		var item =[];
-		var g = {}
-		g.lineId = $("div[data-detail="+layout+"]").find("div[class='col-sm-10']").find("select[name='line']").find("option:selected").val();
-		item.push(g);
-		return item;
-	}
+
 	/**
 	 * 背景图片编辑
 	 */

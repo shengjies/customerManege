@@ -54,8 +54,7 @@ public class SopLineController extends BaseController
 	@Autowired
 	private IProductionLineService lineService; // 产线
 
-	
-	@RequiresPermissions("iso:sopLine:view")
+	@RequiresPermissions("iso:sopLine:list")
 	@GetMapping("/view/{id}")
 	public String sopLine(@PathVariable("id") Integer isoId, ModelMap mmap)
 	{

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.page.pageInfo.mapper.PageInfoMapper;
 import com.ruoyi.project.page.pageInfo.domain.PageInfo;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
@@ -134,6 +135,7 @@ public class PageInfoServiceImpl implements IPageInfoService
      * @return 结果
      */
 	@Override
+	@Transactional
 	public int insertPageInfo(PageInfo pageInfo,HttpServletRequest request)
 	{
 		//获取对应的公司
@@ -151,10 +153,16 @@ public class PageInfoServiceImpl implements IPageInfoService
 			pageInfo.setPageUrl(pageUrl+pageCode);
 			pageInfo.setCreateTime(new Date());
 			pageInfoMapper.insertPageInfo(pageInfo);
-			savePageConfig(pageInfo);
+			//添加对应看板产线信息
+			if(pageInfo.getConfigs() != null && pageInfo.getConfigs().size() >0){
+				for (PageInfoConfig config : pageInfo.getConfigs()) {
+					config.setPId(pageInfo.getId());
+					pageInfoConfigMapper.insertPageInfoConfig(config);
+				}
+			}
 			return 1;
 		}
-	    return 1;
+	    return 0;
 	}
 	
 	/**

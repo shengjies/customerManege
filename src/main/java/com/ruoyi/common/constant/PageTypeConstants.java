@@ -20,5 +20,9 @@ public class PageTypeConstants {
      * 4、图纸看板
      */
     public static final int PAGE_TYPE_TZLB = 4;
+    /**
+     * 产线汇总
+     */
+    public static final int PAGE_TYPE_HZ = 1;
 
 }

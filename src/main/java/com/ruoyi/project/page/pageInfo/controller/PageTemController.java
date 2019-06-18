@@ -60,7 +60,10 @@ public class PageTemController extends BaseController {
         if(StringUtils.isEmpty(code))return "error/404";
         mmap.put("code",code);
         if(StringUtils.isEmpty(pwd))return prefix+ "/pwd";
-        PageInfo info = pageInfoService.selectPageByCode(code);
+//        PageInfo info = pageInfoService.selectPageByCode(code);
+        PageInfo info = new PageInfo();
+        info.setPagePwd("123456");
+        info.setPageType(1);
         if(info == null) {
             mmap.put("msg","页面不存在");
             return prefix + "/pwd";
@@ -69,13 +72,13 @@ public class PageTemController extends BaseController {
             mmap.put("msg","密码错误");
             return prefix + "/pwd";
         }
-        if(info.getDevCompany() == null) return "error/404";
-        mmap.put("info",info);
-        mmap.put("company",info.getDevCompany());
+//        if(info.getDevCompany() == null) return "error/404";
+//        mmap.put("info",info);
+//        mmap.put("company",info.getDevCompany());
         String to = "error/404";
         switch (info.getPageType()){
-            case PageTypeConstants.PAGE_TYPE_GG:
-                to = prefix +"/lattice";
+            case PageTypeConstants.PAGE_TYPE_HZ:
+                to = prefix +"/tem1";
                 break;
             case PageTypeConstants.PAGE_TYPE_LB:
                 to = prefix +"/swing";

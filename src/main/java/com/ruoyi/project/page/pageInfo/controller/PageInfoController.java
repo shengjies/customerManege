@@ -94,7 +94,7 @@ public class PageInfoController extends BaseController
 	@RequestMapping("/save")
 	@ResponseBody
 	public AjaxResult addSave(@RequestBody PageInfo pageInfo,HttpServletRequest request)
-	{		
+	{
 		return toAjax(pageInfoService.insertPageInfo(pageInfo,request));
 	}
 

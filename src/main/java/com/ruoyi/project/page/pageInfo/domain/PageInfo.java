@@ -35,7 +35,7 @@ public class PageInfo extends BaseEntity
 	@Excel(name = "页面URL")
 	private String pageUrl;
 	/** 布局类型 */
-	private Integer pageType;  //布局类型  1、宫格布局 2、轮播布局 3、产线平衡 4、产品文件
+	private Integer pageType;  //布局类型  1、产线汇总 2、产线详情
 	/**  */
 	private Integer pageLayoutType;//
 	/** 布局类型名称 */

@@ -11,23 +11,17 @@
 					<div class="select-list">
 						<ul>
 							<li>
-								页面编号：<input type="text" name="pageId"/>
+								看板编号：<input type="text" name="pageId"/>
 							</li>
 							<li>
-								页面名称：<input type="text" name="pageName"/>
+								看板名称：<input type="text" name="pageName"/>
 							</li>
 
 							<li>
-								布局类型：<select name="pageLayoutType" th:with="layout =${@layout.selectLayoutAll(-1)}">
+								看板类型：<select name="pageLayoutType" th:with="layout =${@layout.selectLayoutAll(-1)}">
 									<option value="-1">所有</option>
 								<option th:each="dict : ${layout}" th:text="${dict.layout_name}"  th:value="${dict.id}"></option>
 								</select>
-							</li>
-							<li th:if="${@product.isSys(#httpServletRequest.getCookies())}">
-								所属公司：<select name="companyId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
-								<option value="-1">所有</option>
-								<option th:each="com : ${Company}" th:text="${com.comName}" th:value="${com.companyId}"></option>
-							</select>
 							</li>
 							<li class="select-time">
 								<label>创建时间： </label>
@@ -76,7 +70,7 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
-                modalName: "页面管理",
+                modalName: "看板管理",
 				search: false,
 		        showExport: true,
 				sortName:'createTime',
@@ -91,17 +85,17 @@
 				},
 				{
 					field : 'pageId', 
-					title : '页面编号',
+					title : '看板编号',
 					sortable: true
 				},
 				{
 					field : 'pageName',
-					title : '页面名称',
+					title : '看板名称',
 					sortable: true
 				},
 				{
 					field : 'pageLayoutType',
-					title : '页面布局类型',
+					title : '看板类型',
 					sortable: true,
 					formatter:function (value, row, index) {
 						if(row.layoutTypeName){
@@ -112,7 +106,7 @@
 				},
 				{
 					field : 'pageUrl', 
-					title : '页面URL',
+					title : '看板URL',
 					sortable: true,
 					formatter:function (value, row, index) {
 						if(row.pageUrl){
@@ -134,17 +128,6 @@
 							return actions.join('');
 						}
 						return '-';
-					}
-				},
-				{
-					field : 'companyId',
-					title : '所属公司',
-					sortable: true,
-					formatter:function (value, row, index) {
-						if(row.devCompany){
-							return row.devCompany.comName;
-						}
-						return "-";
 					}
 				},
 				{
@@ -176,7 +159,7 @@
 		 */
 		function add() {
 			var url = prefix+'/add';
-			createMenuItem(url, "新建页面");
+			createMenuItem(url, "新建看板");
 		}
 		/**
 		 * 编辑页面
@@ -193,7 +176,7 @@
 				}
 				url = url.replace("{pid}", id);
 			}
-			createMenuItem(url, "编辑页面");
+			createMenuItem(url, "编辑看板");
 		}
 		/**
 		 * 预览
@@ -209,7 +192,7 @@
 		 */
 		function pwd(id) {
 			var url = prefix+'/pwd/'+id;
-			$.modal.open("页面密码",url,400,340)
+			$.modal.open("看板密码",url,400,340)
 		}
     </script>
 </body>
