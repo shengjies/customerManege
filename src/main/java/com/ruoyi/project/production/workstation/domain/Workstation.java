@@ -27,6 +27,8 @@ public class Workstation extends BaseEntity
 	private Integer sopId;
 	/** 计数器id */
 	private Integer devId;
+	/** 计数器硬件名称 */
+	private String devName;
 	/** 计数器编码 */
 	private String devCode;
 	/** 看板硬件id */
@@ -43,6 +45,14 @@ public class Workstation extends BaseEntity
 	private Date cTime;
 	/** 标记是否需要删除 */
 	private Integer defId;
+
+	public String getDevName() {
+		return devName;
+	}
+
+	public void setDevName(String devName) {
+		this.devName = devName;
+	}
 
 	public Integer getId() {
 		return id;

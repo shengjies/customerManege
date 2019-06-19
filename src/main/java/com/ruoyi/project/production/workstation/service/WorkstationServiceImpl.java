@@ -1,19 +1,17 @@
 package com.ruoyi.project.production.workstation.service;
 
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
-import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.workstation.domain.Workstation;
+import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
-import com.ruoyi.project.production.workstation.domain.Workstation;
-import com.ruoyi.common.support.Convert;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 工位配置 服务层实现
@@ -64,7 +62,7 @@ public class WorkstationServiceImpl implements IWorkstationService
      * @return 结果
      */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int insertWorkstation(Workstation workstation) throws Exception
 	{
 	    //查询计数器硬件
@@ -136,7 +134,7 @@ public class WorkstationServiceImpl implements IWorkstationService
      * @return 结果
      */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int updateWorkstation(Workstation workstation) throws Exception
 	{
 		Workstation work = workstationMapper.selectWorkstationById(workstation.getId());
@@ -239,7 +237,7 @@ public class WorkstationServiceImpl implements IWorkstationService
      * @return 结果
      */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int deleteWorkstationById(Integer id)
 	{
 		Workstation work = workstationMapper.selectWorkstationById(id);

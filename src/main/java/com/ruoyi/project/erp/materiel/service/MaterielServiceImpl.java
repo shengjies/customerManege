@@ -133,7 +133,7 @@ public class MaterielServiceImpl implements IMaterielService {
      */
     @Override
     public int updateMateriel(Materiel materiel) {
-        if (materiel.getPriceImport() != 0.00f) {
+        if (materiel.getPriceImport() != null && materiel.getPriceImport() != 0.00f) {
             materiel.setPrice(new BigDecimal(materiel.getPriceImport()));
         }
         // 更新物料库存的物料信息

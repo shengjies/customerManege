@@ -77,10 +77,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where dev_id = #{devId} and io_id = #{ioId} and work_id = #{workId}  and create_time BETWEEN #{sysDateTimeOld} AND #{sysDateTime} group by timeHour,createDate;
     </select>
 
-    <!--通过工单id查询各个IO口数据记录-->
+    <!--通过工单id和产线id查询各个IO口数据记录-->
     <select id="selectDevDataLogByWorkId" parameterType="Integer" resultMap="DevDataLogResult">
         <include refid="selectDevDataLogVo"/>
-        where work_id = #{workId} and company_id =#{companyId}
+        where work_id = #{workId} and line_id = #{lineId} and company_id =#{companyId} and del_data > 0;
     </select>
     <!--查询对应产线工单硬件IO口上传回传的数据-->
     <select id="selectLineWorkDevIo" resultMap="DevDataLogResult">

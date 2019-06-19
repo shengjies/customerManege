@@ -98,7 +98,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int insertProductIntoStock(ProductIntoStock productIntoStock,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) {
@@ -247,7 +247,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int nullifyProductIntoStockByIds(Integer intoId,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;

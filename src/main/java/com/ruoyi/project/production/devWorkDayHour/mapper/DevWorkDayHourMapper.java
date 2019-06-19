@@ -125,11 +125,15 @@ public interface DevWorkDayHourMapper {
      * 查询对应工单，对应IO口，对应时间的硬件IO口24小时数据
      *
      * @param workId   工单id
+     * @param lineId  产线id
      * @param devId    硬件Id
      * @param ioId     IO口id
      * @param dataTime 时间
      * @return IO口24小时记录
      */
-//    @DataSource(DataSourceType.SLAVE)
-    DevWorkDayHour selectWorkDayHourListByDate(@Param("workId") Integer workId, @Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("dataTime") Date dataTime);
+    DevWorkDayHour selectWorkDayHourListByDate(@Param("workId") Integer workId,
+                                               @Param("lineId")Integer lineId,
+                                               @Param("devId") Integer devId,
+                                               @Param("ioId") Integer ioId,
+                                               @Param("dataTime") Date dataTime);
 }

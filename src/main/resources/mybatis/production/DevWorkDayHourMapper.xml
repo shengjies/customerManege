@@ -244,7 +244,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--查询指定日期的工单每小时统计列表-->
     <select id="selectWorkDayHourListByDate" resultMap="DevWorkDayHourResult">
         <include refid="selectDevWorkDayHourVo"/>
-        where work_id = #{workId} and dev_id = #{devId} and io_id = #{ioId} and data_time = #{dataTime}
+        where work_id = #{workId} and line_id = #{lineId} and dev_id = #{devId} and io_id = #{ioId} and data_time = #{dataTime}
     </select>
 
 </mapper>

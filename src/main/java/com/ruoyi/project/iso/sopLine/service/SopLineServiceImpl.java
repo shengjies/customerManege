@@ -64,7 +64,7 @@ public class SopLineServiceImpl implements ISopLineService
      * @return 结果
      */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int insertSopLine(SopLine sopLine)
 	{
 		if(sopLine != null){
@@ -104,7 +104,7 @@ public class SopLineServiceImpl implements ISopLineService
      * @return 结果
      */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int updateSopLine(SopLine sopLine)
 	{
 		if(sopLine != null){
@@ -148,7 +148,7 @@ public class SopLineServiceImpl implements ISopLineService
 	 * @return
 	 */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int deleteSopLine(int companyId,int lineId, int sopId) {
 		try {
 			//删除对应公司 对应产线 对应 SOP 配置信息

@@ -156,7 +156,7 @@ public interface DevWorkOrderMapper {
     List<DevWorkOrder> selectWorkOrderTodayBeInOrFinish();
 
     /**
-     * 查询所有正在生产或者已经完成的工单
+     * 还未确认数据的所有工单信息
      *
      * @return
      */

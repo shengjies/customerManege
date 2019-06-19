@@ -12,7 +12,7 @@
 					<ul>
 						<li>
 							供应商：
-							<select id="supplierId" name="supplierId" style="width: 140px" th:with="supplierList = ${@supplier.selectSupplierAllByCompanyId(#httpServletRequest.getCookies())}">
+							<select id="supplierId" name="supplierId"  th:with="supplierList = ${@supplier.selectSupplierAllByCompanyId(#httpServletRequest.getCookies())}">
 								<option value="">请选择</option>
 								<option th:each="supplier : ${supplierList}" th:text="${supplier.supplierName}" th:value="${supplier.id}">
 								</option>

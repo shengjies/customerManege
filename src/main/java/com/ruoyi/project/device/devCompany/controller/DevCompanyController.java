@@ -3,9 +3,12 @@ package com.ruoyi.project.device.devCompany.controller;
 import java.util.Date;
 import java.util.List;
 
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.service.IUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -44,11 +47,14 @@ public class DevCompanyController extends BaseController {
 
     private String prefix = "device/devCompany";
 
-    @Value("${img.url}")
+    @Value("${file.iso}")
     private String imgUrl;
 
     @Autowired
     private IDevCompanyService devCompanyService;
+
+    @Autowired
+    private IIsoService isoService;
 
     @RequiresPermissions("device:devCompany:view")
     @GetMapping()
@@ -118,9 +124,9 @@ public class DevCompanyController extends BaseController {
     @Log(title = "公司", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(DevCompany devCompany,HttpServletRequest request) {
+    public AjaxResult editSave(DevCompany devCompany, HttpServletRequest request) {
         try {
-            return toAjax(devCompanyService.updateDevCompany(devCompany,request));
+            return toAjax(devCompanyService.updateDevCompany(devCompany, request));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,16 +167,20 @@ public class DevCompanyController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/updateComLogo")
     @ResponseBody
-    public AjaxResult updateComLogo(@RequestParam("avatarfile") MultipartFile file,HttpServletRequest request) {
+    public AjaxResult updateComLogo(@RequestParam("avatarfile") MultipartFile file, HttpServletRequest request) {
         User currentUser = JwtUtil.getTokenUser(request);
         DevCompany company = devCompanyService.selectDevCompanyById(currentUser.getCompanyId());
         try {
             if (!file.isEmpty()) {
-                String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
-                company.setComLogo(imgUrl+avatar); // 设置LOGO
-                if (devCompanyService.updateDevCompany(company,request) > 0) {
-                    setSysUser(userService.selectUserById(currentUser.getUserId()));
-                    return success();
+                Iso iso = isoService.selectIsoById(1);
+                if (StringUtils.isNotNull(iso)) {
+                    String comLogoName = FileUploadUtils.upload(iso.getDisk() + "/", file);
+                    String comLogoPath = imgUrl + iso.getDiskPath() + "/" + comLogoName;
+                    company.setComLogo(comLogoPath);
+                    if (devCompanyService.updateDevCompany(company, request) > 0) {
+                        setSysUser(userService.selectUserById(currentUser.getUserId()));
+                        return success();
+                    }
                 }
             }
             return error();
@@ -187,7 +197,7 @@ public class DevCompanyController extends BaseController {
      * @return
      */
     @GetMapping("/comPicture")
-    public String comPicture(ModelMap mmap,HttpServletRequest request) {
+    public String comPicture(ModelMap mmap, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         DevCompany devCompany = devCompanyService.selectDevCompanyById(user.getCompanyId());
         mmap.put("company", devCompany);
@@ -204,8 +214,13 @@ public class DevCompanyController extends BaseController {
     @ResponseBody
     public AjaxResult uploadComPicture(MultipartFile file) {
         try {
-            String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
-            return success(imgUrl+avatar); // 返回路径
+            Iso iso = isoService.selectIsoById(1);
+            if (StringUtils.isNotNull(iso)) {
+                String comPic = FileUploadUtils.upload(iso.getDisk() + "/", file);
+                // 返回路径
+                return success(imgUrl + iso.getDiskPath() + "/" + comPic);
+            }
+            return error("图片上传失败");
         } catch (Exception e) {
             return error("图片上传失败");
         }
@@ -213,25 +228,27 @@ public class DevCompanyController extends BaseController {
 
     /**
      * 公司轮播图片保存（保存地址N）
+     *
      * @param comPicture
      * @return
      */
     @PostMapping("/updateComPicture")
     @ResponseBody
-    public AjaxResult updateComPicture(String comPicture,HttpServletRequest request){
+    public AjaxResult updateComPicture(String comPicture, HttpServletRequest request) {
         DevCompany company = devCompanyService.selectDevCompanyById(JwtUtil.getTokenUser(request).getCompanyId());
         company.setComPicture(comPicture);
-        return toAjax(devCompanyService.updateDevCompany(company,request));
+        return toAjax(devCompanyService.updateDevCompany(company, request));
     }
 
     /**
      * 校验公司名称是否唯一
+     *
      * @param company
      * @return
      */
     @PostMapping("/checkComNameUnique")
     @ResponseBody
-    public String checkComNameUnique(DevCompany company){
+    public String checkComNameUnique(DevCompany company) {
         return devCompanyService.checkComNameUnique(company);
     }
 }

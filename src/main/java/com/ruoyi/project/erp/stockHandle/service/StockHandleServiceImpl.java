@@ -92,7 +92,7 @@ public class StockHandleServiceImpl implements IStockHandleService
      * @return 结果
      */
 	@Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
 	public int insertStockHandle(StockHandle stockHandle, HttpServletRequest request)
 	{
 		User user = JwtUtil.getTokenUser(request);
@@ -286,7 +286,7 @@ public class StockHandleServiceImpl implements IStockHandleService
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int nullifyStockHandleById(Integer id) {
         StockHandleDetails handleDetails = new StockHandleDetails();
         handleDetails.setHandleId(id);

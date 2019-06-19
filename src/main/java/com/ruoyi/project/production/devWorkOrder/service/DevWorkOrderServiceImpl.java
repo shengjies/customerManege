@@ -10,6 +10,7 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
+import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devIo.domain.DevIo;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
@@ -70,8 +72,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private DevProductListMapper productListMapper; // 产品
 
-
-
     @Autowired
     private WorkOrderChangeMapper orderChangeMapper;
 
@@ -83,6 +83,12 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     @Autowired
     private WorkstationMapper workstationMapper;
+
+    @Autowired
+    private WorkDataMapper workDataMapper;
+
+    @Autowired
+    private WorkDayHourMapper workDayHourMapper;
 
 
 
@@ -240,9 +246,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int editWorkerOrderById(Integer id,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        Long userId = user.getUserId(); // 登录用户id
+        Long userId = user.getUserId();
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
 
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
@@ -275,48 +282,49 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         //首次点击开始，工单处于未进行、未开始的状态，页面点击开始按钮
         if (null != devWorkOrder && devWorkOrder.getWorkorderStatus().equals(WorkConstants.WORK_STATUS_NOSTART)) {
             if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_NOSTART)) {
-                devWorkOrder.setStartTime(new Date());  // 实际开始时间
+                // 实际开始时间
+                devWorkOrder.setStartTime(new Date());
             }
-            devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);  // 修改工单的状态为进行中
-            devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);   // 修改工单的操作状态为正在进行，页面显示暂停按钮
-            devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
+            // 修改工单的状态为进行中
+            devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);
+            // 修改工单的操作状态为正在进行，页面显示暂停按钮
+            devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);
+            // 工单的更新者
+            devWorkOrder.setUpdateBy(user.getUserName());
 
-            // 通过产线id获取io口集合信息
-//            List<DevIo> devIos = devIoMapper.selectLineDevIO(devWorkOrder.getLineId()); // 对应产线IO口列表
-//            DevList devList = null;
-//            WorkData workData = null;
-//            WorkDayHour workDayHour = null;
-//            for (DevIo io : devIos) {
-//                // 通过io口id查询硬件信息
-//                //devDevice = devDeviceMapper.selectDevDeviceById(io.getDevId());
-//                devList = devListMapper.selectDevListById(io.getDevId());
-//                // 初始化工单数据
-//                workData = new WorkData();
-//                workData.setWorkId(devWorkOrder.getId()); // 所属工单
-//                workData.setCompanyId(devWorkOrder.getCompanyId()); // 所属公司
-//                workData.setLineId(devWorkOrder.getLineId()); // 所属产线
-//                workData.setDevId(devList.getId()); // 所属硬件
-//                workData.setDevName(devList.getDeviceName()); // 硬件名称
-//                workData.setIoId(io.getId()); // 所属IO口id
-//                workData.setIoName(io.getIoName()); // 所属IO口名称
-//                workData.setIoOrder(io.getIoOrder()); // 所属IO的排序
-//                workData.setCreateTime(new Date()); // 创建时间
-//                workDataMapper.insertWorkData(workData);// 保存工单数据
-//
-//                // 初始化工单各个IO口每小时数据
-//                workDayHour = new WorkDayHour();
-//                workDayHour.setWorkId(devWorkOrder.getId()); // 所属工单
-//                workDayHour.setCompanyId(devWorkOrder.getCompanyId()); // 所属公司
-//                workDayHour.setLineId(devWorkOrder.getLineId()); // 所属产线
-//                workDayHour.setDevId(devList.getId()); // 所属硬件
-//                workDayHour.setDevName(devList.getDeviceName()); // 硬件名称
-//                workDayHour.setIoId(io.getId()); // 所属IO口id
-//                workDayHour.setIoName(io.getIoName()); // 所属IO口名称
-//                workDayHour.setIoOrder(io.getIoOrder()); // 所属IO的排序
-//                workDayHour.setDataTime(new Date()); // 创建时间年月日
-//                workDayHour.setCreateTime(new Date()); // 创建时间年月日时分秒
-//                workDayHourMapper.insertWorkDayHour(workDayHour); // 保存工单各个IO口每小时数据
-//            }
+            // 通过产线id获取各个工位信息
+            List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(),devWorkOrder.getLineId());
+            WorkData workData = null;
+            WorkDayHour workDayHour = null;
+            if (com.ruoyi.common.utils.StringUtils.isNotEmpty(workstationList)) {
+                for (Workstation workstation : workstationList) {
+                    // 初始化工单数据
+                    workData = new WorkData();
+                    workData.setWorkId(devWorkOrder.getId());
+                    workData.setCompanyId(devWorkOrder.getCompanyId());
+                    workData.setLineId(devWorkOrder.getLineId());
+                    // 设置计数器硬件
+                    workData.setDevId(workstation.getDevId());
+                    workData.setDevName(workstation.getDevName());
+                    // 设置工位
+                    workData.setIoId(workstation.getId());
+                    workData.setCreateTime(new Date());
+                    workDataMapper.insertWorkData(workData);
+
+                    // 初始化工单各个IO口每小时数据
+                    workDayHour = new WorkDayHour();
+                    workDayHour.setWorkId(devWorkOrder.getId());
+                    workDayHour.setCompanyId(devWorkOrder.getCompanyId());
+                    workDayHour.setLineId(devWorkOrder.getLineId());
+                    // 初始化硬件名称以及工位信息
+                    workDayHour.setDevId(workstation.getDevId());
+                    workDayHour.setDevName(workstation.getDevName());
+                    workDayHour.setIoId(workstation.getId());
+                    workDayHour.setDataTime(new Date()); // 创建时间年月日
+                    workDayHour.setCreateTime(new Date()); // 创建时间年月日时分秒
+                    workDayHourMapper.insertWorkDayHour(workDayHour); // 保存工单各个IO口每小时数据
+                }
+            }
         }
 
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
@@ -342,7 +350,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Override
     public int finishWorkerOrder(Integer id,HttpServletRequest request) {
         User tokenUser = JwtUtil.getTokenUser(request);
-        Long userId = tokenUser.getUserId(); // 登录用户id
+        Long userId = tokenUser.getUserId();
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
         // 不是工单负责人

@@ -116,5 +116,12 @@ public interface WorkstationMapper
 	 * @return
 	 */
 	Workstation selectByDevCode(@Param("code")String code);
-	
+
+	/**
+	 * 通过产线查询工位列表信息
+	 * @param companyId 公司id
+	 * @param lineId 产线id
+	 * @return 结果
+	 */
+    List<Workstation> selectWorkstationListByLineId(@Param("companyId") Integer companyId, @Param("lineId") Integer lineId);
 }

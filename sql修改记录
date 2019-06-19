@@ -192,3 +192,28 @@ ADD COLUMN `te_user` INT NULL COMMENT '测试员' AFTER `me_user`;
 # 2019-6-17
 ALTER TABLE `octopus`.`dev_work_order`
 ADD COLUMN `put_into_number` INT NULL COMMENT '投入产量' AFTER `sign`;
+
+# 添加仪器设备管理
+# 2019-06-19
+CREATE TABLE `octopus`.`tab_instrument_manage` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `company_id` INT NULL COMMENT '公司主键id',
+  `im_code` VARCHAR(125) NULL COMMENT '仪器编号',
+  `im_name` VARCHAR(45) NULL COMMENT '仪器名称',
+  `im_model` VARCHAR(45) NULL COMMENT '仪器型号',
+  `im_department` VARCHAR(45) NULL COMMENT '使用部门',
+  `im_liable` INT NULL COMMENT '设备责任人',
+  `im_status` CHAR(1) NULL DEFAULT 0 COMMENT '设备状态(0、停用，1、启用)',
+  `im_check_number` VARCHAR(125) NULL COMMENT '校验证书号码',
+  `im_check_period` VARCHAR(45) NULL COMMENT '校验有效期',
+  `im_check_book` VARCHAR(45) NULL COMMENT '校验证书',
+  `im_check_mechanism` VARCHAR(45) NULL COMMENT '校验机构',
+  `im_supplier` VARCHAR(45) NULL COMMENT '供应商',
+  `im_start_time` DATETIME NULL COMMENT '启用日期',
+  `create_id` INT NULL COMMENT '创建者',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = '仪器设备管理';
+

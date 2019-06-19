@@ -19,6 +19,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="sign"    column="sign"    />
         <result property="cTime"    column="c_time"    />
         <result property="defId"    column="def_id"    />
+        <association property="devName" column="dev_id" select="selectDevName">
+            <result property="devName" column="device_name"/>
+        </association>
     </resultMap>
 	
 	<sql id="selectWorkstationVo">
@@ -145,5 +148,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--根据硬件编码查询对应的工位信息-->
     <select id="selectByDevCode" resultMap="WorkstationResult">
       SELECT * FROM tab_workstation where c_code =#{code} limit 1;
+    </select>
+
+    <!--通过产线id查询工位列表信息-->
+    <select id="selectWorkstationListByLineId" resultMap="WorkstationResult">
+        SELECT * FROM tab_workstation where company_id = #{companyId} and line_id = #{lineId} and dev_id > 0;;
+    </select>
+
+    <!--查询硬件名称-->
+    <select id="selectDevName" resultType="java.lang.String">
+        SELECT device_name FROM dev_list where id = #{devId};
     </select>
 </mapper>

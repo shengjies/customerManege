@@ -5,6 +5,8 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
+import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.iso.iso.service.IIsoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,14 +56,17 @@ public class ProfileController extends BaseController {
     @Autowired
     private IDevCompanyService devCompanyService;
 
-    @Value("${img.url}")
+    @Autowired
+    private IIsoService isoService;
+
+    @Value("${file.iso}")
     private String imgUrl;
 
     /**
      * 个人信息
      */
     @GetMapping()
-    public String profile(ModelMap mmap,HttpServletRequest request) {
+    public String profile(ModelMap mmap, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         user.setSex(dict.getLabel("sys_user_sex", user.getSex()));
         mmap.put("user", user);
@@ -72,7 +77,7 @@ public class ProfileController extends BaseController {
 
     @GetMapping("/checkPassword")
     @ResponseBody
-    public boolean checkPassword(String password,HttpServletRequest request) {
+    public boolean checkPassword(String password, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (PasswordUtil.matches(user, password)) {
             return true;
@@ -81,7 +86,7 @@ public class ProfileController extends BaseController {
     }
 
     @GetMapping("/resetPwd")
-    public String resetPwd(ModelMap mmap,HttpServletRequest request) {
+    public String resetPwd(ModelMap mmap, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         mmap.put("user", userService.selectUserById(user.getUserId()));
         return prefix + "/resetPwd";
@@ -90,11 +95,11 @@ public class ProfileController extends BaseController {
     @Log(title = "重置密码", businessType = BusinessType.UPDATE)
     @PostMapping("/resetPwd")
     @ResponseBody
-    public AjaxResult resetPwd(String oldPassword, String newPassword,HttpServletRequest request) {
+    public AjaxResult resetPwd(String oldPassword, String newPassword, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (StringUtils.isNotEmpty(newPassword) && PasswordUtil.matches(user, oldPassword)) {
             user.setPassword(newPassword);
-            if (userService.resetUserPwd(user,request) > 0) {
+            if (userService.resetUserPwd(user, request) > 0) {
                 setSysUser(userService.selectUserById(user.getUserId()));
                 return success();
             }
@@ -108,7 +113,7 @@ public class ProfileController extends BaseController {
      * 修改用户
      */
     @GetMapping("/edit")
-    public String edit(ModelMap mmap,HttpServletRequest request) {
+    public String edit(ModelMap mmap, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         mmap.put("user", userService.selectUserById(user.getUserId()));
         return prefix + "/edit";
@@ -118,7 +123,7 @@ public class ProfileController extends BaseController {
      * 修改头像
      */
     @GetMapping("/avatar")
-    public String avatar(ModelMap mmap,HttpServletRequest request) {
+    public String avatar(ModelMap mmap, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         mmap.put("user", userService.selectUserById(user.getUserId()));
         return prefix + "/avatar";
@@ -130,13 +135,14 @@ public class ProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/update")
     @ResponseBody
-    public AjaxResult update(User user,HttpServletRequest request) {
+    public AjaxResult update(User user, HttpServletRequest request) {
         User tokenUser = JwtUtil.getTokenUser(request);
         User currentUser = userService.selectUserById(tokenUser.getUserId());
         currentUser.setUserName(user.getUserName());
         currentUser.setEmail(user.getEmail());
         currentUser.setSex(user.getSex());
-        currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 设置用户标记为0 已经完成初始化设置
+        // 设置用户标记为0 已经完成初始化设置
+        currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD);
         // 设置公司名称
         //DevCompany devCompany = devCompanyService.selectDevCompanyById(currentUser.getCompanyId());
         //String newComName = user.getDevCompany().getComName();
@@ -145,7 +151,7 @@ public class ProfileController extends BaseController {
         //}
         //devCompany.setComName(user.getDevCompany().getComName());
         //devCompanyService.updateDevCompany(devCompany);
-        if (userService.updateUserInfo(currentUser,request) > 0) {
+        if (userService.updateUserInfo(currentUser, request) > 0) {
             setSysUser(userService.selectUserById(currentUser.getUserId()));
             return success();
         }
@@ -158,18 +164,25 @@ public class ProfileController extends BaseController {
     @Log(title = "个人信息", businessType = BusinessType.UPDATE)
     @PostMapping("/updateAvatar")
     @ResponseBody
-    public AjaxResult updateAvatar(@RequestParam("avatarfile") MultipartFile file,HttpServletRequest request) {
+    public AjaxResult updateAvatar(@RequestParam("avatarfile") MultipartFile file, HttpServletRequest request) {
         User currentUser = JwtUtil.getTokenUser(request);
         try {
             if (!file.isEmpty()) {
-                String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
-                currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD); // 设置登录标记已经完成初始化
-                currentUser.setAvatar(imgUrl + avatar);
-                String imgurl = imgUrl + avatar;
-                if (userService.updateUserInfo(currentUser,request) > 0) {
-                    setSysUser(userService.selectUserById(currentUser.getUserId()));
-                    return AjaxResult.success("success",imgurl);
+                Iso iso = isoService.selectIsoById(1);
+                if (StringUtils.isNotNull(iso)) {
+                    String path = iso.getDisk() + "/";
+                    String avatar = FileUploadUtils.upload(path, file);
+                    //String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file);
+                    // 设置登录标记已经完成初始化
+                    currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD);
+                    currentUser.setAvatar(imgUrl + iso.getDiskPath() + "/" + avatar);
+                    String imgurl = imgUrl + iso.getDiskPath() + "/" + avatar;
+                    if (userService.updateUserInfo(currentUser, request) > 0) {
+                        setSysUser(userService.selectUserById(currentUser.getUserId()));
+                        return AjaxResult.success("success", imgurl);
+                    }
                 }
+                return error();
             }
             return error();
         } catch (Exception e) {
@@ -188,9 +201,9 @@ public class ProfileController extends BaseController {
     @ResponseBody
     public AjaxResult changeLoginTag(User user, HttpServletRequest request) {
         try {
-            if (userService.changeLoginTag(user,request) > 0) {
+            if (userService.changeLoginTag(user, request) > 0) {
                 setSysUser(userService.selectUserById(JwtUtil.getTokenUser(request).getUserId()));
-                return AjaxResult.success("success",user);
+                return AjaxResult.success("success", user);
             }
             return error();
         } catch (BusinessException e) {

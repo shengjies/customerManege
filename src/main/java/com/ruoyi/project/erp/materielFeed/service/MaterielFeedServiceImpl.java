@@ -100,7 +100,7 @@ public class MaterielFeedServiceImpl implements IMaterielFeedService
      * @return 结果
      */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int insertMaterielFeed(MaterielFeed materielFeed,HttpServletRequest request)
 	{
         User user = JwtUtil.getTokenUser(request);
@@ -209,7 +209,7 @@ public class MaterielFeedServiceImpl implements IMaterielFeedService
 	 * @return 结果
 	 */
 	@Override
-	@Transactional
+	@Transactional(rollbackFor = Exception.class)
 	public int nullifyMaterielFeedById(Integer id) {
 		MaterielFeedDetails materielFeedDetails = new MaterielFeedDetails();
 		materielFeedDetails.setFeedId(id);

@@ -103,7 +103,7 @@ public class MaterielOutStockServiceImpl implements IMaterielOutStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int insertMaterielOutStock(MaterielOutStock materielOutStock,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null ) return 0;
@@ -215,7 +215,7 @@ public class MaterielOutStockServiceImpl implements IMaterielOutStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int nullifyMaterielOutStockByIds(Integer id,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null ) {

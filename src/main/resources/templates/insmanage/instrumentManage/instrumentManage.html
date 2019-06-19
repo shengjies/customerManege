@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								仪器编号：<input type="text" name="imCode"/>
+							</li>
+
+							<li>
+								仪器型号：<input type="text" name="imModel"/>
+							</li>
+
+							<li>
+								使用部门：<input type="text" name="imDepartment"/>
+							</li>
+
+							<li>
+								设备责任人：
+								<select style="width: 200px" id="imLiable" name="imLiable"
+										th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+									<option value="">全部</option>
+									<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+								</select>
+							</li>
+
+							<li>
+								设备状态：
+								<select name="imStatus" id="imStatus">
+									<option value="">请选择</option>
+									<option value="0">停用</option>
+									<option value="1">启用</option>
+								</select>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="insmanage:instrumentManage:add">
+					<i class="fa fa-plus"></i> 添加设备
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="insmanage:instrumentManage:edit">
+					<i class="fa fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="insmanage:instrumentManage:remove">
+					<i class="fa fa-remove"></i> 删除
+				</a>
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="insmanage:instrumentManage:export">
+						<i class="fa fa-download"></i> 导出
+				 </a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('insmanage:instrumentManage:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('insmanage:instrumentManage:remove')}]];
+        var prefix = ctx + "insmanage/instrumentManage";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "仪器设备管理",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'id', 
+					title : '',
+					visible: false
+				},
+				{
+					field : 'imCode', 
+					title : '仪器编号',
+					sortable: true
+				},
+				{
+					field : 'imName', 
+					title : '仪器名称',
+					sortable: true
+				},
+				{
+					field : 'imModel', 
+					title : '仪器型号',
+					sortable: true
+				},
+				{
+					field : 'imDepartment', 
+					title : '使用部门',
+					sortable: true
+				},
+				{
+					field : 'imLiable', 
+					title : '设备责任人',
+					sortable: true,
+                    formatter:function (value,row,index) {
+                        return row.imLiableName;
+                    }
+				},
+				{
+					field : 'imStatus', 
+					title : '设备状态',
+					sortable: true,
+                    formatter:function (value,row,index) {
+						if (row.imStatus == 0) {
+						    return '<a class="' + editFlag + '" href="javascript:void(0)" onclick="startStatus(\'' + row.id + '\')"><span style="font-weight: bold;color: red">已停用</span></a>';
+						} else {
+                            return '<a class=" ' + editFlag + '" href="javascript:void(0)" onclick="stopStatus(\'' + row.id + '\')"><span style="font-weight: bold;color: green">已启用</span></a>';
+						}
+                    }
+				},
+				{
+					field : 'imCheckNumber', 
+					title : '校验证书号码',
+					sortable: true
+				},
+				{
+					field : 'imCheckPeriod', 
+					title : '校验有效期',
+					sortable: true
+				},
+				{
+					field : 'imCheckBook', 
+					title : '校验证书',
+					sortable: true
+				},
+				{
+					field : 'imCheckMechanism', 
+					title : '校验机构',
+					sortable: true
+				},
+				{
+					field : 'imSupplier', 
+					title : '供应商',
+					sortable: true
+				},
+				{
+					field : 'imStartTime', 
+					title : '启用日期',
+					sortable: true
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+
+
+        /* 设备管理-停用 */
+        function stopStatus(id) {
+            $.modal.confirm("确认要停用设备吗？", function () {
+                $.operate.post(prefix + "/changeStatus", {"id": id, "imStatus": 0});
+            })
+        }
+
+        /* 设备管理启用 */
+        function startStatus(id) {
+            $.modal.confirm("确认要启用设备吗？", function () {
+                $.operate.post(prefix + "/changeStatus", {"id": id, "imStatus": 1});
+            })
+        }
+
+    </script>
+</body>
+</html>

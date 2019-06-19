@@ -13,7 +13,7 @@
                     <ul>
                         <li>
                             选择客户：
-                            <select id="customerId" name="customerId" style="width: 140px"
+                            <select id="customerId" name="customerId"
                                     th:with="customerList = ${@customer.selectCustomerAllByCompanyId(#httpServletRequest.getCookies())}">
                                 <option value="">请选择</option>
                                 <option th:each="customer : ${customerList}" th:text="${customer.customerName}"

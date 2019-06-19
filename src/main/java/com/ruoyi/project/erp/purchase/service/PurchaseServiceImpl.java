@@ -93,7 +93,7 @@ public class PurchaseServiceImpl implements IPurchaseService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int insertPurchase(Purchase purchase,HttpServletRequest request) {
         if (purchase.getSupplierId() == null) return 0;
         User user = JwtUtil.getTokenUser(request);
@@ -140,7 +140,7 @@ public class PurchaseServiceImpl implements IPurchaseService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updatePurchase(Purchase purchase) {
 
         //将对应的详情数据标记为1

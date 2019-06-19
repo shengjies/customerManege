@@ -105,7 +105,7 @@ public class LineIntoStockServiceImpl implements ILineIntoStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int insertLineIntoStock(LineIntoStock lineIntoStock, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;
@@ -240,7 +240,7 @@ public class LineIntoStockServiceImpl implements ILineIntoStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int nullifyLineIntoStockByIds(Integer id, HttpServletRequest request) {
         /**
          * 查询出所有工单，更新实际入库数量以及产品库存信息

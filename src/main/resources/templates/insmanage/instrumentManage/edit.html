@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-instrumentManage-edit" th:object="${instrumentManage}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">仪器编号：</label>
+				<div class="col-sm-8">
+					<input id="imCode" name="imCode" th:field="*{imCode}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">仪器名称：</label>
+				<div class="col-sm-8">
+					<input id="imName" name="imName" th:field="*{imName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">仪器型号：</label>
+				<div class="col-sm-8">
+					<input id="imModel" name="imModel" th:field="*{imModel}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">使用部门：</label>
+				<div class="col-sm-8">
+					<input id="imDepartment" name="imDepartment" th:field="*{imDepartment}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">设备责任人：</label>
+				<div class="col-sm-8">
+					<select id="imLiable" name="imLiable" class="form-control" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="">请选择</option>
+						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}" th:field="*{imLiable}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">校验证书号码：</label>
+				<div class="col-sm-8">
+					<input id="imCheckNumber" name="imCheckNumber" th:field="*{imCheckNumber}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">校验有效期：</label>
+				<div class="col-sm-8">
+					<input id="imCheckPeriod" name="imCheckPeriod" th:field="*{imCheckPeriod}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">校验证书：</label>
+				<div class="col-sm-8">
+					<input id="imCheckBook" name="imCheckBook" th:field="*{imCheckBook}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">校验机构：</label>
+				<div class="col-sm-8">
+					<input id="imCheckMechanism" name="imCheckMechanism" th:field="*{imCheckMechanism}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">供应商：</label>
+				<div class="col-sm-8">
+					<input id="imSupplier" name="imSupplier" th:field="*{imSupplier}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "insmanage/instrumentManage";
+		$("#form-instrumentManage-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-instrumentManage-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

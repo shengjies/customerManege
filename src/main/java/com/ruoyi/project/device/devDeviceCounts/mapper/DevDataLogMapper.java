@@ -4,6 +4,7 @@ import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.device.devDeviceCounts.domain.DataLogTask;
 import com.ruoyi.project.device.devDeviceCounts.domain.DevDataLog;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -45,7 +46,7 @@ public interface DevDataLogMapper {
      * 查询每天正在生产或者已经完成的工单每小时的IO口数据
      *
      * @param devId          硬件id
-     * @param ioId           IO口id
+     * @param ioId           工位id
      * @param workId         工单id
      * @param sysDateTimeOld 前一个小时时间
      * @param sysDateTime    当前时间
@@ -57,14 +58,17 @@ public interface DevDataLogMapper {
 
 
     /**
-     * 通过工单id查询数据上报列表
+     * 查询数据上报列表
      *
-     * @param workId    工单id主键
+     * @param workId 工单id主键
+     * @param lineId 产线id
      * @param companyId 公司Id主键
      * @return 数据上报日志信息
      */
 //    @DataSource(value = DataSourceType.SLAVE)
-    public List<DevDataLog> selectDevDataLogByWorkId(@Param("workId") Integer workId, @Param("companyId") Integer companyId);
+    public List<DevDataLog> selectDevDataLogByWorkId(@Param("workId") Integer workId,
+                                                     @Param("lineId") Integer lineId,
+                                                     @Param("companyId") Integer companyId);
 
     /**
      * 查询对应产线工单硬件IO口上传回传的数据

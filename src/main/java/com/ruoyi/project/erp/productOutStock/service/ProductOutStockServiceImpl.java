@@ -98,13 +98,14 @@ public class ProductOutStockServiceImpl implements IProductOutStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int insertProductOutStock(ProductOutStock productOutStock,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) {
             return 0;
         }
-        String proOutStockCode = CodeUtils.getProOutStockCode(); // 自动生产产品出库单号
+        // 自动生产产品出库单号
+        String proOutStockCode = CodeUtils.getProOutStockCode();
         /**
          * 产品出库单操作
          */
@@ -130,16 +131,20 @@ public class ProductOutStockServiceImpl implements IProductOutStockService {
                 if (StringUtils.isNull(productStock)) {
                     throw new BusinessException("产品" + productOutStockDetail.getProductCode() + "没有库存记录");
                 }
-                Integer outNumber = productOutStockDetail.getOutNumber(); // 产品出库数量
-                Integer goodNumber = productStock.getGoodNumber(); // 产品良品库存数量
+                // 产品出库数量
+                Integer outNumber = productOutStockDetail.getOutNumber();
+                // 产品良品库存数量
+                Integer goodNumber = productStock.getGoodNumber();
                 if (outNumber > goodNumber) {
                     throw new BusinessException("产品" + productOutStockDetail.getProductCode() + "良品库存不足");
                 }
-                productStock.setTotalNumber(productStock.getTotalNumber() - outNumber); // 总库存
-                productStock.setGoodNumber(goodNumber - outNumber); // 良品库存
+                // 总库存
+                productStock.setTotalNumber(productStock.getTotalNumber() - outNumber);
+                // 良品库存
+                productStock.setGoodNumber(goodNumber - outNumber);
                 productStock.setLastUpdate(new Date());
-
-                productStockMapper.updateProductStock(productStock); // 更新库存
+                // 更新库存
+                productStockMapper.updateProductStock(productStock);
                 /**
                  * 产品出库清单操作
                  */
@@ -149,7 +154,8 @@ public class ProductOutStockServiceImpl implements IProductOutStockService {
                 if (!StringUtils.isEmpty(productCustomers)) {
                     ProductCustomer productCustomer = productCustomers.get(0);
                     bigIntoNumber = new BigDecimal(productOutStockDetail.getOutNumber());
-                    productOutStockDetail.setPrice(productCustomer.getCustomerPrice()); // 设置单价
+                    // 设置单价
+                    productOutStockDetail.setPrice(productCustomer.getCustomerPrice());
                     productOutStockDetail.setTotalPrice(productCustomer.getCustomerPrice().multiply(bigIntoNumber));
                 }
                 productOutStockDetail.setOutId(productOutStock.getId());
@@ -162,21 +168,28 @@ public class ProductOutStockServiceImpl implements IProductOutStockService {
                  * 订单明细操作
                  */
                 // 是否选择了订单
-                String orderCode = productOutStockDetail.getOrderCode();// 订单编号
-                if (!StringUtils.isEmpty(orderCode) && !"-1".equals(orderCode)) { // 选择了订单
+                // 订单编号
+                String orderCode = productOutStockDetail.getOrderCode();
+                // 选择了订单
+                if (!StringUtils.isEmpty(orderCode) && !"-1".equals(orderCode)) {
                     // 订单信息
                     OrderInfo orderInfo = orderInfoMapper.selectOrderInfoListByOrderCode(user.getCompanyId(),orderCode);
                     if(orderInfo != null){
-                        orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() + productOutStockDetail.getOutNumber()); // 更新订单总数
-                        orderInfoMapper.updateOrderInfo(orderInfo); // 更新订单
+                        // 更新订单总数
+                        orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() + productOutStockDetail.getOutNumber());
+                        // 更新订单
+                        orderInfoMapper.updateOrderInfo(orderInfo);
                     }
-                    Integer customerId = productOutStock.getCustomerId(); // 客户id
-                    String productCode = productOutStockDetail.getProductCode(); // 产品编码
+                    // 客户id
+                    Integer customerId = productOutStock.getCustomerId();
+                    // 产品编码
+                    String productCode = productOutStockDetail.getProductCode();
                     // 查询订单明细
                     OrderDetails orderDetails = orderDetailsMapper.selectOrderDetailByCodeAndCusId(user.getCompanyId(),orderCode,customerId,productCode);
-                    orderDetails.setDeliverNum(orderDetails.getDeliverNum()+productOutStockDetail.getOutNumber()); // 更新订单明细已交付数量
-
-                    orderDetailsMapper.updateOrderDetails(orderDetails); // 更新订单明细
+                    // 更新订单明细已交付数量
+                    orderDetails.setDeliverNum(orderDetails.getDeliverNum()+productOutStockDetail.getOutNumber());
+                    // 更新订单明细
+                    orderDetailsMapper.updateOrderDetails(orderDetails);
                 }
             }
         }
@@ -214,13 +227,14 @@ public class ProductOutStockServiceImpl implements IProductOutStockService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int nullifyProductOutStockById(Integer id,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null ) {
              return 0;
         }
-        ProductOutStock productOutStock = productOutStockMapper.selectProductOutStockById(id); // 出库主表对象
+        // 出库主表对象
+        ProductOutStock productOutStock = productOutStockMapper.selectProductOutStockById(id);
         ProductOutStockDetails productOutStockDetails = new ProductOutStockDetails();
         productOutStockDetails.setOutId(id);
         // 产品出库明细信息
@@ -238,8 +252,10 @@ public class ProductOutStockServiceImpl implements IProductOutStockService {
                 /**
                  * 订单以及订单明细数据回滚
                  */
-                String orderCode = outStockDetails.getOrderCode(); // 订单编号
-                if (!StringUtils.isEmpty(orderCode) && !"-1".equals(orderCode)) { // 选择了订单出库
+                // 订单编号
+                String orderCode = outStockDetails.getOrderCode();
+                // 选择了订单出库
+                if (!StringUtils.isEmpty(orderCode) && !"-1".equals(orderCode)) {
                     // 订单数据回滚
                     OrderInfo orderInfo = orderInfoMapper.selectOrderInfoListByOrderCode(user.getCompanyId(), orderCode);
                     orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() - outStockDetails.getOutNumber());
