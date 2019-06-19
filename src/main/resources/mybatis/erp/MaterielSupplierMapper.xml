@@ -106,7 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--根据物料id和供应商id查询供应商编码-->
     <select id="findSupplierCodeByMaterielId" resultMap="MaterielSupplierResult">
-        SELECT * FROM erpstock.tab_materiel_supplier where materiel_id = #{mid} and supplier_id = #{sid} limit 1;
+        SELECT * FROM tab_materiel_supplier where materiel_id = #{mid} and supplier_id = #{sid} limit 1;
     </select>
 
 
