@@ -160,7 +160,6 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllBeInOrFinish();
 
     /**

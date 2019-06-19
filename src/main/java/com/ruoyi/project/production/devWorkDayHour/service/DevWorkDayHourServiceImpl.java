@@ -124,12 +124,12 @@ public class DevWorkDayHourServiceImpl implements IDevWorkDayHourService {
         List<DevWorkOrder> workOrders = workOrderMapper.selectWorkOrderAllBeInOrFinish();
         for (DevWorkOrder workOrder : workOrders) {
             // 上传数据各个公司各个IO口记录集合
-            dataLogs = dataLogMapper.selectDevDataLogByWorkId(workOrder.getId(),workOrder.getLineId(),workOrder.getCompanyId());
+            dataLogs = dataLogMapper.selectDevDataLogByWorkId(workOrder.getId(),workOrder.getCompanyId());
             // 上传数据列表
             for (DevDataLog dataLog : dataLogs) {
                 try {
                     // 查询出当前系统时间与前一个小时的上传数据
-                    dataLogTask = dataLogMapper.selectDataLogBeInOrFinish(dataLog.getDevId(),dataLog.getIoId(), dataLog.getWorkId(), sysDateTimeOld, sysDateTime);
+                    dataLogTask = dataLogMapper.selectDataLogBeInOrFinish(dataLog.getDevId(),dataLog.getIoId(), dataLog.getWorkId(),dataLog.getLineId(), sysDateTimeOld, sysDateTime);
                     if (dataLogTask != null && dataLogTask.getSumData() != 0) {
                         /**
                          * 获取IO口数据的上传日期，通过上传日期判断硬件IO口24小时记录表有没有存在数据<br>

@@ -48,12 +48,13 @@ public interface DevDataLogMapper {
      * @param devId          硬件id
      * @param ioId           工位id
      * @param workId         工单id
+     * @param lineId          产线id
      * @param sysDateTimeOld 前一个小时时间
      * @param sysDateTime    当前时间
      * @return 结果包装类
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     DataLogTask selectDataLogBeInOrFinish(@Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("workId") Integer workId,
+                                          @Param("lineId") Integer lineId,
                                           @Param("sysDateTimeOld") Date sysDateTimeOld, @Param("sysDateTime") Date sysDateTime);
 
 
@@ -61,13 +62,10 @@ public interface DevDataLogMapper {
      * 查询数据上报列表
      *
      * @param workId 工单id主键
-     * @param lineId 产线id
      * @param companyId 公司Id主键
      * @return 数据上报日志信息
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     public List<DevDataLog> selectDevDataLogByWorkId(@Param("workId") Integer workId,
-                                                     @Param("lineId") Integer lineId,
                                                      @Param("companyId") Integer companyId);
 
     /**
