@@ -1,5 +1,6 @@
 package com.ruoyi.project.erp.orderDetails.domain;
 
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
@@ -21,6 +22,10 @@ public class OrderDetails extends BaseEntity
 	private String orderCode;
 	/**  */
 	private String prodectCode;
+	/**
+	 * 产品库存数量
+	 */
+	private Integer productNumber;
 	/**  */
 	private String productModel;
 	/**  */
@@ -35,12 +40,20 @@ public class OrderDetails extends BaseEntity
 	private Float totalPrict;
 	/**  */
 	private Integer deliverNum;
+	/**
+	 * 订单明细锁定库存数量
+	 */
+	private Integer lockNumber;
 	/**  */
 	private Date createTime;
 	/**
 	 * 客户主键ID
 	 */
 	private Integer customerId;
+	/**
+	 * 客户名称
+	 */
+	private String customerName;
 	/**
 	 * 公司主键ID
 	 */
@@ -49,6 +62,30 @@ public class OrderDetails extends BaseEntity
 	private String remark;
 
 	private Integer productId;
+
+	public Integer getProductNumber() {
+		return productNumber;
+	}
+
+	public void setProductNumber(Integer productNumber) {
+		this.productNumber = productNumber;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public Integer getLockNumber() {
+		return lockNumber;
+	}
+
+	public void setLockNumber(Integer lockNumber) {
+		this.lockNumber = lockNumber;
+	}
 
 	public Integer getCustomerId() {
 		return customerId;
@@ -168,11 +205,12 @@ public class OrderDetails extends BaseEntity
 	{
 		return deliverNum;
 	}
+	@Override
 	public void setCreateTime(Date createTime) 
 	{
 		this.createTime = createTime;
 	}
-
+	@Override
 	public Date getCreateTime() 
 	{
 		return createTime;

@@ -25,6 +25,10 @@ public class OrderInfo extends BaseEntity
 	private Integer orderNumber;
 	/**  */
 	private Integer orderDeliverNum;
+	/**
+	 * 订单锁定库存总数量
+	 */
+	private Integer lockNumber;
 
 	private Float totalPrice;//订单总金额
 	/**  */
@@ -63,6 +67,14 @@ public class OrderInfo extends BaseEntity
 	 * 订单详情
 	 */
 	private List<OrderDetails> orderDetails;
+
+	public Integer getLockNumber() {
+		return lockNumber;
+	}
+
+	public void setLockNumber(Integer lockNumber) {
+		this.lockNumber = lockNumber;
+	}
 
 	public String getCustomerCode() {
 		return customerCode;

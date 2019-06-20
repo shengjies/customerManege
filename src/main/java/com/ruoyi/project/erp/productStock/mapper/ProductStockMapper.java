@@ -75,7 +75,6 @@ public interface ProductStockMapper {
      * @param productCode 产品编码
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.ERP)
     ProductStock selectProductStockByProCode(@Param("companyId") Integer companyId, @Param("productCode") String productCode);
 
     /**

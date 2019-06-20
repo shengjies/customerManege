@@ -52,7 +52,7 @@ public interface IOrderInfoService
 	 * @param orderInfo
 	 * @return
 	 */
-	int cancelOrder(OrderInfo orderInfo);
+	int cancelOrder(OrderInfo orderInfo,HttpServletRequest request);
 
 		
 	/**

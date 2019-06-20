@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,8 +110,11 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 		if (user == null) {
 		    return 0;
 		}
-		// 设置启用日期
-		instrumentManage.setImStartTime(new Date());
+		InstrumentManage ins= instrumentManageMapper.selectInstrumentManageById(instrumentManage.getId());
+		if (StringUtils.isNotNull(ins) && StringUtils.isNull(ins.getImStartTime())) {
+			// 设置启用日期
+			instrumentManage.setImStartTime(new Date());
+		}
 		return instrumentManageMapper.updateInstrumentManage(instrumentManage);
 	}
 }

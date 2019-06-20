@@ -21,10 +21,17 @@
         <result property="companyId" column="company_id"/>
         <result property="remark" column="remark"/>
         <result property="productId" column="product_id"/>
+        <result property="lockNumber" column="lock_number"/>
+        <association property="customerName" column="customer_id" select="selectCusName">
+            <result property="customerName" column="id"/>
+        </association>
+        <association property="productNumber" column="product_id" select="selectProNum">
+            <result property="productNumber" column="good_number"/>
+        </association>
     </resultMap>
 
     <sql id="selectOrderDetailsVo">
-        select id, order_id, order_code, prodect_code,product_id, product_model, customer_code, product_name, product_prict,remark, number, total_prict, deliver_num, create_time,customer_id,company_id from tab_order_details
+        select id, order_id, order_code, prodect_code,product_id, product_model, customer_code, product_name, product_prict,remark, number, total_prict, deliver_num,lock_number, create_time,customer_id,company_id from tab_order_details
     </sql>
 
     <select id="selectOrderDetailsList" parameterType="OrderDetails" resultMap="OrderDetailsResult">
@@ -42,7 +49,34 @@
             <if test="totalPrict != null ">and total_prict = #{totalPrict}</if>
             <if test="deliverNum != null ">and deliver_num = #{deliverNum}</if>
             <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="productId != null ">and product_id = #{productId}</if>
+            <if test="companyId != null ">and company_id = #{companyId}</if>
         </where>
+    </select>
+
+    <!--查询锁定库存大0的订单明细信息-->
+    <select id="selectOrderDetailsListByPid" parameterType="OrderDetails" resultMap="OrderDetailsResult">
+        <include refid="selectOrderDetailsVo"/>
+        where lock_number > 0
+        <if test="productId != null ">and product_id = #{productId}</if>
+        <if test="companyId != null ">and company_id = #{companyId}</if>
+        <if test="orderId != null ">and order_id = #{orderId}</if>
+        <if test="orderCode != null  and orderCode != '' ">
+            and order_code like concat ('%',#{orderCode},'%')
+        </if>
+        <if test="customerId != null  and customerId != '' ">and customer_id = #{customerId}</if>
+        <if test="prodectCode != null  and prodectCode != '' ">
+            and prodect_code like concat ('%',#{prodectCode},'%')
+        </if>
+    </select>
+
+    <!--查找客户名称-->
+    <select id="selectCusName" resultType="java.lang.String">
+        SELECT customer_name FROM tab_customer where id = #{customerId};
+    </select>
+    <!--查找产品库存良品数量-->
+    <select id="selectProNum" resultType="java.lang.Integer">
+        SELECT good_number FROM tab_product_stock where product_id = #{productId};
     </select>
 
     <select id="selectOrderDetailsById" parameterType="Integer" resultMap="OrderDetailsResult">
@@ -68,6 +102,7 @@
             <if test="companyId != null  ">company_id,</if>
             <if test="remark != null  ">remark,</if>
             <if test="productId != null  ">product_id,</if>
+            <if test="lockNumber != null  ">lock_number,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="orderId != null  ">#{orderId},</if>
@@ -85,6 +120,7 @@
             <if test="companyId != null  ">#{companyId},</if>
             <if test="remark != null  ">#{remark},</if>
             <if test="productId != null  ">#{productId},</if>
+            <if test="lockNumber != null  ">#{lockNumber},</if>
         </trim>
     </insert>
 
@@ -107,6 +143,7 @@
             <if test="remark != null  ">remark = #{remark},</if>
             <if test="productId != null  ">product_id = #{productId},</if>
             <if test="sign >= 0">sign = #{sign},</if>
+            <if test="lockNumber != null  ">lock_number = #{lockNumber},</if>
         </trim>
         where id = #{id}
     </update>
@@ -150,15 +187,16 @@
 
     <!--查询未交付完的订单明细信息-->
     <select id="selectOrderDetailsListByProIdAndCusId" resultType="com.ruoyi.project.erp.orderDetails.domain.OrderDetails">
-        SELECT a.id as id, a.order_id as orderId,a.order_code as orderCode,a.number as number,a.deliver_num as deliverNum,a.prodect_code as productCode
-            FROM tab_order_details as a,erpstock.tab_order_info as b where a.order_id = b.id
+        SELECT a.id as id, a.order_id as orderId,a.order_code as orderCode,a.number as number,a.deliver_num as deliverNum,a.prodect_code as productCode,
+           a.lock_number as lockNumber FROM tab_order_details as a,tab_order_info as b where a.order_id = b.id
             and b.company_id =#{companyId} and b.customer_id = #{customerId} and a.product_id = #{productId} and b.order_status = #{orderStatus};
     </select>
 
     <!--通过产品id客户id订单状态查询最新的一条记录-->
     <select id="selectOrderDetailsListByProIdAndCusIdOne" resultType="com.ruoyi.project.erp.orderDetails.domain.OrderDetails">
          SELECT a.id as id, a.order_id as orderId,a.order_code as orderCode,a.number as number,a.deliver_num as deliverNum,a.prodect_code as productCode,
-         b.order_status as orderStatus FROM tab_order_details as a,erpstock.tab_order_info as b
+         a.product_id as productId,a.lock_number as lockNumber,
+         b.order_status as orderStatus FROM tab_order_details as a,tab_order_info as b
          where a.order_id = b.id and b.company_id =#{companyId} and b.customer_id = #{customerId}
          and a.product_id = #{productId} and b.order_status = #{orderStatus} and
          a.deliver_num > 0 order by b.create_time desc limit 1;
@@ -166,7 +204,8 @@
 
     <select id="selectOrderDetailsListByNullProInStock" resultType="com.ruoyi.project.erp.orderDetails.domain.OrderDetails">
          SELECT a.id as id, a.order_id as orderId,a.order_code as orderCode,a.number as number,a.deliver_num as deliverNum,a.prodect_code as productCode,
-         b.order_status as orderStatus FROM tab_order_details as a,erpstock.tab_order_info as b
+         a.lock_number as lockNumber,
+         b.order_status as orderStatus FROM tab_order_details as a,tab_order_info as b
          where a.order_id = b.id and b.company_id =#{companyId} and b.customer_id = #{customerId}
          and a.product_id = #{productId} and b.order_status = #{orderStatus} and
          a.deliver_num &lt; a.number order by b.create_time desc limit 1;

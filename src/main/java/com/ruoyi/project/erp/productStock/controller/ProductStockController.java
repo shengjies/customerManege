@@ -156,4 +156,10 @@ public class ProductStockController extends BaseController {
         ProductStock productStock = new ProductStock();
         return AjaxResult.success("success",productStockService.selectProductStockList(productStock,request));
     }
+
+    @GetMapping("/showLockDetail/{id}")
+    public String showLockDetail(@PathVariable("id") Integer productId,ModelMap modelMap){
+        modelMap.put("productId",productId);
+        return prefix + "/lockNumber";
+    }
 }

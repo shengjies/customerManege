@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" name="orderId" id="orderId" th:value="${id}">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            产品编号：<input type="text" name="prodectCode"/>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "erp/orderDetails";
+    $(function() {
+        var options = {
+            url: prefix + "/listByPid",
+            modalName: "库存锁定明细",
+            search: false,
+            showExport: false,
+            showSearch: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            columns: [
+                {
+                    field : 'id',
+                    title : '',
+                    visible: false
+                },
+                {
+                    field : 'prodectCode',
+                    title : '产品编码',
+                    sortable: true
+                },
+                {
+                    field : 'productModel',
+                    title : '产品型号',
+                    sortable: true
+                },
+                {
+                    field : 'productNumber',
+                    title : '产品库存数量',
+                    sortable: true
+                },
+                {
+                    field : 'lockNumber',
+                    title : '本次锁定库存数量',
+                    sortable: true
+                },
+                {
+                    field : '',
+                    title : '待生产数',
+                    formatter:function (value,row,index) {
+                        return row.number-row.lockNumber-row.deliverNum;
+                    }
+                },
+                {
+                    field : 'number',
+                    title : '订单数量',
+                    sortable: true
+                },
+                {
+                    field : 'deliverNum',
+                    title : '已交付数量',
+                    sortable: true
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId");
+    });
+
+</script>
+</body>
+</html>

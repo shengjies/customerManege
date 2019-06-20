@@ -111,7 +111,6 @@ public class DevProductList extends BaseEntity {
     public void setGoodNumber(Integer goodNumber) {
         this.goodNumber = goodNumber;
     }
-
     public FileSourceInfo getFileSourceInfo() {
         return fileSourceInfo;
     }

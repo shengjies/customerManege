@@ -22,11 +22,12 @@
         <result property="createTime" column="create_time"/>
         <result property="create_by" column="create_by"/>
         <result property="totalPrice" column="total_price"/>
+        <result property="lockNumber" column="lock_number"/>
     </resultMap>
 
     <sql id="selectOrderInfoVo">
         select id, company_id, order_code, order_number, order_deliver_num, customer_id, customer_consignee, customer_name, receiving_address,
-         contact_information, deliver_time, examine_content, order_status, remark, create_time, create_by,total_price from tab_order_info
+         contact_information, deliver_time, examine_content, order_status, remark, create_time, create_by,total_price,lock_number from tab_order_info
     </sql>
 
     <select id="selectOrderInfoList" parameterType="OrderInfo" resultMap="OrderInfoResult">
@@ -68,6 +69,7 @@
             <if test="remark != null  and remark != ''  ">remark,</if>
             <if test="createTime != null  ">create_time,</if>
             <if test="create_by != null  ">create_by,</if>
+            <if test="lockNumber != null  ">lock_number,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyId != null  ">#{companyId},</if>
@@ -85,6 +87,7 @@
             <if test="remark != null  and remark != ''  ">#{remark},</if>
             <if test="createTime != null  ">#{createTime},</if>
             <if test="create_by != null  ">#{createBy},</if>
+            <if test="lockNumber != null  ">#{lockNumber},</if>
         </trim>
     </insert>
 
@@ -112,6 +115,7 @@
             <if test="createTime != null  ">create_time = #{createTime},</if>
             <if test="create_by != null  ">create_by = #{create_by},</if>
             <if test="totalPrice != null ">total_price = #{totalPrice},</if>
+            <if test="lockNumber != null ">lock_number = #{lockNumber},</if>
         </trim>
         where id = #{id}
     </update>

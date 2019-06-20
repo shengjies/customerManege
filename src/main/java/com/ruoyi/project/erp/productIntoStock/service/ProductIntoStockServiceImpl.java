@@ -123,9 +123,10 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
             for (ProductIntoStockDetails productIntoStockDetail : productIntoStockDetailList) {
                 // 查询客户关联产品价格信息
                 List<ProductCustomer> productCustomers = productCustomerMapper.selectProductCustomerByProIdOrCusId(productIntoStockDetail.getProductId(), productIntoStock.getCustomerId());
+                Integer intoNumber = productIntoStockDetail.getIntoNumber();// 退货数量
                 if (!StringUtils.isEmpty(productCustomers)) { // 客户产品关联
                     ProductCustomer productCustomer = productCustomers.get(0);
-                    bigOutNumber = new BigDecimal(productIntoStockDetail.getIntoNumber());
+                    bigOutNumber = new BigDecimal(intoNumber);
                     productIntoStockDetail.setPrice(productCustomer.getCustomerPrice());
                     productIntoStockDetail.setTotalPrice(productCustomer.getCustomerPrice().multiply(bigOutNumber));
                 }
@@ -139,7 +140,6 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
                  * 客户退货修改详情交互数量 <br>
                  * 修改订单总数量 <br>
                  */
-                Integer intoNumber = productIntoStockDetail.getIntoNumber(); // 退货数量
                 Integer productId = productIntoStockDetail.getProductId(); // 产品id
                 Integer customerId = productIntoStock.getCustomerId(); // 供应商id
 
@@ -150,7 +150,8 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
                         intoNumber = getInteger(intoNumber, orderDetails);
                     } else { // 查询已交付完成的订单明细指已经关闭的订单
                         orderDetails = orderDetailsMapper.selectOrderDetailsListByProIdAndCusIdOne(user.getCompanyId(), customerId, productId, StockConstants.ORDER_STATUS_THREE);
-                        if (!StringUtils.isNull(orderDetails)) { // 查询到已经完成的订单
+                        // 查询到已经完成的订单
+                        if (!StringUtils.isNull(orderDetails)) {
                             intoNumber = getInteger(intoNumber, orderDetails);
                         } else {
                             throw new BusinessException("该客户产品编码为" + productIntoStockDetail.getProductCode() + "超出订单数量");
@@ -163,28 +164,30 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
                  */
                 // 查看库存记录
                 ProductStock productStock = productStockMapper.selectProductStockByProCode(user.getCompanyId(), productIntoStockDetail.getProductCode());
-                if (StringUtils.isNull(productStock)) { // 不存在记录新增
+                if (StringUtils.isNull(productStock)) {
                     productStock = new ProductStock();
                     productStock.setCompanyId(user.getCompanyId());
                     productStock.setCreateTime(new Date());
                     productStock.setLastUpdate(new Date());
-                    productStock.setBadNumber(productIntoStockDetail.getIntoNumber()); // 不良品数量
-                    productStock.setProductCode(productIntoStockDetail.getProductCode()); // 编码
-                    productStock.setTotalNumber(productIntoStockDetail.getIntoNumber()); // 总数
-                    productStock.setProductName(productIntoStockDetail.getProductName()); // 名称
-                    productStock.setProductModel(productIntoStockDetail.getProductModel()); // 型号
+                    productStock.setBadNumber(intoNumber);
+                    productStock.setProductCode(productIntoStockDetail.getProductCode());
+                    productStock.setTotalNumber(intoNumber);
+                    productStock.setProductName(productIntoStockDetail.getProductName());
+                    productStock.setProductModel(productIntoStockDetail.getProductModel());
                     // 查询产品
                     DevProductList product = productMapper.selectDevProductByCode(user.getCompanyId(), productIntoStockDetail.getProductCode());
                     productStock.setProductId(product == null ? null : product.getId());
 
-                    productStockMapper.insertProductStock(productStock); // 新增产品库存
+                    productStockMapper.insertProductStock(productStock);
                 } else {
-
-                    productStock.setTotalNumber(productStock.getTotalNumber() + productIntoStockDetail.getIntoNumber()); // 更新总数
-                    productStock.setBadNumber(productStock.getBadNumber() + productIntoStockDetail.getIntoNumber()); // 更新不良品
+                    // 更新总数
+                    productStock.setTotalNumber(productStock.getTotalNumber() + productIntoStockDetail.getIntoNumber());
+                    // 更新不良品
+                    productStock.setBadNumber(productStock.getBadNumber() + productIntoStockDetail.getIntoNumber());
+                    productStock.setLockNumber(productStock.getLockNumber() + productIntoStockDetail.getIntoNumber());
                     productStock.setLastUpdate(new Date());
-
-                    productStockMapper.updateProductStock(productStock); // 更新产品库存
+                    // 更新产品库存
+                    productStockMapper.updateProductStock(productStock);
                 }
             }
         }
@@ -202,18 +205,24 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
         OrderInfo orderInfo = orderInfoMapper.selectOrderInfoById(orderDetails.getOrderId());
         Integer deliverNum = orderDetails.getDeliverNum();
         if (deliverNum >= intoNumber) {
+            orderInfo.setLockNumber(orderInfo.getLockNumber() + intoNumber);
             orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() - intoNumber);
             orderInfo.setOrderStatus(StockConstants.ORDER_STATUS_TWO);
+            orderDetails.setLockNumber(orderDetails.getLockNumber() + intoNumber);
             orderDetails.setDeliverNum(deliverNum - intoNumber);
             intoNumber = 0;
         } else {
             orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() - deliverNum);
+            // 锁定数量
+            orderInfo.setLockNumber(orderInfo.getLockNumber() + deliverNum);
             orderInfo.setOrderStatus(StockConstants.ORDER_STATUS_TWO);
             orderDetails.setDeliverNum(0);
+            orderDetails.setLockNumber(orderDetails.getLockNumber() + deliverNum);
             intoNumber = intoNumber - deliverNum;
         }
-        orderDetailsMapper.updateOrderDetails(orderDetails); // 更新明细数据
-        orderInfoMapper.updateOrderInfo(orderInfo); // 更细订单
+        // 更新订单、明细、库存
+        orderDetailsMapper.updateOrderDetails(orderDetails);
+        orderInfoMapper.updateOrderInfo(orderInfo);
         return intoNumber;
     }
 
@@ -264,6 +273,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
             // 库存数量回滚
             ProductStock productStock = productStockMapper.selectProductStockByProId(productId);
             productStock.setTotalNumber(productStock.getTotalNumber() - backNumber);
+            productStock.setLockNumber(productStock.getLockNumber() - backNumber);
             productStock.setBadNumber(productStock.getBadNumber() - backNumber);
             productStock.setLastUpdate(new Date());
             productStockMapper.updateProductStock(productStock);
@@ -277,11 +287,15 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
                 Integer number = orderDetails.getNumber(); // 总交付数量
                 Integer difNumber = number - deliverNum; // 还未交付数量
                 if (difNumber >= backNumber) { // 未交付数量大于退货数量
+                    orderInfo.setLockNumber(orderInfo.getLockNumber() - backNumber);
                     orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() + backNumber);
+                    orderDetails.setLockNumber(orderDetails.getLockNumber() - backNumber);
                     orderDetails.setDeliverNum(orderDetails.getDeliverNum() + backNumber);
                     backNumber = 0;
                 } else { // 未交付数量小于退货数量
-                    orderDetails.setDeliverNum(orderDetails.getNumber()); // 设置该产品明细为全部交付
+                    orderDetails.setLockNumber(orderDetails.getLockNumber() - difNumber);
+                    orderDetails.setDeliverNum(orderDetails.getNumber());
+                    orderInfo.setLockNumber(orderInfo.getLockNumber() - difNumber);
                     orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() + difNumber);
                     backNumber = backNumber - difNumber;
                 }

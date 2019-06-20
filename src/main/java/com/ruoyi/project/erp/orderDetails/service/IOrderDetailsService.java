@@ -50,5 +50,11 @@ public interface IOrderDetailsService
      * @return 结果
      */
 	public int deleteOrderDetailsByIds(String ids);
-	
+
+	/**
+	 * 查询锁定库存大于0的订单信息
+	 * @param orderDetails 订单明细
+	 * @return 结果
+	 */
+	List<OrderDetails> selectOrderDetailsListByPid(OrderDetails orderDetails);
 }

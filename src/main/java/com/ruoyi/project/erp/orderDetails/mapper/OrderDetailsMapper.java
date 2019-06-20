@@ -29,7 +29,6 @@ public interface OrderDetailsMapper {
      * @param orderDetails 订单详情信息
      * @return 订单详情集合
      */
-//    @DataSource(value = DataSourceType.ERP)
     public List<OrderDetails> selectOrderDetailsList(OrderDetails orderDetails);
 
     /**
@@ -126,7 +125,6 @@ public interface OrderDetailsMapper {
      * @param orderStatus 订单状态
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.ERP)
     List<OrderDetails> selectOrderDetailsListByProIdAndCusId(@Param("companyId") Integer companyId,
                                                              @Param("customerId") Integer customerId,
                                                              @Param("productId") Integer productId,
@@ -140,7 +138,6 @@ public interface OrderDetailsMapper {
      * @param orderStatus 订单状态
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.ERP)
     OrderDetails selectOrderDetailsListByProIdAndCusIdOne(@Param("companyId") Integer companyId,
                                                           @Param("customerId") Integer customerId,
                                                           @Param("productId") Integer productId,
@@ -154,9 +151,15 @@ public interface OrderDetailsMapper {
      * @param orderStatus 订单状态
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.ERP)
     OrderDetails selectOrderDetailsListByNullProInStock(@Param("companyId") Integer companyId,
                                                         @Param("customerId") Integer customerId,
                                                         @Param("productId") Integer productId,
                                                         @Param("orderStatus")Integer orderStatus);
+
+    /**
+     * 查询锁定库存大于0的订单明细信息
+     * @param orderDetails 订单明细
+     * @return 结果
+     */
+    List<OrderDetails> selectOrderDetailsListByPid(OrderDetails orderDetails);
 }

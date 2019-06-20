@@ -90,6 +90,7 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
+                showLockProUrl: prefix + "/showLockPro/{id}",
                 modalName: "订单数据",
 				search: false,
 		        showExport: true,
@@ -112,25 +113,25 @@
 					field : 'orderCode', 
 					title : '订单号',
 					sortable: true,
-					width:160
 				},
 				{
 					field : 'orderNumber', 
 					title : '订单总数',
 					sortable: true,
-					width:100
 				},
 				{
 					field : 'orderDeliverNum', 
-					title : '已交付总数',
+					title : '已交数量/锁定数量',
 					sortable: true,
-					width:100
+                    formatter:function (value,row,index) {
+						return '<span style="font-weight: bold;color: green">'+ row.orderDeliverNum +'</span>'+ '/' +
+							'<a href="javascript:void(0)" onclick="showLockPro('+ row.id +')"><span style="font-weight: bold;color: red">'+ row.lockNumber +'</span></a>';
+                    }
 				},
 				{
 					field : 'totalPrice',
 					title : '订单总价',
 					sortable: true,
-					width:100
 				},
 				{
 					field : 'customerName', 
@@ -141,7 +142,6 @@
 					field : 'deliverTime', 
 					title : '交付时间',
 					sortable: true,
-					width:145
 				},
 				{
 					field : 'orderStatus', 
@@ -166,13 +166,11 @@
 					field : 'remark', 
 					title : '备注信息',
 					sortable: true,
-					width:300
 				},
 				{
 					field : 'createTime', 
 					title : '下单时间',
 					sortable: true,
-					width:145
 				},
 		        {
 		            title: '操作',
@@ -205,6 +203,13 @@
 		function addOrder() {
 			createMenuItem(prefix+"/add","订单下单")
 		}
+        /**
+         * 查看订单锁定的产品信息
+         */
+		function showLockPro(id) {
+            var url = $.common.isEmpty(id) ? $.table._option.showLockProUrl : $.table._option.showLockProUrl.replace("{id}", id);
+            $.modal.open("查看订单锁定产品信息", url);
+        }
 
 		/**
 		 * 订单取消

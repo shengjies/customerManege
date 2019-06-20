@@ -1,6 +1,9 @@
 package com.ruoyi.project.erp.orderDetails.controller;
 
 import java.util.List;
+
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +21,8 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 订单详情 信息操作处理
@@ -47,10 +52,27 @@ public class OrderDetailsController extends BaseController
 	@RequiresPermissions("erp:orderDetails:list")
 	@PostMapping("/list")
 	@ResponseBody
-	public TableDataInfo list(OrderDetails orderDetails)
+	public TableDataInfo list(OrderDetails orderDetails, HttpServletRequest request)
 	{
+		User user = JwtUtil.getTokenUser(request);
+		orderDetails.setCompanyId(user.getCompanyId());
 		startPage();
         List<OrderDetails> list = orderDetailsService.selectOrderDetailsList(orderDetails);
+		return getDataTable(list);
+	}
+
+	/**
+	 * 查询锁定库存大于0的订单明细信息
+	 */
+	@RequiresPermissions("erp:orderDetails:list")
+	@PostMapping("/listByPid")
+	@ResponseBody
+	public TableDataInfo listByPid(OrderDetails orderDetails, HttpServletRequest request)
+	{
+		User user = JwtUtil.getTokenUser(request);
+		orderDetails.setCompanyId(user.getCompanyId());
+		startPage();
+		List<OrderDetails> list = orderDetailsService.selectOrderDetailsListByPid(orderDetails);
 		return getDataTable(list);
 	}
 	

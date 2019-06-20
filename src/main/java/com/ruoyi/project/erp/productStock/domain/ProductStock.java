@@ -48,6 +48,10 @@ public class ProductStock extends BaseEntity {
      */
     private Integer goodNumber;
     /**
+     * 锁定库存
+     */
+    private Integer lockNumber;
+    /**
      * 不良品库存
      */
     private Integer badNumber;
@@ -63,6 +67,14 @@ public class ProductStock extends BaseEntity {
      * 最后一次修改时间
      */
     private Date lastUpdate;
+
+    public Integer getLockNumber() {
+        return lockNumber;
+    }
+
+    public void setLockNumber(Integer lockNumber) {
+        this.lockNumber = lockNumber;
+    }
 
     public void setId(Integer id) {
         this.id = id;

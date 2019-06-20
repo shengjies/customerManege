@@ -11,6 +11,8 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
+import com.ruoyi.project.erp.productStock.domain.ProductStock;
+import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,9 @@ public class OrderInfoServiceImpl implements IOrderInfoService
 
 	@Autowired
 	private OrderDetailsMapper detailsMapper;
+
+	@Autowired
+	private ProductStockMapper productStockMapper;
 
 	/**
      * 查询订单数据信息
@@ -156,12 +161,83 @@ public class OrderInfoServiceImpl implements IOrderInfoService
 
 
 	/**
-	 * 取消订单
+	 * 订单状态业务逻辑
 	 * @param orderInfo
 	 * @return
 	 */
 	@Override
-	public int cancelOrder(OrderInfo orderInfo) {
+	@Transactional(rollbackFor = Exception.class)
+	public int cancelOrder(OrderInfo orderInfo,HttpServletRequest request) {
+		User user = JwtUtil.getTokenUser(request);
+		if (user == null) {
+		    return 0;
+		}
+		// 订单状态
+		OrderInfo info = orderInfoMapper.selectOrderInfoById(orderInfo.getId());
+		Integer orderStatus = orderInfo.getOrderStatus();
+		OrderDetails orderDetails = new OrderDetails();
+		orderDetails.setCompanyId(user.getCompanyId());
+		orderDetails.setOrderId(orderInfo.getId());
+		ProductStock productStock = null;
+		List<OrderDetails> orderDetailsList = detailsMapper.selectOrderDetailsList(orderDetails);
+		if (StringUtils.isNotEmpty(orderDetailsList)) {
+			Integer totalLockNumber = 0;
+			/**
+			 * 订单审核过程
+			 */
+			if (StockConstants.ORDER_STATUS_TWO.equals(orderStatus)) {
+				for (OrderDetails details : orderDetailsList) {
+					// 订单明细数量
+					Integer number = details.getNumber();
+					productStock = productStockMapper.selectProductStockByProId(details.getProductId());
+					if (StringUtils.isNull(productStock)) {
+						throw new BusinessException("没有所下订单库存记录信息");
+					}
+					// 库存良品数量
+					Integer goodNumber = productStock.getGoodNumber();
+					if (number <= goodNumber) {
+						totalLockNumber += number;
+						// 库存足够，订单明细锁定库存数量,锁定订单明细数量
+						details.setLockNumber(number);
+						productStock.setGoodNumber(goodNumber - number);
+						productStock.setLockNumber(productStock.getLockNumber() + number);
+					} else {
+						totalLockNumber += goodNumber;
+						//库存不足，订单明细锁定库存数量,良品库存数量全部锁定
+						details.setLockNumber(goodNumber);
+						productStock.setGoodNumber(0);
+						productStock.setLockNumber(productStock.getLockNumber() + goodNumber);
+					}
+					// 订单明细锁定总数增加
+					detailsMapper.updateOrderDetails(details);
+					productStockMapper.updateProductStock(productStock);
+				}
+				orderInfo.setLockNumber(info.getLockNumber() + totalLockNumber);
+				/**
+				 * 取消订单
+				 */
+			} else if (StockConstants.ORDER_STATUS_FOUR.equals(orderStatus)) {
+				for (OrderDetails details : orderDetailsList) {
+					// 库存数量操作
+					productStock = productStockMapper.selectProductStockByProId(details.getProductId());
+					if (StringUtils.isNull(productStock)) {
+						throw new BusinessException("没有所下订单库存记录信息");
+					}
+					productStock.setGoodNumber(productStock.getGoodNumber() + details.getLockNumber());
+					productStock.setLockNumber(productStock.getLockNumber() - details.getLockNumber() <= 0?
+							0:productStock.getLockNumber() - details.getLockNumber());
+					// 订单主表锁定数量减少
+					totalLockNumber += details.getLockNumber();
+					// 订单明细锁定库存数量减少为0
+					details.setLockNumber(0);
+
+					detailsMapper.updateOrderDetails(details);
+					productStockMapper.updateProductStock(productStock);
+				}
+				orderInfo.setLockNumber(info.getLockNumber() - totalLockNumber <= 0 ?
+						0:info.getLockNumber() - totalLockNumber);
+			}
+		}
 		return orderInfoMapper.updateOrderInfo(orderInfo);
 	}
 

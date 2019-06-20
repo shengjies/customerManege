@@ -136,8 +136,12 @@ public class OrderInfoController extends BaseController
 	@Log(title = "订单数据", businessType = BusinessType.UPDATE)
 	@PostMapping("/cancel")
 	@ResponseBody
-	public AjaxResult cancelOrder(OrderInfo orderInfo){
-		return toAjax(orderInfoService.cancelOrder(orderInfo));
+	public AjaxResult cancelOrder(OrderInfo orderInfo,HttpServletRequest request){
+		try {
+			return toAjax(orderInfoService.cancelOrder(orderInfo,request));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 	
 	/**
@@ -178,5 +182,14 @@ public class OrderInfoController extends BaseController
 		} catch (BusinessException e) {
 			return error(e.getMessage());
 		}
+	}
+
+	/**
+	 * 查看订单锁定的产品信息
+	 */
+	@GetMapping("/showLockPro/{id}")
+	public String showLockPro(@PathVariable("id") Integer id,ModelMap modelMap){
+		modelMap.put("id",id);
+		return prefix + "/lockProduct";
 	}
 }

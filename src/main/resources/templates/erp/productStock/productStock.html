@@ -91,6 +91,7 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
+                showLockDetailUrl:prefix + "/showLockDetail/{id}",
                 modalName: "产品库存",
                 search: false,
                 showExport: false,
@@ -121,10 +122,11 @@
 				},
 				{
 					field : 'goodNumber', 
-					title : '良品库存',
+					title : '可用库存/锁定库存',
 					sortable: true,
                     formatter: function (value, row, index) {
-						return '<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="handleProStock(\'' + row.productId + '\')"><i></i>'+ row.goodNumber +'</a> '
+						return '<a href="javascript:void(0)" onclick="handleProStock(\'' + row.productId + '\')"><span style="font-weight: bold;color: green">'+ row.goodNumber +'</span></a> '+'/'+
+							'<a href="javascript:void(0)" onclick="showLockDetail('+ row.productId+')"><span style="font-weight: bold;color: red">'+ row.lockNumber +'</span></a>'
                     }
 				},
 				{
@@ -142,11 +144,6 @@
                     formatter: function (value, row, index) {
                         return '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="handleProStock(\'' + row.productId + '\')"><i></i>'+ row.scrapNumber +'</a> '
                     }
-				},
-				{
-					field : 'createTime', 
-					title : '创建时间',
-					sortable: true
 				},
 				{
 					field : 'lastUpdate', 
@@ -174,6 +171,14 @@
          */
         function handlePro() {
             createMenuItem("/erp/stockHandle/handleStock?handleType=0","查看产品库存内部调整列表")
+        }
+
+        /**
+         * 查看锁定库存明细
+         */
+        function showLockDetail(productId) {
+            var url = $.common.isEmpty(productId) ? $.table._option.showLockDetailUrl : $.table._option.showLockDetailUrl.replace("{id}", productId);
+            $.modal.open("查看库存锁定明细", url);
         }
 
         /**

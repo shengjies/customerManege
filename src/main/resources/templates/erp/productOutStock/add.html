@@ -80,10 +80,10 @@
                             <tr>
                                 <th>产品编码</th>
                                 <th>产品型号</th>
-                                <th>库存数量</th>
-                                <th>客户编码</th>
                                 <th>订单号</th>
                                 <th>订单数量</th>
+                                <th>锁定数量</th>
+                                <th>客户编码</th>
                                 <th>已交货数量</th>
                                 <th style="width: 100px">本次出库数量</th>
                                 <th>操作</th>
@@ -147,20 +147,19 @@
                 for (var i = 0; i < data.length; i++) {
                     item.push("<option value='" + data[i].productCode + "' data-product-id='" + data[i].id + "' " +
                         "data-product-model='" + data[i].productModel + "'" +
-                        "data-product-goodnum='" + data[i].goodNumber + "'" +
                         " data-product-name='" + data[i].productName + "'>" + data[i].productCode + "</option>")
                 };
                 var textDetail = '<tr>' +
                     '<td><select name="prodectCode" class="selectpicker show-tick form-control"  data-live-search="true" ' +
                     'style="min-width: 150px;" onchange="productChange(this)" >' + item +
                     '<td><input name="productModel" class="form-control" type="text" readonly="true"></td>' +
-                    '<td><input name="goodNumber" class="form-control" type="text" readonly="true"></td>' +
-                    '<td><input name="customerCode" class="form-control" type="text" readonly="true"></td>' +
                     '</select></td>' +
                     '<td><select id="orderCode" name="orderCode" class="selectpicker show-tick form-control"  data-live-search="true" ' +
                     'style="min-width: 150px;" onchange="orderChange(this)" >' +
                     '</select></td>' +
                     '<td><input name="number" class="form-control" type="text" readonly="true"></td>' +
+                    '<td><input name="lockNumber" class="form-control" type="text" readonly="true"></td>' +
+                    '<td><input name="customerCode" class="form-control" type="text" readonly="true"></td>' +
                     '<td><input name="deliverNum" class="form-control" type="text" readonly="true"></td>' +
                     '<td><input name="outNumber" class="form-control" type="number" value="0"></td>' +
                     '<td><a  class="btn btn-primary btn-rounded btn-sm" onclick="removeRow(this)"><i></i>&nbsp;删除</a></td>' +
@@ -190,7 +189,7 @@
     function productChange(val) {
         // 每次选择改变前清空上次数据
         $(val).parent("td").siblings("td").find("input[name='productModel']").val("");
-        $(val).parent("td").siblings("td").find("input[name='goodNumber']").val("");
+        $(val).parent("td").siblings("td").find("input[name='lockNumber']").val("");
         $(val).parent("td").siblings("td").find("input[name='customerCode']").val("");
         $(val).parent("td").siblings("td").find("select[name='orderCode']").find("option").remove(); // 移除订单下拉框选项
         $(val).parent("td").siblings("td").find("input[name='number']").val("");
@@ -205,7 +204,6 @@
                     if ($(val).val() != -1) {
                         var data = res.data;
                         $(val).parent("td").siblings("td").find("input[name='productModel']").val($(val).find("option:selected").attr("data-product-model"));
-                        $(val).parent("td").siblings("td").find("input[name='goodNumber']").val($(val).find("option:selected").attr("data-product-goodnum"));
                         $(val).parent("td").siblings("td").find("input[name='customerCode']").val(data.customerCode);
                         var item2 = [];
                         // 订单详情
@@ -213,7 +211,9 @@
                         item2.push("<option value='-1' >NA</option>")
                         for (var i = 0; i < orderDetails.length; i++) {
                             item2.push("<option value='" + orderDetails[i].orderCode + "' data-order-id='" + orderDetails[i].orderId + "' " +
-                                "data-order-number='" + orderDetails[i].number + "' data-order-deliverNum='" + orderDetails[i].deliverNum + "'>" + orderDetails[i].orderCode + "</option>")
+                                "data-order-number='" + orderDetails[i].number + "'" +
+                                "data-order-locknum='" + orderDetails[i].lockNumber + "'" +
+                                " data-order-deliverNum='" + orderDetails[i].deliverNum + "'>" + orderDetails[i].orderCode + "</option>")
                         }
                         $(val).parent("td").siblings("td").find("select[name='orderCode']").append(item2); // 添加
                     } else {
@@ -227,7 +227,7 @@
             })
         } else {
             $(val).parent("td").siblings("td").find("input[name='productModel']").val("");
-            $(val).parent("td").siblings("td").find("input[name='goodNumber']").val("");
+            $(val).parent("td").siblings("td").find("input[name='lockNumber']").val("");
             $(val).parent("td").siblings("td").find("input[name='customerCode']").val("");
             $(val).parent("td").siblings("td").find("select[name='orderCode']").find("option").remove(); // 移除订单下拉框选项
             $(val).parent("td").siblings("td").find("input[name='number']").val("");
@@ -243,6 +243,7 @@
     function orderChange(val) {
         $(val).parent("td").siblings("td").find("input[name='outNumber']").val("0");
         $(val).parent("td").siblings("td").find("input[name='number']").val($(val).find("option:selected").attr("data-order-number"));
+        $(val).parent("td").siblings("td").find("input[name='lockNumber']").val($(val).find("option:selected").attr("data-order-locknum"));
         $(val).parent("td").siblings("td").find("input[name='deliverNum']").val($(val).find("option:selected").attr("data-order-deliverNum"));
     }
 

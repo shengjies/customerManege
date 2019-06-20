@@ -217,3 +217,13 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = '仪器设备管理';
 
+
+# 添加库存锁定逻辑
+# 2019-06-20
+ALTER TABLE `octopus`.`tab_order_info`
+ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '锁定订单库存总数' AFTER `order_deliver_num`;
+ALTER TABLE `octopus`.`tab_order_details`
+ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '订单明细锁定库存数量' AFTER `deliver_num`;
+ALTER TABLE `octopus`.`tab_product_stock`
+ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '产品库存锁定数量' AFTER `good_number`;
+

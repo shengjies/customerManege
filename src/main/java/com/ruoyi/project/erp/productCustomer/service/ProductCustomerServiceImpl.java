@@ -129,8 +129,6 @@ public class ProductCustomerServiceImpl implements IProductCustomerService {
     @Override
     public ProductCustomer findCustomerCode(int cid, int pid,HttpServletRequest request) {
         User u = JwtUtil.getTokenUser(request);
-        // 产品信息
-//        DevProductList product = productMapper.selectDevProductListById(pid);
         // 客户产品关联
         ProductCustomer customerCode = productCustomerMapper.findCustomerCode(cid, pid);
         // 查询各公司已审核未交付完成的订单明细信息

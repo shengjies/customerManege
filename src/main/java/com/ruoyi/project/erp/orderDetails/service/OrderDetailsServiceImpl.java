@@ -79,5 +79,14 @@ public class OrderDetailsServiceImpl implements IOrderDetailsService
 	{
 		return orderDetailsMapper.deleteOrderDetailsByIds(Convert.toStrArray(ids));
 	}
-	
+
+	/**
+	 * 通过产品id查询订单明细大于0的库存信息
+	 * @param orderDetails 订单明细
+	 * @return 结果
+	 */
+	@Override
+	public List<OrderDetails> selectOrderDetailsListByPid(OrderDetails orderDetails) {
+		return orderDetailsMapper.selectOrderDetailsListByPid(orderDetails);
+	}
 }
