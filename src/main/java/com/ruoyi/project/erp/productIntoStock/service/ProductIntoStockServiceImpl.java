@@ -184,7 +184,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
                     productStock.setTotalNumber(productStock.getTotalNumber() + productIntoStockDetail.getIntoNumber());
                     // 更新不良品
                     productStock.setBadNumber(productStock.getBadNumber() + productIntoStockDetail.getIntoNumber());
-                    productStock.setLockNumber(productStock.getLockNumber() + productIntoStockDetail.getIntoNumber());
+                    //productStock.setLockNumber(productStock.getLockNumber() + productIntoStockDetail.getIntoNumber());
                     productStock.setLastUpdate(new Date());
                     // 更新产品库存
                     productStockMapper.updateProductStock(productStock);
@@ -205,19 +205,19 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
         OrderInfo orderInfo = orderInfoMapper.selectOrderInfoById(orderDetails.getOrderId());
         Integer deliverNum = orderDetails.getDeliverNum();
         if (deliverNum >= intoNumber) {
-            orderInfo.setLockNumber(orderInfo.getLockNumber() + intoNumber);
+            //orderInfo.setLockNumber(orderInfo.getLockNumber() + intoNumber);
             orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() - intoNumber);
             orderInfo.setOrderStatus(StockConstants.ORDER_STATUS_TWO);
-            orderDetails.setLockNumber(orderDetails.getLockNumber() + intoNumber);
+            //orderDetails.setLockNumber(orderDetails.getLockNumber() + intoNumber);
             orderDetails.setDeliverNum(deliverNum - intoNumber);
             intoNumber = 0;
         } else {
             orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() - deliverNum);
             // 锁定数量
-            orderInfo.setLockNumber(orderInfo.getLockNumber() + deliverNum);
+            //orderInfo.setLockNumber(orderInfo.getLockNumber() + deliverNum);
             orderInfo.setOrderStatus(StockConstants.ORDER_STATUS_TWO);
             orderDetails.setDeliverNum(0);
-            orderDetails.setLockNumber(orderDetails.getLockNumber() + deliverNum);
+            //orderDetails.setLockNumber(orderDetails.getLockNumber() + deliverNum);
             intoNumber = intoNumber - deliverNum;
         }
         // 更新订单、明细、库存
@@ -273,7 +273,7 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
             // 库存数量回滚
             ProductStock productStock = productStockMapper.selectProductStockByProId(productId);
             productStock.setTotalNumber(productStock.getTotalNumber() - backNumber);
-            productStock.setLockNumber(productStock.getLockNumber() - backNumber);
+            //productStock.setLockNumber(productStock.getLockNumber() - backNumber);
             productStock.setBadNumber(productStock.getBadNumber() - backNumber);
             productStock.setLastUpdate(new Date());
             productStockMapper.updateProductStock(productStock);
@@ -287,15 +287,15 @@ public class ProductIntoStockServiceImpl implements IProductIntoStockService {
                 Integer number = orderDetails.getNumber(); // 总交付数量
                 Integer difNumber = number - deliverNum; // 还未交付数量
                 if (difNumber >= backNumber) { // 未交付数量大于退货数量
-                    orderInfo.setLockNumber(orderInfo.getLockNumber() - backNumber);
+                    //orderInfo.setLockNumber(orderInfo.getLockNumber() - backNumber);
                     orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() + backNumber);
-                    orderDetails.setLockNumber(orderDetails.getLockNumber() - backNumber);
+                    //orderDetails.setLockNumber(orderDetails.getLockNumber() - backNumber);
                     orderDetails.setDeliverNum(orderDetails.getDeliverNum() + backNumber);
                     backNumber = 0;
                 } else { // 未交付数量小于退货数量
-                    orderDetails.setLockNumber(orderDetails.getLockNumber() - difNumber);
+                    //orderDetails.setLockNumber(orderDetails.getLockNumber() - difNumber);
                     orderDetails.setDeliverNum(orderDetails.getNumber());
-                    orderInfo.setLockNumber(orderInfo.getLockNumber() - difNumber);
+                    //orderInfo.setLockNumber(orderInfo.getLockNumber() - difNumber);
                     orderInfo.setOrderDeliverNum(orderInfo.getOrderDeliverNum() + difNumber);
                     backNumber = backNumber - difNumber;
                 }

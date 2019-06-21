@@ -383,7 +383,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (productionLine.getDeviceLiable() != userId.intValue() && productionLine.getDeviceLiableTow() != userId.intValue()) {
             throw new BusinessException("不是工单负责人");
         }
-        if (devWorkOrder.getWorkSign() == WorkConstants.WORK_SIGN_YES) {
+        if (devWorkOrder.getWorkSign().equals(WorkConstants.WORK_SIGN_YES)) {
             throw new BusinessException("该工单已经提交过，不能重复提交");
         }
         devWorkOrder.setWorkSign(WorkConstants.WORK_SIGN_YES); // 设置状态为已确认数据不可进行修改和删除
