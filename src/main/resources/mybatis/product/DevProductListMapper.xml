@@ -151,7 +151,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--根据订单id查询对应的产品信息-->
     <select id="findProductByOrderId" resultMap="DevProductListResult">
-      SELECT prodect_code as product_code,product_id as  id FROM erpstock.tab_order_details where order_id = #{orderId};
+      SELECT prodect_code as product_code,product_id as  id FROM tab_order_details where order_id = #{orderId};
     </select>
 
     <!--根据产品编码查询对公司下的产品信息-->

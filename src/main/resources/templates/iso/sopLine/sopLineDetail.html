@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <input type="hidden" id="isoId" name="sopId" th:value="${isoId}">
+                    <ul>
+                        <li>
+                            产线：
+                            <select name="lineId" th:with="lineList=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
+                                <option value="-1">请选择</option>
+                                <option th:each="item : ${lineList}"  th:text="${item.lineName}" th:value="${item.id}"></option>
+                            </select>
+                        </li>
+
+                        <li>
+                            产品编码：<input type="text" name="pnCode"/>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "iso/sopLine";
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add/{id}",
+            updateUrl: prefix + "/edit",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "作业指导书产线配置",
+            search: false,
+            showExport: false,
+            showSearch: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            columns: [
+                {
+                    field : 'id',
+                    title : '',
+                    visible: false
+                },
+                {
+                    field : 'lineId',
+                    title : '产线',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return row.lineName;
+                    }
+                },
+                {
+                    field : 'pnCode',
+                    title : '产品编码',
+                    sortable: true
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId")
+    });
+</script>
+</body>
+</html>

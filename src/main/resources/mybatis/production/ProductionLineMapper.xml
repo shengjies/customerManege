@@ -124,7 +124,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--查询产线已经配置的硬件信息-->
     <select id="selectLineDev" resultType="java.util.Map">
         SELECT a.id as dev_id,a.device_name,b.id as io_d,b.io_name,b.is_sign FROM
-         devicemanage.dev_io as b,dev_list as a where b.line_id = #{id} and a.id = b.dev_id;
+         dev_io as b,dev_list as a where b.line_id = #{id} and a.id = b.dev_id;
     </select>
 
     <!--清空相关产线IO配置-->

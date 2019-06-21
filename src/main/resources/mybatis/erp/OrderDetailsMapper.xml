@@ -181,7 +181,7 @@
     </select>
 
     <select id="findByOrderCodeAndProductCode" resultMap="OrderDetailsResult">
-      SELECT * FROM erpstock.tab_order_details where company_id = #{companyId}
+      SELECT * FROM tab_order_details where company_id = #{companyId}
        and order_code =#{orderCode} and prodect_code=#{productCode} limit 1;
     </select>
 

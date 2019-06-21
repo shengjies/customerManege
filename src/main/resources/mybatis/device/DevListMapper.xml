@@ -146,7 +146,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectAll" resultType="com.ruoyi.project.device.devList.domain.DevList" >
-        SELECT id,device_name as deviceName  FROM devicemanage.dev_list where device_status = 1 and  company_id =#{company_id};
+        SELECT id,device_name as deviceName  FROM dev_list where device_status = 1 and  company_id =#{company_id};
     </select>
 
     <!--根据硬件编号查询对应的硬件是否存在-->

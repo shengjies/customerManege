@@ -52,7 +52,7 @@ public class SopLineController extends BaseController
 	private IWorkstationService workstationService;
 
 	@Autowired
-	private IProductionLineService lineService; // 产线
+	private IProductionLineService lineService;
 
 	@RequiresPermissions("iso:sopLine:list")
 	@GetMapping("/view/{id}")
@@ -60,6 +60,14 @@ public class SopLineController extends BaseController
 	{
 		mmap.put("isoId",isoId);
 	    return prefix + "/sopLine";
+	}
+
+	@RequiresPermissions("iso:sopLine:list")
+	@GetMapping("/showDetail/{id}")
+	public String showdetail(@PathVariable("id") Integer isoId, ModelMap mmap)
+	{
+		mmap.put("isoId",isoId);
+		return prefix + "/sopLineDetail";
 	}
 	
 	/**

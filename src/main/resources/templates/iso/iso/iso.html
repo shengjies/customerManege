@@ -61,6 +61,7 @@
             removeUrl: prefix + "/remove/{id}",
             createUploadUrl: prefix + "/fileupload/{id}",
             createSopLineUrl: "/iso/sopLine/view/{id}",
+            createShowSopLineUrl: "/iso/sopLine/showDetail/{id}",
             search: false,
             showExport: false,
             showSearch:false,
@@ -95,7 +96,8 @@
                             actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.isoId + '\')"><i class="fa fa-remove"></i>删除</a> ');
                         }
                         if (row.category == 4 ) { // 作业指导书目录
-                            actions.push('<a class="btn btn-success btn-xs ' + sopLineFlag + '" href="#" onclick="setLineInfo(\'' + row.isoId + '\')"><i class="fa fa-gear"></i>配置产线</a>');
+                            actions.push('<a class="btn btn-success btn-xs ' + sopLineFlag + '" href="#" onclick="setLineInfo(\'' + row.isoId + '\')"><i class="fa fa-gear"></i>配置产线</a> ');
+                            actions.push('<a class="btn btn-warning btn-xs ' + sopLineFlag + '" href="#" onclick="showLineInfo(\'' + row.isoId + '\')"><i class="fa fa-eye"></i>配置明细</a>');
                         }
                         return actions.join('');
                     }
@@ -247,6 +249,14 @@
     function setLineInfo(isoId) {
         var url = $.common.isEmpty(isoId) ? $.table._option.createSopLineUrl : $.table._option.createSopLineUrl.replace("{id}", isoId);
         createMenuItem(url,"SOP产线配置");
+    }
+    /**
+     * 查看配置明细
+     * @param isoId 作业指导书id
+     */
+    function showLineInfo(isoId) {
+        var url = $.common.isEmpty(isoId) ? $.table._option.createShowSopLineUrl : $.table._option.createShowSopLineUrl.replace("{id}", isoId);
+        $.modal.open("配置明细", url);
     }
 </script>
 </body>

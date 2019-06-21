@@ -42,11 +42,26 @@
             var msg = data.response.msg;
             if (code == web_status.FAIL) {
                 $.modal.alertError(msg);
+            } else {
+                $.modal.confirm("上传成功",function () {
+                    submitHandler();
+                })
             }
         });
     });
 
     function submitHandler() {
+        var fileLength = $(".file-upload-indicator").length;
+        var sum = 0;
+        $(".file-upload-indicator").each(function () {
+            if ($(this).attr("title") == '上传') {
+                sum++;
+            }
+        })
+        if (fileLength != sum) {
+            $.modal.alertError("还有文件未上传，请点击上传");
+            return;
+        }
         $.modal.close();
         window.parent.$.table.refresh();
     }
