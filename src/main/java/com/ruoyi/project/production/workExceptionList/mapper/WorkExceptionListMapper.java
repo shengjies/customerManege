@@ -83,4 +83,18 @@ public interface WorkExceptionListMapper
 	 */
 //	@DataSource(value = DataSourceType.SLAVE)
 	List<WorkExceptionList> selectWorkExceByWorkId(@Param("workIds")String workIds);
+
+	/**
+	 * 根据工单id查询未处理的异常信息是否存在
+	 * @param wid 工单id
+	 * @return
+	 */
+	WorkExceptionList selectWorkExceNotByWorkId(@Param("wid")int wid);
+
+	/**
+	 * 根据工单id查询所以工单异常信息
+	 * @param wid 工单id
+	 * @return
+	 */
+	List<WorkExceptionList> selectWorkExceAllByWorkId(@Param("wid")int wid);
 }

@@ -193,6 +193,12 @@ ADD COLUMN `te_user` INT NULL COMMENT '测试员' AFTER `me_user`;
 ALTER TABLE `octopus`.`dev_work_order`
 ADD COLUMN `put_into_number` INT NULL COMMENT '投入产量' AFTER `sign`;
 
+
+#=======2019-06-19 zsj 添加标记工单用时
+ALTER TABLE `octopus`.`dev_work_order`
+ADD COLUMN `sign_time` DATETIME NULL COMMENT '标记开始时间' AFTER `put_into_number`,
+ADD COLUMN `sign_huor` FLOAT(10,1) NULL DEFAULT 0 AFTER `sign_time`;
+
 # 添加仪器设备管理
 # 2019-06-19
 CREATE TABLE `octopus`.`tab_instrument_manage` (
@@ -217,6 +223,9 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = '仪器设备管理';
 
+ALTER TABLE `devicemanage`.`sys_user`
+ADD UNIQUE INDEX `login_name_uindex` (`login_name` ASC) VISIBLE;
+;
 
 # 添加库存锁定逻辑
 # 2019-06-20

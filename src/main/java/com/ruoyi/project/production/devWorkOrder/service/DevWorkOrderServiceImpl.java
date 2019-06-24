@@ -10,7 +10,6 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devIo.domain.DevIo;
@@ -272,10 +271,13 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 devWorkOrder.setUpdateBy(user.getUserName());
                 //将其工单对应的数据需要重新记录初始值
                 devWorkDataMapper.updateWorkSigInit(devWorkOrder.getId());
+                //计数时间
+                devWorkOrder.setSignHuor(devWorkOrder.getSignHuor()+TimeUtil.getDateDel(devWorkOrder.getSignTime(),new Date()));
             } else if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_PAUSE)) {
                 //页面点击开始按钮继续工单生产
                 devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);
                 devWorkOrder.setUpdateBy(user.getUserName());
+                devWorkOrder.setSignTime(new Date());
             }
         }
         //首次点击开始，工单处于未进行、未开始的状态，页面点击开始按钮
@@ -283,14 +285,13 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_NOSTART)) {
                 // 实际开始时间
                 devWorkOrder.setStartTime(new Date());
+                devWorkOrder.setStartTime(new Date());  // 实际开始时间
+                devWorkOrder.setSignTime(new Date());//标记开始时间
+                devWorkOrder.setSignHuor(0F);//标记用时
             }
-            // 修改工单的状态为进行中
-            devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);
-            // 修改工单的操作状态为正在进行，页面显示暂停按钮
-            devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);
-            // 工单的更新者
-            devWorkOrder.setUpdateBy(user.getUserName());
-
+            devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);  // 修改工单的状态为进行中
+            devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);   // 修改工单的操作状态为正在进行，页面显示暂停按钮
+            devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
             // 通过产线id获取各个工位信息
             List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(),devWorkOrder.getLineId());
             WorkData workData = null;
@@ -361,6 +362,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         devWorkOrder.setEndTime(new Date()); // 设置结束时间
         devWorkOrder.setUpdateBy(tokenUser.getUserName());
         devWorkOrder.setUpdateTime(new Date());
+        if(devWorkOrder.getSignTime() != null){
+            devWorkOrder.setSignHuor(devWorkOrder.getSignHuor()+TimeUtil.getDateDel(devWorkOrder.getSignTime(),new Date()));
+        }
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder); // 更新
     }
 
@@ -386,6 +390,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (devWorkOrder.getWorkSign().equals(WorkConstants.WORK_SIGN_YES)) {
             throw new BusinessException("该工单已经提交过，不能重复提交");
         }
+        //计数生产用时
+//        devWorkOrder.setSignHuor(devWorkOrder.getSignHuor()+TimeUtil.getDateDel(devWorkOrder.getSignTime(),new Date()));
         devWorkOrder.setWorkSign(WorkConstants.WORK_SIGN_YES); // 设置状态为已确认数据不可进行修改和删除
         devWorkOrder.setUpdateTime(new Date());
         devWorkOrder.setUpdateBy(tokenUser.getUserName());
@@ -456,13 +462,18 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 if (data != null) order.setCumulativeNumber(data.getCumulativeNum());
             }
         }
+        float standardHour = order.getSignHuor();
         //达成率默认为0
         order.setReachRate(0.0F);
-        if (!StringUtils.isEmpty(order.getStartTime()) && order.getCumulativeNumber() != null) {
-            //计算分母
-            float standardTotal = order.getProductStandardHour() * TimeUtil.getDateDel(order.getStartTime());
-            order.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) order.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
+        if (order.getWorkorderStatus() == WorkConstants.WORK_STATUS_STARTING && order.getCumulativeNumber() != null) {
+            //计数标准产量
+            if(order.getOperationStatus() == WorkConstants.OPERATION_STATUS_STARTING){//工单正在开始中
+                standardHour += TimeUtil.getDateDel(order.getSignTime(),new Date());
+            }
+            int standardTotal = (int)(order.getProductStandardHour()*standardHour);
+            order.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) order.getCumulativeNumber() / ((float)standardTotal))*100).setScale(2, BigDecimal.ROUND_HALF_UP).floatValue());
         }
+        order.setSignHuor(standardHour);
         return order;
     }
 

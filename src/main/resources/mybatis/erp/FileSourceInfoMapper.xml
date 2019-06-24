@@ -77,4 +77,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectFileSourceInfoVo"/>
         where save_id = #{saveId} and company_id = #{companyId}
     </select>
+
+    <!--根据产品id和公司id查询对应的产品文件信息-->
+    <select id="selectFileSourceBySaveIdAndComId" resultMap="FileSourceInfoResult">
+        SELECT file_path,file_name,create_time FROM tab_file_source_info
+        where company_id = #{companyId} and save_type = 5 and save_id=#{saveId};
+    </select>
 </mapper>

@@ -6,6 +6,10 @@ import java.util.List;
 
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.device.devList.domain.DevList;
+import com.ruoyi.project.device.devList.mapper.DevListMapper;
+import com.ruoyi.project.product.list.domain.DevProductList;
+import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,12 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
 {
 	@Autowired
 	private FileSourceInfoMapper fileSourceInfoMapper;
+
+	@Autowired
+	private DevListMapper devListMapper;
+
+	@Autowired
+	private DevProductListMapper productListMapper;
 
 	/**
      * 查询文件素材管理列表
@@ -76,5 +86,26 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
 		}
 		return fileSourceInfoMapper.deleteFileSourceInfoByIds(Convert.toStrArray(ids));
 	}
-	
+
+	/**
+	 * 根据硬件编号和产品编码查询对应的产品文件信息
+	 * @param dCode 硬件编码
+	 * @param pCode 产品编码
+	 * @return
+	 * @throws Exception
+	 */
+	@Override
+	public List<FileSourceInfo> selectFileSourceByDCodeAndPCode(String dCode, String pCode) throws Exception {
+		//判断对应的硬件编码是否存在
+		DevList devList = devListMapper.selectDevListByCode(dCode);
+		if(devList == null || devList.getCompanyId() ==null){
+			throw  new Exception("硬件不存在");
+		}
+		//产线对应的产品是否存在
+	    DevProductList productList = productListMapper.selectDevProductByCode(devList.getCompanyId(),pCode);
+		if(productList == null){
+			throw new Exception("产品不存在");
+		}
+		return fileSourceInfoMapper.selectFileSourceBySaveIdAndComId(productList.getId(),productList.getCompanyId());
+	}
 }

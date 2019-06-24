@@ -44,11 +44,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ecnStatus"    column="ecn_status"    />
         <result property="ecnText"    column="ecn_text"    />
         <result property="sign"    column="sign"    />
+        <result property="putIntoNumber"    column="put_into_number"    />
+        <result property="signTime"    column="sign_time"    />
+        <result property="signHuor"    column="sign_huor"    />
     </resultMap>
     <sql id="selectDevWorkOrderVo">
         select id, workorder_name, workorder_number, company_id, line_id, product_name, product_code, product_number, production_start, production_end, start_time, end_time, product_standard_hour, create_time, create_by, update_time, device_liable, update_by, people_number, working_hour, overtime_hour,
         overtime_race, manual_time, workorder_status, operation_status, init_date, work_sign, scrap_num, actual_warehouse_num,
-        cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign from dev_work_order
+        cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign,
+         put_into_number,sign_time,sign_huor from dev_work_order
     </sql>
 
     <select id="selectDevWorkOrderList" parameterType="DevWorkOrder" resultMap="DevWorkOrderResult">
@@ -220,6 +224,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderCode != null  ">order_code =#{orderCode},</if>
             <if test="ecnStatus != null  ">ecn_status =#{ecnStatus},</if>
             <if test="ecnText != null  ">ecn_text =#{ecnText},</if>
+            <if test="putIntoNumber != null  ">put_into_number =#{putIntoNumber},</if>
+            <if test="signTime != null  ">sign_time =#{signTime},</if>
+            <if test="signHuor != null  ">sign_huor =#{signHuor},</if>
             update_time = sysdate()
         </trim>
         where id = #{id}
@@ -265,8 +272,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!--查询当天排版计划-->
-    <select id="selectDayWorkOrder" resultType="java.lang.String">
-      SELECT workorder_number FROM dev_work_order where company_id= #{company_id} and line_id = #{line_id} and production_start = date_format(now(),'%y%m%d');
+    <select id="selectDayWorkOrder" resultMap="DevWorkOrderResult">
+      select id, workorder_number,  operation_status FROM
+      dev_work_order where company_id= #{company_id} and line_id = #{line_id}
+      and production_start = date_format(now(),'%y%m%d');
     </select>
 
     <!--查询当天所有的排班计划-->

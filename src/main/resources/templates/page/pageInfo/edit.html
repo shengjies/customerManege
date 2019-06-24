@@ -59,150 +59,45 @@
 							<div id="detail_pane" th:with="layout =${@layout.selectLayoutAll(0)}">
 								<div th:data-detail="${lay.id}" th:each="lay : ${layout}"  >
 									<div class="col-sm-12" th:if="${lay.layout_type == 1}">
-										<div class="row" th:with="init =${@page.selectPageInitInfo(1,#httpServletRequest.getCookies())}" >
-											<div th:if="${init == null or init['line'] == null }" class="col-sm-6">
-												<h4 style="color: red">请建立相关产线或者产线配置相关硬件...</h4>
-											</div>
-											<div th:if="${init != null and init['line'] != null }" class="col-sm-6" th:each="i:${#numbers.sequence(1,lay.layout_num)}">
-												<div th:style="${i > 2 ? 'margin-top: 15px;':''}" class="panel panel-primary">
-													<div class="panel-heading">
-														宮格<span th:text="${i}"></span>
-													</div>
-													<div class="panel-body">
-														<div class="form-group"  >
-															<label>生产线</label>
-															<select  class="form-control m-b" name="line">
-																<option th:each="line : ${init['line']}" th:selected="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].lineId != null and pageInfo.configs[i - 1].lineId == line.id?true:false }" th:text="${line.lineName}" th:value="${line.id}"></option>
-															</select>
-														</div>
-														<div class="form-group">
-															<label>采样数据名称</label>
-															<select  class="form-control m-b" name="io">
-																<option th:each="ios : ${init[not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].lineId != null?pageInfo.configs[i - 1].lineId+'':init['line'][0].id+'']}" th:selected="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioId != null and pageInfo.configs[i - 1].ioId == ios.id?true:false }" th:text="${ios.remark + '-' + ios.ioName}" th:value="${ios.id}"></option>
-															</select>
-														</div>
-														<div class="form-group">
-															<label>采样数据名称</label>
-															<select  class="form-control m-b" name="io1">
-																<option th:each="ios : ${init[not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].lineId != null?pageInfo.configs[i - 1].lineId+'':init['line'][0].id+'']}" th:selected="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioId1 != null and pageInfo.configs[i - 1].ioId1 == ios.id?true:false }" th:text="${ios.remark + '-' + ios.ioName}" th:value="${ios.id}"></option>
-															</select>
-														</div>
-														<div class="form-group">
-															<div data-checke-info class="col-sm-12">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="gd" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('gd')?true:false }"  id="inlineCheckbox1">工单号</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ygrs" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('ygrs')?true:false }"  id="inlineCheckbox3">用工人数</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="zcgs" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('zcgs')?true:false }" id="inlineCheckbo4">正常工时</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbgs" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('jbgs')?true:false }" id="inlineCheckbox5">加班工时</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbbl" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('jbbl')?true:false }" id="inlineCheckbox2">加班倍率</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ycqk" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('ycqk')?true:false }" id="inlineCheckbox6">异常情况</label>
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="dtgdjh" th:checked="${not #lists.isEmpty(pageInfo.configs) and pageInfo.configs.size() == lay.layout_num and pageInfo.configs[i - 1].ioConfig != null and pageInfo.configs[i - 1].ioConfig.containsKey('dtgdjh')?true:false }" id="inlineCheckbox7">当天工单计划</label>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
+										<div th:if="${lines == null}" class="col-sm-6">
+											<h4 style="color: red">请建立产线...</h4>
 										</div>
-									</div>
-									<div class="col-sm-12" th:if="${lay.layout_type == 2}">
-										<div th:if="${page1 == null}" class="col-sm-6">
-											<h4 style="color: red">请建立相关页面...</h4>
-										</div>
-										<div  class="panel panel-primary" th:if="${page1 != null}">
+										<div  class="panel panel-primary" th:if="${lines != null}">
 											<div class="panel-heading">
-												<span>轮播页面</span>
+												<span>请选择相关产线</span>
 											</div>
 											<div class="panel-body">
 												<div class="form-group">
 													<div data-checke-info class="col-sm-12">
-														<label class="checkbox-inline" th:each="p : ${page1}">
-															<input type="checkbox" th:checked="${p.exist}" th:value="${p.pageUrl}" th:data-id="${p.id}"  id="page1"><span th:text="${p.pageName}"></span>
+														<label class="checkbox-inline" th:if="${pageInfo.pageType == 1}" th:data-line-id="${item.id}"  th:each="item : ${lines}">
+															<input type="checkbox" onchange="hzCheck(this)" th:checked="${item.manual == 1 ?true:false}" th:value="${item.id}" style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;" th:text="${item.lineName}"></span>
+														</label>
+														<label class="checkbox-inline" th:if="${pageInfo.pageType != 1}" th:data-line-id="${item.id}"  th:each="item : ${lines}" >
+															<input type="checkbox" onchange="hzCheck(this)" th:value="${item.id}"   style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;" th:text="${item.lineName}"></span>
 														</label>
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-									<div class="col-sm-10" th:if="${lay.layout_type == 3}" th:with="ph =${@page.selectPageInitInfo(1,#httpServletRequest.getCookies())}">
-										<div th:if="${ph == null}" class="col-sm-6">
-											<h4 style="color: red">请建立相关产线...</h4>
+									<div class="col-sm-12" th:if="${lay.layout_type == 2}">
+										<div th:if="${lines == null}" class="col-sm-6">
+											<h4 style="color: red">请建立产线...</h4>
 										</div>
-										<div  class="panel panel-primary" th:if="${ph != null}">
+										<div  class="panel panel-primary" th:if="${lines != null}">
 											<div class="panel-heading">
-												<span>生产平衡</span>
+												<span>请选择相关产线</span>
 											</div>
 											<div class="panel-body">
-												<div class="form-group"  >
-													<label>生产线</label>
-													<select  class="form-control m-b" name="line">
-														<option th:each="line : ${ph['line']}" th:text="${line.lineName}" th:selected="${pageInfo.pageType == 3 and not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].lineId != null and pageInfo.configs[0].lineId == line.id?true:false }"  th:value="${line.id}"></option>
-													</select>
-												</div>
-												<div class="row">
-													<div class="col-sm-6">
-														<ul class="list-group" id="gd-info-li">
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="gd" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('gd')?true:false }"  >工单号</label>
-															</li>
-															<li class="list-group-item ">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ygrs" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('ygrs')?true:false }" >用工人数</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="zcgs" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('zcgs')?true:false }"  >正常工时</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbgs" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('jbgs')?true:false }" >加班工时</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="jbbl" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('jbbl')?true:false }" >加班倍率</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="ycqk" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('ycqk')?true:false }"  >异常情况</label>
-															</li>
-															<li class="list-group-item">
-																<label class="checkbox-inline">
-																	<input type="checkbox" value="dtgdjh" th:checked="${pageInfo.pageType == 3 and  not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].ioConfig != null and pageInfo.configs[0].ioConfig.containsKey('dtgdjh')?true:false }" >当天工单计划</label>
-															</li>
-														</ul>
+												<div class="form-group">
+													<div data-checke-info class="col-sm-12">
+														<label class="checkbox-inline" th:if="${pageInfo.pageType == 2}" th:data-line-id="${item.id}"  th:each="item : ${lines}">
+															<input type="radio" name="line" th:checked="${item.manual == 1 ?true:false}" th:value="${item.id}"   style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;"  th:text="${item.lineName}"></span>
+														</label>
+														<label class="checkbox-inline" th:if="${pageInfo.pageType != 2}" th:data-line-id="${item.id}"  th:each="item : ${lines}">
+															<input type="radio" name="line"  th:value="${item.id}"  style="width: 20px;height: 20px" ><span style="line-height: 25px;margin-left: 10px;"  th:text="${item.lineName}"></span>
+														</label>
 													</div>
-													<div class="col-sm-6" id="dev-io-ul" th:if="${not #lists.isEmpty(pageInfo.configs)}">
-														<ul class="list-group"  th:if="${  pageInfo.configs[0] != null and pageInfo.configs[0].lineId != null and  ph[pageInfo.configs[0].lineId+''] != null }">
-															<li class="list-group-item"  th:each="ios : ${ph[pageInfo.configs[0].lineId+'']}">
-																<label class="checkbox-inline">
-																	<input type="checkbox" th:value="${ios.id}" checked th:text="${ios.remark + '-' + ios.ioName}"></label>
-															</li>
-														</ul>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-sm-10" th:if="${lay.layout_type == 4}" th:with="ph =${@page.selectPageInitInfo(1,#httpServletRequest.getCookies())}">
-										<div th:if="${ph == null}" class="col-sm-6">
-											<h4 style="color: red">请建立相关产线...</h4>
-										</div>
-										<div  class="panel panel-primary" th:if="${ph != null}">
-											<div class="panel-heading">
-												<span>生产平衡</span>
-											</div>
-											<div class="panel-body">
-												<div class="form-group"  >
-													<label>生产线</label>
-													<select  class="form-control m-b" name="line">
-														<option th:each="line : ${ph['line']}" th:text="${line.lineName}" th:selected="${pageInfo.pageType == 4 and not #lists.isEmpty(pageInfo.configs)  and pageInfo.configs[0].lineId != null and pageInfo.configs[0].lineId == line.id?true:false }"  th:value="${line.id}"></option>
-													</select>
 												</div>
 											</div>
 										</div>
@@ -335,44 +230,16 @@
 		})
 	})
 
-	$(document).on("change","select[name='line']",function () {
-		var line_id = $(this).find("option:selected").val();
-		var than = this;
-		var layoutType = $("#layout_type").find("option:selected").attr("layout-type");
-		$.post("/device/devIo/byLineId",{"lien_id":line_id},function (data) {
-			if(data.rows){
-				if(layoutType ==  1) {
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io']").find("option").remove();
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io1']").find("option").remove();
-					var item = [];
-					data.rows.forEach(function (io) {
-						item.push("<option  value=" + io.id + ">" + io.remark + '-' + io.ioName + "</option>")
-					});
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io']").append(item);
-					$(than).parent("div[class='form-group']").siblings("div[class='form-group']").find("select[name='io1']").append(item);
-				}else if(layoutType == 3){
-					$("#dev-io-ul").find("ul[class='list-group']").find("li").remove();
-					var item = [];
-					data.rows.forEach(function (io) {
-						item.push("<li class=\"list-group-item\"> <label class=\"checkbox-inline\"> <input type=\"checkbox\" value="+io.id+" checked >"+ io.remark + '-' + io.ioName + "</label></li>")
-					});
-					$("#dev-io-ul").find("ul[class='list-group']").append(item);
-				}
-			}else{
-				layer.msg("操作异常……", {icon: $.modal.icon(modal_status.FAIL),
-							time: 500,
-							shade: [0.1, '#8F8F8F']
-						},
-						function () {
-						});
-			}
-		})
-	})
 	/** 数据提交与验证 */
 	$("#form-page-add").validate({
-		rules:{
-			pageName:{
-				required:true,
+		rules: {
+			pageName: {
+				required: true,
+			},
+		},
+		messages: {
+			pageName: {
+				required: "请输入看板名称",
 			},
 		}
 	});
@@ -402,12 +269,6 @@
 			case "2"://轮播布局
 				data.configs = roll(layout);
 				break;
-			case "3"://平衡布局
-				data.configs =balance(layout);
-				break;
-			case "4"://平衡布局
-				data.configs =productFile(layout);
-				break;
 		}
 		$.ajax({
 			cache : true,
@@ -432,114 +293,42 @@
 	}
 
 	/**
-	 * 宫格布局
+	 * 产线汇总
 	 */
 	function lattice(layout) {
-		var item =[];
-		$("div[data-detail="+layout+"]").find("div[class='row']").find("div[class='col-sm-6']").each(function () {
-			var g ={};
-			g.lineId = $(this).find("select[name='line']").find("option:selected").val();
-			g.ioId = $(this).find("select[name='io']").find("option:selected").val();
-			g.ioId1 = $(this).find("select[name='io1']").find("option:selected").val();
-			var c ={};
-			$(this).find("div[data-checke-info]").find("input[type='checkbox']:checked").each(function () {
-				var check = $(this).val();
-				switch (check) {
-					case "gd":
-						c.gd = true;
-						break;
-					case "ygrs":
-						c.ygrs = true;
-						break
-					case "zcgs":
-						c.zcgs = true;
-						break;
-					case "jbgs":
-						c.jbgs = true;
-						break;
-					case "jbbl":
-						c.jbbl = true;
-						break;
-					case "ycqk":
-						c.ycqk = true;
-						break;
-					case "dtgdjh":
-						c.dtgdjh = true;
-						break;
-				}
-			})
-			g.devIoConfig = JSON.stringify(c);
-			item.push(g);
+		var rows = [];
+		$("#detail_pane").find("div[data-detail='" + layout + "']").find("div[class='panel-body']")
+				.find("label[class='checkbox-inline']").each(function () {
+			var item = $(this).find("input[type='checkbox']");
+			if ($(item).is(':checked')) {
+				var row = {
+					lineId: $(this).attr("data-line-id")
+				};
+				rows.push(row);
+			}
 		});
-		return item;
+		return rows;
 	}
 
 	/**
-	 * 轮播布局
+	 * 产线详情
 	 */
 	function roll(layout) {
-		var item =[];
-		$("div[data-detail="+layout+"]").find("div[class='col-sm-12']").find("input[type='checkbox']:checked").each(function () {
-			var g ={};
-			g.devIoConfig = $(this).val();
-			g.ioId = $(this).attr("data-id");
-			item.push(g)
-		})
-		return item;
-	}
-	/**
-	 * 生产平衡
-	 */
-	function balance(layout) {
-		var item =[];
-		var g = {}
-		var c ={};
-		g.lineId = $("div[data-detail="+layout+"]").find("div[class='col-sm-10']").find("select[name='line']").find("option:selected").val();
-		$("div[data-detail="+layout+"]").find("#gd-info-li").find("input[type='checkbox']:checked").each(function () {
-			var check = $(this).val();
-			switch (check) {
-				case "gd":
-					c.gd = true;
-					break;
-				case "ygrs":
-					c.ygrs = true;
-					break
-				case "zcgs":
-					c.zcgs = true;
-					break;
-				case "jbgs":
-					c.jbgs = true;
-					break;
-				case "jbbl":
-					c.jbbl = true;
-					break;
-				case "ycqk":
-					c.ycqk = true;
-					break;
-				case "dtgdjh":
-					c.dtgdjh = true;
-					break;
+		var rows = [];
+		$("#detail_pane").find("div[data-detail='" + layout + "']").find("div[class='panel-body']")
+				.find("label[class='checkbox-inline']").each(function () {
+			var item = $(this).find("input[type='radio']");
+			if ($(item).is(':checked')) {
+				var row = {
+					lineId: $(this).attr("data-line-id")
+				};
+				rows.push(row);
 			}
-		})
-		var io=[];
-		$("div[data-detail="+layout+"]").find("#dev-io-ul").find("input[type='checkbox']:checked").each(function () {
-			io.push($(this).val());
-		})
-		c.io = io;
-		g.devIoConfig = JSON.stringify(c);
-		item.push(g);
-		return item;
+		});
+		return rows;
 	}
-	/**
-	 * 文件
-	 */
-	function productFile(layout) {
-		var item =[];
-		var g = {}
-		g.lineId = $("div[data-detail="+layout+"]").find("div[class='col-sm-10']").find("select[name='line']").find("option:selected").val();
-		item.push(g);
-		return item;
-	}
+
+
 	/**
 	 * 背景图片编辑
 	 */
@@ -563,6 +352,18 @@
 				return true;
 			}
 		});
+	}
+	/**
+	 * 产线汇总选择
+	 * @param val
+	 */
+	function hzCheck(val) {
+		//获取父元素
+		var size = $(val).parent("label").parent("div[data-checke-info]").find("input[type='checkbox']:checked").size();
+		if (size > 10) {
+			$.modal.alertWarning("最多只能选择10条产线");
+			$(val).attr("checked", false)
+		}
 	}
 </script>
 </body>

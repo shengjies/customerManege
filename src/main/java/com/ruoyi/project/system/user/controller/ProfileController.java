@@ -136,24 +136,29 @@ public class ProfileController extends BaseController {
     @PostMapping("/update")
     @ResponseBody
     public AjaxResult update(User user, HttpServletRequest request) {
-        User tokenUser = JwtUtil.getTokenUser(request);
-        User currentUser = userService.selectUserById(tokenUser.getUserId());
-        currentUser.setUserName(user.getUserName());
-        currentUser.setEmail(user.getEmail());
-        currentUser.setSex(user.getSex());
-        // 设置用户标记为0 已经完成初始化设置
-        currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD);
-        // 设置公司名称
-        //DevCompany devCompany = devCompanyService.selectDevCompanyById(currentUser.getCompanyId());
-        //String newComName = user.getDevCompany().getComName();
-        //if (user.getLoginName().equals(currentUser.getCreateBy()) == false && newComName.equals(devCompany.getComName()) == false) { // 不是自己创建的公司不能修改名字
-        //    return error("不允许修改非自己创建的公司");
-        //}
-        //devCompany.setComName(user.getDevCompany().getComName());
-        //devCompanyService.updateDevCompany(devCompany);
-        if (userService.updateUserInfo(currentUser, request) > 0) {
-            setSysUser(userService.selectUserById(currentUser.getUserId()));
-            return success();
+        try {
+            User tokenUser = JwtUtil.getTokenUser(request);
+            User currentUser = userService.selectUserById(tokenUser.getUserId());
+            currentUser.setUserName(user.getUserName());
+            currentUser.setEmail(user.getEmail());
+            currentUser.setSex(user.getSex());
+            // 设置用户标记为0 已经完成初始化设置
+            currentUser.setLoginTag(UserConstants.LOGIN_TAG_ADD);
+            // 设置公司名称
+            //DevCompany devCompany = devCompanyService.selectDevCompanyById(currentUser.getCompanyId());
+            //String newComName = user.getDevCompany().getComName();
+            //if (user.getLoginName().equals(currentUser.getCreateBy()) == false && newComName.equals(devCompany.getComName()) == false) { // 不是自己创建的公司不能修改名字
+            //    return error("不允许修改非自己创建的公司");
+            //}
+            //devCompany.setComName(user.getDevCompany().getComName());
+            //devCompanyService.updateDevCompany(devCompany);
+            if (userService.updateUserInfo(currentUser, request) > 0) {
+                setSysUser(userService.selectUserById(currentUser.getUserId()));
+                return success();
+            }
+
+        }catch (Exception e){
+
         }
         return error();
     }

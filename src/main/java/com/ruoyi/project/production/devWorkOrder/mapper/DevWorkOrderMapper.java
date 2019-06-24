@@ -95,7 +95,7 @@ public interface DevWorkOrderMapper {
      * @return
      */
 //    @DataSource(DataSourceType.SLAVE)
-    List<String> selectDayWorkOrder(@Param("company_id") int company_id, @Param("line_id") int line_id);
+    List<DevWorkOrder> selectDayWorkOrder(@Param("company_id") int company_id, @Param("line_id") int line_id);
 
 
     /**

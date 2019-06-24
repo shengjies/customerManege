@@ -145,7 +145,7 @@
 
     <!--校验文件夹名称的唯一性-->
     <select id="selectIsoByFolderNameUnique" resultMap="IsoResult">
-         SELECT * FROM octopus.tab_iso where i_type = #{iType} and parent_id = #{parentId} and c_name =#{cName};
+         SELECT * FROM tab_iso where i_type = #{iType} and parent_id = #{parentId} and c_name =#{cName};
     </select>
 
     <!--根据父id和产线id查询对应产线所以未配置的SOP指导书-->

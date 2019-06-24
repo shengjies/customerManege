@@ -120,4 +120,18 @@ public interface ProductionLineMapper
 	 * @return 结果
 	 */
 	List<ProductionLine> selectLineNotConfigByIsoId(@Param("isoId") Integer isoId,@Param("companyId") Integer companyId);
+
+	/**
+	 * 根据页面id查询对应的配置产线信息
+	 * @param pid 页面id
+	 * @return
+	 */
+	List<ProductionLine> selectLineByPageId(@Param("pid")int pid);
+
+	/**
+	 * 查询产线详情
+	 * @param pid 页面id
+	 * @return
+	 */
+	ProductionLine selectLineDetailByPageId(@Param("pid")int pid);
 }

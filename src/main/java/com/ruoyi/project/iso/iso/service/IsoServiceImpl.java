@@ -15,6 +15,7 @@ import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
 import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
+import com.ruoyi.project.page.pageInfo.domain.SopApi;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -31,9 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 文件管理 服务层实现
@@ -324,7 +323,8 @@ public class IsoServiceImpl implements IIsoService {
      * @return
      */
     @Override
-    public Iso selectSopByDevCode(String code) throws Exception {
+    public Map<String,Object> selectSopByDevCode(String code) throws Exception {
+        Map<String,Object> map = new HashMap<>();
         //根据硬件编码查询对应的工位信息
         Workstation workstation = workstationMapper.selectByDevCode(code);
         if (workstation == null) throw new Exception("工位不存在");
@@ -349,6 +349,18 @@ public class IsoServiceImpl implements IIsoService {
         if(hz.equals("pdf")){
             iso.setcId(1);
         }
-        return iso;
+        map.put("iso",iso);
+        SopApi sopApi = new SopApi();
+        sopApi.setlName(line.getLineName());
+        sopApi.setwName(workstation.getwName());
+        sopApi.setwCode(workOrder.getWorkorderNumber());
+        sopApi.setwStatus(workOrder.getOperationStatus());
+        sopApi.setwNumber(workOrder.getProductNumber());
+        sopApi.setpCode(workOrder.getProductCode());
+        sopApi.setpName(workOrder.getProductName());
+        sopApi.setIsoId(iso.getIsoId());
+        sopApi.setIsoPath(iso.getPath());
+        map.put("data",sopApi);
+        return map;
     }
 }

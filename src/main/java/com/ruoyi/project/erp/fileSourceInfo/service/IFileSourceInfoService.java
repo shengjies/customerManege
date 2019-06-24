@@ -38,5 +38,14 @@ public interface IFileSourceInfoService
      * @return 结果
      */
 	public int deleteFileSourceInfoByIds(String ids);
+
+	/**
+	 * 根据硬件编号和产品编码查询对应的产品文件信息
+	 * @param dCode 硬件编码
+	 * @param pCode 产品编码
+	 * @return
+	 * @throws Exception
+	 */
+	public List<FileSourceInfo> selectFileSourceByDCodeAndPCode(String dCode,String pCode) throws Exception;
 	
 }

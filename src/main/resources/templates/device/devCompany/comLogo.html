@@ -73,6 +73,10 @@
             type: "post",
             processData: false,
             contentType: false,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
             success: function(result) {
                 $.operate.saveSuccess(result);
             }

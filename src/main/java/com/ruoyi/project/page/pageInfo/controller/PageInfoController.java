@@ -106,7 +106,7 @@ public class PageInfoController extends BaseController
 	{
 		PageInfo pageInfo = pageInfoService.selectPageInfoById(id);
 		mmap.put("pageInfo", pageInfo);
-		mmap.put("page1",pageInfoService.selectAllPage(1,id, request.getCookies()));
+		mmap.put("lines",pageInfoService.selectPageLineByPid(id,JwtUtil.getTokenUser(request).getCompanyId()));
 	    return prefix + "/edit";
 	}
 	

@@ -22,7 +22,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ipqcUser"    column="ipqc_user"    />
         <result property="meUser"    column="me_user"    />
         <result property="teUser"    column="te_user"    />
-
+    </resultMap>
+    <resultMap type="ProductionLine" id="ProductionLineResult1">
+        <result property="id"    column="id"    />
+        <result property="lineName"    column="line_name"    />
+        <result property="deviceLiable"    column="device_liable"    />
+        <result property="remark"    column="remark"    />
+        <result property="defId"    column="def_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="create_by"    column="create_by"    />
+        <result property="deviceLiableTow"    column="device_liable1"    />
+        <result property="manual"    column="manual"    />
+        <result property="paramConfig"    column="param_config"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="productCodes"    column="product_codes"    />
+        <result property="edUser"    column="ed_user"    />
+        <result property="ipqcUser"    column="ipqc_user"    />
+        <result property="meUser"    column="me_user"    />
+        <result property="teUser"    column="te_user"    />
+        <association property="deviceLiableName" column="device_liable" select="selectDeviceLiableName">
+            <result property="deviceLiableName" column="user_name"/>
+        </association>
     </resultMap>
 	
 	<sql id="selectProductionLineVo">
@@ -157,5 +178,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectLineNotConfigByIsoId" resultMap="ProductionLineResult">
         SELECT * FROM dev_production_line  as l left join
        (SELECT * FROM tab_sop_line where sop_id = #{isoId}) as sl on l.id = sl.line_id where sl.line_id is null and l.company_id = #{companyId};
+    </select>
+
+    <!--根据页面id查询对应的配置产线信息-->
+    <select id="selectLineByPageId" resultMap="ProductionLineResult">
+        SELECT l.* FROM dev_page_config as p,dev_production_line as l where p.line_id = l.id and  p_id = #{pid};
+    </select>
+
+    <!--查询产线详情-->
+    <select id="selectLineDetailByPageId" resultMap="ProductionLineResult1">
+        SELECT l.* FROM dev_page_config as p,dev_production_line as l where p.line_id = l.id and  p_id = #{pid} limit 1;
+    </select>
+    <select id="selectDeviceLiableName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{device_liable};
     </select>
 </mapper>

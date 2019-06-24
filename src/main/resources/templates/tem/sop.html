@@ -55,7 +55,7 @@
                 $('#wrapper').fullScreen();
             }
             $(document).ready(function() {
-                setInterval(getData, 30*1000);
+                setInterval(getData, 15*1000);
             });
             function getData() {
                 $.post("/c/d/"+[[${code}]],function (res) {

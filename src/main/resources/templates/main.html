@@ -285,7 +285,12 @@
                 dataType: 'json',
                 data: $('#form-user-edit').serialize(),
                 async: false,  //同步请求，
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
                 success: function (result) {
+                    $.modal.closeLoading();
                     if (result.code == web_status.SUCCESS) {
                         $.modal.alert("初始化成功");
                         $("#user_name",parent.parent.document).html(result.data.userName);

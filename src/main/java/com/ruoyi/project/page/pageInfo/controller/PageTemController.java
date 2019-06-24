@@ -2,6 +2,7 @@ package com.ruoyi.project.page.pageInfo.controller;
 
 import com.ruoyi.common.constant.PageTypeConstants;
 import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import com.ruoyi.project.erp.fileSourceInfo.service.IFileSourceInfoService;
@@ -60,10 +61,7 @@ public class PageTemController extends BaseController {
         if(StringUtils.isEmpty(code))return "error/404";
         mmap.put("code",code);
         if(StringUtils.isEmpty(pwd))return prefix+ "/pwd";
-//        PageInfo info = pageInfoService.selectPageByCode(code);
-        PageInfo info = new PageInfo();
-        info.setPagePwd("123456");
-        info.setPageType(1);
+        PageInfo info = pageInfoService.selectPageByCode(code);
         if(info == null) {
             mmap.put("msg","页面不存在");
             return prefix + "/pwd";
@@ -72,22 +70,16 @@ public class PageTemController extends BaseController {
             mmap.put("msg","密码错误");
             return prefix + "/pwd";
         }
-//        if(info.getDevCompany() == null) return "error/404";
-//        mmap.put("info",info);
-//        mmap.put("company",info.getDevCompany());
+        if(info.getDevCompany() == null) return "error/404";
+        mmap.put("info",info);
+        mmap.put("company",info.getDevCompany());
         String to = "error/404";
         switch (info.getPageType()){
             case PageTypeConstants.PAGE_TYPE_HZ:
                 to = prefix +"/tem1";
                 break;
-            case PageTypeConstants.PAGE_TYPE_LB:
-                to = prefix +"/swing";
-                break;
-            case PageTypeConstants.PAGE_TYPE_SCPH:
-                to = prefix +"/balance";
-                break;
-            case PageTypeConstants.PAGE_TYPE_TZLB:
-                to = prefix +"/drawing";
+            case PageTypeConstants.PAGE_TYPE_XQ:
+                to = prefix +"/tem2";
                 break;
         }
         return to;
@@ -98,25 +90,12 @@ public class PageTemController extends BaseController {
      * @return
      */
     @ResponseBody
-    @PostMapping("/gg")
-    public Map<String,Object> temJs(String code){
-        Map<String,Object> map = new HashMap<>();
-        map.put("code",pageInfoConfigService.selectPageConfigByPageCode(code));
-        return map;
+    @PostMapping("/hz")
+    public AjaxResult temJs(String code){
+        return AjaxResult.success(pageInfoService.selectPageByCode(code));
     }
 
-    /**
-     * 生产平衡报表JS调用接口
-     * @param code
-     * @return
-     */
-    @ResponseBody
-    @PostMapping("/balance")
-    public Map<String,Object> temBalanceJs(String code){
-        Map<String,Object> map = new HashMap<>();
-        map.put("code",pageInfoConfigService.selectBalanceConfigDataByPageCode(code));
-        return map;
-    }
+
 
     /**
      * 查询文件素材管理列表

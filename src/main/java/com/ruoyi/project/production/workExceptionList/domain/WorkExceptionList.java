@@ -200,18 +200,24 @@ public class WorkExceptionList extends BaseEntity {
         this.workorderNumber = workorderNumber;
     }
 
+    @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append("id", getId())
-                .append("companyId", getCompanyId())
-                .append("workId", getWorkId())
-                .append("exceType", getExceType())
-                .append("remark", getRemark())
-                .append("exceStatut", getExceStatut())
-                .append("createTime", getCreateTime())
-                .append("handleUser", getHandleUser())
-                .append("handleTime", getHandleTime())
-                .toString();
+        return "WorkExceptionList{" +
+                "id=" + id +
+                ", companyId=" + companyId +
+                ", workId=" + workId +
+                ", devWorkOrder=" + devWorkOrder +
+                ", exceType=" + exceType +
+                ", workExceptionType=" + workExceptionType +
+                ", remark='" + remark + '\'' +
+                ", exceStatut=" + exceStatut +
+                ", createTime=" + createTime +
+                ", handleUser='" + handleUser + '\'' +
+                ", handleTime=" + handleTime +
+                ", handleContent='" + handleContent + '\'' +
+                ", exce='" + exce + '\'' +
+                ", typeName='" + typeName + '\'' +
+                ", workorderNumber='" + workorderNumber + '\'' +
+                '}';
     }
-
 }

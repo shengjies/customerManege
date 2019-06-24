@@ -163,6 +163,8 @@ public class WorkstationServiceImpl implements IWorkstationService
 					workstation.setDevCode(devList.getDeviceId());
 				}
 			}
+		}else {
+			workstation.setDevCode(work.getDevCode());
 		}
 		//看板
 		if(work.getcId() != workstation.getcId()){
@@ -182,6 +184,8 @@ public class WorkstationServiceImpl implements IWorkstationService
 					workstation.setcCode(devList.getDeviceId());
 				}
 			}
+		}else{
+			workstation.setcCode(work.getcCode());
 		}
 		//MES
 		if(work.geteId() != workstation.geteId()){
@@ -201,6 +205,8 @@ public class WorkstationServiceImpl implements IWorkstationService
 					workstation.seteCode(devList.getDeviceId());
 				}
 			}
+		}else{
+			workstation.seteCode(work.geteCode());
 		}
 		//判断数据标识
 		if(workstation.getSign() == 1){//是

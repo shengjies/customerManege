@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -73,9 +74,13 @@ public class ProductionLine extends BaseEntity
 	private String productCodes;
 
 	private Integer edUser; // 工程部责任人
+	private User edUserInfo;
 	private Integer ipqcUser; // 品质管理人
+	private User ipqcUserInfo; // 品质管理人
 	private Integer meUser; // 机械工程师
+	private User meUserInfo; // 机械工程师
 	private Integer teUser; // 测试员工
+	private User teUserInfo; // 测试员工
 
 	public Integer getEdUser() {
 		return edUser;
@@ -278,6 +283,38 @@ public class ProductionLine extends BaseEntity
 
 	public void setProductCodes(String productCodes) {
 		this.productCodes = productCodes;
+	}
+
+	public User getEdUserInfo() {
+		return edUserInfo;
+	}
+
+	public void setEdUserInfo(User edUserInfo) {
+		this.edUserInfo = edUserInfo;
+	}
+
+	public User getIpqcUserInfo() {
+		return ipqcUserInfo;
+	}
+
+	public void setIpqcUserInfo(User ipqcUserInfo) {
+		this.ipqcUserInfo = ipqcUserInfo;
+	}
+
+	public User getMeUserInfo() {
+		return meUserInfo;
+	}
+
+	public void setMeUserInfo(User meUserInfo) {
+		this.meUserInfo = meUserInfo;
+	}
+
+	public User getTeUserInfo() {
+		return teUserInfo;
+	}
+
+	public void setTeUserInfo(User teUserInfo) {
+		this.teUserInfo = teUserInfo;
 	}
 
 	@Override

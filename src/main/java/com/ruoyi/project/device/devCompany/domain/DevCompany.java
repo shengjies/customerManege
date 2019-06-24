@@ -21,7 +21,7 @@ public class DevCompany extends BaseEntity
 	@Excel(name = "公司编号")
 	private Integer companyId;
 	/** 公司名称 */
-	@Excel(name = "公司明称")
+	@Excel(name = "公司名称")
 	private String comName;
 	/** 公司地址 */
 	@Excel(name = "公司地址")

@@ -30,9 +30,9 @@
                                                 <li>
                                                     工单生产状态：
                                                     <select style="width: 100px" name="workorderStatus" id="workorderStatus">
-                                                        <option value="">全部</option>
-                                                        <option selected value="0">未进行</option>
-                                                        <option value="1">进行中</option>
+                                                        <option selected value="">全部</option>
+                                                        <option  value="0">未进行</option>
+                                                        <option  value="1">进行中</option>
                                                         <option value="2">已完成</option>
                                                     </select>
                                                 </li>
@@ -56,7 +56,9 @@
                         <div class="col-sm-12" style="margin-top: 5px;">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    工单数据  <span style="margin-left: 20px;font-size: 12px" id="start-time"></span> &nbsp;&nbsp;&nbsp;<a class="btn btn-success btn-sm " id="action-btn-start" href="javascript:void(0)" onclick="editStatus(1)" shiro:hasPermission="device:devWorkOrder:edit"><i></i>开始</a>
+                                    工单数据  <span style="margin-left: 20px;font-size: 12px" id="start-time"></span> &nbsp;&nbsp;&nbsp; <span style="font-weight: bold;font-size: 24px;">状态：</span>
+                                    <span style="font-weight: bold;font-size: 24px;color: #fff" id="line-live-work-gdzt">未进行</span>&nbsp;&nbsp;&nbsp;
+                                    <a class="btn btn-success btn-sm " id="action-btn-start" href="javascript:void(0)" onclick="editStatus(1)" shiro:hasPermission="device:devWorkOrder:edit"><i></i>开始</a>
                                     <a class="btn  btn-success btn-sm " id="action-btn-stop" style="display: none" onclick="editStatus(0)"  href="javascript:void(0)"  shiro:hasPermission="device:devWorkOrder:edit"><i></i>暂停</a>
                                     <a class="btn btn-danger btn-sm " id="action-btn-end" href="javascript:void(0)" onclick="finishWorkerOrder()" shiro:hasPermission="device:devWorkOrder:edit"><i></i>结束</a>
                                     <a class="btn btn-success btn-sm " id="action-btn-save" href="javascript:void(0)"  shiro:hasPermission="device:devWorkOrder:edit" onclick="save()"> <i></i>刷新数据</a>
@@ -80,10 +82,10 @@
                                                         <td align="right"><label>入库数量:<input type="number"   id="line-live-work-rk"  ></label></td>
                                                         <td align="right"><label>报废数量:<input type="number"   id="line-live-work-bf"  ></label></td>
                                                         <td align="right"><label>直通率[%]:<input type="number"   id="line-live-work-ztl" ></label></td>
-                                                        <td align="right"><label>工单达成率[%]:<input type="number" readonly id="line-live-work-dcl"  ></label></td>
+                                                        <td align="right"><label>达成率[%]:<input type="number" readonly id="line-live-work-dcl"  ></label></td>
                                                     </tr>
                                                     <tr>
-                                                        <td align="right"><label>正常工时:<input type="number"   id="line-live-work-zcgs" ></label></td>
+                                                        <td align="right"><label>出勤工时:<input type="number"   id="line-live-work-zcgs" ></label></td>
                                                         <td align="right"><label>调整工时:<input type="number"   id="line-live-work-tzgs"  ></label></td>
                                                         <td align="right"><label>加班工时:<input type="number"  id="line-live-work-gbgs"  style="width: 40%" ><select style="border: 1px solid #ddd;border-radius: 4px;background: transparent;outline: none;height: 26px;" id="line-live-work-gbbl">
                                                             <option value="1.5">1.5倍</option>
@@ -91,7 +93,14 @@
                                                             <option value="3">3.0倍</option>
                                                         </select></label></td>
                                                         <td align="right"><label>用工人数:<input type="number"  id="line-live-work-ygrs" ></label></td>
-                                                        <td align="center"><label>工单状态:<span style="color: #1c84c6" id="line-live-work-gdzt">未进行</span></label></td>
+                                                        <td align="right"><label>投入数量:<input type="number"  id="line-live-work-trcl" ></label></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td align="right"><label>生产工时:<input type="number" readonly  id="line-live-work-scgs" ></label></td>
+                                                        <td align="right"></td>
+                                                        <td align="right"></td>
+                                                        <td align="right"></label></td>
+                                                        <td align="right"></label></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="4" style="padding: 8px">
@@ -414,6 +423,8 @@
                 $("#line-live-work-gbgs").val(item.overtimeHour);//加班工时
                 $("#line-live-work-gbbl").val(item.overtimeRace == null?1.5:item.overtimeRace)//加班倍率
                 $("#line-live-work-ygrs").val(item.peopleNumber);//用工人数
+                $("#line-live-work-trcl").val(item.putIntoNumber);//用工人数
+                $("#line-live-work-scgs").val(item.signHuor.toFixed(2));//用工人数
                 if(item.workorderStatus == 0){
                     $("#line-live-work-gdzt").text("未进行")
                     $("#action-btn-start").css('display','inline-block');
@@ -618,16 +629,9 @@
             overtimeHour:$("#line-live-work-gbgs").val(),//加班工时
             overtimeRace:$("#line-live-work-gbbl").val(),//加班倍率
             peopleNumber:$("#line-live-work-ygrs").val(),//用工人数
+            putIntoNumber:$("#line-live-work-trcl").val(),//投入产量
         }
         var config =[];
-        $("#param-tr").find("td").each(function () {
-            var item ={};
-            item.k = $(this).find("label").find("span").text();
-            item.v = $(this).find("label").find("input").val();
-            if(item.v && item.v != ""){
-                config.push(item);
-            }
-        })
         data.paramConfig = JSON.stringify(config);
         $.ajax({
             cache : true,

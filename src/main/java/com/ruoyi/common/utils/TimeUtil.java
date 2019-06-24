@@ -65,10 +65,17 @@ public class TimeUtil {
     }
 
     public static void main(String[] args) throws Exception {
-//        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        Date startDate = format.parse("2019-05-17 10:00:00");
-//        Date endDate = format.parse("2019-05-17 12:20:00");
-//        System.out.println(getDateDel(startDate,endDate));
+        System.out.println(getSystemDate());
+    }
+
+    public static Date getSystemDate(){
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return  format1.parse(format.format(new Date()));
+        }catch (Exception e){
+            return null;
+        }
     }
 
     public static float getDateDel(Date startDate,Date endDate){

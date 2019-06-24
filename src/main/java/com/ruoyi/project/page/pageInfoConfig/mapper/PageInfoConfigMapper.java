@@ -88,4 +88,12 @@ public interface PageInfoConfigMapper
 	 */
 //	@DataSource(DataSourceType.SLAVE)
 	PageInfoConfig selectPageConfigOtherPage(@Param("p_id")int p_id,@Param("other_id")int other_id);
+
+	/**
+	 * 根据看板id 和 产线id查询对应的产线是否配置
+	 * @param pid 看板id
+	 * @param lineId 产线id
+	 * @return
+	 */
+	PageInfoConfig selectPageConfigByPidAndLineId(@Param("pid")int pid ,@Param("lineId")int lineId);
 }

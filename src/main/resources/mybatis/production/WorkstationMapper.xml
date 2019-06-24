@@ -83,11 +83,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="wName != null  and wName != ''  ">w_name = #{wName},</if>
             <if test="sopId != null  ">sop_id = #{sopId},</if>
             <if test="devId != null  ">dev_id = #{devId},</if>
-            <if test="devCode != null  and devCode != ''  ">dev_code = #{devCode},</if>
+            dev_code = #{devCode},
             <if test="cId != null  ">c_id = #{cId},</if>
-            <if test="cCode != null  and cCode != ''  ">c_code = #{cCode},</if>
+            c_code = #{cCode},
             <if test="eId != null  ">e_id = #{eId},</if>
-            <if test="eCode != null  and eCode != ''  ">e_code = #{eCode},</if>
+            e_code = #{eCode},
             <if test="sign != null  ">sign = #{sign},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="defId != null  ">def_id = #{defId},</if>

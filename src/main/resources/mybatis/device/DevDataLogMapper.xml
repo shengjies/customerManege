@@ -86,4 +86,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectLineWorkDevIo" resultMap="DevDataLogResult">
         SELECT * FROM dev_data_log where line_id = #{line_id} and work_id = #{work_id} and dev_id =  #{dev_id} and io_id = #{io_id} order by create_time desc limit 1
     </select>
+
+    <!--实时统计当前小时的工位产量-->
+    <select id="selectLineWorkSysTemData" resultType="java.lang.Integer">
+        SELECT coalesce(sum(del_data),0) FROM dev_data_log
+        where company_id =#{companyId} and line_id = #{lineId} and work_id = #{workId} and
+        dev_id = #{devId} and io_id = #{wid}
+        and create_time &gt;= date_format(now(),'%Y-%m-%d %H:00:00')
+    </select>
 </mapper>

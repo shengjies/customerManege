@@ -61,8 +61,12 @@ public class ReportServiceImpl implements IReportService {
         int totalScrapNum =0;//总报废数量
         float totalStandardHour =0F;//标准总工时
         float totalHour =0F;//实际总工时
+        float totalProduct=0F;//生产总工时
         float totalReachRate = 0F;//总平均达成率
         float reachRateNum = 0F;//总达成率
+        float ztRate = 0F;//总直通率
+        float pjztRate = 0F;//平均直通率
+        int totalInput =0;//总投入数量
         float totalZcHour = 0F;//正常总工时
         float totalWork1 = 0F;//1.5
         float totalWork2 = 0F;//2
@@ -92,18 +96,19 @@ public class ReportServiceImpl implements IReportService {
                List<DevWorkOrder> orders = devWorkOrderMapper.selectOrderByLineIsSubmit(user.getCompanyId(),productCode,
                        lineId,startTime+" 00:00:00",endTime+" 23:59:59");
                 for (DevWorkOrder order : orders) {
-                    float wh = order.getWorkingHour() == null?0:order.getWorkingHour();
-                    float mh = order.getManualTime()==null?0:order.getManualTime();
-                    order.setWorkingHour( wh+mh );
+                    float wh = order.getWorkingHour() == null?0:order.getWorkingHour();//正常工时
+//                    float mh = order.getManualTime()==null?0:order.getManualTime();//手动调整工时
+                    float sh = order.getSignHuor() == null?0:order.getSignHuor();//生产工时
                     sb.append(order.getId());
                     sb.append(",");
-                    totalActualNum += order.getActualWarehouseNum() ==null?0:order.getActualWarehouseNum();
-                    totalScrapNum += order.getScrapNum() == null?0:order.getScrapNum();
-                    totalZcHour += order.getWorkingHour() ==null?0F:order.getWorkingHour();
-                    totalHour += order.getWorkingHour() ==null?0F:order.getWorkingHour();
-                    totalHour += order.getOvertimeHour() ==null?0F:order.getOvertimeHour();
-                    totalCumulativeNumber += order.getCumulativeNumber() ==null?0:order.getCumulativeNumber();
-                    if(order.getOvertimeRace() != null && order.getOvertimeRace() >0){
+                    totalActualNum += order.getActualWarehouseNum()==null?0:order.getActualWarehouseNum();//总入库数量
+                    totalScrapNum += order.getScrapNum()==null?0:order.getScrapNum();
+                    totalHour += wh;//正常中工时
+                    totalProduct += sh;//生产总工时
+                    totalInput += order.getPutIntoNumber()==null?0:order.getPutIntoNumber();//中投入数
+                    totalCumulativeNumber += order.getCumulativeNumber() ==null?0:order.getCumulativeNumber();//总累计数量
+                    //加班倍率
+                    if(order.getOvertimeHour() != null && order.getOvertimeHour() > 0 && order.getOvertimeRace() != null && order.getOvertimeRace() >0){
                         if(order.getOvertimeRace() == 1.5){
                             order.setWork1(order.getOvertimeRace()+"");
                             totalWork1 += order.getOvertimeRace();
@@ -115,51 +120,28 @@ public class ReportServiceImpl implements IReportService {
                             totalWork3 += order.getOvertimeHour();
                         }
                     }
+                    order.setPutIntoNumber(order.getPutIntoNumber() == null?0:order.getPutIntoNumber());
                     //直通率 = 入库数量 / 累计产量
-                    order.setDirectPassRate(0F);
-                    if(order.getCumulativeNumber() != null && order.getActualWarehouseNum() != null){
-                        order.setDirectPassRate(order.getCumulativeNumber() ==0?0:getFloat3(((float)order.getActualWarehouseNum()/order.getCumulativeNumber()))*100);
-                    }
+                    ztRate +=  order.getDirectPassRate()==null?0:order.getDirectPassRate();
+
                     //达成率
                     order.setReachRate(0F);
                     if(order.getCumulativeNumber() != null && order.getProductStandardHour() != null){
-                        //计算分母
-                        float w = order.getWorkingHour()==null?0:order.getWorkingHour();
-                        float o =  order.getOvertimeHour()==null?0:order.getOvertimeHour();
-                      float total =  order.getProductStandardHour()*(w +o);
-                        order.setReachRate(total==0?0:getFloat3(((float)order.getCumulativeNumber()/total))*100);
+                        float total =  order.getProductStandardHour()*(sh);//实际标准产量
+                        order.setReachRate(total==0?0:getFloat3((((float)order.getCumulativeNumber())/ total))*100);
                     }
-                    reachRateNum+=order.getReachRate();
+                    reachRateNum+=order.getReachRate();//总达成率
                     //标准工时
                     float standardHour = 0F;
                     if(order.getProductStandardHour() != null && order.getProductStandardHour() >0){
-                        standardHour = (float)order.getProductNumber()/order.getProductStandardHour();
+                        int num = order.getActualWarehouseNum() ==null?order.getProductNumber():order.getActualWarehouseNum();
+                        standardHour = (float)num/order.getProductStandardHour();
                     }
-                    totalStandardHour +=standardHour;
-                    if(!StringUtils.isEmpty(order.getParamConfig())){
-                        JSONArray array = JSON.parseArray(order.getParamConfig());
-                        for (int i =0;i<array.size();i++){
-                            JSONObject o = array.getJSONObject(i);
-                            if(i == 0){
-                                order.setParam1(o.get("k").toString()+o.get("v"));
-                            }
-                            if(i == 1){
-                                order.setParam2(o.get("k").toString()+o.get("v"));
-                            }
-                            if(i == 2){
-                                order.setParam3(o.get("k").toString()+o.get("v"));
-                            }
-                            if(i == 3){
-                                order.setParam4(o.get("k").toString()+o.get("v"));
-                            }
-                            if(i == 4){
-                                order.setParam5(o.get("k").toString()+o.get("v"));
-                            }
-                        }
-                    }
+                    totalStandardHour +=standardHour;//总标准工时
                 }
                 if(orders.size() >0){
-                    totalReachRate = getFloat3(reachRateNum/orders.size());
+                    totalReachRate = getFloat3(reachRateNum/orders.size());//平均达成率
+                    pjztRate = getFloat3(ztRate/orders.size());//平均直通率
                 }
                 JRDataSource dataSource = new JRBeanCollectionDataSource(orders);
                 param.put("orderDataTable",dataSource);
@@ -177,11 +159,13 @@ public class ReportServiceImpl implements IReportService {
         param.put("totalHour",totalHour);
         param.put("totalReachRate",totalReachRate);
         param.put("totalZcHour",totalZcHour);
+        param.put("totalInput",totalInput);
         param.put("totalWork1",totalWork1);
         param.put("totalWork2",totalWork2);
         param.put("totalWork3",totalWork3);
+        param.put("totalProduct",totalProduct);//生产总工时
         //直通率
-        param.put("totalDirectPassRate",totalCumulativeNumber == 0?0:getFloat3(((float)totalActualNum/totalCumulativeNumber))*100);
+        param.put("totalDirectPassRate",pjztRate);
         PdfUtil util = new PdfUtil();
         util.exportPdf(path,pdfName,resourceLoader,response,request,param);
         return 1;

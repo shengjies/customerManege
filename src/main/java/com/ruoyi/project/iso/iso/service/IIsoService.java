@@ -2,12 +2,14 @@ package com.ruoyi.project.iso.iso.service;
 
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.page.pageInfo.domain.SopApi;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文件管理 服务层
@@ -93,5 +95,5 @@ public interface IIsoService
 	 * @param code 硬件编码
 	 * @return
 	 */
-	Iso selectSopByDevCode(String code) throws Exception;
+	Map<String,Object> selectSopByDevCode(String code) throws Exception;
 }

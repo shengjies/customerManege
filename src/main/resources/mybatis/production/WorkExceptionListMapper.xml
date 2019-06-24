@@ -133,4 +133,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
      FROM dev_work_exception_list as a,dev_work_exception_type as b,dev_work_order as c
      where a.exce_type = b.id and  a.work_id = c.id and work_id in (${workIds})
     </select>
+
+    <!--根据工单id查询未处理的异常信息是否存在-->
+    <select id="selectWorkExceNotByWorkId" resultMap="WorkExceptionListResult">
+      SELECT * FROM dev_work_exception_list where work_id = #{wid} and  exce_statut !=2 limit 1;
+    </select>
+
+    <!--根据工单id查询所以工单异常信息-->
+    <select id="selectWorkExceAllByWorkId" resultMap="WorkExceptionListResult">
+         SELECT a.*,b.type_name as typeName FROM dev_work_exception_list as a,
+          dev_work_exception_type as b where a.exce_type = b.id  and work_id = #{wid};
+    </select>
 </mapper>

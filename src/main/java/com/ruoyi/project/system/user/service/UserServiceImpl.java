@@ -280,7 +280,7 @@ public class UserServiceImpl implements IUserService {
      * @return 结果
      */
     @Override
-    public int updateUserInfo(User user, HttpServletRequest request) {
+    public int updateUserInfo(User user, HttpServletRequest request) throws Exception {
         user.setDevCompany(null);
         user.setCreateTime(null);
         user.setLoginDate(null);

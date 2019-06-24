@@ -128,4 +128,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPageConfigOtherPage" resultMap="PageInfoConfigResult">
         SELECT * FROM dev_page_config where p_id = #{p_id} and io_id = #{other_id} limit 1;
     </select>
+
+    <!--根据看板id 和 产线id查询对应的产线是否配置-->
+    <select id="selectPageConfigByPidAndLineId" resultMap="PageInfoConfigResult">
+        SELECT * FROM dev_page_config where p_id = #{pid} and line_id = #{lineId} limit 1;
+    </select>
 </mapper>

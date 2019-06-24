@@ -81,4 +81,15 @@ public interface DevDataLogMapper {
     DevDataLog selectLineWorkDevIo(@Param("line_id") int line_id, @Param("work_id") int work_id, @Param("dev_id") int dev_id,
                                    @Param("io_id") int io_id);
 
+    /**
+     * 实时统计当前小时的工位产量
+     * @param companyId 公司id
+     * @param lineId 产线id
+     * @param workId 工单id
+     * @param devId 硬件id
+     * @param wid 工位id
+     * @return
+     */
+    int selectLineWorkSysTemData(@Param("companyId")int companyId,@Param("lineId")int lineId,@Param("workId")int workId,
+                                 @Param("devId")int devId,@Param("wid")int wid);
 }

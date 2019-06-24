@@ -161,6 +161,14 @@ public class DevWorkOrder extends BaseEntity {
      * 产品型号
      */
     private String productModel;
+
+    /** 投入产量 */
+    private Integer putIntoNumber;
+    /** 标记开始时间 */
+    private Date signTime;
+    /** 标记用时 */
+    private Float signHuor;
+
     /**
      * 封装产品id
      */
@@ -652,6 +660,30 @@ public class DevWorkOrder extends BaseEntity {
         this.sign = sign;
     }
 
+    public Integer getPutIntoNumber() {
+        return putIntoNumber;
+    }
+
+    public void setPutIntoNumber(Integer putIntoNumber) {
+        this.putIntoNumber = putIntoNumber;
+    }
+
+    public Date getSignTime() {
+        return signTime;
+    }
+
+    public void setSignTime(Date signTime) {
+        this.signTime = signTime;
+    }
+
+    public Float getSignHuor() {
+        return signHuor;
+    }
+
+    public void setSignHuor(Float signHuor) {
+        this.signHuor = signHuor;
+    }
+
     @Override
     public String toString() {
         return "DevWorkOrder{" +
@@ -688,6 +720,9 @@ public class DevWorkOrder extends BaseEntity {
                 ", actualWarehouseNum=" + actualWarehouseNum +
                 ", badNumber=" + badNumber +
                 ", productModel='" + productModel + '\'' +
+                ", putIntoNumber=" + putIntoNumber +
+                ", signTime=" + signTime +
+                ", signHuor=" + signHuor +
                 ", productId=" + productId +
                 ", remark='" + remark + '\'' +
                 ", orderCode='" + orderCode + '\'' +

@@ -6,6 +6,7 @@ import com.ruoyi.project.device.devIo.domain.DevIo;
 import com.ruoyi.project.page.pageInfo.domain.PageInfo;
 import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -86,19 +87,17 @@ public interface IPageInfoService
 	 */
 	PageInfo selectPageByCode(String code);
 
-	List<Map<String,Object>> selectBalanceConfigData(JSONArray ios, DevWorkOrder order, int companyId, int lineId);
-
-	/**
-	 * 查询对应异常和当天排版
-	 * @param object 是否包含对应的key
-	 * @param company_id 公司编号
-	 * @param order_id 工单编号
-	 */
-	void selectExceOrder(JSONObject object, int company_id, int order_id, PageInfoConfig config);
 	/**
 	 * 重置页面密码
 	 * @param info 页面信息
 	 * @return
 	 */
 	int savePwd(PageInfo info);
+
+	/**
+	 * 根据页面id查询所有产线，判断是否需要配置
+	 * @param pid
+	 * @return
+	 */
+	List<ProductionLine> selectPageLineByPid(int pid,int companyId);
 }

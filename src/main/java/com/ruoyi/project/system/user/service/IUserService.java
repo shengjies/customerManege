@@ -92,7 +92,7 @@ public interface IUserService
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUserInfo(User user,HttpServletRequest request);
+    public int updateUserInfo(User user,HttpServletRequest request) throws Exception;
 
     /**
      * 修改用户密码信息

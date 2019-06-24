@@ -5,6 +5,8 @@ import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.page.layout.domain.Layout;
 import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.productionLine.domain.ProductionLine;
+import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
@@ -62,8 +64,23 @@ public class PageInfo extends BaseEntity
 	/** 专用于判断对应轮播页面是否配置其他页面 */
 	private boolean exist = false;
 
-	/** 对应产线所以未完成和正在进行的工单 */
+
+	/*************************** 产线汇总 *********************/
+	private List<PageTem> tems;
+	/*************************** 产线详情 *********************/
+
+	/** 当天所以工单 */
 	private List<DevWorkOrder> workOrder;
+	/** 正在进行工单所有异常 */
+	private List<WorkExceptionList> exs;
+	/***  正在进行工单 */
+	private DevWorkOrder work;
+	/***  产线信息 */
+	private ProductionLine line;
+	/***  标准产量 */
+	private PageStandard standard;
+	/***  实际产量 */
+	private PageReal real;
 
 	public void setId(Integer id) 
 	{
@@ -210,6 +227,54 @@ public class PageInfo extends BaseEntity
 
 	public void setWorkOrder(List<DevWorkOrder> workOrder) {
 		this.workOrder = workOrder;
+	}
+
+	public List<PageTem> getTems() {
+		return tems;
+	}
+
+	public void setTems(List<PageTem> tems) {
+		this.tems = tems;
+	}
+
+	public DevWorkOrder getWork() {
+		return work;
+	}
+
+	public void setWork(DevWorkOrder work) {
+		this.work = work;
+	}
+
+	public ProductionLine getLine() {
+		return line;
+	}
+
+	public void setLine(ProductionLine line) {
+		this.line = line;
+	}
+
+	public List<WorkExceptionList> getExs() {
+		return exs;
+	}
+
+	public void setExs(List<WorkExceptionList> exs) {
+		this.exs = exs;
+	}
+
+	public PageStandard getStandard() {
+		return standard;
+	}
+
+	public void setStandard(PageStandard standard) {
+		this.standard = standard;
+	}
+
+	public PageReal getReal() {
+		return real;
+	}
+
+	public void setReal(PageReal real) {
+		this.real = real;
 	}
 
 	@Override

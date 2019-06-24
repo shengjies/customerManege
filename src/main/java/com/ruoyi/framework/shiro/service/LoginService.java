@@ -146,9 +146,13 @@ public class LoginService
      */
     public void recordLoginInfo(User user)
     {
-        user.setLoginIp(ShiroUtils.getIp());
-        user.setLoginDate(DateUtils.getNowDate());
-        userService.updateUserInfo(user,null);
+        try {
+            user.setLoginIp(ShiroUtils.getIp());
+            user.setLoginDate(DateUtils.getNowDate());
+            userService.updateUserInfo(user,null);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public AjaxResult loginOut(User user,String token){

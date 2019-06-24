@@ -52,18 +52,5 @@ public interface IPageInfoConfigService
      */
 	public int deletePageInfoConfigByIds(String ids);
 
-	/**
-	 * 根据页面编号定时查询对应的宫格刷新数据
-	 * @param code 页面编号
-	 * @return
-	 */
-	List<PageInfoConfig> selectPageConfigByPageCode(String code);
-
-	/**
-	 * 根据页面编号定时查询生产平衡报表数据进行刷新
-	 * @param code 页面编号
-	 * @return
-	 */
-	PageInfoConfig selectBalanceConfigDataByPageCode(String code);
 	
 }
