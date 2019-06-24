@@ -381,7 +381,11 @@
             },
             success: function (result) {
                 if (result.code == web_status.SUCCESS) {
-                    $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                    $.modal.confirm("库存内部调整成功",function () {
+                        $("#actualTime").val("");
+                        $("#remark").val("");
+                        $("#add-order-table-body").find("tr").remove();
+                    });
                 } else {
                     $.modal.alertError(result.msg);
                 }

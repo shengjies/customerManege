@@ -308,7 +308,10 @@
 				},
 				success: function (result) {
 					if (result.code == web_status.SUCCESS) {
-						$.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+						// $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                        $.modal.confirm("下单成功",function () {
+                            $("#add-order-table-body").find("tr").remove();
+                        });
 					} else {
 						$.modal.alertError(result.msg);
 					}
