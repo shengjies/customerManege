@@ -2,6 +2,9 @@ package com.ruoyi.framework.shiro.web.filter;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -47,7 +50,7 @@ public class LogoutFilter extends org.apache.shiro.web.filter.authc.LogoutFilter
             String redirectUrl = getRedirectUrl(request, response, subject);
             try
             {
-                User user = ShiroUtils.getSysUser();
+                User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
                 if (StringUtils.isNotNull(user))
                 {
                     String loginName = user.getLoginName();

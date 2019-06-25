@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.productBom.mapper.ProductBomMapper">
+    
+    <resultMap type="ProductBom" id="ProductBomResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="bomCode"    column="bom_code"    />
+        <result property="bomVersion"    column="bom_version"    />
+        <result property="productId"    column="product_id"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productModel"    column="product_model"    />
+        <result property="productName"    column="product_name"    />
+        <result property="remark"    column="remark"    />
+        <result property="createId"    column="create_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectProductBomVo">
+        select id, company_id, bom_code, bom_version, product_id, product_code, product_model, product_name, remark, create_id, create_time from tab_product_bom
+    </sql>
+	
+    <select id="selectProductBomList" parameterType="ProductBom" resultMap="ProductBomResult">
+        <include refid="selectProductBomVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="bomCode != null  and bomCode != '' "> and bom_code = #{bomCode}</if>
+             <if test="bomVersion != null  and bomVersion != '' "> and bom_version = #{bomVersion}</if>
+             <if test="productId != null "> and product_id = #{productId}</if>
+             <if test="productCode != null  and productCode != '' "> and product_code = #{productCode}</if>
+             <if test="productModel != null  and productModel != '' "> and product_model = #{productModel}</if>
+             <if test="productName != null  and productName != '' "> and product_name = #{productName}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+             <if test="createId != null "> and create_id = #{createId}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectProductBomById" parameterType="Integer" resultMap="ProductBomResult">
+        <include refid="selectProductBomVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertProductBom" parameterType="ProductBom" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_product_bom
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="bomCode != null  and bomCode != ''  ">bom_code,</if>
+			<if test="bomVersion != null  and bomVersion != ''  ">bom_version,</if>
+			<if test="productId != null  ">product_id,</if>
+			<if test="productCode != null  and productCode != ''  ">product_code,</if>
+			<if test="productModel != null  and productModel != ''  ">product_model,</if>
+			<if test="productName != null  and productName != ''  ">product_name,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="createId != null  ">create_id,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="bomCode != null  and bomCode != ''  ">#{bomCode},</if>
+			<if test="bomVersion != null  and bomVersion != ''  ">#{bomVersion},</if>
+			<if test="productId != null  ">#{productId},</if>
+			<if test="productCode != null  and productCode != ''  ">#{productCode},</if>
+			<if test="productModel != null  and productModel != ''  ">#{productModel},</if>
+			<if test="productName != null  and productName != ''  ">#{productName},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="createId != null  ">#{createId},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateProductBom" parameterType="ProductBom">
+        update tab_product_bom
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="bomCode != null  and bomCode != ''  ">bom_code = #{bomCode},</if>
+            <if test="bomVersion != null  and bomVersion != ''  ">bom_version = #{bomVersion},</if>
+            <if test="productId != null  ">product_id = #{productId},</if>
+            <if test="productCode != null  and productCode != ''  ">product_code = #{productCode},</if>
+            <if test="productModel != null  and productModel != ''  ">product_model = #{productModel},</if>
+            <if test="productName != null  and productName != ''  ">product_name = #{productName},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="createId != null  ">create_id = #{createId},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteProductBomById" parameterType="Integer">
+        delete from tab_product_bom where id = #{id}
+    </delete>
+	
+    <delete id="deleteProductBomByIds" parameterType="String">
+        delete from tab_product_bom where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

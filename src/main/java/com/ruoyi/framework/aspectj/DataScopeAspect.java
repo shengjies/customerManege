@@ -1,6 +1,9 @@
 package com.ruoyi.framework.aspectj;
 
 import java.lang.reflect.Method;
+
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
@@ -60,7 +63,7 @@ public class DataScopeAspect
             return;
         }
         // 获取当前的用户
-        User currentUser = ShiroUtils.getSysUser();
+        User currentUser = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if (currentUser != null)
         {
             // 如果是超级管理员，则不过滤数据

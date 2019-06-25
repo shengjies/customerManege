@@ -765,4 +765,57 @@ public class ExcelUtil<T>
         }
         return val;
     }
+
+    public static Object getCellValue1(Row row, int column)
+    {
+        if (row == null)
+        {
+            return row;
+        }
+        Object val = "";
+        try
+        {
+            Cell cell = row.getCell(column);
+            if (cell != null)
+            {
+                if (cell.getCellTypeEnum() == CellType.NUMERIC)
+                {
+                    val = cell.getNumericCellValue();
+                    if (HSSFDateUtil.isCellDateFormatted(cell))
+                    {
+                        val = DateUtil.getJavaDate((Double) val); // POI Excel 日期格式转换
+                    }
+                    else
+                    {
+                        if ((Double) val % 1 > 0)
+                        {
+                            val = new DecimalFormat("0.00").format(val);
+                        }
+                        else
+                        {
+                            val = new DecimalFormat("0").format(val);
+                        }
+                    }
+                }
+                else if (cell.getCellTypeEnum() == CellType.STRING)
+                {
+                    val = cell.getStringCellValue();
+                }
+                else if (cell.getCellTypeEnum() == CellType.BOOLEAN)
+                {
+                    val = cell.getBooleanCellValue();
+                }
+                else if (cell.getCellTypeEnum() == CellType.ERROR)
+                {
+                    val = cell.getErrorCellValue();
+                }
+
+            }
+        }
+        catch (Exception e)
+        {
+            return val;
+        }
+        return val;
+    }
 }

@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div style="text-align: center;color: red"><span>请填写各个参数的下标，最小从1开始</span></div>
+    <form class="form-horizontal m" id="form-productBom-config-save">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">从第几行开始解析：</label>
+            <div class="col-sm-8">
+                <input id="rowIndex" name="rowIndex" class="form-control"
+                       type="number" min="1" th:value="${config != null?config.rowIndex:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">物料编码下标：</label>
+            <div class="col-sm-8">
+                <input id="materielCode" name="materielCode" class="form-control"
+                       type="number" min="1" th:value="${config != null?config.materielCode:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">物料名称下标：</label>
+            <div class="col-sm-8">
+                <input id="materielName" name="materielName" class="form-control"
+                       type="number" min="1" th:value="${config != null?config.materielName:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">物料型号下标：</label>
+            <div class="col-sm-8">
+                <input id="materielModel" name="materielModel" class="form-control"
+                       type="number" min="1" th:value="${config != null?config.materielModel:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">用量下标：</label>
+            <div class="col-sm-8">
+                <input id="number" name="number" class="form-control"
+                       type="number" min="1" th:value="${config != null?config.number:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">单位下标：</label>
+            <div class="col-sm-8">
+                <input id="unit" name="unit" class="form-control"
+                       type="number" min="1" th:value="${config != null and  config.unit != null?config.unit:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">位号下标：</label>
+            <div class="col-sm-8">
+                <input id="placeNumber" name="placeNumber" class="form-control"
+                       type="number" min="1" th:value="${config != null and  config.placeNumber != null?config.placeNumber:''}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注下标：</label>
+            <div class="col-sm-8">
+                <input id="remarkIndex" name="remarkIndex" class="form-control"
+                       type="number" min="1" th:value="${config != null and  config.remarkIndex != null?config.remarkIndex:''}">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "erp/productBom"
+    $("#form-productBom-config-save").validate({
+        rules:{
+            rowIndex:{
+                required:true,
+            },
+            materielCode:{
+                required:true,
+            },
+            materielName:{
+                required:true,
+            },
+            materielModel:{
+                required:true,
+            },
+            number:{
+                required:true,
+            },
+        },
+        messages:{
+            rowIndex:{
+                required:"请填写从第几行开始解析下标",
+            },
+            materielCode:{
+                required:"请填写物料编码下标",
+            },
+            materielName:{
+                required:"请填写物料名称下标",
+            },
+            materielModel:{
+                required:"请填写物料型号下标",
+            },
+            number:{
+                required:"请填写用量下标",
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/config/edit", $('#form-productBom-config-save').serialize());
+        }
+    }
+</script>
+</body>
+</html>

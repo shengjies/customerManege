@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.productBom.mapper.BomConfigMapper">
+    
+    <resultMap type="BomConfig" id="BomConfigResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="materielCode"    column="materiel_code"    />
+        <result property="materielName"    column="materiel_name"    />
+        <result property="materielModel"    column="materiel_model"    />
+        <result property="number"    column="number"    />
+        <result property="unit"    column="unit"    />
+        <result property="placeNumber"    column="place_number"    />
+        <result property="remarkIndex"    column="remark_index"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="rowIndex"    column="row_index"    />
+    </resultMap>
+	
+	<sql id="selectBomConfigVo">
+        select id, company_id, materiel_code, materiel_name, materiel_model, number, unit, place_number, remark_index, create_time, row_index from tab_bom_config
+    </sql>
+	
+
+    <select id="selectBomConfigLimit1"  resultMap="BomConfigResult">
+        <include refid="selectBomConfigVo"/>
+        limit 1;
+    </select>
+        
+    <insert id="insertBomConfig" parameterType="BomConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_bom_config
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="materielCode != null  ">materiel_code,</if>
+			<if test="materielName != null  ">materiel_name,</if>
+			<if test="materielModel != null  ">materiel_model,</if>
+			<if test="number != null  ">number,</if>
+			<if test="unit != null  ">unit,</if>
+			<if test="placeNumber != null  ">place_number,</if>
+			<if test="remarkIndex != null  ">remark_index,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="rowIndex != null  ">row_index,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="materielCode != null  ">#{materielCode},</if>
+			<if test="materielName != null  ">#{materielName},</if>
+			<if test="materielModel != null  ">#{materielModel},</if>
+			<if test="number != null  ">#{number},</if>
+			<if test="unit != null  ">#{unit},</if>
+			<if test="placeNumber != null  ">#{placeNumber},</if>
+			<if test="remarkIndex != null  ">#{remarkIndex},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="rowIndex != null  ">#{rowIndex},</if>
+         </trim>
+    </insert>
+
+	<delete id="deleteBomConfigAll" >
+        delete  from tab_bom_config
+    </delete>
+
+    
+</mapper>

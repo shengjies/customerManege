@@ -2,6 +2,8 @@ package com.ruoyi.framework.aspectj;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import com.ruoyi.framework.jwt.JwtUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -75,7 +77,7 @@ public class LogAspect
             }
 
             // 获取当前的用户
-            User currentUser = ShiroUtils.getSysUser();
+            User currentUser = JwtUtil.getTokenUser(ServletUtils.getRequest());
 
             // *========数据库日志=========*//
             OperLog operLog = new OperLog();

@@ -3,6 +3,9 @@ package com.ruoyi.framework.shiro.web.filter.online;
 import java.io.IOException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
@@ -52,7 +55,7 @@ public class OnlineSessionFilter extends AccessControlFilter
             boolean isGuest = onlineSession.getUserId() == null || onlineSession.getUserId() == 0L;
             if (isGuest == true)
             {
-                User user = ShiroUtils.getSysUser();
+                User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
                 if (user != null)
                 {
                     onlineSession.setUserId(user.getUserId());

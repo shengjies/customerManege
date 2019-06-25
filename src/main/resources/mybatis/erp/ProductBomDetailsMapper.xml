@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.productBom.mapper.ProductBomDetailsMapper">
+    
+    <resultMap type="ProductBomDetails" id="ProductBomDetailsResult">
+        <result property="id"    column="id"    />
+        <result property="bomId"    column="bom_id"    />
+        <result property="bomDetailsType"    column="bom_details_type"    />
+        <result property="detailId"    column="detail_id"    />
+        <result property="detailCode"    column="detail_code"    />
+        <result property="detailModel"    column="detail_model"    />
+        <result property="detailName"    column="detail_name"    />
+        <result property="oneNum"    column="one_num"    />
+        <result property="price"    column="price"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="createId"    column="create_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="placeNumber"    column="place_number"    />
+        <result property="unit"    column="unit"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+	
+	<sql id="selectProductBomDetailsVo">
+        select id, bom_id, bom_details_type, detail_id, detail_code, detail_model, detail_name, one_num, price, total_price, create_id, create_time, place_number, unit, remark from tab_product_bom_details
+    </sql>
+	
+    <select id="selectProductBomDetailsList" parameterType="ProductBomDetails" resultMap="ProductBomDetailsResult">
+        <include refid="selectProductBomDetailsVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="bomId != null "> and bom_id = #{bomId}</if>
+             <if test="bomDetailsType != null "> and bom_details_type = #{bomDetailsType}</if>
+             <if test="detailId != null "> and detail_id = #{detailId}</if>
+             <if test="detailCode != null  and detailCode != '' "> and detail_code = #{detailCode}</if>
+             <if test="detailModel != null  and detailModel != '' "> and detail_model = #{detailModel}</if>
+             <if test="detailName != null  and detailName != '' "> and detail_name = #{detailName}</if>
+             <if test="oneNum != null "> and one_num = #{oneNum}</if>
+             <if test="price != null "> and price = #{price}</if>
+             <if test="totalPrice != null "> and total_price = #{totalPrice}</if>
+             <if test="createId != null "> and create_id = #{createId}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+             <if test="placeNumber != null  and placeNumber != '' "> and place_number = #{placeNumber}</if>
+             <if test="unit != null  and unit != '' "> and unit = #{unit}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+         </where>
+    </select>
+    
+    <select id="selectProductBomDetailsById" parameterType="Integer" resultMap="ProductBomDetailsResult">
+        <include refid="selectProductBomDetailsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertProductBomDetails" parameterType="ProductBomDetails" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_product_bom_details
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bomId != null  ">bom_id,</if>
+			<if test="bomDetailsType != null  ">bom_details_type,</if>
+			<if test="detailId != null  ">detail_id,</if>
+			<if test="detailCode != null  and detailCode != ''  ">detail_code,</if>
+			<if test="detailModel != null  and detailModel != ''  ">detail_model,</if>
+			<if test="detailName != null  and detailName != ''  ">detail_name,</if>
+			<if test="oneNum != null  ">one_num,</if>
+			<if test="price != null  ">price,</if>
+			<if test="totalPrice != null  ">total_price,</if>
+			<if test="createId != null  ">create_id,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="placeNumber != null  and placeNumber != ''  ">place_number,</if>
+			<if test="unit != null  and unit != ''  ">unit,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bomId != null  ">#{bomId},</if>
+			<if test="bomDetailsType != null  ">#{bomDetailsType},</if>
+			<if test="detailId != null  ">#{detailId},</if>
+			<if test="detailCode != null  and detailCode != ''  ">#{detailCode},</if>
+			<if test="detailModel != null  and detailModel != ''  ">#{detailModel},</if>
+			<if test="detailName != null  and detailName != ''  ">#{detailName},</if>
+			<if test="oneNum != null  ">#{oneNum},</if>
+			<if test="price != null  ">#{price},</if>
+			<if test="totalPrice != null  ">#{totalPrice},</if>
+			<if test="createId != null  ">#{createId},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="placeNumber != null  and placeNumber != ''  ">#{placeNumber},</if>
+			<if test="unit != null  and unit != ''  ">#{unit},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateProductBomDetails" parameterType="ProductBomDetails">
+        update tab_product_bom_details
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bomId != null  ">bom_id = #{bomId},</if>
+            <if test="bomDetailsType != null  ">bom_details_type = #{bomDetailsType},</if>
+            <if test="detailId != null  ">detail_id = #{detailId},</if>
+            <if test="detailCode != null  and detailCode != ''  ">detail_code = #{detailCode},</if>
+            <if test="detailModel != null  and detailModel != ''  ">detail_model = #{detailModel},</if>
+            <if test="detailName != null  and detailName != ''  ">detail_name = #{detailName},</if>
+            <if test="oneNum != null  ">one_num = #{oneNum},</if>
+            <if test="price != null  ">price = #{price},</if>
+            <if test="totalPrice != null  ">total_price = #{totalPrice},</if>
+            <if test="createId != null  ">create_id = #{createId},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="placeNumber != null  and placeNumber != ''  ">place_number = #{placeNumber},</if>
+            <if test="unit != null  and unit != ''  ">unit = #{unit},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteProductBomDetailsById" parameterType="Integer">
+        delete from tab_product_bom_details where id = #{id}
+    </delete>
+	
+    <delete id="deleteProductBomDetailsByIds" parameterType="String">
+        delete from tab_product_bom_details where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>
