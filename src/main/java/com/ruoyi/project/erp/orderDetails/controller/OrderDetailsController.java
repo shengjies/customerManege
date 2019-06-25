@@ -75,6 +75,21 @@ public class OrderDetailsController extends BaseController
 		List<OrderDetails> list = orderDetailsService.selectOrderDetailsListByPid(orderDetails);
 		return getDataTable(list);
 	}
+
+	/**
+	 * 查询所差数量即需要生产数量大于0的订单明细
+	 */
+	@RequiresPermissions("erp:mrp:add")
+	@PostMapping("/listDifPro")
+	@ResponseBody
+	public TableDataInfo listDifPro(OrderDetails orderDetails, HttpServletRequest request)
+	{
+		User user = JwtUtil.getTokenUser(request);
+		orderDetails.setCompanyId(user.getCompanyId());
+		startPage();
+		List<OrderDetails> list = orderDetailsService.selectOrderDetailsListDifPro(orderDetails);
+		return getDataTable(list);
+	}
 	
 	
 	/**

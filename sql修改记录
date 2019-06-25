@@ -236,3 +236,83 @@ ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '订单明细锁定库存数
 ALTER TABLE `octopus`.`tab_product_stock`
 ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '产品库存锁定数量' AFTER `good_number`;
 
+
+# ======================================= MRP功能模块 ====================================
+# 2019-06-24 服务器未执行sql
+
+ALTER TABLE `octopus`.`tab_product_bom_details`
+ADD COLUMN `place_number` TEXT NULL COMMENT '位号' AFTER `create_time`,
+ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '单位' AFTER `place_number`;
+
+ALTER TABLE `octopus`.`tab_order_details`
+ADD COLUMN `lock_mat_number` INT NULL COMMENT '锁定物料库存数量' AFTER `product_id`,
+ADD COLUMN `mat_status` INT NULL COMMENT '物料满足状态(0、物料充足可生产，1、物料不足不可生产)' AFTER `lock_mat_number`;
+ALTER TABLE `octopus`.`tab_order_details`
+CHANGE COLUMN `lock_mat_number` `lock_mat_number` INT(11) NULL DEFAULT 0 COMMENT '锁定物料库存数量' ;
+
+ALTER TABLE `octopus`.`tab_materiel_stock`
+ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '物料库存锁定数量' AFTER `temporary_number`;
+
+CREATE TABLE `octopus`.`tab_bom_config` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键自增长id',
+  `company_id` INT NULL COMMENT '公司id',
+  `materiel_code` INT NOT NULL COMMENT '物料编码下标',
+  `materiel_name` INT NOT NULL COMMENT '物料名称下标',
+  `materiel_model` INT NOT NULL COMMENT '物料型号下标',
+  `number` INT NOT NULL COMMENT '用量下标',
+  `unit` INT NULL COMMENT '单位下标',
+  `place_number` INT NULL COMMENT '位号下标',
+  `remark` INT NULL COMMENT '备注下标',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'BOM导入配置';
+
+CREATE TABLE `octopus`.`tab_bom_change` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键自增长id',
+  `company_id` INT NULL COMMENT '公司id',
+  `p_id` INT NULL COMMENT '产品id',
+  `old_version` INT NULL COMMENT '上一个版本',
+  `new_version` INT NULL COMMENT '新版本',
+  `c_time` DATETIME NULL COMMENT '创建时间',
+  `c_id` INT NULL COMMENT '创建者',
+  `sh_time` DATETIME NULL COMMENT '审核时间',
+  `sh_id` INT NULL COMMENT '审核人',
+  `sh_status` INT NULL DEFAULT 0 COMMENT '审核状态(0、未审核 1、已审核)',
+  `change_text` TEXT NULL COMMENT '修改内容(每行用<br/>隔开)',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'BOM更改记录';
+
+CREATE TABLE `octopus`.`tab_mrp` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '主键自增长id',
+  `company_id` INT NULL COMMENT '公司id',
+  `m_code` VARCHAR(45) NULL COMMENT 'MRP编号',
+  `materiel_code` VARCHAR(45) NULL COMMENT '物料编号',
+  `materiel_name` VARCHAR(45) NULL COMMENT '物料名称',
+  `materiel_model` VARCHAR(45) NULL COMMENT '物料型号',
+  `materiel_id` INT NULL COMMENT '物料id',
+  `supplier_id` INT NULL COMMENT '供应商id',
+  `order_id` INT NULL COMMENT '订单id',
+  `order_code` VARCHAR(125) NULL COMMENT '订单编号',
+  `product_id` INT NULL COMMENT '产品id',
+  `product_code` VARCHAR(45) NULL COMMENT '产品编号',
+  `product_name` VARCHAR(45) NULL COMMENT '产品名称',
+  `need_number` INT NULL DEFAULT 0 COMMENT '所需数量',
+  `del_number` INT NULL DEFAULT 0 COMMENT '所差数量',
+  `tiao_number` INT NULL DEFAULT 0 COMMENT '调整数量',
+  `total_number` INT NULL DEFAULT 0 COMMENT '总数(所差数量+调整数量，不显示)',
+  `m_status` INT NULL COMMENT '状态(0、需采购 1、采购中、2、采购完成 3、不采购)',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'MRP记录表';
+
+# 2019-06-25 服务器数据库未执行sql
+ALTER TABLE `octopus`.`tab_order_details`
+ADD COLUMN `tiao_number` INT NULL DEFAULT 0 COMMENT '调整数量' AFTER `mat_status`;
+ALTER TABLE `octopus`.`tab_order_details`
+ADD COLUMN `mrp_status` INT NULL DEFAULT 0 COMMENT '是否已经生成mrp记录(0、未生成，1、已生成)' AFTER `tiao_number`;
+

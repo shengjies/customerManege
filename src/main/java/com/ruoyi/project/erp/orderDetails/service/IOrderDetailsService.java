@@ -57,4 +57,11 @@ public interface IOrderDetailsService
 	 * @return 结果
 	 */
 	List<OrderDetails> selectOrderDetailsListByPid(OrderDetails orderDetails);
+
+	/**
+	 * 查询所差数量即需要生产数量大于0的订单明细
+	 * @param orderDetails 订单明细
+	 * @return 结果
+	 */
+    List<OrderDetails> selectOrderDetailsListDifPro(OrderDetails orderDetails);
 }

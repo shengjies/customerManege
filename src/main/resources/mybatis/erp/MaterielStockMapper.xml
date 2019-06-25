@@ -18,10 +18,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="lastUpdate"    column="last_update"    />
         <result property="temporaryNumber"    column="temporary_number"    />
+        <result property="lockNumber"    column="lock_number"    />
     </resultMap>
 	
 	<sql id="selectMaterielStockVo">
-        select id, company_id, materiel_id, materiel_code, materiel_model, materiel_name, total_number, good_number, bad_number, scrap_number, create_time, last_update, temporary_number from tab_materiel_stock
+        select id, company_id, materiel_id, materiel_code, materiel_model, materiel_name, total_number, good_number, bad_number, scrap_number,
+         create_time, last_update, temporary_number,lock_number from tab_materiel_stock
     </sql>
 	
     <select id="selectMaterielStockList" parameterType="MaterielStock" resultMap="MaterielStockResult">
@@ -72,6 +74,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createTime != null  ">create_time,</if>
 			<if test="lastUpdate != null  ">last_update,</if>
 			<if test="temporaryNumber != null  ">temporary_number,</if>
+            <if test="lockNumber != null  ">lock_nubmer,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -86,6 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createTime != null  ">#{createTime},</if>
 			<if test="lastUpdate != null  ">#{lastUpdate},</if>
 			<if test="temporaryNumber != null  ">#{temporaryNumber},</if>
+            <if test="lockNumber != null  ">#{lockNumber},</if>
          </trim>
     </insert>
 	 
@@ -104,6 +108,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null  ">create_time = #{createTime},</if>
             <if test="lastUpdate != null  ">last_update = #{lastUpdate},</if>
             <if test="temporaryNumber != null  ">temporary_number = #{temporaryNumber},</if>
+            <if test="lockNumber != null  ">lock_number = #{lockNumber},</if>
         </trim>
         where id = #{id}
     </update>

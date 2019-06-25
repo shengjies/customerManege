@@ -89,4 +89,14 @@ public class OrderDetailsServiceImpl implements IOrderDetailsService
 	public List<OrderDetails> selectOrderDetailsListByPid(OrderDetails orderDetails) {
 		return orderDetailsMapper.selectOrderDetailsListByPid(orderDetails);
 	}
+
+	/**
+	 * 查询所差数量即需要生产数量大于0的订单明细
+	 * @param orderDetails 订单明细
+	 * @return 结果
+	 */
+	@Override
+	public List<OrderDetails> selectOrderDetailsListDifPro(OrderDetails orderDetails) {
+		return orderDetailsMapper.selectOrderDetailsListDifPro(orderDetails);
+	}
 }

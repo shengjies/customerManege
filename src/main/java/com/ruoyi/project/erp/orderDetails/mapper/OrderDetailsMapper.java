@@ -37,7 +37,6 @@ public interface OrderDetailsMapper {
      * @param orderDetails 订单详情信息
      * @return 结果
      */
-//    @DataSource(DataSourceType.ERP)
     public int insertOrderDetails(OrderDetails orderDetails);
 
     /**
@@ -46,7 +45,6 @@ public interface OrderDetailsMapper {
      * @param orderDetails 订单详情信息
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.ERP)
     public int updateOrderDetails(OrderDetails orderDetails);
 
     /**
@@ -71,7 +69,6 @@ public interface OrderDetailsMapper {
      * @param orderId 订单编号
      * @return
      */
-//    @DataSource(DataSourceType.ERP)
     int deleteOrderDetailsByOrderId(int orderId);
 
     /**
@@ -82,7 +79,6 @@ public interface OrderDetailsMapper {
      * @param productCode 产品编码
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.ERP)
     OrderDetails selectOrderDetailByCodeAndCusId(@Param("companyId") Integer companyId,
                                                  @Param("orderCode") String orderCode,
                                                  @Param("customerId") Integer customerId,
@@ -94,7 +90,6 @@ public interface OrderDetailsMapper {
 	 * @param sign 标记 0 或 1
 	 * @return
 	 */
-//    @DataSource(DataSourceType.ERP)
 	int editOrderDetailsSign(@Param("oid")int oid,@Param("sign") int sign);
 
 	/**
@@ -103,7 +98,6 @@ public interface OrderDetailsMapper {
 	 * @param pcode 产品编码
 	 * @return
 	 */
-//    @DataSource(DataSourceType.ERP)
 	OrderDetails findOrderDetailsByOidAndPCode(@Param("oid")int oid ,@Param("pcode")String pcode);
 
     /**
@@ -112,7 +106,6 @@ public interface OrderDetailsMapper {
      * @param productCode
      * @return
      */
-//    @DataSource(DataSourceType.ERP)
 	OrderDetails findByOrderCodeAndProductCode(@Param("companyId")int companyId,
                                                @Param("orderCode")String orderCode,
                                                @Param("productCode")String productCode);
@@ -162,4 +155,11 @@ public interface OrderDetailsMapper {
      * @return 结果
      */
     List<OrderDetails> selectOrderDetailsListByPid(OrderDetails orderDetails);
+
+    /**
+     * 查询所差数量即需要生产数量大于0的订单明细
+     * @param orderDetails 订单明细
+     * @return 结果
+     */
+    List<OrderDetails> selectOrderDetailsListDifPro(OrderDetails orderDetails);
 }

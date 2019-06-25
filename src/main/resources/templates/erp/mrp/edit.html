@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-mrp-edit" th:object="${mrp}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">公司id：</label>
+				<div class="col-sm-8">
+					<input id="companyId" name="companyId" th:field="*{companyId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">MRP编号：</label>
+				<div class="col-sm-8">
+					<input id="mCode" name="mCode" th:field="*{mCode}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物料编号：</label>
+				<div class="col-sm-8">
+					<input id="materielCode" name="materielCode" th:field="*{materielCode}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物料名称：</label>
+				<div class="col-sm-8">
+					<input id="materielName" name="materielName" th:field="*{materielName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物料型号：</label>
+				<div class="col-sm-8">
+					<input id="materielModel" name="materielModel" th:field="*{materielModel}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物料id：</label>
+				<div class="col-sm-8">
+					<input id="materielId" name="materielId" th:field="*{materielId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">供应商id：</label>
+				<div class="col-sm-8">
+					<input id="supplierId" name="supplierId" th:field="*{supplierId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">订单id：</label>
+				<div class="col-sm-8">
+					<input id="orderId" name="orderId" th:field="*{orderId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">订单编号：</label>
+				<div class="col-sm-8">
+					<input id="orderCode" name="orderCode" th:field="*{orderCode}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">产品id：</label>
+				<div class="col-sm-8">
+					<input id="productId" name="productId" th:field="*{productId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">产品编号：</label>
+				<div class="col-sm-8">
+					<input id="productCode" name="productCode" th:field="*{productCode}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">产品名称：</label>
+				<div class="col-sm-8">
+					<input id="productName" name="productName" th:field="*{productName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">所需数量：</label>
+				<div class="col-sm-8">
+					<input id="needNumber" name="needNumber" th:field="*{needNumber}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">所差数量：</label>
+				<div class="col-sm-8">
+					<input id="delNumber" name="delNumber" th:field="*{delNumber}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">调整数量：</label>
+				<div class="col-sm-8">
+					<input id="tiaoNumber" name="tiaoNumber" th:field="*{tiaoNumber}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">总数(所差数量+调整数量，不显示)：</label>
+				<div class="col-sm-8">
+					<input id="totalNumber" name="totalNumber" th:field="*{totalNumber}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">状态(0、需采购 1、采购中、2、采购完成 3、不采购)：</label>
+				<div class="col-sm-8">
+					<input id="mStatus" name="mStatus" th:field="*{mStatus}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "erp/mrp";
+		$("#form-mrp-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-mrp-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

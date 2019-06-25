@@ -22,6 +22,10 @@
         <result property="remark" column="remark"/>
         <result property="productId" column="product_id"/>
         <result property="lockNumber" column="lock_number"/>
+        <result property="lockMatNumber" column="lock_mat_number"/>
+        <result property="matStatus" column="mat_status"/>
+        <result property="tiaoNumber" column="tiao_number"/>
+        <result property="mrp_status" column="mrpStatus"/>
         <association property="customerName" column="customer_id" select="selectCusName">
             <result property="customerName" column="id"/>
         </association>
@@ -31,7 +35,8 @@
     </resultMap>
 
     <sql id="selectOrderDetailsVo">
-        select id, order_id, order_code, prodect_code,product_id, product_model, customer_code, product_name, product_prict,remark, number, total_prict, deliver_num,lock_number, create_time,customer_id,company_id from tab_order_details
+        select id, order_id, order_code, prodect_code,product_id, product_model, customer_code, product_name, product_prict,remark, number, total_prict, deliver_num,lock_number,
+         create_time,customer_id,company_id,lock_mat_number,mat_status,tiao_number,mrp_status from tab_order_details
     </sql>
 
     <select id="selectOrderDetailsList" parameterType="OrderDetails" resultMap="OrderDetailsResult">
@@ -103,6 +108,10 @@
             <if test="remark != null  ">remark,</if>
             <if test="productId != null  ">product_id,</if>
             <if test="lockNumber != null  ">lock_number,</if>
+            <if test="lockMatNumber != null  ">lock_mat_number,</if>
+            <if test="matStatus != null  ">mat_status,</if>
+            <if test="tiaoNumber != null  ">tiao_number,</if>
+            <if test="mrpStatus != null  ">mrp_status,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="orderId != null  ">#{orderId},</if>
@@ -121,6 +130,10 @@
             <if test="remark != null  ">#{remark},</if>
             <if test="productId != null  ">#{productId},</if>
             <if test="lockNumber != null  ">#{lockNumber},</if>
+            <if test="lockMatNumber != null  ">#{lockMatNumber},</if>
+            <if test="matStatus != null  ">#{matStatus},</if>
+            <if test="tiaoNumber != null  ">#{tiaoNumber},</if>
+            <if test="mrpStatus != null  ">#{mrpStatus},</if>
         </trim>
     </insert>
 
@@ -144,6 +157,10 @@
             <if test="productId != null  ">product_id = #{productId},</if>
             <if test="sign >= 0">sign = #{sign},</if>
             <if test="lockNumber != null  ">lock_number = #{lockNumber},</if>
+            <if test="lockMatNumber != null  ">lock_mat_number = #{lockMatNumber},</if>
+            <if test="matStatus != null  ">mat_status = #{matStatus},</if>
+            <if test="tiaoNumber != null  ">tiao_number = #{tiaoNumber},</if>
+            <if test="mrpStatus != null  ">mrp_status = #{mrpStatus},</if>
         </trim>
         where id = #{id}
     </update>
@@ -209,5 +226,13 @@
          where a.order_id = b.id and b.company_id =#{companyId} and b.customer_id = #{customerId}
          and a.product_id = #{productId} and b.order_status = #{orderStatus} and
          a.deliver_num &lt; a.number order by b.create_time desc limit 1;
+    </select>
+
+    <!--查询所需生产数量大于0的订单明细，用于mrp生成-->
+    <select id="selectOrderDetailsListDifPro" resultMap="OrderDetailsResult">
+        SELECT * FROM tab_order_details where (number-deliver_num-lock_number) > 0 and mrp_status = 0
+        <if test="companyId != null ">and company_id = #{companyId}</if>
+        <if test="orderCode != null  "> and order_code like concat('%',#{orderCode},'%')</if>
+        <if test="customerId != null and customerId != -1 "> and customer_id = #{customerId}</if>
     </select>
 </mapper>

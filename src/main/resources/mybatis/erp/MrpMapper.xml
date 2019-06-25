@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.mrp.mapper.MrpMapper">
+    
+    <resultMap type="Mrp" id="MrpResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="mCode"    column="m_code"    />
+        <result property="materielCode"    column="materiel_code"    />
+        <result property="materielName"    column="materiel_name"    />
+        <result property="materielModel"    column="materiel_model"    />
+        <result property="materielId"    column="materiel_id"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="productId"    column="product_id"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productName"    column="product_name"    />
+        <result property="needNumber"    column="need_number"    />
+        <result property="delNumber"    column="del_number"    />
+        <result property="tiaoNumber"    column="tiao_number"    />
+        <result property="totalNumber"    column="total_number"    />
+        <result property="mStatus"    column="m_status"    />
+    </resultMap>
+	
+	<sql id="selectMrpVo">
+        select id, company_id, m_code, materiel_code, materiel_name, materiel_model, materiel_id, supplier_id, order_id, order_code, product_id, product_code, product_name, need_number, del_number, tiao_number, total_number, m_status from tab_mrp
+    </sql>
+	
+    <select id="selectMrpList" parameterType="Mrp" resultMap="MrpResult">
+        <include refid="selectMrpVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="mCode != null  and mCode != '' "> and m_code = #{mCode}</if>
+             <if test="materielCode != null  and materielCode != '' "> and materiel_code = #{materielCode}</if>
+             <if test="materielName != null  and materielName != '' "> and materiel_name = #{materielName}</if>
+             <if test="materielModel != null  and materielModel != '' "> and materiel_model = #{materielModel}</if>
+             <if test="materielId != null "> and materiel_id = #{materielId}</if>
+             <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+             <if test="orderId != null "> and order_id = #{orderId}</if>
+             <if test="orderCode != null  and orderCode != '' "> and order_code = #{orderCode}</if>
+             <if test="productId != null "> and product_id = #{productId}</if>
+             <if test="productCode != null  and productCode != '' "> and product_code = #{productCode}</if>
+             <if test="productName != null  and productName != '' "> and product_name = #{productName}</if>
+             <if test="needNumber != null "> and need_number = #{needNumber}</if>
+             <if test="delNumber != null "> and del_number = #{delNumber}</if>
+             <if test="tiaoNumber != null "> and tiao_number = #{tiaoNumber}</if>
+             <if test="totalNumber != null "> and total_number = #{totalNumber}</if>
+             <if test="mStatus != null "> and m_status = #{mStatus}</if>
+         </where>
+    </select>
+    
+    <select id="selectMrpById" parameterType="Integer" resultMap="MrpResult">
+        <include refid="selectMrpVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMrp" parameterType="Mrp" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mrp
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="mCode != null  and mCode != ''  ">m_code,</if>
+			<if test="materielCode != null  and materielCode != ''  ">materiel_code,</if>
+			<if test="materielName != null  and materielName != ''  ">materiel_name,</if>
+			<if test="materielModel != null  and materielModel != ''  ">materiel_model,</if>
+			<if test="materielId != null  ">materiel_id,</if>
+			<if test="supplierId != null  ">supplier_id,</if>
+			<if test="orderId != null  ">order_id,</if>
+			<if test="orderCode != null  and orderCode != ''  ">order_code,</if>
+			<if test="productId != null  ">product_id,</if>
+			<if test="productCode != null  and productCode != ''  ">product_code,</if>
+			<if test="productName != null  and productName != ''  ">product_name,</if>
+			<if test="needNumber != null  ">need_number,</if>
+			<if test="delNumber != null  ">del_number,</if>
+			<if test="tiaoNumber != null  ">tiao_number,</if>
+			<if test="totalNumber != null  ">total_number,</if>
+			<if test="mStatus != null  ">m_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="mCode != null  and mCode != ''  ">#{mCode},</if>
+			<if test="materielCode != null  and materielCode != ''  ">#{materielCode},</if>
+			<if test="materielName != null  and materielName != ''  ">#{materielName},</if>
+			<if test="materielModel != null  and materielModel != ''  ">#{materielModel},</if>
+			<if test="materielId != null  ">#{materielId},</if>
+			<if test="supplierId != null  ">#{supplierId},</if>
+			<if test="orderId != null  ">#{orderId},</if>
+			<if test="orderCode != null  and orderCode != ''  ">#{orderCode},</if>
+			<if test="productId != null  ">#{productId},</if>
+			<if test="productCode != null  and productCode != ''  ">#{productCode},</if>
+			<if test="productName != null  and productName != ''  ">#{productName},</if>
+			<if test="needNumber != null  ">#{needNumber},</if>
+			<if test="delNumber != null  ">#{delNumber},</if>
+			<if test="tiaoNumber != null  ">#{tiaoNumber},</if>
+			<if test="totalNumber != null  ">#{totalNumber},</if>
+			<if test="mStatus != null  ">#{mStatus},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMrp" parameterType="Mrp">
+        update tab_mrp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="mCode != null  and mCode != ''  ">m_code = #{mCode},</if>
+            <if test="materielCode != null  and materielCode != ''  ">materiel_code = #{materielCode},</if>
+            <if test="materielName != null  and materielName != ''  ">materiel_name = #{materielName},</if>
+            <if test="materielModel != null  and materielModel != ''  ">materiel_model = #{materielModel},</if>
+            <if test="materielId != null  ">materiel_id = #{materielId},</if>
+            <if test="supplierId != null  ">supplier_id = #{supplierId},</if>
+            <if test="orderId != null  ">order_id = #{orderId},</if>
+            <if test="orderCode != null  and orderCode != ''  ">order_code = #{orderCode},</if>
+            <if test="productId != null  ">product_id = #{productId},</if>
+            <if test="productCode != null  and productCode != ''  ">product_code = #{productCode},</if>
+            <if test="productName != null  and productName != ''  ">product_name = #{productName},</if>
+            <if test="needNumber != null  ">need_number = #{needNumber},</if>
+            <if test="delNumber != null  ">del_number = #{delNumber},</if>
+            <if test="tiaoNumber != null  ">tiao_number = #{tiaoNumber},</if>
+            <if test="totalNumber != null  ">total_number = #{totalNumber},</if>
+            <if test="mStatus != null  ">m_status = #{mStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMrpById" parameterType="Integer">
+        delete from tab_mrp where id = #{id}
+    </delete>
+	
+    <delete id="deleteMrpByIds" parameterType="String">
+        delete from tab_mrp where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

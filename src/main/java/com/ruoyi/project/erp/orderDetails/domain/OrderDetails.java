@@ -62,6 +62,55 @@ public class OrderDetails extends BaseEntity
 	private String remark;
 
 	private Integer productId;
+	/**
+	 * 锁定库存数量
+	 */
+	private Integer lockMatNumber;
+	/**
+	 * 物料满足状态</br>
+	 * 0、物料充足可生产，1、物料不足不可生产
+	 */
+	private Integer matStatus;
+	/**
+	 * 调整数量
+	 */
+	private Integer tiaoNumber;
+	/**
+	 * 是否生成mrp状态（0、未生成，1、已生成）
+	 */
+	private Integer mrpStatus;
+
+	public Integer getMrpStatus() {
+		return mrpStatus;
+	}
+
+	public void setMrpStatus(Integer mrpStatus) {
+		this.mrpStatus = mrpStatus;
+	}
+
+	public Integer getTiaoNumber() {
+		return tiaoNumber;
+	}
+
+	public void setTiaoNumber(Integer tiaoNumber) {
+		this.tiaoNumber = tiaoNumber;
+	}
+
+	public Integer getLockMatNumber() {
+		return lockMatNumber;
+	}
+
+	public void setLockMatNumber(Integer lockMatNumber) {
+		this.lockMatNumber = lockMatNumber;
+	}
+
+	public Integer getMatStatus() {
+		return matStatus;
+	}
+
+	public void setMatStatus(Integer matStatus) {
+		this.matStatus = matStatus;
+	}
 
 	public Integer getProductNumber() {
 		return productNumber;
@@ -242,20 +291,32 @@ public class OrderDetails extends BaseEntity
 		this.productId = productId;
 	}
 
+	@Override
 	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("orderId", getOrderId())
-            .append("orderCode", getOrderCode())
-            .append("prodectCode", getProdectCode())
-            .append("productModel", getProductModel())
-            .append("customerCode", getCustomerCode())
-            .append("productName", getProductName())
-            .append("productPrict", getProductPrict())
-            .append("number", getNumber())
-            .append("totalPrict", getTotalPrict())
-            .append("deliverNum", getDeliverNum())
-            .append("createTime", getCreateTime())
-            .toString();
-    }
+		return "OrderDetails{" +
+				"id=" + id +
+				", orderId=" + orderId +
+				", orderCode='" + orderCode + '\'' +
+				", prodectCode='" + prodectCode + '\'' +
+				", productNumber=" + productNumber +
+				", productModel='" + productModel + '\'' +
+				", customerCode='" + customerCode + '\'' +
+				", productName='" + productName + '\'' +
+				", productPrict=" + productPrict +
+				", number=" + number +
+				", totalPrict=" + totalPrict +
+				", deliverNum=" + deliverNum +
+				", lockNumber=" + lockNumber +
+				", createTime=" + createTime +
+				", customerId=" + customerId +
+				", customerName='" + customerName + '\'' +
+				", companyId=" + companyId +
+				", remark='" + remark + '\'' +
+				", productId=" + productId +
+				", lockMatNumber=" + lockMatNumber +
+				", matStatus=" + matStatus +
+				", tiaoNumber=" + tiaoNumber +
+				", sign=" + sign +
+				'}';
+	}
 }

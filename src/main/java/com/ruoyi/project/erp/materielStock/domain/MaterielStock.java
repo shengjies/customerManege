@@ -67,6 +67,18 @@ public class MaterielStock extends BaseEntity {
      * 临时库存数量
      */
     private Integer temporaryNumber;
+    /**
+     * 锁定物料库存数量
+     */
+    private Integer lockNumber;
+
+    public Integer getLockNumber() {
+        return lockNumber;
+    }
+
+    public void setLockNumber(Integer lockNumber) {
+        this.lockNumber = lockNumber;
+    }
 
     public void setId(Integer id) {
         this.id = id;

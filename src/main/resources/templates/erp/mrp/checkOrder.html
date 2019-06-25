@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            订单号：<input type="text" name="orderCode"/>
+                        </li>
+
+                        <li>
+                            客户：<select style="width: 240px"  name="customerId" id="customerId"
+                                       th:with="customer = ${@customer.selectCustomerAllByCompanyId(#httpServletRequest.getCookies())}">
+                            <option value="-1">请选择</option>
+                            <option th:each="item : ${customer}" th:value="${item.id}" th:utext="${item.customerName}"></option>
+                        </select>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-success btn-del btn-del disabled" onclick="addMrp()" shiro:hasPermission="erp:mrp:add">
+                <i class="fa fa-sticky-note"></i> 生成MRP
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "erp/orderDetails";
+
+    $(function() {
+        var options = {
+            url: prefix + "/listDifPro",
+            addMrpUrl: "/erp/mrp/addMrpByOrDeIds",
+            modalName: "订单明细",
+            search: false,
+            showExport: true,
+            sortOrder:"desc",
+            sortName:"createTime",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field : 'id',
+                    title : '',
+                    visible: false
+                },
+                {
+                    field : 'orderCode',
+                    title : '订单号',
+                    sortable: true,
+                },
+                {
+                    field : 'prodectCode',
+                    title : '产品编号',
+                    sortable: true,
+                },
+                {
+                    field : 'customerName',
+                    title : '客户名称',
+                },
+                {
+                    field : 'number',
+                    title : '订单数量',
+                    sortable: true,
+                },
+                {
+                    field : 'lockNumber',
+                    title : '锁定产品库存数',
+                    sortable: true,
+                },
+                {
+                    field : 'deliverNum',
+                    title : '交付数量',
+                    sortable: true,
+                },
+                {
+                    title : '所差数量',
+                    formatter:function (value,row,index) {
+                        return row.number - row.lockNumber - row.deliverNum;
+                    }
+                },
+                {
+                    field : 'lockMatNumber',
+                    title : '锁定物料库存数',
+                    sortable: true,
+                },
+                {
+                    field : 'tiaoNumber',
+                    title : '调整数量',
+                    formatter:function (value,row,index) {
+                        return '<input onchange="changeNumber(this,'+ row.id +','+ index +')" type="number" name="tiaoNumber" id="tiaoNumber" value="'+ row.tiaoNumber+'"/>'
+                    }
+                },
+                {
+                    field : 'matStatus',
+                    title : '可生产状态',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        if (row.matStatus != 0) {
+                            return '<a href="javascript:void(0)"><span style="color: red;font-weight: bold">不可生产</span></a>'
+                        } else {
+                            return "物料充足可生产";
+                        }
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 数值改变赋值给对应的字段
+     */
+    function changeNumber(val,id,index) {
+        $('#bootstrap-table').bootstrapTable('updateCell',{index:index,field:'tiaoNumber',value:val.value});
+    }
+    /**
+     * 生成MRP
+     */
+    function addMrp() {
+
+        var a = $('#bootstrap-table').bootstrapTable('getSelections');
+        if (a.length > 0) {
+            console.log(a[0]);
+            $.modal.confirm("确认将选中的" + a.length + "条数据生成MRP吗?", function () {
+                var url = $.table._option.addMrpUrl;
+                var data = {"mrps": JSON.stringify(a)};
+                $.operate.submit(url, "post", "json", data);
+            });
+        } else {
+            $.modal.alertWarning("请至少选择一条记录");
+        }
+
+
+    }
+</script>
+</body>
+</html>
