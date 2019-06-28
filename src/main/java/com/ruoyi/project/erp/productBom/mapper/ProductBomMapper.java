@@ -1,7 +1,10 @@
 package com.ruoyi.project.erp.productBom.mapper;
 
 import com.ruoyi.project.erp.productBom.domain.ProductBom;
-import java.util.List;	
+import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 /**
  * 产品BOM单 数据层
@@ -58,5 +61,12 @@ public interface ProductBomMapper
      * @return 结果
      */
 	public int deleteProductBomByIds(String[] ids);
-	
+
+	/**
+	 * 通过产品id查询最新的产品bom信息
+	 * @param companyId 公司id
+	 * @param productId 产品id
+	 * @return 结果
+	 */
+    ProductBom selectProBomNewVerByProId(@Param("companyId") Integer companyId,@Param("productId") Integer productId);
 }

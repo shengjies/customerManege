@@ -59,10 +59,22 @@ public class Purchase extends BaseEntity
 	private String remark;
 
 	private Float totalPrice;
+	/**
+	 * mrp生成采购单信息封装
+	 */
+	private String mrpDetails;
 
 	private List<PurchaseDetails> details;
 
-	public void setId(Integer id) 
+	public String getMrpDetails() {
+		return mrpDetails;
+	}
+
+	public void setMrpDetails(String mrpDetails) {
+		this.mrpDetails = mrpDetails;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}
@@ -280,6 +292,8 @@ public class Purchase extends BaseEntity
 				", createTime=" + createTime +
 				", create_by=" + create_by +
 				", remark='" + remark + '\'' +
+				", totalPrice=" + totalPrice +
+				", mrpDetails='" + mrpDetails + '\'' +
 				", details=" + details +
 				'}';
 	}

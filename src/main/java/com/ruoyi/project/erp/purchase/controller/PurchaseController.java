@@ -8,6 +8,7 @@ import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
 import com.ruoyi.project.erp.contract.service.IContractService;
+import com.ruoyi.project.erp.mrp.domain.Mrp;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.aspectj.weaver.loadtime.Aj;
@@ -89,6 +90,12 @@ public class PurchaseController extends BaseController
 	{
 	    return prefix + "/add";
 	}
+
+	@GetMapping("/addPur")
+	public String addPur(Integer supplierId, ModelMap modelMap){
+		modelMap.put("supplierId",supplierId);
+		return prefix + "/checkTime";
+	}
 	
 	/**
 	 * 新增保存采购单
@@ -147,7 +154,11 @@ public class PurchaseController extends BaseController
 	@RequestMapping("/status")
 	@RequiresPermissions("erp:purchase:edit")
 	public AjaxResult editStatus(Purchase purchase){
-		return toAjax(purchaseService.editStatus(purchase));
+		try {
+			return toAjax(purchaseService.editStatus(purchase));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 	/**
@@ -203,5 +214,18 @@ public class PurchaseController extends BaseController
 		Workbook wb = purchaseService.uploadPurchase(id,request);
 		String fileName = ExcelUtils.encodingFilename("采购单");
 		return ExcelUtils.getAjaxResult(wb,fileName);
+	}
+
+	/**
+	 * 勾选mrp转化成采购单
+	 */
+	@PostMapping("/mrpToPurchase")
+	@ResponseBody
+	public AjaxResult mrpToPurchase(@RequestBody Purchase purchase){
+		try {
+			return toAjax(purchaseService.mrpToPurchase(purchase));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 }

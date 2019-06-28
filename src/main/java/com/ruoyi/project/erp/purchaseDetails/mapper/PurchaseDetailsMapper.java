@@ -69,7 +69,6 @@ public interface PurchaseDetailsMapper
 	 * @param mcode 物料编码
 	 * @return
 	 */
-//	@DataSource(DataSourceType.ERP)
 	PurchaseDetails selectDetailByPidAndMCode(@Param("pid")int pid,@Param("mcode")String mcode);
 
 	/**

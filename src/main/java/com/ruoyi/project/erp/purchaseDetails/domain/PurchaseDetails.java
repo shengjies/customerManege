@@ -47,10 +47,70 @@ public class PurchaseDetails extends BaseEntity
 	private Integer moq;
 
 	private Integer supplierId;
-
-	private int sign;//用于标记 默认未 0
+	//用于标记 默认未 0
+	private int sign;
 
 	private Integer companyId;
+	/** 封装mrp主键自增长id */
+	private Integer mrpId;
+	/** 封装mrp物料id */
+	private Integer materielId;
+	/** 封装mrp所差数量 */
+	private Integer delNumber;
+	/** 封装mrp调整数量 */
+	private Integer tiaoNumber;
+	/** 封装mrp总数(所差数量+调整数量，不显示) */
+	private Integer totalNumber;
+	/** 封装mrp锁定的物料库存数量 */
+	private Integer lockMatNumber;
+
+	public Integer getTotalNumber() {
+		return totalNumber;
+	}
+
+	public void setTotalNumber(Integer totalNumber) {
+		this.totalNumber = totalNumber;
+	}
+
+	public Integer getLockMatNumber() {
+		return lockMatNumber;
+	}
+
+	public void setLockMatNumber(Integer lockMatNumber) {
+		this.lockMatNumber = lockMatNumber;
+	}
+
+	public Integer getMrpId() {
+		return mrpId;
+	}
+
+	public void setMrpId(Integer mrpId) {
+		this.mrpId = mrpId;
+	}
+
+	public Integer getMaterielId() {
+		return materielId;
+	}
+
+	public void setMaterielId(Integer materielId) {
+		this.materielId = materielId;
+	}
+
+	public Integer getDelNumber() {
+		return delNumber;
+	}
+
+	public void setDelNumber(Integer delNumber) {
+		this.delNumber = delNumber;
+	}
+
+	public Integer getTiaoNumber() {
+		return tiaoNumber;
+	}
+
+	public void setTiaoNumber(Integer tiaoNumber) {
+		this.tiaoNumber = tiaoNumber;
+	}
 
 	public Integer getPrereceiveNumber() {
 		return prereceiveNumber;
@@ -200,19 +260,32 @@ public class PurchaseDetails extends BaseEntity
 		this.supplierId = supplierId;
 	}
 
+	@Override
 	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("purchaseId", getPurchaseId())
-            .append("materielCode", getMaterielCode())
-            .append("materielName", getMaterielName())
-            .append("materielModel", getMaterielModel())
-            .append("price", getPrice())
-            .append("supplierCode", getSupplierCode())
-            .append("number", getNumber())
-            .append("deliverNum", getDeliverNum())
-            .append("totalPrict", getTotalPrict())
-            .append("remark", getRemark())
-            .toString();
-    }
+		return "PurchaseDetails{" +
+				"id=" + id +
+				", purchaseId=" + purchaseId +
+				", purchaseCode='" + purchaseCode + '\'' +
+				", materielCode='" + materielCode + '\'' +
+				", materielName='" + materielName + '\'' +
+				", materielModel='" + materielModel + '\'' +
+				", price=" + price +
+				", supplierCode='" + supplierCode + '\'' +
+				", number=" + number +
+				", deliverNum=" + deliverNum +
+				", prereceiveNumber=" + prereceiveNumber +
+				", totalPrict=" + totalPrict +
+				", remark='" + remark + '\'' +
+				", moq=" + moq +
+				", supplierId=" + supplierId +
+				", sign=" + sign +
+				", companyId=" + companyId +
+				", mrpId=" + mrpId +
+				", materielId=" + materielId +
+				", delNumber=" + delNumber +
+				", tiaoNumber=" + tiaoNumber +
+				", totalNumber=" + totalNumber +
+				", lockMatNumber=" + lockMatNumber +
+				'}';
+	}
 }

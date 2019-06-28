@@ -119,12 +119,13 @@
 					sortable: true
 				},
 				{
-					field : 'goodNumber', 
-					title : '良品数',
+					field : 'goodNumber',
+					title : '可用库存/锁定库存',
 					sortable: true,
-                    formatter: function (value, row, index) {
-                        return '<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="handleMatStock(\'' + row.materielId + '\')"><i></i>'+ row.goodNumber +'</a> '
-                    }
+					formatter: function (value, row, index) {
+						return '<a href="javascript:void(0)" onclick="handleMatStock(\'' + row.materielId + '\')"><span style="font-weight: bold;color: green">'+ row.goodNumber +'</span></a> '+'/'+
+							'<a href="javascript:void(0)" onclick="showLockDetail('+ row.materielId+')"><span style="font-weight: bold;color: red">'+ row.lockNumber +'</span></a>'
+					}
 				},
 				{
 					field : 'badNumber', 

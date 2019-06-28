@@ -53,8 +53,15 @@ public interface IMrpService
 
 	/**
 	 * 将选中的订单明细生成mrp
-	 * @param mrps
+	 * @param mrps mrp列表
 	 * @return 结果
 	 */
     int addMrpByOrDeIds(String mrps);
+
+	/**
+	 * 取消MRP
+	 * @param mrp mrp信息
+	 * @return 结果
+	 */
+	int cancelMrp(Mrp mrp);
 }

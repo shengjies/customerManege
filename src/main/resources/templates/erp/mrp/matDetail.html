@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" id="orderId" name="orderId" th:value="${orderId}">
+                <input type="hidden" id="productId" name="productId" th:value="${productId}">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            物料编号：<input type="text" name="materielCode"/>
+                        </li>
+
+                        <li>
+                            采购状态：
+                            <select id="mStatus" name="mStatus">
+                                <option value="-1">请选择</option>
+                                <option value="0">需采购</option>
+                                <option value="1">采购中</option>
+                                <option value="2">采购完成</option>
+                                <option value="3">不采购</option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "erp/mrp";
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            modalName: "MRP记录",
+            search: false,
+            showExport: false,
+            showSearch: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            columns: [
+                {
+                    field : 'id',
+                    title : '主键自增长id',
+                    visible: false
+                },
+                {
+                    field : 'mCode',
+                    title : 'MRP编号',
+                    sortable: true
+                },
+                {
+                    field : 'materielCode',
+                    title : '物料编号',
+                    sortable: true
+                },
+                {
+                    field : 'needNumber',
+                    title : '所需数量',
+                    sortable: true
+                },
+                {
+                    field : 'delNumber',
+                    title : '所差数量',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        if (row.delNumber < 0) {
+                            return '0';
+                        } else {
+                            return row.delNumber;
+                        }
+                    }
+                },
+                {
+                    field : 'mStatus',
+                    title : '采购状态',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        if (row.mStatus == 0) {
+                            return '<span style="color: red">需采购</span>';
+                        } else if (row.mStatus == 1) {
+                            return '<span style="color: blue">采购中</span>';
+                        } else if (row.mStatus == 2) {
+                            return '<span style="color: green">采购完成</span>';
+                        } else if (row.mStatus == 3) {
+                            return '<span style="color: black">不需要采购</span>';
+                        }
+                    }
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId");
+    });
+
+    function submitHandler() {
+        $.modal.close();
+        window.parent.$.table.refresh();
+    }
+</script>
+</body>
+</html>

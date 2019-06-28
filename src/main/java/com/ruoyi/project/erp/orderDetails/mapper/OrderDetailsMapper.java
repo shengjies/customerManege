@@ -162,4 +162,15 @@ public interface OrderDetailsMapper {
      * @return 结果
      */
     List<OrderDetails> selectOrderDetailsListDifPro(OrderDetails orderDetails);
+
+    /**
+     * 通过订单id和产品id查询订单明细
+     * @param companyId 公司id
+     * @param orderId 订单id
+     * @param productId 产品id
+     * @return 结果
+     */
+    OrderDetails selectOrderDetailsListByOIdAndPid(@Param("companyId") Integer companyId,
+                                                   @Param("orderId") Integer orderId,
+                                                   @Param("productId") Integer productId);
 }

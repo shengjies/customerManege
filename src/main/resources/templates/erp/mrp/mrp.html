@@ -3,169 +3,264 @@
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <body class="gray-bg">
-    
-     <div class="container-div">
-		<div class="row">
-			<div class="col-sm-12 search-collapse">
-				<form id="formId">
-					<div class="select-list">
-						<ul>
-							<li>
-								物料编号：<input type="text" name="materielCode"/>
-							</li>
 
-							<li>
-								物料名称：<input type="text" name="materielName"/>
-							</li>
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" name="supplierId" id="supplierId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            物料编号：<input type="text" name="materielCode"/>
+                        </li>
 
-							<li>
-								物料型号：<input type="text" name="materielModel"/>
-							</li>
+                        <li>
+                            物料型号：<input type="text" name="materielModel"/>
+                        </li>
 
-							<li>
-								订单编号：<input type="text" name="orderCode"/>
-							</li>
+                        <li>
+                            订单编号：<input type="text" name="orderCode"/>
+                        </li>
 
-							<li>
-								产品编号：<input type="text" name="productCode"/>
-							</li>
+                        <li>
+                            采购状态：
+                            <select id="mStatus" name="mStatus" style="width: 100px;">
+                                <option value="-1">请选择</option>
+                                <option value="0">需采购</option>
+                                <option value="1">采购中</option>
+                                <option value="2">采购完成</option>
+                                <option value="3">不采购</option>
+                            </select>
+                        </li>
 
-							<li>
-								状态(0、需采购 1、采购中、2、采购完成 3、不采购)：<input type="text" name="mStatus"/>
-							</li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
 
-							<li>
-								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
-							</li>
-						</ul>
-					</div>
-				</form>
-			</div>
-			
-	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-				<a class="btn btn-success" onclick="addMrp()" shiro:hasPermission="erp:mrp:add">
-					<i class="fa fa-plus"></i> 添加MRP
-				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="erp:mrp:edit">
-					<i class="fa fa-edit"></i> 修改
-				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="erp:mrp:remove">
-					<i class="fa fa-remove"></i> 删除
-				</a>
-				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="erp:mrp:export">
-						<i class="fa fa-download"></i> 导出
-				 </a>
-			</div>
-			<div class="col-sm-12 select-table table-striped">
-				<table id="bootstrap-table" data-mobile-responsive="true"></table>
-			</div>
-		</div>
-	</div>
-    <div th:include="include :: footer"></div>
-    <script th:inline="javascript">
-        var editFlag = [[${@permission.hasPermi('erp:mrp:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('erp:mrp:remove')}]];
-        var prefix = ctx + "erp/mrp";
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <div class="select-list">
+                <ul>
+                    <li>
+                        <a class="btn btn-success btn-sm" onclick="addMrp()" shiro:hasPermission="erp:mrp:add">
+                            <i class="fa fa-plus"></i> 添加MRP
+                        </a>
+                    </li>
+                    <li>
+                        选择供应商：
+                        <select  name="checkSup" id="checkSup" onchange="changeSup(this)" th:with="supplier = ${@supplier.selectSupplierAllByCompanyId(#httpServletRequest.getCookies())}">
+                            <option value="-1">请选择</option>
+                            <option th:each="item : ${supplier}" th:text="${item.supplierName}" th:value="${item.id}"></option>
+                        </select>
+                    </li>
+                    <li>
+                        <a class="btn btn-primary btn-del btn-del disabled btn-sm" onclick="addPurchase()"
+                           shiro:hasPermission="erp:purchase:add">
+                            <i class="fa fa-file-powerpoint-o"></i> 生成采购单
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var cancelFlag = [[${@permission.hasPermi('erp:mrp:cancel')}]];
+    var prefix = ctx + "erp/mrp";
 
-        $(function() {
-            var options = {
-                url: prefix + "/list",
-                createUrl: prefix + "/addMrp",
-                updateUrl: prefix + "/edit/{id}",
-                removeUrl: prefix + "/remove",
-				exportUrl: prefix + "/export",
-                modalName: "MRP记录",
-				search: false,
-		        showExport: true,
-                columns: [{
-		            checkbox: true
-		        },
-				{
-					field : 'id', 
-					title : '主键自增长id',
-					visible: false
-				},
-				{
-					field : 'mCode', 
-					title : 'MRP编号',
-					sortable: true
-				},
-				{
-					field : 'materielCode', 
-					title : '物料编号',
-					sortable: true
-				},
-				{
-					field : 'materielName', 
-					title : '物料名称',
-					sortable: true
-				},
-				{
-					field : 'materielModel', 
-					title : '物料型号',
-					sortable: true
-				},
-				{
-					field : 'supplierId', 
-					title : '供应商id',
-					sortable: true
-				},
-				{
-					field : 'orderCode', 
-					title : '订单编号',
-					sortable: true
-				},
-				{
-					field : 'productCode', 
-					title : '产品编号',
-					sortable: true
-				},
-				{
-					field : 'productName', 
-					title : '产品名称',
-					sortable: true
-				},
-				{
-					field : 'needNumber', 
-					title : '所需数量',
-					sortable: true
-				},
-				{
-					field : 'delNumber', 
-					title : '所差数量',
-					sortable: true
-				},
-				{
-					field : 'tiaoNumber', 
-					title : '调整数量',
-					sortable: true
-				},
-				{
-					field : 'mStatus', 
-					title : '状态(0、需采购 1、采购中、2、采购完成 3、不采购)',
-					sortable: true
-				},
-		        {
-		            title: '操作',
-		            align: 'center',
-		            formatter: function(value, row, index) {
-		            	var actions = [];
-		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
-						return actions.join('');
-		            }
-		        }]
-            };
-            $.table.init(options);
-        });
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/addMrp",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "MRP记录",
+            search: false,
+            showExport: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'mrpId',
+                    title: '主键自增长id',
+                    visible: false
+                },
+                {
+                    field: 'mCode',
+                    title: 'MRP编号',
+                    sortable: true
+                },
+                {
+                    field: 'materielCode',
+                    title: '物料编号',
+                    sortable: true
+                },
+                {
+                    field: 'materielName',
+                    title: '物料名称',
+                    sortable: true
+                },
+                {
+                    field: 'materielModel',
+                    title: '物料型号',
+                    sortable: true
+                },
+                {
+                    field: 'orderCode',
+                    title: '订单编号',
+                    sortable: true
+                },
+                {
+                    field: 'productCode',
+                    title: '产品编号',
+                    sortable: true
+                },
+                {
+                    field: 'productName',
+                    title: '产品名称',
+                    sortable: true
+                },
+                {
+                    field: 'needNumber',
+                    title: '所需数量',
+                    sortable: true
+                },
+                {
+                    field: 'delNumber',
+                    title: '所差数量',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        if (row.delNumber < 0) {
+                            return '0';
+                        } else {
+                            return row.delNumber;
+                        }
+                    }
+                },
+                {
+                    field: 'lockMatNumber',
+                    title: '锁定物料库存数量',
+                    sortable: true
+                },
+                {
+                    field: 'tiaoNumber',
+                    title: '调整数量',
+                    sortable: true,
+                    width: 100,
+                    formatter: function (value, row, index) {
+                        return '<input style="width: 100px" onchange="changeNumber(this,' + row.id + ',' + index + ')" type="number" name="tiaoNumber" id="tiaoNumber" value="' + row.tiaoNumber + '"/>'
+                    }
+                },
+                {
+                    field: 'mStatus',
+                    title: '采购状态',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.mStatus == 0) {
+                            return '<span style="color: red">需采购</span>';
+                        } else if (row.mStatus == 1) {
+                            return '<span style="color: blue">采购中</span>';
+                        } else if (row.mStatus == 2) {
+                            return '<span style="color: green">采购完成</span>';
+                        } else if (row.mStatus == 3) {
+                            return '<span style="color: black">不需要采购</span>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-danger btn-xs ' + cancelFlag + '" href="#" onclick="cancel(\'' + row.mCode + '\')"><i class="fa fa-remove"></i>取消MRP</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
 
-        /**
-         * 订单明细选择生成MRP窗口
-         */
-        function addMrp() {
-            createMenuItem($.table._option.createUrl,"订单明细选择生成MRP窗口");
+    /**
+     * 数值改变赋值给对应的字段
+     */
+    function changeNumber(val, id, index) {
+        $('#bootstrap-table').bootstrapTable('updateCell', {index: index, field: 'tiaoNumber', value: val.value});
+    }
+
+    /**
+     * 订单明细选择生成MRP窗口
+     */
+    function addMrp() {
+        createMenuItem($.table._option.createUrl, "订单明细选择生成MRP窗口");
+    }
+
+    /**
+     * 取消MRP
+     */
+    function cancel(mCode) {
+        $.modal.confirm("确定取消该相同编号批次的MRP信息吗?",function (callBack) {
+            if(callBack){
+                var data ={
+                    mCode:mCode,
+                }
+                var config = {
+                    url: prefix + "/cancelMrp",
+                    type: "post",
+                    dataType: "json",
+                    data: data,
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        $.operate.ajaxSuccess(result);
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    /**
+     * 选择供应商查询和供应商关联的物料MRP信息
+     */
+    function changeSup(val) {
+        $("#supplierId").val(($(val).find("option:selected").val()));
+        $.table.search("formId");
+    }
+
+    /**
+     * 生成采购单填写相关信息
+     */
+    function addPurchase() {
+        var detail = $('#bootstrap-table').bootstrapTable('getSelections');
+        var supplierId = $("#supplierId").val();
+        if (!supplierId || supplierId == -1) {
+            $.modal.alertWarning("请选择对应的供应商生成采购单");
+            return;
         }
-    </script>
+        if (detail.length > 0) {
+            $.modal.confirm("确认将选中的" + detail.length + "条数据生成采购单吗?", function () {
+                var data =  JSON.stringify(detail);
+                var url = "/erp/purchase/addPur?supplierId=" + supplierId;
+                $.modal.open("采购单信息填写",url,700,500);
+            });
+        } else {
+            $.modal.alertWarning("请至少选择一条记录");
+        }
+    }
+</script>
 </body>
 </html>

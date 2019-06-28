@@ -20,4 +20,25 @@ public class MrpConstants {
      * 0、未生成 ；1、已生成
      */
     public final static Integer ORDER_TO_MRP = 1;
+
+    /**
+     * MRP采购状态描述 需采购 0 </br>
+     * 0、需采购 1、采购中、2、采购完成 3、不采购
+     */
+    public final static Integer MRP_MAT_NEEDCG = 0;
+    /**
+     * MRP采购状态描述 采购中 1 </br>
+     * 0、需采购 1、采购中、2、采购完成 3、不采购
+     */
+    public final static Integer MRP_MAT_CGING = 1;
+    /**
+     * MRP采购状态描述 采购完成 2 </br>
+     * 0、需采购 1、采购中、2、采购完成 3、不采购
+     */
+    public final static Integer MRP_MAT_CGFINISH = 2;
+    /**
+     * MRP采购状态描述 不采购 3 </br>
+     * 0、需采购 1、采购中、2、采购完成 3、不采购
+     */
+    public final static Integer MRP_MAT_NOTCG = 3;
 }

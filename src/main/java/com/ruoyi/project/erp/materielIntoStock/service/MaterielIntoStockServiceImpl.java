@@ -15,11 +15,18 @@ import com.ruoyi.project.erp.materielStockIqc.domain.MaterielStockIqc;
 import com.ruoyi.project.erp.materielStockIqc.mapper.MaterielStockIqcMapper;
 import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
 import com.ruoyi.project.erp.materielSupplier.mapper.MaterielSupplierMapper;
+import com.ruoyi.project.erp.mrp.domain.Mrp;
+import com.ruoyi.project.erp.mrp.mapper.MrpMapper;
+import com.ruoyi.project.erp.mrpPurchase.domain.MrpPurchase;
+import com.ruoyi.project.erp.mrpPurchase.mapper.MrpPurchaseMapper;
+import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
+import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
 import com.ruoyi.project.erp.purchase.domain.Purchase;
 import com.ruoyi.project.erp.purchase.mapper.PurchaseMapper;
 import com.ruoyi.project.erp.purchaseDetails.domain.PurchaseDetails;
 import com.ruoyi.project.erp.purchaseDetails.mapper.PurchaseDetailsMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,22 +49,31 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
     private MaterielIntoStockMapper materielIntoStockMapper;
 
     @Autowired
-    private MaterielIntoStockDetailsMapper materielIntoStockDetailsMapper; // 物料入库清单数据层
+    private MaterielIntoStockDetailsMapper materielIntoStockDetailsMapper;
 
     @Autowired
-    private MaterielStockMapper materielStockMapper; // 物料库存数据层
+    private MaterielStockMapper materielStockMapper;
 
     @Autowired
-    private PurchaseMapper purchaseMapper; // 采购单数据层
+    private PurchaseMapper purchaseMapper;
 
     @Autowired
-    private PurchaseDetailsMapper purchaseDetailsMapper; // 采购单详情数据层
+    private PurchaseDetailsMapper purchaseDetailsMapper;
 
     @Autowired
-    private MaterielSupplierMapper materielSupplierMapper; // 物料供应商关联数据层
+    private MaterielSupplierMapper materielSupplierMapper;
 
     @Autowired
-    private MaterielStockIqcMapper materielStockIqcMapper; // 物料IQC数据层
+    private MaterielStockIqcMapper materielStockIqcMapper;
+
+    @Autowired
+    private MrpPurchaseMapper mrpPurchaseMapper;
+
+    @Autowired
+    private MrpMapper mrpMapper;
+
+    @Autowired
+    private OrderDetailsMapper orderDetailsMapper;
 
     /**
      * 查询物料入库信息
@@ -75,8 +91,8 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
         for (MaterielIntoStockDetails intoStockDetails : materielIntoStockDetailsList) {
             if (!StringUtils.isEmpty(intoStockDetails.getPurchaseCode()) && !"-1".equals(intoStockDetails.getPurchaseCode())) {
                 // 获取采购单明细
-                PurchaseDetails purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsByCode(null,intoStockDetails.getPurchaseCode(),
-                        intoStockDetails.getSupplierCode(),intoStockDetails.getMaterielCode());
+                PurchaseDetails purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsByCode(null, intoStockDetails.getPurchaseCode(),
+                        intoStockDetails.getSupplierCode(), intoStockDetails.getMaterielCode());
                 intoStockDetails.setPurchaseDetails(purchaseDetails);
             }
         }
@@ -93,7 +109,7 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
     @Override
     public List<MaterielIntoStock> selectMaterielIntoStockList(MaterielIntoStock materielIntoStock, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        if (user == null ) {
+        if (user == null) {
             return Collections.emptyList();
         }
         materielIntoStock.setCompanyId(user.getCompanyId());
@@ -108,7 +124,7 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int insertMaterielIntoStock(MaterielIntoStock materielIntoStock,HttpServletRequest request) {
+    public int insertMaterielIntoStock(MaterielIntoStock materielIntoStock, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) return 0;
         /**
@@ -123,6 +139,9 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
         int i = materielIntoStockMapper.insertMaterielIntoStock(materielIntoStock);
         if (!StringUtils.isEmpty(materielIntoStock.getMaterielIntoStockDetails())) {
             BigDecimal intoNumber = null;
+            List<MrpPurchase> mrpPurchaseList = null;
+            Mrp mrp = null;
+            OrderDetails orderDetails = null;
             List<MaterielIntoStockDetails> materielIntoStockDetails = materielIntoStock.getMaterielIntoStockDetails();
             for (MaterielIntoStockDetails materielIntoStockDetail : materielIntoStockDetails) {
                 /**
@@ -130,22 +149,22 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
                  */
                 // 查询物料对应供应商价格信息
                 List<MaterielSupplier> materielSuppliers = materielSupplierMapper.selectMaterielSupplierListByMatIdAndSupId(materielIntoStockDetail.getMaterielId(), materielIntoStock.getSupplierId());
-                if (!StringUtils.isEmpty(materielSuppliers)) { // 物料供应商关联信息
+                // 物料供应商关联信息
+                if (!StringUtils.isEmpty(materielSuppliers)) {
                     MaterielSupplier materielSupplier = materielSuppliers.get(0);
                     intoNumber = new BigDecimal(materielIntoStockDetail.getIntoNumber());
                     materielIntoStockDetail.setPrice(materielSupplier.getSupplierPrice());
                     materielIntoStockDetail.setTotalPrice(materielSupplier.getSupplierPrice().multiply(intoNumber));
                 }
-                materielIntoStockDetail.setIntoId(materielIntoStock.getId()); // 物料入库主键
-                materielIntoStockDetail.setIntoCode(matIntoStockCode); // 物料入库单号
-                materielIntoStockDetail.setCreateTime(new Date()); // 物料入库时间
+                materielIntoStockDetail.setIntoId(materielIntoStock.getId());
+                materielIntoStockDetail.setIntoCode(matIntoStockCode);
+                materielIntoStockDetail.setCreateTime(new Date());
 
                 materielIntoStockDetailsMapper.insertMaterielIntoStockDetails(materielIntoStockDetail);
 
                 MaterielStockIqc materielStockIqc = materielStockIqcMapper.selectMaterielStockIqcByComId(user.getCompanyId());
-                // 物料内部库存记录
-                MaterielStock materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(materielIntoStockDetail.getMaterielCode(),user.getCompanyId());
-
+                // 物料库存记录
+                MaterielStock materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(materielIntoStockDetail.getMaterielCode(), user.getCompanyId());
                 /**
                  * 库存操作
                  * 判断公司IQC的开启状态，开启，物料全部录入临时仓库
@@ -155,76 +174,97 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
                     /**
                      * 物料录入到临时仓库
                      */
-                    if (StringUtils.isNull(materielStock)) { // 库存不存在，新增库存记录
-                        materielStock = new MaterielStock();
-                        materielStock.setCompanyId(user.getCompanyId()); // 公司id
-                        materielStock.setCreateTime(new Date()); // 创建时间
-                        materielStock.setLastUpdate(new Date()); // 最后一次更新时间
-                        materielStock.setMaterielId(materielIntoStockDetail.getMaterielId());
-                        materielStock.setMaterielModel(materielIntoStockDetail.getMaterielModel());
-                        materielStock.setMaterielCode(materielIntoStockDetail.getMaterielCode());
-                        materielStock.setMaterielName(materielIntoStockDetail.getMaterielName());
-                        materielStock.setTemporaryNumber(materielIntoStockDetail.getIntoNumber()); // 更新临时仓库数量
-                        materielStock.setTotalNumber(materielIntoStockDetail.getIntoNumber());
-
-                        materielStockMapper.insertMaterielStock(materielStock); // 新增
-                    } else {
-                        materielStock.setTotalNumber(materielStock.getTotalNumber() + materielIntoStockDetail.getIntoNumber());
-                        materielStock.setTemporaryNumber(materielStock.getTemporaryNumber() + materielIntoStockDetail.getIntoNumber());
-                        materielStock.setLastUpdate(new Date());
-                        materielStockMapper.updateMaterielStock(materielStock); // 更新
-                    }
+                    materielStock.setTotalNumber(materielStock.getTotalNumber() + materielIntoStockDetail.getIntoNumber());
+                    materielStock.setTemporaryNumber(materielStock.getTemporaryNumber() + materielIntoStockDetail.getIntoNumber());
                     /**
                      * 采购单明细预收仓库新增数量
                      * 采购单总数不变
                      */
-                    PurchaseDetails purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsByCode(null,materielIntoStockDetail.getPurchaseCode(),
-                            materielIntoStockDetail.getSupplierCode(),materielIntoStockDetail.getMaterielCode());
+                    PurchaseDetails purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsByCode(null, materielIntoStockDetail.getPurchaseCode(),
+                            materielIntoStockDetail.getSupplierCode(), materielIntoStockDetail.getMaterielCode());
                     purchaseDetails.setPrereceiveNumber(purchaseDetails.getPrereceiveNumber() + materielIntoStockDetail.getIntoNumber());
                     purchaseDetailsMapper.updatePurchaseDetails(purchaseDetails);
-
-                } else {   // 没有开启IQC，物料直接录入到良品仓库
-                    if (StringUtils.isNull(materielStock)) { // 库存不存在，新增库存记录
-                        materielStock = new MaterielStock();
-                        materielStock.setCompanyId(user.getCompanyId()); // 公司id
-                        materielStock.setCreateTime(new Date()); // 创建时间
-                        materielStock.setLastUpdate(new Date()); // 最后一次更新时间
-                        materielStock.setMaterielId(materielIntoStockDetail.getMaterielId());
-                        materielStock.setMaterielModel(materielIntoStockDetail.getMaterielModel());
-                        materielStock.setMaterielCode(materielIntoStockDetail.getMaterielCode());
-                        materielStock.setMaterielName(materielIntoStockDetail.getMaterielName());
-                        materielStock.setGoodNumber(materielIntoStockDetail.getIntoNumber());
-                        materielStock.setTotalNumber(materielIntoStockDetail.getIntoNumber());
-
-                        materielStockMapper.insertMaterielStock(materielStock); // 新增
-                    } else {
-                        materielStock.setTotalNumber(materielStock.getTotalNumber() + materielIntoStockDetail.getIntoNumber());
-                        materielStock.setGoodNumber(materielStock.getGoodNumber() + materielIntoStockDetail.getIntoNumber());
-                        materielStock.setLastUpdate(new Date());
-                        materielStockMapper.updateMaterielStock(materielStock); // 更新
-                    }
-                    /**
-                     * 采购单操作
-                     */
+                    // 没有开启IQC，物料直接录入到良品仓库
+                } else {
                     // 获取采购单号
                     String purchaseCode = materielIntoStockDetail.getPurchaseCode();
-                    if (!StringUtils.isNull(purchaseCode) && !purchaseCode.equals("-1")) { // 选择了采购单
+                    // 选择了采购单
+                    if (!StringUtils.isNull(purchaseCode) && !purchaseCode.equals("-1")) {
                         /**
                          * 采购单增加总数
                          */
                         // 获取采购单信息
-                        Purchase purchase = purchaseMapper.selectPurchaseBySupIdAndPuraseCode(user.getCompanyId(),materielIntoStock.getSupplierId(),purchaseCode);
+                        Purchase purchase = purchaseMapper.selectPurchaseBySupIdAndPuraseCode(user.getCompanyId(), materielIntoStock.getSupplierId(), purchaseCode);
                         purchase.setDeliverTotalNum(purchase.getDeliverTotalNum() + materielIntoStockDetail.getIntoNumber());
                         purchaseMapper.updatePurchase(purchase);
                         /**
                          * 采购单详情增加已采购数量
                          */
-                        PurchaseDetails purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsByCode(purchase.getId(),purchase.getPurchaseCode(),
-                                materielIntoStockDetail.getSupplierCode(),materielIntoStockDetail.getMaterielCode());
+                        PurchaseDetails purchaseDetails = purchaseDetailsMapper.selectPurchaseDetailsByCode(purchase.getId(), purchase.getPurchaseCode(),
+                                materielIntoStockDetail.getSupplierCode(), materielIntoStockDetail.getMaterielCode());
                         purchaseDetails.setDeliverNum(purchaseDetails.getDeliverNum() + materielIntoStockDetail.getIntoNumber());
                         purchaseDetailsMapper.updatePurchaseDetails(purchaseDetails);
+
+                        /**
+                         * MRP相关数据操作
+                         */
+                        // 查询mrp采购单关联信息(mrp还差总数大于0)
+                        mrpPurchaseList = mrpPurchaseMapper.selectMrpPurchaseByPurIdAndMatCodeGtNum(purchase.getId(), materielIntoStockDetail.getMaterielCode());
+                        // mrp判断依据入库数量，递减
+                        Integer mrpNumber = materielIntoStockDetail.getIntoNumber();
+                        for (MrpPurchase mrpPurchase : mrpPurchaseList) {
+                            if (mrpNumber <= 0) {
+                                break;
+                            }
+                            // 差的总数大于本次入库数量
+                            if (mrpPurchase.getTotalNumber() >= mrpNumber) {
+                                // mrp采购单关联表
+                                mrpPurchase.setTotalNumber(mrpPurchase.getTotalNumber() - mrpNumber);
+                                mrpPurchase.setDelNumber(mrpPurchase.getDelNumber() - mrpNumber <= 0 ? 0 : mrpPurchase.getDelNumber() - mrpNumber);
+                                mrpPurchase.setLockMatNumber(mrpPurchase.getLockMatNumber() + mrpNumber);
+                                mrpPurchase.setInitLockMatNumber(mrpPurchase.getInitLockMatNumber() + mrpNumber);
+                                // mrp更新
+                                mrp = mrpMapper.selectMrpById(mrpPurchase.getMrpId());
+                                mrp.setDelNumber(mrp.getDelNumber() - mrpNumber <= 0 ? 0 : mrp.getDelNumber() - mrpNumber);
+                                mrp.setTotalNumber(mrp.getTotalNumber() - mrpNumber);
+                                mrp.setLockMatNumber(mrp.getLockMatNumber() + mrpNumber);
+                                // 订单操作
+                                orderDetails = orderDetailsMapper.selectOrderDetailsListByOIdAndPid(user.getCompanyId(), mrp.getOrderId(), mrp.getProductId());
+                                orderDetails.setLockMatNumber(orderDetails.getLockMatNumber() + mrpNumber);
+                                mrpNumber = 0;
+
+                                // 差的总数小于本次入库数量
+                            } else {
+                                // mrp采购单关联表
+                                mrpNumber = (mrpNumber - (mrpPurchase.getTotalNumber()));
+                                mrpPurchase.setLockMatNumber(mrpPurchase.getLockMatNumber() + mrpPurchase.getDelNumber() + mrpPurchase.getTiaoNumber());
+                                mrpPurchase.setInitLockMatNumber(mrpPurchase.getInitLockMatNumber() + mrpPurchase.getTotalNumber());
+                                mrpPurchase.setTotalNumber(0);
+                                mrpPurchase.setDelNumber(0);
+                                // mrp更新
+                                mrp = mrpMapper.selectMrpById(mrpPurchase.getMrpId());
+                                // 订单操作
+                                orderDetails = orderDetailsMapper.selectOrderDetailsListByOIdAndPid(user.getCompanyId(), mrp.getOrderId(), mrp.getProductId());
+                                orderDetails.setLockMatNumber(orderDetails.getLockMatNumber() + mrp.getTotalNumber());
+                                mrp.setLockMatNumber(mrp.getLockMatNumber() + mrp.getDelNumber() + mrp.getTiaoNumber());
+                                mrp.setTotalNumber(0);
+                                mrp.setDelNumber(0);
+                            }
+                            orderDetailsMapper.updateOrderDetails(orderDetails);
+                            mrpPurchaseMapper.updateMrpPurchase(mrpPurchase);
+                            mrpMapper.updateMrp(mrp);
+                        }
+                        materielStock.setTotalNumber(materielStock.getTotalNumber() + materielIntoStockDetail.getIntoNumber());
+                        materielStock.setGoodNumber(materielStock.getGoodNumber() + mrpNumber);
+                        materielStock.setLockNumber(materielStock.getLockNumber() + (materielIntoStockDetail.getIntoNumber() - mrpNumber));
+                        // 未选择采购单直接操作物料库存
+                    } else {
+                        materielStock.setTotalNumber(materielStock.getTotalNumber() + materielIntoStockDetail.getIntoNumber());
+                        materielStock.setGoodNumber(materielStock.getGoodNumber() + materielIntoStockDetail.getIntoNumber());
                     }
                 }
+                materielStock.setLastUpdate(new Date());
+                materielStockMapper.updateMaterielStock(materielStock);
             }
         }
         return i;
@@ -254,14 +294,15 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
 
     /**
      * 作废物料入库单
+     *
      * @param id 物料入库id
      * @return 结果
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int nullifyMaterielIntoStockByIds(Integer id,HttpServletRequest request) {
+    public int nullifyMaterielIntoStockByIds(Integer id, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        if (user == null ) {
+        if (user == null) {
             return 0;
         }
         MaterielIntoStock materielIntoStock = materielIntoStockMapper.selectMaterielIntoStockById(id);
@@ -273,17 +314,17 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
         // 物料iqc状态
         MaterielStockIqc materielStockIqc = materielStockIqcMapper.selectMaterielStockIqcByComId(user.getCompanyId());
         MaterielStock materielStock = null;
+        List<MrpPurchase> mrpPurchaseList = null;
+        Mrp mrp = null;
+        OrderDetails orderDetails = null;
         for (MaterielIntoStockDetails intoStockDetails : materielIntoStockDetailsList) {
             // 库存数据回滚
-            materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(intoStockDetails.getMaterielCode(),user.getCompanyId());
+            materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(intoStockDetails.getMaterielCode(), user.getCompanyId());
             /**
              * 开启iqc的情况，库存回滚临时仓库数量
              */
-            if (!StringUtils.isNull(materielStockIqc) && StockConstants.IQC_YES.equals(materielStockIqc.getStockIqc())) { // 开启物料IQC
+            if (!StringUtils.isNull(materielStockIqc) && StockConstants.IQC_YES.equals(materielStockIqc.getStockIqc())) {
                 materielStock.setTemporaryNumber(materielStock.getTemporaryNumber() - intoStockDetails.getIntoNumber());
-                materielStock.setLastUpdate(new Date());
-                materielStockMapper.updateMaterielStock(materielStock);
-
                 /**
                  * 采购单明细数据回滚，回滚预收仓库数量
                  */
@@ -292,13 +333,11 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
                         intoStockDetails.getSupplierCode(), intoStockDetails.getMaterielCode());
                 purchaseDetails.setPrereceiveNumber(purchaseDetails.getPrereceiveNumber() - intoStockDetails.getIntoNumber());
                 purchaseDetailsMapper.updatePurchaseDetails(purchaseDetails);
-
-            } else  { // 未开启IQC的情况
-                materielStock.setTotalNumber(materielStock.getTotalNumber() - intoStockDetails.getIntoNumber());
-                materielStock.setGoodNumber(materielStock.getGoodNumber() - intoStockDetails.getIntoNumber());
-                materielStock.setLastUpdate(new Date());
-                materielStockMapper.updateMaterielStock(materielStock);
-                // 物料入库关联的采购单详情信息
+                /**
+                 * 未开启IQC物料检验
+                 */
+            } else {
+                // 选择了采购单入库
                 if (!StringUtils.isEmpty(intoStockDetails.getPurchaseCode()) && !"-1".equals(intoStockDetails.getPurchaseCode())) {
                     // 采购单数据回滚
                     Purchase purchase = purchaseMapper.selectPurchaseBySupIdAndPuraseCode(user.getCompanyId(), materielIntoStock.getSupplierId(), intoStockDetails.getPurchaseCode());
@@ -310,8 +349,72 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
                             intoStockDetails.getSupplierCode(), intoStockDetails.getMaterielCode());
                     purchaseDetails.setDeliverNum(purchaseDetails.getDeliverNum() - intoStockDetails.getIntoNumber());
                     purchaseDetailsMapper.updatePurchaseDetails(purchaseDetails);
+                    /**
+                     * MRP关联操作
+                     */
+                    // 查询实际锁定库存大于0的mrp采购单关联信息
+                    mrpPurchaseList = mrpPurchaseMapper.selectMrpPurchaseByPurIdAndMatCodeGtLockNum(purchase.getId(),intoStockDetails.getMaterielCode());
+                    // mrp判断依据入库数量，递减
+                    Integer mrpNumber = intoStockDetails.getIntoNumber();
+                    for (MrpPurchase mrpPurchase : mrpPurchaseList) {
+                        if (mrpNumber <= 0) {
+                            break;
+                        }
+                        // 实际库存锁定数量
+                        int realNumber = mrpPurchase.getInitLockMatNumber();
+                        // 作废入库单的数量小于实际库存锁定数量
+                        if (mrpNumber <= realNumber) {
+                            // mrp采购单关联
+                            mrpPurchase.setTotalNumber(mrpPurchase.getTotalNumber() + mrpNumber);
+                            mrpPurchase.setDelNumber(mrpPurchase.getDelNumber() + mrpNumber);
+                            mrpPurchase.setLockMatNumber(mrpPurchase.getLockMatNumber() - mrpNumber);
+                            mrpPurchase.setInitLockMatNumber(realNumber - mrpNumber);
+                            // mrp表记录
+                            mrp = mrpMapper.selectMrpById(mrpPurchase.getMrpId());
+                            // 订单记录
+                            orderDetails = orderDetailsMapper.selectOrderDetailsListByOIdAndPid(user.getCompanyId(), mrp.getOrderId(), mrp.getProductId());
+                            orderDetails.setLockMatNumber(orderDetails.getLockMatNumber() - mrpNumber);
+
+                            mrp.setTotalNumber(mrp.getTotalNumber() + mrpNumber);
+                            mrp.setDelNumber(mrp.getDelNumber() + mrpNumber);
+                            mrp.setLockMatNumber(mrp.getLockMatNumber() - mrpNumber);
+
+                            mrpNumber = 0;
+
+                            // 作废入库单的订单数量大于实际库存锁定数量
+                        } else {
+                            // mrp表记录
+                            mrp = mrpMapper.selectMrpById(mrpPurchase.getMrpId());
+                            // 订单记录
+                            orderDetails = orderDetailsMapper.selectOrderDetailsListByOIdAndPid(user.getCompanyId(), mrp.getOrderId(), mrp.getProductId());
+                            orderDetails.setLockMatNumber(orderDetails.getLockMatNumber() - realNumber);
+
+                            mrp.setLockMatNumber(mrp.getLockMatNumber() - realNumber);
+                            mrp.setDelNumber((mrp.getDelNumber() + (mrp.getTotalNumber() + realNumber)) - mrp.getTiaoNumber());
+                            mrp.setTotalNumber(mrp.getTotalNumber() + realNumber);
+                            // mrp采购单关联
+                            mrpPurchase.setTotalNumber(mrpPurchase.getTotalNumber() + realNumber);
+                            mrpPurchase.setDelNumber((mrpPurchase.getDelNumber() + (mrpPurchase.getTotalNumber() + realNumber)) - mrpPurchase.getTiaoNumber());
+                            mrpPurchase.setLockMatNumber(mrpPurchase.getLockMatNumber() - realNumber);
+                            mrpPurchase.setInitLockMatNumber(0);
+
+                            mrpNumber = (mrpNumber - realNumber);
+                        }
+                        orderDetailsMapper.updateOrderDetails(orderDetails);
+                        mrpPurchaseMapper.updateMrpPurchase(mrpPurchase);
+                        mrpMapper.updateMrp(mrp);
+                    }
+                    materielStock.setTotalNumber(materielStock.getTotalNumber() - intoStockDetails.getIntoNumber());
+                    materielStock.setGoodNumber(materielStock.getGoodNumber() - mrpNumber);
+                    materielStock.setLockNumber(materielStock.getLockNumber() - (intoStockDetails.getIntoNumber() - mrpNumber));
+                    // 没有选择采购单入库
+                } else {
+                    materielStock.setTotalNumber(materielStock.getTotalNumber() - intoStockDetails.getIntoNumber());
+                    materielStock.setGoodNumber(materielStock.getGoodNumber() - intoStockDetails.getIntoNumber());
                 }
             }
+            materielStock.setLastUpdate(new Date());
+            materielStockMapper.updateMaterielStock(materielStock);
 
             // 物料入库明细删除状态更新
             materielIntoStockDetailsMapper.deleteMaterielIntoStockDetailsById(intoStockDetails.getId());

@@ -114,4 +114,11 @@ public class CodeUtils {
         return String.valueOf(randomChar);
     }
 
+    /**
+     * 获取MRP编号
+     * @return 结果
+     */
+    public static String getMrpCode(){
+        return "MRP"+getCode()+getRandom();
+    }
 }

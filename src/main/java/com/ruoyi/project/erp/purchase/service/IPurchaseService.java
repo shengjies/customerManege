@@ -83,4 +83,11 @@ public interface IPurchaseService
 	 * @return 结果
 	 */
     Workbook uploadPurchase(Integer id, HttpServletRequest request);
+
+	/**
+	 * mrp转化成采购单
+	 * @param purchase 采购单信息
+	 * @return 结果
+	 */
+	int mrpToPurchase(Purchase purchase);
 }

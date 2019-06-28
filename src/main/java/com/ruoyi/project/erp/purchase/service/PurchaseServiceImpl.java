@@ -1,13 +1,17 @@
 package com.ruoyi.project.erp.purchase.service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.constant.MrpConstants;
 import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -16,6 +20,12 @@ import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.erp.contract.domain.Contract;
 import com.ruoyi.project.erp.contract.service.IContractService;
 import com.ruoyi.project.erp.contractContent.domain.ContractContent;
+import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
+import com.ruoyi.project.erp.materielSupplier.mapper.MaterielSupplierMapper;
+import com.ruoyi.project.erp.mrp.domain.Mrp;
+import com.ruoyi.project.erp.mrp.mapper.MrpMapper;
+import com.ruoyi.project.erp.mrpPurchase.domain.MrpPurchase;
+import com.ruoyi.project.erp.mrpPurchase.mapper.MrpPurchaseMapper;
 import com.ruoyi.project.erp.purchaseDetails.domain.PurchaseDetails;
 import com.ruoyi.project.erp.purchaseDetails.mapper.PurchaseDetailsMapper;
 import com.ruoyi.project.erp.supplier.domain.Supplier;
@@ -23,6 +33,7 @@ import com.ruoyi.project.erp.supplier.mapper.SupplierMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.regexp.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.purchase.mapper.PurchaseMapper;
@@ -54,6 +65,15 @@ public class PurchaseServiceImpl implements IPurchaseService {
 
     @Autowired
     private IContractService contractService;
+
+    @Autowired
+    private MaterielSupplierMapper materielSupplierMapper;
+
+    @Autowired
+    private MrpMapper mrpMapper;
+
+    @Autowired
+    private MrpPurchaseMapper mrpPurchaseMapper;
 
     /**
      * 查询采购单信息
@@ -87,6 +107,109 @@ public class PurchaseServiceImpl implements IPurchaseService {
     }
 
     /**
+     * mrp转化成采购单
+     * @param purchase 采购单信息
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int mrpToPurchase(Purchase purchase) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null ) {
+            return 0;
+        }
+        //根据供应商id查询对应的供应商信息
+        Supplier supplier = supplierMapper.selectSupplierById(purchase.getSupplierId());
+        if (supplier == null) {
+            return 0;
+        }
+        // 生成采购单号
+        String purchaseCode = CodeUtils.getPurchaseCode();
+        purchase.setPurchaseCode(purchaseCode);
+        purchase.setCompanyId(user.getCompanyId());
+        purchase.setCreate_by(user.getUserId().intValue());
+        purchase.setSupplierName(supplier.getCompanyName());
+        purchase.setSupplierAddress(supplier.getCompanyAddress());
+        purchase.setLiaisonMan(supplier.getSupplierName());
+        purchase.setPhone(supplier.getContactInformation());
+        purchase.setDeliverAddress(supplier.getSendAddress());
+        purchase.setManEmail(supplier.getEmail());
+        purchase.setPaymentMethod(supplier.getPaymentTime());
+        purchase.setCreateTime(new Date());
+        //添加主表信息
+        purchaseMapper.insertPurchase(purchase);
+        int totalNum = 0;
+        float totalPrice = 0F;
+        MaterielSupplier materielSupplier = null;
+        BigDecimal supplierPrice = new BigDecimal("0");
+        Mrp mrp = null;
+        MrpPurchase mrpPurchase = null;
+        PurchaseDetails uniquePurchase = null;
+        String mrpDetails = purchase.getMrpDetails();
+        if (StringUtils.isNotEmpty(mrpDetails)) {
+            List<PurchaseDetails> purchaseDetails = JSON.parseArray(mrpDetails, PurchaseDetails.class);
+            for (PurchaseDetails detail : purchaseDetails) {
+                // mrp状态更新为采购中
+                mrp = mrpMapper.selectMrpById(detail.getMrpId());
+                if (MrpConstants.MRP_MAT_CGING.equals(mrp.getmStatus())) {
+                    throw new BusinessException("勾选中已有生成采购单记录，勿重复操作");
+                }
+                mrp.setSupplierId(purchase.getSupplierId());
+                mrp.setmStatus(MrpConstants.MRP_MAT_CGING);
+                mrp.setTiaoNumber(detail.getTiaoNumber());
+                mrp.setTotalNumber(detail.getDelNumber() + detail.getTiaoNumber());
+                mrpMapper.updateMrp(mrp);
+                // 查询供应商物料关联
+                materielSupplier = materielSupplierMapper.findSupplierCodeByMaterielId(detail.getMaterielId(), purchase.getSupplierId());
+                detail.setPrice(materielSupplier.getSupplierPrice().floatValue());
+                // 判断同批次MRP生成的采购单物料信息是否重复
+                uniquePurchase = detailsMapper.selectDetailByPidAndMCode(purchase.getId(), detail.getMaterielCode());
+                // 新增MRP采购单关联信息
+                mrpPurchase = new MrpPurchase();
+                // 存在相同的采购单号
+                if (StringUtils.isNotNull(uniquePurchase)) {
+                    uniquePurchase.setNumber(uniquePurchase.getNumber() + detail.getTiaoNumber() + detail.getDelNumber());
+                    uniquePurchase.setTotalPrict(uniquePurchase.getPrice() * uniquePurchase.getNumber());
+                    // 修改
+                    detailsMapper.updatePurchaseDetails(uniquePurchase);
+                    totalNum += (detail.getTiaoNumber() + detail.getDelNumber());
+                    totalPrice += (uniquePurchase.getPrice() * (detail.getTiaoNumber() + detail.getDelNumber()));
+
+                    mrpPurchase.setPurDetailId(uniquePurchase.getId());
+                } else {
+                    // 采购订单明细
+                    detail.setCompanyId(user.getCompanyId());
+                    detail.setPurchaseId(purchase.getId());
+                    detail.setPurchaseCode(purchaseCode);
+                    detail.setCreateTime(new Date());
+                    detail.setNumber(detail.getDelNumber() + detail.getTiaoNumber());
+
+                    detail.setSupplierCode(materielSupplier.getSupplierCode());
+                    detail.setSupplierId(purchase.getSupplierId());
+                    detail.setTotalPrict(detail.getPrice() * detail.getNumber());
+                    // 新增
+                    detailsMapper.insertPurchaseDetails(detail);
+                    totalNum += detail.getNumber();
+                    totalPrice += detail.getTotalPrict();
+
+                    mrpPurchase.setPurDetailId(detail.getId());
+                }
+
+                mrpPurchase.setMrpId(detail.getMrpId());
+                mrpPurchase.setPurId(purchase.getId());
+                mrpPurchase.setDelNumber(detail.getDelNumber());
+                mrpPurchase.setTiaoNumber(detail.getTiaoNumber());
+                mrpPurchase.setLockMatNumber(detail.getLockMatNumber());
+                mrpPurchase.setTotalNumber(detail.getDelNumber() + detail.getTiaoNumber());
+                mrpPurchaseMapper.insertMrpPurchase(mrpPurchase);
+            }
+        }
+        purchase.setTotalNumber(totalNum);
+        purchase.setTotalPrice(totalPrice);
+        return purchaseMapper.updatePurchase(purchase);
+    }
+
+    /**
      * 新增采购单
      *
      * @param purchase 采购单信息
@@ -101,7 +224,8 @@ public class PurchaseServiceImpl implements IPurchaseService {
         //根据供应商id查询对应的供应商信息
         Supplier supplier = supplierMapper.selectSupplierById(purchase.getSupplierId());
         if (supplier == null) return 0;
-        String purchaseCode = CodeUtils.getPurchaseCode(); // 生成采购单号
+        // 生成采购单号
+        String purchaseCode = CodeUtils.getPurchaseCode();
         purchase.setPurchaseCode(purchaseCode);
         purchase.setCompanyId(user.getCompanyId());
         purchase.setCreate_by(user.getUserId().intValue());
@@ -205,7 +329,28 @@ public class PurchaseServiceImpl implements IPurchaseService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int editStatus(Purchase purchase) {
+        // 采购单状态
+        Integer purchaseStatut = purchase.getPurchaseStatut();
+        Purchase purchaseById = purchaseMapper.selectPurchaseById(purchase.getId());
+        if (StockConstants.ORDER_STATUS_TWO.equals(purchaseById.getPurchaseStatut()) || StockConstants.ORDER_STATUS_THREE.equals(purchaseById.getPurchaseStatut())) {
+            throw new BusinessException("已审核的采购单不能取消");
+        }
+        // 取消采购单
+        if (StockConstants.ORDER_STATUS_FOUR.equals(purchaseStatut)) {
+            Mrp mrp;
+            List<MrpPurchase> mrpPurchaseList = mrpPurchaseMapper.selectMrpPurchaseByPurId(purchase.getId());
+            for (MrpPurchase mrpPurchase : mrpPurchaseList) {
+                mrp = mrpMapper.selectMrpById(mrpPurchase.getMrpId());
+                mrp.setSupplierId(null);
+                mrp.setTiaoNumber(0);
+                mrp.setmStatus(MrpConstants.MRP_MAT_NEEDCG);
+                mrpMapper.updateMrp(mrp);
+            }
+            // 删除mrp采购单关联信息
+            mrpPurchaseMapper.deleteMrpPurchaseByPurId(purchase.getId());
+        }
         return purchaseMapper.updatePurchase(purchase);
     }
 
@@ -235,9 +380,26 @@ public class PurchaseServiceImpl implements IPurchaseService {
      */
     @Override
     public int closePurchase(Purchase purchase) {
-        Purchase purchase1 = purchaseMapper.selectPurchaseById(purchase.getId());
-        if (StockConstants.ORDER_STATUS_THREE.equals(purchase1.getPurchaseStatut())) { // 采购单已经关闭
+        //采购单主表id
+        Integer purId = purchase.getId();
+        Purchase purchase1 = purchaseMapper.selectPurchaseById(purId);
+        if (!purchase1.getDeliverTotalNum().equals(purchase1.getTotalNumber())) {
+            throw new BusinessException("未交付完的采购单不允许关闭");
+        }
+        if (StockConstants.ORDER_STATUS_THREE.equals(purchase1.getPurchaseStatut())) {
             throw new BusinessException("采购单已关闭，请勿重复操作");
+        }
+        /**
+         * 关闭采购单更新mrp为采购完成状态，更新订单明细物料状态为物料充足
+         */
+        // mrp采购单关联表
+        List<MrpPurchase> mrpPurchaseList = mrpPurchaseMapper.selectMrpPurchaseByPurId(purId);
+        Mrp mrp;
+        for (MrpPurchase mrpPurchase : mrpPurchaseList) {
+            mrp = mrpMapper.selectMrpById(mrpPurchase.getMrpId());
+            // mrp状态更新为采购完成
+            mrp.setmStatus(MrpConstants.MRP_MAT_CGFINISH);
+
         }
         return purchaseMapper.updatePurchase(purchase);
     }

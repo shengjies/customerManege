@@ -1,6 +1,7 @@
 package com.ruoyi.project.erp.productBom.mapper;
 
 import com.ruoyi.project.erp.productBom.domain.ProductBomDetails;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -59,5 +60,11 @@ public interface ProductBomDetailsMapper
      * @return 结果
      */
 	public int deleteProductBomDetailsByIds(String[] ids);
-	
+
+	/**
+	 * 通过bom主表id查询bom清单
+	 * @param bomId bom主表id
+	 * @return 结果
+	 */
+    List<ProductBomDetails> selectProBomDetailsByBomId(@Param("bomId") Integer bomId);
 }

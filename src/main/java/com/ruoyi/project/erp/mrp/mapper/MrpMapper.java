@@ -1,7 +1,9 @@
 package com.ruoyi.project.erp.mrp.mapper;
 
 import com.ruoyi.project.erp.mrp.domain.Mrp;
-import java.util.List;	
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * MRP记录 数据层
@@ -21,11 +23,20 @@ public interface MrpMapper
 	
 	/**
      * 查询MRP记录列表
-     * 
+     *
      * @param mrp MRP记录信息
      * @return MRP记录集合
      */
 	public List<Mrp> selectMrpList(Mrp mrp);
+
+
+	/**
+	 * 查询MRP记录列表
+	 *
+	 * @param supplierId 供应商id
+	 * @return MRP记录集合
+	 */
+	public List<Mrp> selectMrpListBySupId(@Param("supplierId") Integer supplierId);
 	
 	/**
      * 新增MRP记录
@@ -58,5 +69,19 @@ public interface MrpMapper
      * @return 结果
      */
 	public int deleteMrpByIds(String[] ids);
-	
+
+	/**
+	 * 通过mrp编号查询mrp列表
+	 * @param companyId 公司id
+	 * @param mCode mrp批次编号
+	 * @return 结果
+	 */
+	public List<Mrp> selectMrpListByMcode(@Param("companyId") Integer companyId, @Param("mCode") String mCode);
+
+	/**
+	 * 通过mrp批次编号删除mrp信息
+	 * @param mCode mrp编号信息
+	 * @return 结果
+	 */
+	public int deleteMrpByMcode(@Param("mCode") String mCode);
 }

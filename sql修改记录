@@ -315,4 +315,44 @@ ALTER TABLE `octopus`.`tab_order_details`
 ADD COLUMN `tiao_number` INT NULL DEFAULT 0 COMMENT '调整数量' AFTER `mat_status`;
 ALTER TABLE `octopus`.`tab_order_details`
 ADD COLUMN `mrp_status` INT NULL DEFAULT 0 COMMENT '是否已经生成mrp记录(0、未生成，1、已生成)' AFTER `tiao_number`;
+ALTER TABLE `octopus`.`tab_product_bom`
+CHANGE COLUMN `bom_version` `bom_version` INT NOT NULL COMMENT 'bom版本号' ;
+
+# 2019-06-26 服务器数据库未执行sql
+ALTER TABLE `octopus`.`tab_mrp`
+ADD COLUMN `lock_mat_number` INT NULL DEFAULT 0 COMMENT '锁定的物料库存数量' AFTER `m_status`;
+ALTER TABLE `octopus`.`tab_mrp`
+CHANGE COLUMN `id` `mrp_id` INT(11) NOT NULL AUTO_INCREMENT COMMENT '主键自增长id' ;
+
+ALTER TABLE `octopus`.`tab_materiel_supplier`
+ADD INDEX `m_s_index` (`supplier_id` ASC, `materiel_id` ASC) VISIBLE;
+
+CREATE TABLE `octopus`.`tab_mrp_purchase` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'mrp采购单关联表id主键',
+  `mrp_id` INT NULL COMMENT 'MRP表主键id',
+  `pur_id` INT NULL COMMENT '采购单id',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'mrp采购单关联表';
+
+ALTER TABLE `octopus`.`tab_mrp_purchase`
+ADD COLUMN `pur_detail_id` INT NULL COMMENT '采购单详表id' AFTER `pur_id`,
+CHANGE COLUMN `pur_id` `pur_id` INT(11) NULL DEFAULT NULL COMMENT '采购单主表id' ;
+
+# 2019-06-27 服务器数据库未执行sql
+ALTER TABLE `octopus`.`tab_mrp_purchase`
+ADD COLUMN `del_number` INT NULL DEFAULT 0 COMMENT '对应mrp还差的数量' AFTER `pur_detail_id`,
+ADD COLUMN `tiao_number` INT NULL DEFAULT 0 COMMENT '对应mrp生成采购单调整的数量' AFTER `del_number`,
+ADD COLUMN `lock_mat_number` INT NULL DEFAULT 0 COMMENT '对应mrp锁定的物料库存数量' AFTER `tiao_number`;
+ALTER TABLE `octopus`.`tab_mrp_purchase`
+ADD COLUMN `total_number` INT NULL DEFAULT 0 COMMENT '对应mrp差的总数量(所差数量+调整数量)' AFTER `tiao_number`;
+ALTER TABLE `octopus`.`tab_mrp_purchase`
+ADD COLUMN `init_lock_mat_number` INT NULL DEFAULT 0 COMMENT 'mrp初始化时锁定库存数量' AFTER `lock_mat_number`;
+
+
+
+
+
+
 

@@ -1,0 +1,99 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/layer/laydate/laydate.css}" rel="stylesheet"/>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="row">
+        <div class="col-sm-12 select-table">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-content">
+                            <form role="form" id="form-purchase-add">
+                                <input type="hidden" id="supplierId" name="supplierId" th:value="${supplierId}">
+                                <div class="form-group">
+                                    <label class="col-sm-6 control-label" style="margin-top: 10px;">交货日期：</label>
+                                    <div class="col-sm-6">
+                                        <input  id="deliverTime" name="deliverTime"  class="form-control layer-date">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-12" style="margin-top: 10px;">
+                                        运输费用：<label><input type="radio"  value="甲方负责" name="cost"/>甲方负责</label>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <label><input type="radio" value="乙方负责" name="cost"/>乙方负责</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-12 control-label" style="margin-top: 10px;">备注信息：</label>
+                                    <div class="col-sm-12">
+                                        <textarea id="remark" class="form-control" rows="4" type="text" name="remark"></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>
+<script type="text/javascript">
+    var prefix = ctx + "erp/purchase";
+    var start = {
+        elem: '#deliverTime',
+        format: 'YYYY-MM-DD hh:mm:ss',
+        min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16 23:59:59', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+        }
+    };
+    laydate(start);
+
+    function submitHandler() {
+        var  deliverTime = $("#deliverTime").val();
+        if(!deliverTime){
+            $.modal.alertWarning("请选择交货日期");
+            return;
+        }
+        var cost = $("input[name='cost']:checked").val();
+        if(!cost){
+            $.modal.alertWarning("请选择运输费用付款方式");
+            return;
+        }
+        var data ={
+            supplierId:$("#supplierId").val(),
+            deliverTime:deliverTime,
+            cost:cost,
+            remark:$("#remark").val(),
+            purchaseStatut:1
+        }
+        var detail = window.parent.$('#bootstrap-table').bootstrapTable('getSelections');
+        console.log(detail[0]);
+        var mrpDetails = JSON.stringify(detail);
+        data.mrpDetails = mrpDetails;
+        var config = {
+            url: "/erp/purchase/mrpToPurchase",
+            type: "post",
+            dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                $.operate.successCallback(result);
+            }
+        };
+        $.ajax(config)
+    }
+</script>
+</body>
+</html>

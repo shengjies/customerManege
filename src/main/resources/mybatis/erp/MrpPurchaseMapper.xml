@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.mrpPurchase.mapper.MrpPurchaseMapper">
+    
+    <resultMap type="MrpPurchase" id="MrpPurchaseResult">
+        <result property="id"    column="id"    />
+        <result property="mrpId"    column="mrp_id"    />
+        <result property="purId"    column="pur_id"    />
+        <result property="purDetailId"    column="pur_detail_id"    />
+        <result property="delNumber"    column="del_number"    />
+        <result property="tiaoNumber"    column="tiao_number"    />
+        <result property="totalNumber"    column="total_number"    />
+        <result property="lockMatNumber"    column="lock_mat_number"    />
+        <result property="initLockMatNumber"    column="init_lock_mat_number"    />
+        <association property="materielCode" column="mrp_id" select="selectMatCode">
+            <result property="materielCode" column="materiel_code"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectMrpPurchaseVo">
+        select id, mrp_id, pur_id, pur_detail_id,del_number,tiao_number,total_number,lock_mat_number,init_lock_mat_number from tab_mrp_purchase
+    </sql>
+	
+    <select id="selectMrpPurchaseList" parameterType="MrpPurchase" resultMap="MrpPurchaseResult">
+        <include refid="selectMrpPurchaseVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="mrpId != null "> and mrp_id = #{mrpId}</if>
+             <if test="purId != null "> and pur_id = #{purId}</if>
+             <if test="purDetailId != null "> and pur_detail_id = #{purDetailId}</if>
+         </where>
+    </select>
+    
+    <select id="selectMrpPurchaseById" parameterType="Integer" resultMap="MrpPurchaseResult">
+        <include refid="selectMrpPurchaseVo"/>
+        where id = #{id}
+    </select>
+
+    <!--查询物料编码-->
+    <select id="selectMatCode" resultType="java.lang.String">
+        SELECT materiel_code FROM tab_mrp where mrp_id = #{mrpId};
+    </select>
+        
+    <insert id="insertMrpPurchase" parameterType="MrpPurchase" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mrp_purchase
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="mrpId != null  ">mrp_id,</if>
+			<if test="purId != null  ">pur_id,</if>
+			<if test="purDetailId != null  ">pur_detail_id,</if>
+            <if test="delNumber != null  ">del_number,</if>
+            <if test="tiaoNumber != null  ">tiao_number,</if>
+            <if test="totalNumber != null  ">total_number,</if>
+            <if test="lockMatNumber != null  ">lock_mat_number,</if>
+            <if test="initLockMatNumber != null  ">init_lock_mat_number,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="mrpId != null  ">#{mrpId},</if>
+			<if test="purId != null  ">#{purId},</if>
+			<if test="purDetailId != null  ">#{purDetailId},</if>
+            <if test="delNumber != null  ">#{delNumber},</if>
+            <if test="tiaoNumber != null  ">#{tiaoNumber},</if>
+            <if test="totalNumber != null  ">#{totalNumber},</if>
+            <if test="lockMatNumber != null  ">#{lockMatNumber},</if>
+            <if test="initLockMatNumber != null  ">#{initLockMatNumber},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMrpPurchase" parameterType="MrpPurchase">
+        update tab_mrp_purchase
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mrpId != null  ">mrp_id = #{mrpId},</if>
+            <if test="purId != null  ">pur_id = #{purId},</if>
+            <if test="purDetailId != null  ">pur_detail_id = #{purDetailId},</if>
+            <if test="delNumber != null  ">del_number = #{delNumber},</if>
+            <if test="tiaoNumber != null  ">tiao_number = #{tiaoNumber},</if>
+            <if test="totalNumber != null  ">total_number = #{totalNumber},</if>
+            <if test="lockMatNumber != null  ">lock_mat_number = #{lockMatNumber},</if>
+            <if test="initLockMatNumber != null  ">init_lock_mat_number = #{initLockMatNumber},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMrpPurchaseById" parameterType="Integer">
+        delete from tab_mrp_purchase where id = #{id}
+    </delete>
+	
+    <delete id="deleteMrpPurchaseByIds" parameterType="String">
+        delete from tab_mrp_purchase where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过采购单id查询mrp采购单关联信息-->
+    <select id="selectMrpPurchaseByPurId" resultMap="MrpPurchaseResult">
+        SELECT * FROM tab_mrp_purchase where pur_id = #{purId}
+    </select>
+
+    <!--通过采购单id删除mrp采购单关联信息-->
+    <delete id="deleteMrpPurchaseByPurId" parameterType="Integer">
+        delete from tab_mrp_purchase where pur_id = #{purId}
+    </delete>
+
+    <select id="selectMrpPurchaseByPurDetailId" resultMap="MrpPurchaseResult">
+        SELECT * FROM tab_mrp_purchase where pur_detail_id = #{purDetailId}
+    </select>
+
+    <!--通过物料编码采购单id查询还需总数大于0的mrp采购单关联信息-->
+    <select id="selectMrpPurchaseByPurIdAndMatCodeGtNum" resultMap="MrpPurchaseResult">
+        SELECT mp.* FROM tab_mrp_purchase as mp,tab_mrp as m where mp.mrp_id = m.mrp_id  and mp.pur_id = #{purId} and m.materiel_code = #{materielCode} and mp.total_number > 0
+    </select>
+
+    <!--通过物料编码和采购单id查询实际锁定库存大于0的mrp采购单关联列表-->
+    <select id="selectMrpPurchaseByPurIdAndMatCodeGtLockNum" resultMap="MrpPurchaseResult">
+        SELECT mp.* FROM tab_mrp_purchase as mp,tab_mrp as m where mp.mrp_id = m.mrp_id and mp.pur_id = #{purId} and m.materiel_code = #{materielCode}
+            and mp.init_lock_mat_number > 0
+    </select>
+</mapper>

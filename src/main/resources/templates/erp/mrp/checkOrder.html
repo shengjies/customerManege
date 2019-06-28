@@ -105,19 +105,32 @@
                 {
                     field : 'tiaoNumber',
                     title : '调整数量',
+                    width:100,
                     formatter:function (value,row,index) {
-                        return '<input onchange="changeNumber(this,'+ row.id +','+ index +')" type="number" name="tiaoNumber" id="tiaoNumber" value="'+ row.tiaoNumber+'"/>'
+                        return '<input style="width: 100px" onchange="changeNumber(this,'+ row.id +','+ index +')" type="number" name="tiaoNumber" id="tiaoNumber" value="'+ row.tiaoNumber+'"/>'
                     }
                 },
                 {
                     field : 'matStatus',
-                    title : '可生产状态',
+                    title : '物料状态',
                     sortable: true,
                     formatter:function (value,row,index) {
                         if (row.matStatus != 0) {
-                            return '<a href="javascript:void(0)"><span style="color: red;font-weight: bold">不可生产</span></a>'
+                            return '<a href="javascript:void(0)" onclick="showMatDetail('+ row.orderId+','+ row.productId +')"><span style="color: red;font-weight: bold">物料不足</span></a>'
                         } else {
-                            return "物料充足可生产";
+                            return '<a href="javascript:void(0)" onclick="showMatDetail('+ row.orderId+','+ row.productId +')"><span style="color: green;font-weight: bold">物料充足</span></a>'
+                        }
+                    }
+                },
+                {
+                    field : 'mrpStatus',
+                    title : 'MRP状态',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        if (row.mrpStatus == 1) {
+                            return '<span style="font-weight: bold;color: green">已生成MRP</span>';
+                        } else {
+                            return '<span style="font-weight: bold;color: red">未生成MRP</span>';
                         }
                     }
                 }
@@ -136,7 +149,6 @@
      * 生成MRP
      */
     function addMrp() {
-
         var a = $('#bootstrap-table').bootstrapTable('getSelections');
         if (a.length > 0) {
             console.log(a[0]);
@@ -148,8 +160,14 @@
         } else {
             $.modal.alertWarning("请至少选择一条记录");
         }
+    }
 
-
+    /**
+     * 查询物料情况
+     * @param orderId
+     */
+    function showMatDetail(orderId,productId) {
+        $.modal.open("查看物料情况窗口","/erp/mrp/showMatDetail?orderId="+orderId + "&productId=" + productId);
     }
 </script>
 </body>

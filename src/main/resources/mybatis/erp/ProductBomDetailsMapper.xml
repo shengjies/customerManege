@@ -119,5 +119,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
-    
+
+    <!--通过bom主表id查询bom清单信息-->
+    <select id="selectProBomDetailsByBomId" resultMap="ProductBomDetailsResult">
+        <include refid="selectProductBomDetailsVo"/>
+        where bom_id = #{bomId}
+    </select>
 </mapper>

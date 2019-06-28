@@ -99,5 +99,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
-    
+
+    <select id="selectProBomNewVerByProId" resultMap="ProductBomResult">
+        SELECT * FROM tab_product_bom where company_id = #{companyId} and product_id = #{productId} order by bom_version desc limit 1;
+    </select>
 </mapper>

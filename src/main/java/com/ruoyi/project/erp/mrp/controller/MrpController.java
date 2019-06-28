@@ -3,6 +3,9 @@ package com.ruoyi.project.erp.mrp.controller;
 import java.util.List;
 
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,7 +55,9 @@ public class MrpController extends BaseController
 	public TableDataInfo list(Mrp mrp)
 	{
 		startPage();
-        List<Mrp> list = mrpService.selectMrpList(mrp);
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		mrp.setCompanyId(user.getCompanyId());
+		List<Mrp> list = mrpService.selectMrpList(mrp);
 		return getDataTable(list);
 	}
 	
@@ -136,6 +141,30 @@ public class MrpController extends BaseController
 	{
 		try {
 			return toAjax(mrpService.addMrpByOrDeIds(mrps));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
+	}
+
+	/**
+	 * 跳转查看未能生产原因窗口
+	 */
+	@GetMapping("/showMatDetail")
+	public String showMatDetail(Integer orderId,Integer productId,ModelMap modelMap){
+		modelMap.put("orderId",orderId);
+		modelMap.put("productId",productId);
+		return prefix + "/matDetail";
+	}
+
+	/**
+	 * 取消MRP
+	 */
+	@RequiresPermissions("erp:mrp:cancel")
+	@PostMapping("/cancelMrp")
+	@ResponseBody
+	public AjaxResult cancelMrp(Mrp mrp){
+		try {
+			return toAjax(mrpService.cancelMrp(mrp));
 		} catch (BusinessException e) {
 			return error(e.getMessage());
 		}

@@ -22,7 +22,7 @@ public class ProductBom extends BaseEntity
 	/** bom单编号 */
 	private String bomCode;
 	/** bom版本号 */
-	private String bomVersion;
+	private Integer bomVersion;
 	/** 产品主键ID */
 	private Integer productId;
 	/** 产品编码 */
@@ -65,16 +65,16 @@ public class ProductBom extends BaseEntity
 	{
 		return bomCode;
 	}
-	public void setBomVersion(String bomVersion) 
-	{
+
+	public Integer getBomVersion() {
+		return bomVersion;
+	}
+
+	public void setBomVersion(Integer bomVersion) {
 		this.bomVersion = bomVersion;
 	}
 
-	public String getBomVersion() 
-	{
-		return bomVersion;
-	}
-	public void setProductId(Integer productId) 
+	public void setProductId(Integer productId)
 	{
 		this.productId = productId;
 	}
