@@ -2,6 +2,8 @@ package com.ruoyi.project.erp.productBom.service;
 
 import com.ruoyi.project.erp.productBom.domain.BomConfig;
 import com.ruoyi.project.erp.productBom.domain.ProductBom;
+import com.ruoyi.project.erp.productBom.domain.ProductBomDetails;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -30,6 +32,16 @@ public interface IProductBomService
      */
 	public List<ProductBom> selectProductBomList(ProductBom productBom);
 
+
+
+	/**
+	 * 根据产品id查询对应的BOM版本信息
+	 * @param pid 产品id
+	 * @return
+	 */
+	List<ProductBom> selectBomByPid(int pid);
+
+
 	/**
 	 * 导入bom单
 	 * @param file 导入文件
@@ -44,15 +56,9 @@ public interface IProductBomService
      * @param productBom 产品BOM单信息
      * @return 结果
      */
-	public int updateProductBom(ProductBom productBom);
+	public String updateProductBom(ProductBom productBom) throws Exception;
 		
-	/**
-     * 删除产品BOM单信息
-     * 
-     * @param ids 需要删除的数据ID
-     * @return 结果
-     */
-	public int deleteProductBomByIds(String ids);
+
 
 	/**
 	 * 查询bom配置信息
@@ -66,5 +72,19 @@ public interface IProductBomService
 	 * @return
 	 */
 	public int saveBomConfig(BomConfig config);
+
+	/**
+	 * 根据bomid查询对应的bom详情数据
+	 * @param bid bom id
+	 * @return
+	 */
+	List<ProductBomDetails> selectBomDetailByBomId(int bid);
+
+	/**
+	 * 导出BOM 单信息
+	 * @param id BOM单id
+	 * @return
+	 */
+	Workbook export(int id);
 	
 }

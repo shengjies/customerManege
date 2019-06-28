@@ -50,7 +50,7 @@ public class ReportServiceImpl implements IReportService {
     public int exportReport(int lineId, String productCode,String startTime, String endTime,
                             HttpServletResponse response, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        String path = "test_A4.jrxml";
+        String path = "/test_A4.jrxml";
         String pdfName = "全局";
         Map<String,Object> param = new HashMap<>();
         param.put("company_name","xxx");

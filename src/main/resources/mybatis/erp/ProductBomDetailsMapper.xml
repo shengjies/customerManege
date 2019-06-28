@@ -20,30 +20,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="placeNumber"    column="place_number"    />
         <result property="unit"    column="unit"    />
         <result property="remark"    column="remark"    />
+        <result property="bIndex"    column="b_index"    />
     </resultMap>
 	
 	<sql id="selectProductBomDetailsVo">
-        select id, bom_id, bom_details_type, detail_id, detail_code, detail_model, detail_name, one_num, price, total_price, create_id, create_time, place_number, unit, remark from tab_product_bom_details
+        select id, bom_id, bom_details_type, detail_id, detail_code, detail_model, detail_name, one_num, price, total_price, create_id, create_time, place_number, unit, remark, b_index from tab_product_bom_details
     </sql>
 	
     <select id="selectProductBomDetailsList" parameterType="ProductBomDetails" resultMap="ProductBomDetailsResult">
         <include refid="selectProductBomDetailsVo"/>
-        <where>  
-            <if test="id != null "> and id = #{id}</if>
-             <if test="bomId != null "> and bom_id = #{bomId}</if>
-             <if test="bomDetailsType != null "> and bom_details_type = #{bomDetailsType}</if>
-             <if test="detailId != null "> and detail_id = #{detailId}</if>
-             <if test="detailCode != null  and detailCode != '' "> and detail_code = #{detailCode}</if>
-             <if test="detailModel != null  and detailModel != '' "> and detail_model = #{detailModel}</if>
-             <if test="detailName != null  and detailName != '' "> and detail_name = #{detailName}</if>
-             <if test="oneNum != null "> and one_num = #{oneNum}</if>
-             <if test="price != null "> and price = #{price}</if>
-             <if test="totalPrice != null "> and total_price = #{totalPrice}</if>
-             <if test="createId != null "> and create_id = #{createId}</if>
-             <if test="createTime != null "> and create_time = #{createTime}</if>
-             <if test="placeNumber != null  and placeNumber != '' "> and place_number = #{placeNumber}</if>
-             <if test="unit != null  and unit != '' "> and unit = #{unit}</if>
-             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+        <where>
+             and bom_id = #{bid}
          </where>
     </select>
     
@@ -109,12 +96,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
+    <!--根据BOM id 详情下标查询对应的详情内容-->
+    <select id="selectBomDetailByBidAndIndex" resultMap="ProductBomDetailsResult">
+        SELECT * FROM tab_product_bom_details where bom_id = #{bid} and bom_details_type = #{bType} and b_index = #{bIndex};
+    </select>
+    
 	<delete id="deleteProductBomDetailsById" parameterType="Integer">
         delete from tab_product_bom_details where id = #{id}
     </delete>
-	
+
     <delete id="deleteProductBomDetailsByIds" parameterType="String">
-        delete from tab_product_bom_details where id in 
+        delete from tab_product_bom_details where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

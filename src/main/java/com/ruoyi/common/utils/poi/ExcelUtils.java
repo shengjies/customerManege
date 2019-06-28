@@ -1,13 +1,10 @@
 package com.ruoyi.common.utils.poi;
 
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.framework.aspectj.lang.annotation.Excel;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.web.domain.AjaxResult;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 下载excel工具类
@@ -90,6 +83,26 @@ public class ExcelUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static Cell creatCell(Row row,int column,String value){
+        Cell cell = row.createCell(column);
+        cell.setCellValue(StringUtils.isEmpty(value)?"":value);
+        return cell;
+    }
+    public static CellStyle createCellStyle(Workbook wb,int size,boolean bold){
+        // 创建表头单元格样式
+        CellStyle cellStyle = wb.createCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);  // 设置单元格水平方向对其方式
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER); // 设置单元格垂直方向对其方式
+        cellStyle.setWrapText(true);
+        // 创建表头字体样式
+        Font font = wb.createFont();
+        font.setBold(bold);
+
+        font.setFontHeightInPoints((short) size);    // 将字体大小设置为18px
+        cellStyle.setFont(font);
+        return cellStyle;
     }
 
 }

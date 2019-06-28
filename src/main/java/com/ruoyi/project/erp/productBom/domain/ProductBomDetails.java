@@ -1,5 +1,6 @@
 package com.ruoyi.project.erp.productBom.domain;
 
+import com.ruoyi.common.utils.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
@@ -47,8 +48,11 @@ public class ProductBomDetails extends BaseEntity
 	private String unit;
 	/** 备注信息 */
 	private String remark;
+	/**  */
+	private Integer bIndex;
 
-	public void setId(Integer id) 
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}
@@ -163,7 +167,7 @@ public class ProductBomDetails extends BaseEntity
 
 	public String getPlaceNumber() 
 	{
-		return placeNumber;
+		return StringUtils.isEmpty(placeNumber)?"":placeNumber;
 	}
 	public void setUnit(String unit) 
 	{
@@ -172,7 +176,7 @@ public class ProductBomDetails extends BaseEntity
 
 	public String getUnit() 
 	{
-		return unit;
+		return StringUtils.isEmpty(unit)?"":unit;
 	}
 	public void setRemark(String remark) 
 	{
@@ -181,26 +185,36 @@ public class ProductBomDetails extends BaseEntity
 
 	public String getRemark() 
 	{
-		return remark;
+		return StringUtils.isEmpty(remark)?"":remark;
 	}
 
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("bomId", getBomId())
-            .append("bomDetailsType", getBomDetailsType())
-            .append("detailId", getDetailId())
-            .append("detailCode", getDetailCode())
-            .append("detailModel", getDetailModel())
-            .append("detailName", getDetailName())
-            .append("oneNum", getOneNum())
-            .append("price", getPrice())
-            .append("totalPrice", getTotalPrice())
-            .append("createId", getCreateId())
-            .append("createTime", getCreateTime())
-            .append("placeNumber", getPlaceNumber())
-            .append("unit", getUnit())
-            .append("remark", getRemark())
-            .toString();
-    }
+	public Integer getbIndex() {
+		return bIndex;
+	}
+
+	public void setbIndex(Integer bIndex) {
+		this.bIndex = bIndex;
+	}
+
+	@Override
+	public String toString() {
+		return "ProductBomDetails{" +
+				"id=" + id +
+				", bomId=" + bomId +
+				", bomDetailsType=" + bomDetailsType +
+				", detailId=" + detailId +
+				", detailCode='" + detailCode + '\'' +
+				", detailModel='" + detailModel + '\'' +
+				", detailName='" + detailName + '\'' +
+				", oneNum=" + oneNum +
+				", price=" + price +
+				", totalPrice=" + totalPrice +
+				", createId=" + createId +
+				", createTime=" + createTime +
+				", placeNumber='" + placeNumber + '\'' +
+				", unit='" + unit + '\'' +
+				", remark='" + remark + '\'' +
+				", bIndex=" + bIndex +
+				'}';
+	}
 }

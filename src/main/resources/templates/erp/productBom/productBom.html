@@ -10,46 +10,25 @@
 				<form id="formId">
 					<div class="select-list">
 						<ul>
-							<li>
-								公司主键ID：<input type="text" name="companyId"/>
-							</li>
 
 							<li>
-								bom单编号：<input type="text" name="bomCode"/>
+								BOM编号：<input type="text" name="bomCode"/>
 							</li>
-
-							<li>
-								bom版本号：<input type="text" name="bomVersion"/>
-							</li>
-
-							<li>
-								产品主键ID：<input type="text" name="productId"/>
-							</li>
-
 							<li>
 								产品编码：<input type="text" name="productCode"/>
 							</li>
-
 							<li>
 								产品型号：<input type="text" name="productModel"/>
 							</li>
-
 							<li>
 								产品名称：<input type="text" name="productName"/>
 							</li>
-
-							<li>
-								备注信息：<input type="text" name="remark"/>
+							<li class="select-time">
+								<label>操作时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
 							</li>
-
-							<li>
-								创建者：<input type="text" name="createId"/>
-							</li>
-
-							<li>
-								创建时间：<input type="text" name="createTime"/>
-							</li>
-
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
 								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -66,15 +45,6 @@
 				<a class="btn btn-success" onclick="importBom()" shiro:hasPermission="erp:productBom:add">
 					<i class="fa fa-upload"></i> 导入bom
 				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="erp:productBom:edit">
-					<i class="fa fa-edit"></i> 修改
-				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="erp:productBom:remove">
-					<i class="fa fa-remove"></i> 删除
-				</a>
-				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="erp:productBom:export">
-						<i class="fa fa-download"></i> 导出
-				 </a>
 			</div>
 			<div class="col-sm-12 select-table table-striped">
 				<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -84,7 +54,8 @@
     <div th:include="include :: footer"></div>
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('erp:productBom:edit')}]];
-        var removeFlag = [[${@permission.hasPermi('erp:productBom:remove')}]];
+        var detailFlag = [[${@permission.hasPermi('erp:productBom:detail')}]];
+        var exportlFlag = [[${@permission.hasPermi('erp:productBom:export')}]];
         var prefix = ctx + "erp/productBom";
 
         $(function() {
@@ -101,29 +72,17 @@
 		            checkbox: true
 		        },
 				{
-					field : 'id', 
-					title : '产品BOM单主键ID',
-					visible: false
-				},
-				{
-					field : 'companyId', 
-					title : '公司主键ID',
-					sortable: true
-				},
-				{
 					field : 'bomCode', 
-					title : 'bom单编号',
+					title : 'BOM编号',
 					sortable: true
 				},
 				{
 					field : 'bomVersion', 
-					title : 'bom版本号',
-					sortable: true
-				},
-				{
-					field : 'productId', 
-					title : '产品主键ID',
-					sortable: true
+					title : '版本号',
+					sortable: true,
+					formatter:function (value, row, index) {
+						return "<span>v"+value+"</span>"
+					}
 				},
 				{
 					field : 'productCode', 
@@ -146,13 +105,8 @@
 					sortable: true
 				},
 				{
-					field : 'createId', 
-					title : '创建者',
-					sortable: true
-				},
-				{
 					field : 'createTime', 
-					title : '创建时间',
+					title : '操作时间',
 					sortable: true
 				},
 		        {
@@ -160,13 +114,15 @@
 		            align: 'center',
 		            formatter: function(value, row, index) {
 		            	var actions = [];
-		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
-						return actions.join('');
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(' + row.id + ',\''+row.bomCode+'\')"><i class="fa fa-edit"></i>编辑</a> ');
+		            	actions.push('<a class="btn btn-primary btn-xs ' + detailFlag + '" href="#" onclick="detail(' + row.id + ')"><i class="fa fa-eye"></i>详情</a> ');
+		            	actions.push('<a class="btn btn-warning btn-xs ' + exportlFlag + '" href="#" onclick="exportBom(' + row.id + ')"><i class="fa fa-download"></i>导出</a> ');
+                        return actions.join('');
 		            }
 		        }]
             };
             $.table.init(options);
+            $("select").select2();
         });
 
 		/**
@@ -178,6 +134,39 @@
 
 		function importBom() {
 			$.modal.open("导入BOM配置",prefix+"/add",500,360)
+		}
+
+		/**
+		 * 编辑bom单
+		 * @param id id号
+ 		 * @param code bom单号
+		 */
+		function edit(id,code) {
+			createMenuItem(prefix+"/edit/"+id,"编辑BOM单 "+code);
+		}
+
+		/**
+		 * BOM单详情
+		 * @param id BOM id
+		 */
+		function detail(id) {
+			createMenuItem(prefix+"/detail?bid="+id,"BOM单详情");
+		}
+
+		/**
+		 * 导出BOM
+		 * @param id BOM id
+		 */
+		function exportBom(id) {
+			$.modal.loading("正在操作，请稍等...");
+			$.post(prefix+"/export", {id: id}, function (result) {
+				if (result.code == web_status.SUCCESS) {
+					window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+				} else {
+					$.modal.alertError(result.msg);
+				}
+				$.modal.closeLoading();
+			})
 		}
     </script>
 </body>

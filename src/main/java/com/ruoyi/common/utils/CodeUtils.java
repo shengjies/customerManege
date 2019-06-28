@@ -82,7 +82,13 @@ public class CodeUtils {
         return "SCFL"+getCode()+getRandom();
     }
 
-
+    /**
+     * 获取bom 单号
+     * @return
+     */
+    public static String getBomCode(){
+        return "BOM"+getCode()+getRandom();
+    }
     /**
      * 获取单号后一段部分
      * @return

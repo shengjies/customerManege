@@ -1,0 +1,212 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <span>BOM 单详情信息</span>&nbsp;&nbsp;&nbsp;<span style="font-size: 24px" id="bom-version-msg"
+                                                                  th:utext="${productBom.bomVersion==1?'初始版本v'+productBom.bomVersion:'由版本v'+oldBom.bomVersion+'变更为版本v'+productBom.bomVersion}">
+
+                </span>
+                </div>
+                <div class="panel-body">
+                    <div class="col-sm-12">
+                        <div class="col-xs-4">产品编号:<span th:utext="${productBom.productCode}"></span></div>
+                        <div class="col-xs-4">产品名称:<span th:utext="${productBom.productName}"></span></div>
+                        <div class="col-xs-4">产品型号:<span th:utext="${productBom.productModel}"></span></div>
+                        <div class="col-xs-4">备注信息:<span th:utext="${productBom.remark}"></span></div>
+                        <div class="col-xs-4">当前版本:<select id="bom-version-sel" style="width: 100%" onchange="bomVersionChange(this)"   >
+                            <option th:each="item:${boms}" th:value="${item.id}"
+                                    th:utext="${'v'+item.bomVersion}" th:selected="${item.bomVersion==productBom.bomVersion}"></option>
+                        </select></div>
+                    </div>
+                    <div class="col-md-12" id="bom-old-table-list" th:if="${productBom.bomVersion != 1}">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5><span style="color: red">变更前</span>&nbsp;BOM编号:<span id="bom-old-code" th:utext="${oldBom.bomCode}"></span>  版本
+                                    v<span id="bom-old-version" th:utext="${oldBom.bomVersion}"></span> BOM列表</h5>
+                            </div>
+                            <div class="ibox-content" style="padding: 0px">
+                                <table class="table table-striped table-bordered table-hover ">
+                                    <thead>
+                                    <tr>
+                                        <th>物料编码</th>
+                                        <th>物料名称</th>
+                                        <th>物料型号</th>
+                                        <th style="width: 80px">用量</th>
+                                        <th style="width: 80px">单价</th>
+                                        <th >总价</th>
+                                        <th style="width: 80px">单位</th>
+                                        <th>位号</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="add-bom-detail-old-table-body">
+                                        <tr th:if="${not #lists.isEmpty(oldDetail)}" th:each="item:${oldDetail}">
+                                            <td th:utext="${item.detailCode}"></td>
+                                            <td th:utext="${item.detailName}">物料名称</td>
+                                            <td th:utext="${item.detailModel}">物料型号</td>
+                                            <td style="width:80px" th:utext="${item.oneNum}">用量</td>
+                                            <td style="width:80px" th:utext="${item.price}">用量</td>
+                                            <td  th:utext="${item.totalPrice}">用量</td>
+                                            <td style="width: 80px" th:utext="${item.unit==null?'':item.unit}">单位</td>
+                                            <td th:utext="${item.placeNumber==null?'':item.placeNumber}">位号</td>
+                                            <td th:utext="${item.remark==null?'':item.remark}">备注</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5><span style="color: red" id="bom-ver-msg" th:utext="${productBom.bomVersion == 1?'初始版本':'变更后'}"></span>&nbsp;BOM编号:
+                                    <span id="bom-new-bom-code" th:utext="${productBom.bomCode}"></span>  版本
+                                    v<span id="bom-new-bom-version" th:utext="${productBom.bomVersion}"></span>, BOM列表</h5>
+                            </div>
+                            <div class="ibox-content" style="padding: 0px">
+                                <table class="table table-striped table-bordered table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>物料编码</th>
+                                            <th>物料名称</th>
+                                            <th>物料型号</th>
+                                            <th style="width:80px">用量</th>
+                                            <th style="width:80px">单价</th>
+                                            <th style="">总价</th>
+                                            <th style="width: 80px">单位</th>
+                                            <th>位号</th>
+                                            <th>备注</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="add-bom-detail-new-table-body">
+                                        <tr th:if="${not #lists.isEmpty(detail2)}" th:each="item:${detail2}">
+                                            <td th:utext="${item.detailCode}"></td>
+                                            <td th:utext="${item.detailName}">物料名称</td>
+                                            <td th:utext="${item.detailModel}">物料型号</td>
+                                            <td style="width:80px" th:utext="${item.oneNum}">用量</td>
+                                            <td style="width:80px" th:utext="${item.price}">用量</td>
+                                            <td  th:utext="${item.totalPrice}">用量</td>
+                                            <td style="width: 80px" th:utext="${item.unit==null?'':item.unit}">单位</td>
+                                            <td th:utext="${item.placeNumber==null?'':item.placeNumber}">位号</td>
+                                            <td th:utext="${item.remark==null?'':item.remark}">备注</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5 style="color: red">更记录</h5>
+                            </div>
+                            <div class="ibox-content" style="padding: 0px">
+                                <div id="bom-change-text" th:if="${productBom.bomVersion == 1}" style="font-size: 24px;">当前版本为初始版本，无变更记录</div>
+                                <div id="bom-change-text" th:if="${productBom.bomVersion != 1}" style="font-size: 24px;"
+                                th:utext="${change == null?'无变更记录':change.changeText}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "erp/productBom"
+    $(function () {
+        $("#bom-version-sel").select2({
+            width:180
+        })
+    })
+    function submitHandler() {
+        $.modal.close();
+    }
+
+    /**
+     * BOM 版本更改
+     * @param val
+     */
+    function bomVersionChange(val) {
+        var id = $(val).find("option:selected").val();
+        $.post(prefix+"/detail/info",{bid:id},function (res) {
+            if(res && res.code == 0 && res.detail2 && res.productBom){
+                if(res.productBom.bomVersion == 1){
+                    $("#bom-old-table-list").css('display','none');
+                    $("#bom-version-msg").text("初始版本v"+res.productBom.bomVersion);
+                    $("#bom-ver-msg").text("初始版本");
+                    $("#bom-change-text").text("当前版本为初始版本，无变更记录");
+                }else{
+                    $("#bom-old-table-list").css('display','block');;
+                    $("#bom-version-msg").text("由版本v"+res.oldBom.bomVersion+"变更为版本v"+res.productBom.bomVersion);
+                    $("#bom-ver-msg").text("变更后");
+                    $("#bom-change-text").text("无变更记录")
+                }
+                if(res.productBom.bomVersion > 1 && res.change){
+                    $("#bom-change-text").text("").html(res.change.changeText);
+                }
+                $("#bom-new-bom-code").text(res.productBom.bomCode);
+                $("#bom-new-bom-version").text(res.productBom.bomVersion);
+                $("#add-bom-detail-new-table-body").children().remove();
+                if(res.detail2){
+                    var rows = res.detail2;
+                    var newItems = new Array();
+                    for(var i =0;i < rows.length;i++ ){
+                        var unit = rows[i].unit == null?'':rows[i].unit;
+                        var placeNumber = rows[i].placeNumber ==null?'':rows[i].placeNumber;
+                        var remark = rows[i].remark == null?'':rows[i].remark;
+                        var row=' <tr>\n' +
+                            '<td>'+rows[i].detailCode+'</td>\n' +
+                            '<td>'+rows[i].detailName+'</td>\n' +
+                            '<td>'+rows[i].detailModel+'</td>\n' +
+                            '<td style="width:80px">'+rows[i].oneNum+'</td>\n' +
+                            '<td style="width:80px">'+rows[i].price+'</td>\n' +
+                            '<td>'+rows[i].totalPrice+'</td>\n' +
+                            '<td style="width: 80px">'+unit+'</td>\n' +
+                            '<td>'+placeNumber+'</td>\n' +
+                            '<td>'+remark+'</td>\n' +
+                            '</tr>';
+                        newItems.push(row);
+                    }
+                    $("#add-bom-detail-new-table-body").append(newItems);
+                }
+                if(res.productBom.bomVersion > 1 && res.oldBom && res.oldDetail){
+                    $("#bom-old-code").text(res.oldBom.bomCode);
+                    $("#bom-old-version").text(res.oldBom.bomVersion);
+                    $("#add-bom-detail-old-table-body").children().remove();
+                    var rows = res.oldDetail;
+                    var oldItems = new Array();
+                    for(var i =0;i < rows.length;i++ ){
+                        var unit = rows[i].unit == null?'':rows[i].unit;
+                        var placeNumber = rows[i].placeNumber ==null?'':rows[i].placeNumber;
+                        var remark = rows[i].remark == null?'':rows[i].remark;
+                        var row=' <tr>\n' +
+                            '<td>'+rows[i].detailCode+'</td>\n' +
+                            '<td>'+rows[i].detailName+'</td>\n' +
+                            '<td>'+rows[i].detailModel+'</td>\n' +
+                            '<td style="width:80px">'+rows[i].oneNum+'</td>\n' +
+                            '<td style="width:80px">'+rows[i].price+'</td>\n' +
+                            '<td>'+rows[i].totalPrice+'</td>\n' +
+                            '<td style="width: 80px">'+unit+'</td>\n' +
+                            '<td>'+placeNumber+'</td>\n' +
+                            '<td>'+remark+'</td>\n' +
+                            '</tr>';
+                        oldItems.push(row);
+                    }
+                    $("#add-bom-detail-old-table-body").append(oldItems);
+                }
+            }else{
+                $.modal.alertError("操作异常");
+            }
+        })
+    }
+</script>
+</body>
+</html>

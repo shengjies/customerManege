@@ -16,26 +16,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"    column="remark"    />
         <result property="createId"    column="create_id"    />
         <result property="createTime"    column="create_time"    />
+        <result property="sign"    column="sign"    />
+        <result property="sSign"    column="s_sign"    />
     </resultMap>
 	
 	<sql id="selectProductBomVo">
-        select id, company_id, bom_code, bom_version, product_id, product_code, product_model, product_name, remark, create_id, create_time from tab_product_bom
+        select id, company_id, bom_code, bom_version, product_id, product_code, product_model, product_name, remark, create_id, create_time, sign,s_sign from tab_product_bom
     </sql>
 	
     <select id="selectProductBomList" parameterType="ProductBom" resultMap="ProductBomResult">
         <include refid="selectProductBomVo"/>
-        <where>  
-            <if test="id != null "> and id = #{id}</if>
-             <if test="companyId != null "> and company_id = #{companyId}</if>
-             <if test="bomCode != null  and bomCode != '' "> and bom_code = #{bomCode}</if>
-             <if test="bomVersion != null  and bomVersion != '' "> and bom_version = #{bomVersion}</if>
-             <if test="productId != null "> and product_id = #{productId}</if>
-             <if test="productCode != null  and productCode != '' "> and product_code = #{productCode}</if>
-             <if test="productModel != null  and productModel != '' "> and product_model = #{productModel}</if>
-             <if test="productName != null  and productName != '' "> and product_name = #{productName}</if>
-             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
-             <if test="createId != null "> and create_id = #{createId}</if>
-             <if test="createTime != null "> and create_time = #{createTime}</if>
+        <where>
+              and sign = 1
+              and company_id = #{companyId}
+             <if test="bomCode != null  and bomCode != '' "> and bom_code like concat(#{bomCode},'%')</if>
+             <if test="productCode != null  and productCode != '' "> and product_code like concat(#{productCode},'%')</if>
+             <if test="productModel != null  and productModel != '' "> and product_model like concat(#{productModel},'%')</if>
+             <if test="productName != null  and productName != '' "> and product_name like concat(#{productName},'%')</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
          </where>
     </select>
     
@@ -49,7 +52,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">company_id,</if>
 			<if test="bomCode != null  and bomCode != ''  ">bom_code,</if>
-			<if test="bomVersion != null  and bomVersion != ''  ">bom_version,</if>
+			<if test="bomVersion != null  ">bom_version,</if>
 			<if test="productId != null  ">product_id,</if>
 			<if test="productCode != null  and productCode != ''  ">product_code,</if>
 			<if test="productModel != null  and productModel != ''  ">product_model,</if>
@@ -57,11 +60,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="remark != null  and remark != ''  ">remark,</if>
 			<if test="createId != null  ">create_id,</if>
 			<if test="createTime != null  ">create_time,</if>
+			<if test="sign != null  ">sign,</if>
+			<if test="sSign != null  ">s_sign,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
 			<if test="bomCode != null  and bomCode != ''  ">#{bomCode},</if>
-			<if test="bomVersion != null  and bomVersion != ''  ">#{bomVersion},</if>
+			<if test="bomVersion != null  ">#{bomVersion},</if>
 			<if test="productId != null  ">#{productId},</if>
 			<if test="productCode != null  and productCode != ''  ">#{productCode},</if>
 			<if test="productModel != null  and productModel != ''  ">#{productModel},</if>
@@ -69,32 +74,43 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="remark != null  and remark != ''  ">#{remark},</if>
 			<if test="createId != null  ">#{createId},</if>
 			<if test="createTime != null  ">#{createTime},</if>
+			<if test="sign != null  ">#{sign},</if>
+			<if test="sSign != null  ">#{sSign},</if>
          </trim>
     </insert>
 	 
-    <update id="updateProductBom" parameterType="ProductBom">
-        update tab_product_bom
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="companyId != null  ">company_id = #{companyId},</if>
-            <if test="bomCode != null  and bomCode != ''  ">bom_code = #{bomCode},</if>
-            <if test="bomVersion != null  and bomVersion != ''  ">bom_version = #{bomVersion},</if>
-            <if test="productId != null  ">product_id = #{productId},</if>
-            <if test="productCode != null  and productCode != ''  ">product_code = #{productCode},</if>
-            <if test="productModel != null  and productModel != ''  ">product_model = #{productModel},</if>
-            <if test="productName != null  and productName != ''  ">product_name = #{productName},</if>
-            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
-            <if test="createId != null  ">create_id = #{createId},</if>
-            <if test="createTime != null  ">create_time = #{createTime},</if>
-        </trim>
-        where id = #{id}
+
+
+    <!--根据产品id查询对应的产品是否已经导入bom-->
+    <select id="selectBomByProductId" resultMap="ProductBomResult">
+        SELECT * FROM tab_product_bom where product_id =#{pid}  limit 1;
+    </select>
+
+    <!--根据产品id查询对应的BOM版本信息-->
+    <select id="selectBomByPid" resultMap="ProductBomResult">
+        SELECT * FROM tab_product_bom where product_id = #{pid} and s_sign = 1   order by bom_version desc;
+    </select>
+
+    <!--根据产品id查询最新版本的BOM单-->
+    <select id="selectNewBomVersion" resultMap="ProductBomResult">
+        SELECT * FROM tab_product_bom where product_id = #{pid} order by bom_version desc limit 1;
+    </select>
+
+    <!--根据产品id修改对应BOM 单的sign值为0-->
+    <update id="updateBomSignByProductId">
+        update tab_product_bom set sign = 0 where product_id = #{pid};
     </update>
 
+    <!--对BOM 进行审核-->
+    <update id="updateBomSignAndSsignById">
+        update tab_product_bom set sign = 1,s_sign = 1 where id = #{id};
+    </update>
 	<delete id="deleteProductBomById" parameterType="Integer">
         delete from tab_product_bom where id = #{id}
     </delete>
-	
+
     <delete id="deleteProductBomByIds" parameterType="String">
-        delete from tab_product_bom where id in 
+        delete from tab_product_bom where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

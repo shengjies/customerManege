@@ -30,7 +30,7 @@ public class PdfUtil {
                 // 非IE浏览器的处理：
                 pdfName = new String(pdfName.getBytes("UTF-8"), "ISO-8859-1");
             }
-            InputStream in = this.getClass().getResourceAsStream("/test_A4.jrxml");
+            InputStream in = this.getClass().getResourceAsStream(temPath);
             JasperReport jasperReport = JasperCompileManager.compileReport(in);
             JasperPrint print = JasperFillManager.fillReport(jasperReport,map,new JREmptyDataSource());
             response.setContentType("application/x-download");

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.bomChange.mapper.BomChangeMapper">
+
+    <resultMap type="BomChange" id="BomChangeResult">
+        <result property="id" column="id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="pId" column="p_id"/>
+        <result property="oldVersion" column="old_version"/>
+        <result property="newVersion" column="new_version"/>
+        <result property="cTime" column="c_time"/>
+        <result property="cId" column="c_id"/>
+        <result property="shTime" column="sh_time"/>
+        <result property="shId" column="sh_id"/>
+        <result property="shStatus" column="sh_status"/>
+        <result property="changeText" column="change_text"/>
+        <result property="newBomId" column="new_bom_id"/>
+        <result property="oldBomId" column="old_bom_id"/>
+    </resultMap>
+    <resultMap type="BomChange" id="BomChangeResultList">
+        <result property="id" column="id"/>
+        <result property="companyId" column="company_id"/>
+        <result property="pId" column="p_id"/>
+        <result property="oldVersion" column="old_version"/>
+        <result property="newVersion" column="new_version"/>
+        <result property="cTime" column="c_time"/>
+        <result property="cId" column="c_id"/>
+        <result property="shTime" column="sh_time"/>
+        <result property="shId" column="sh_id"/>
+        <result property="shStatus" column="sh_status"/>
+        <result property="changeText" column="change_text"/>
+        <result property="newBomId" column="new_bom_id"/>
+        <result property="oldBomId" column="old_bom_id"/>
+        <association property="pCode" column="p_id" select="selectBomPCode">
+            <result property="pCode" column="product_code"/>
+        </association>
+        <association property="oldCode" column="old_bom_id" select="selectOldBomCode">
+            <result property="oldCode" column="bom_code"/>
+        </association>
+        <association property="newCode" column="new_bom_id" select="selectNewBomCode">
+            <result property="newCode" column="bom_code"/>
+        </association>
+        <association property="cUser" column="c_id" select="selectCUser">
+            <result property="cUser" column="user_name"/>
+        </association>
+        <association property="sUser" column="sh_id" select="selectSUser">
+            <result property="sUser" column="user_name"/>
+        </association>
+    </resultMap>
+    <sql id="selectBomChangeVo">
+        select id, company_id, p_id, old_version, new_version, c_time, c_id, sh_time, sh_id, sh_status, change_text, new_bom_id, old_bom_id from tab_bom_change
+    </sql>
+
+    <select id="selectBomChangeList" parameterType="BomChange" resultMap="BomChangeResultList">
+        <include refid="selectBomChangeVo"/>
+        <where>
+            and company_id = #{companyId}
+            and def_id = 0
+            <if test="pId != null and pId > -1 ">and p_id = #{pId}</if>
+            <if test="cId != null and cId > -1">and c_id = #{cId}</if>
+            <if test="shId != null and shId > -1">and sh_id = #{shId}</if>
+            <if test="shStatus != null and shStatus > -1">and sh_status = #{shStatus}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(c_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+    <!--查询产品编码-->
+    <select id="selectBomPCode" resultType="java.lang.String">
+        SELECT product_code FROM dev_product_list where id = #{p_id};
+    </select>
+    <!--查询旧bom编号-->
+    <select id="selectOldBomCode" resultType="java.lang.String">
+        SELECT bom_code FROM tab_product_bom where id = #{old_bom_id};
+    </select>
+    <!--查询新bom编号-->
+    <select id="selectNewBomCode" resultType="java.lang.String">
+        SELECT bom_code FROM tab_product_bom where id = #{new_bom_id};
+    </select>
+    <!--查询创建者-->
+    <select id="selectCUser" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{c_id};
+    </select>
+    <!--查询审核者-->
+    <select id="selectSUser" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{sh_id};
+    </select>
+
+    <select id="selectBomChangeById" parameterType="Integer" resultMap="BomChangeResult">
+        <include refid="selectBomChangeVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertBomChange" parameterType="BomChange" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_bom_change
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyId != null  ">company_id,</if>
+            <if test="pId != null  ">p_id,</if>
+            <if test="oldVersion != null  ">old_version,</if>
+            <if test="newVersion != null  ">new_version,</if>
+            <if test="cTime != null  ">c_time,</if>
+            <if test="cId != null  ">c_id,</if>
+            <if test="shTime != null  ">sh_time,</if>
+            <if test="shId != null  ">sh_id,</if>
+            <if test="shStatus != null  ">sh_status,</if>
+            <if test="changeText != null  and changeText != ''  ">change_text,</if>
+            <if test="newBomId != null  ">new_bom_id,</if>
+            <if test="oldBomId != null  ">old_bom_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyId != null  ">#{companyId},</if>
+            <if test="pId != null  ">#{pId},</if>
+            <if test="oldVersion != null  ">#{oldVersion},</if>
+            <if test="newVersion != null  ">#{newVersion},</if>
+            <if test="cTime != null  ">#{cTime},</if>
+            <if test="cId != null  ">#{cId},</if>
+            <if test="shTime != null  ">#{shTime},</if>
+            <if test="shId != null  ">#{shId},</if>
+            <if test="shStatus != null  ">#{shStatus},</if>
+            <if test="changeText != null  and changeText != ''  ">#{changeText},</if>
+            <if test="newBomId != null  ">#{newBomId},</if>
+            <if test="oldBomId != null  ">#{oldBomId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateBomChange" parameterType="BomChange">
+        update tab_bom_change
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="pId != null  ">p_id = #{pId},</if>
+            <if test="oldVersion != null  ">old_version = #{oldVersion},</if>
+            <if test="newVersion != null  ">new_version = #{newVersion},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="cId != null  ">c_id = #{cId},</if>
+            <if test="shTime != null  ">sh_time = #{shTime},</if>
+            <if test="shId != null  ">sh_id = #{shId},</if>
+            <if test="shStatus != null  ">sh_status = #{shStatus},</if>
+            <if test="changeText != null  and changeText != ''  ">change_text = #{changeText},</if>
+            <if test="newBomId != null  ">new_bom_id = #{newBomId},</if>
+            <if test="oldBomId != null  ">old_bom_id = #{oldBomId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!--取消BOM更改信息-->
+    <update id="cancelBomChange">
+        update tab_bom_change set def_id = 1 where id =#{id}
+    </update>
+
+    <!--根据新版本的BOM id查询变更记录信息-->
+    <select id="selectBomChangeByNewBomId" resultMap="BomChangeResult">
+        SELECT * FROM tab_bom_change where new_bom_id = #{bid} limit 1
+    </select>
+
+</mapper>

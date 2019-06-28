@@ -1,10 +1,21 @@
 package com.ruoyi.project.production.report.controller;
 
+import com.ruoyi.common.utils.file.FileUtils;
+import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.common.utils.poi.PdfUtil;
+import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.erp.bomChange.domain.BomChange;
+import com.ruoyi.project.erp.bomChange.service.IBomChangeService;
+import com.ruoyi.project.erp.productBom.domain.ProductBom;
+import com.ruoyi.project.erp.productBom.domain.ProductBomDetails;
+import com.ruoyi.project.erp.productBom.service.IProductBomService;
 import com.ruoyi.project.production.report.service.IReportService;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;

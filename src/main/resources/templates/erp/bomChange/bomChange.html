@@ -1,0 +1,221 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								产品编码：<select id="pId" name="pId" th:with="product=${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}" >
+									<option value="-1">所有</option>
+									<option th:each="item:${product}" th:value="${item.id}" th:utext="${item.productCode}"></option>
+								</select>
+							</li>
+							<li>
+								创建者：
+								<select id="cId" name="cId" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}" >
+									<option value="-1">所有</option>
+									<option th:each="item:${user}" th:value="${item.userId}" th:utext="${item.userName}"></option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								审核者：
+								<select id="shId" name="shId" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}" >
+									<option value="-1">所有</option>
+									<option th:each="item:${user}" th:value="${item.userId}" th:utext="${item.userName}"></option>
+								</select>
+							</li>
+							<li>
+								审核状态：<select name="shStatus" style="width: 100px">
+								<option value="-1">所有</option>
+								<option value="0">未审核</option>
+								<option value="1">已审核</option>
+								<option value="2">已取消</option>
+							</select>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('erp:bomChange:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('erp:bomChange:remove')}]];
+        var prefix = ctx + "erp/bomChange";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "BOM更改记录",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'pId', 
+					title : '产品编码',
+					sortable: true,
+					formatter:function (value, row, index) {
+						return row.pCode;
+					}
+				},
+
+					{
+						field : 'oldBomId',
+						title : '旧BOM编号',
+						sortable: true,
+						formatter:function (value, row, index) {
+							return row.oldCode;
+						}
+					},
+				{
+					field : 'oldVersion', 
+					title : '旧版本',
+					sortable: true,
+					width:50,
+					formatter:function (value, row, index) {
+						return "<span>v"+value+"</span>"
+					}
+				},
+					{
+						field : 'newBomId',
+						title : '新BOM编号',
+						sortable: true,
+						formatter:function (value, row, index) {
+							return row.newCode;
+						}
+					},
+				{
+					field : 'newVersion', 
+					title : '新版本',
+					sortable: true,
+					width:50,
+					formatter:function (value, row, index) {
+						return "<span>v"+value+"</span>"
+					}
+				},
+				{
+					field : 'cTime', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'cId', 
+					title : '创建者',
+					sortable: true,
+					formatter:function (value, row, index) {
+						return row.cUser;
+					}
+				},
+					{
+						field : 'shStatus',
+						title : '审核状态',
+						sortable: true,
+						formatter:function (value, row, index) {
+							if(value == 0){
+								return "<span>未审核</span>"
+							}else if(value == 1){
+								return "<span style='color: green'>已审核</span>"
+							}else if(value == 2){
+								return "<span style='color: red'>已取消</span>"
+							}
+						}
+					},
+				{
+					field : 'shTime', 
+					title : '审核时间',
+					sortable: true
+				},
+				{
+					field : 'shId', 
+					title : '审核者',
+					sortable: true,
+					formatter:function (value, row, index) {
+						return row.sUser;
+					}
+				},
+				{
+					field : 'changeText', 
+					title : '修改内容',
+					sortable: true,
+					width:200,
+					formatter: function(value, row, index) {
+						value = value.replace(/<br\/>/g,"\n");
+						return $.table.tooltip(value);
+					}
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	if(row.shStatus == 0){
+							actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>审核</a> ');
+							actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>取消</a>');
+						}else {
+							actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" disabled ><i class="fa fa-edit"></i>审核</a> ');
+							actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" disabled ><i class="fa fa-remove"></i>取消</a>');
+						}
+
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+
+			$("#pId").select2({
+				width:200
+			})
+			$("#cId").select2({
+				width:120
+			})
+			$("#shId").select2({
+				width:120
+			})
+        });
+
+        function remove(id) {
+			$.modal.confirm("确认取消本次BOM单的修改吗", function(e) {
+				if(e){
+					var data = {id: id};
+					$.operate.submit(prefix+"/remove", "post", "json", data);
+				}
+			});
+		}
+		function edit(id) {
+			$.modal.confirm("确认进行审核吗", function(e) {
+				if(e){
+					var data = {id: id};
+					$.operate.submit(prefix+"/edit", "post", "json", data);
+				}
+			});
+		}
+    </script>
+</body>
+</html>

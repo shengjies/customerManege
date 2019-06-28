@@ -31,9 +31,9 @@
 
         <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
             <a id="addFolder" class="btn btn-success" onclick="add()" shiro:hasPermission="iso:iso:add">
-                <i class="fa fa-plus"></i> 新增文件夹
+                <i class="fa fa-plus"></i> 新增目录
             </a>
-            <a class="btn btn-primary" onclick="upload()" shiro:hasPermission="iso:iso:add">
+            <a class="btn btn-primary" onclick="upload()" th:style="${id != 4?'':'display: none'}" id="iso-uplod-file" shiro:hasPermission="iso:iso:add">
                 <i class="fa fa-arrow-up"></i> 上传文件
             </a>
             <a id="goBackTag" class="btn btn-default" onclick="goBack()" style="display: none">
@@ -147,6 +147,11 @@
         var backIsoId = $("#backId").val();
         var initId = $("#initId").val(); // 初始id
         var isoId = $("#isoId").val(); // 查询id
+        if(backIsoId == 4 || backIsoId == 7){
+            $("#iso-uplod-file").css("display","none")
+        }else{
+            $("#iso-uplod-file").css("display","inline-block")
+        }
         if (isoId == initId) {
             return;
         }
@@ -164,6 +169,7 @@
                 $("#backId").val(res.data.parentId);
             }
         })
+
         $.form.reset();
         $.table.search("formId");
     }
@@ -181,6 +187,11 @@
                 }
             }
         })
+        if(isoId == 4 || isoId == 7){
+            $("#iso-uplod-file").css("display","none")
+        }else{
+            $("#iso-uplod-file").css("display","inline-block")
+        }
         $("#backId").val($("#isoId").val());
         $("#isoId").val(isoId); // 赋值
         $.form.reset();
