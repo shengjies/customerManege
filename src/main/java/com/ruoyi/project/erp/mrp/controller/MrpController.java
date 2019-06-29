@@ -169,4 +169,44 @@ public class MrpController extends BaseController
 			return error(e.getMessage());
 		}
 	}
+
+	/**
+	 * 跳转锁定物料订单页面
+	 */
+	@GetMapping("/showLockMatDetail")
+	public String showLockMatDetail(Integer materielId,ModelMap mmap){
+		mmap.put("materielId",materielId);
+		return "/erp/materielStock/lockMatDetail";
+	}
+
+	/**
+	 * 查询锁定订单的mrp信息
+	 */
+	@RequiresPermissions("erp:mrp:list")
+	@PostMapping("/showLockMatDetail")
+	@ResponseBody
+	public TableDataInfo showLockMatDetail(Mrp mrp)
+	{
+		startPage();
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		mrp.setCompanyId(user.getCompanyId());
+		List<Mrp> list = mrpService.selectMrpLockMatList(mrp);
+		return getDataTable(list);
+	}
+
+	/**
+	 * 查看订单锁定的物料库存信息
+	 */
+	@RequiresPermissions("erp:mrp:list")
+	@PostMapping("/listByPIdAndOId")
+	@ResponseBody
+	public TableDataInfo listByPIdAndOId(Mrp mrp)
+	{
+		startPage();
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		mrp.setCompanyId(user.getCompanyId());
+		List<Mrp> list = mrpService.selectMrpListByPIdAndOId(mrp);
+		return getDataTable(list);
+	}
+
 }

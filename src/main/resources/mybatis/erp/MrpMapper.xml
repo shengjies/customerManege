@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectMrpList" parameterType="Mrp" resultMap="MrpResult">
         <include refid="selectMrpVo"/>
-        <where>
+        where  m_status in(0,1,3)
             <if test="mrpId != null "> and mrp_id = #{mrpId}</if>
             <if test="companyId != null "> and company_id = #{companyId}</if>
             <if test="mCode != null  and mCode != '' "> and m_code = #{mCode}</if>
@@ -41,7 +41,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and materiel_code like concat ('%',#{materielCode},'%')
             </if>
             <if test="materielName != null  and materielName != '' "> and materiel_name = #{materielName}</if>
-            <if test="materielModel != null  and materielModel != '' "> and materiel_model = #{materielModel}</if>
+            <if test="materielModel != null  and materielModel != '' ">
+                and materiel_model like concat ('%',#{materielModel},'%')
+            </if>
             <if test="materielId != null "> and materiel_id = #{materielId}</if>
             <if test="orderId != null "> and order_id = #{orderId}</if>
             <if test="orderCode != null  and orderCode != '' "> and order_code = #{orderCode}</if>
@@ -53,12 +55,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="tiaoNumber != null "> and tiao_number = #{tiaoNumber}</if>
             <if test="totalNumber != null "> and total_number = #{totalNumber}</if>
             <if test="mStatus != null and mStatus != -1 "> and m_status = #{mStatus}</if>
-        </where>
     </select>
 
     <select id="selectMrpListBySupId" parameterType="Integer" resultMap="MrpResult">
         SELECT m.* FROM tab_mrp m,tab_materiel_supplier s where m.materiel_id = s.materiel_id and s.supplier_id = #{supplierId}
-        and (m.supplier_id = #{supplierId} or m.supplier_id is null)
+        and (m.supplier_id = #{supplierId} or m.supplier_id is null) and m.m_status in(0,1,3)
     </select>
     
     <select id="selectMrpById" parameterType="Integer" resultMap="MrpResult">
@@ -155,4 +156,42 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <delete id="deleteMrpByMcode" parameterType="String">
          delete from tab_mrp where m_code = #{mCode}
     </delete>
+
+    <!--查询mrp的订单信息-->
+    <select id="selectAllOrderCode" resultMap="MrpResult">
+        SELECT * FROM tab_mrp where company_id = #{companyId} group by order_code
+    </select>
+
+    <!--通过订单id和产品id查询mrp关联信息-->
+    <select id="selectMrpByOIdAndPid" resultMap="MrpResult">
+        SELECT * FROM tab_mrp where order_id = #{orderId} and product_id = #{productId}
+    </select>
+
+    <!--查询锁定物料库存的mrp信息-->
+    <select id="selectMrpLockMatList" parameterType="Mrp" resultMap="MrpResult">
+        select * from tab_mrp where company_id = #{companyId} and materiel_id = #{materielId}
+        <if test="orderCode != null and orderCode !=''">
+            and order_code = #{orderCode}
+        </if>
+        <if test="mStatus != null and mStatus != -1">
+            and m_status = #{mStatus}
+        </if>
+         group by order_id,product_id
+    </select>
+
+    <!--查询订单锁定的物料信息-->
+    <select id="selectMrpListByPIdAndOId" parameterType="Mrp" resultMap="MrpResult">
+        select * from tab_mrp where company_id = #{companyId} and order_id = #{orderId} and product_id = #{productId}
+        <if test="materielCode != null and materielCode != ''">
+            and materiel_code = #{materielCode}
+        </if>
+        <if test="mStatus != null and mStatus != -1">
+            and m_status = #{mStatus}
+        </if>
+    </select>
+
+    <!--查询mrp所有的物料信息-->
+    <select id="selectAllMatCode" resultMap="MrpResult">
+        select * from tab_mrp where company_id = #{companyId} group by materiel_code
+    </select>
 </mapper>

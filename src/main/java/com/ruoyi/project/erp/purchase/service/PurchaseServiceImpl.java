@@ -26,11 +26,15 @@ import com.ruoyi.project.erp.mrp.domain.Mrp;
 import com.ruoyi.project.erp.mrp.mapper.MrpMapper;
 import com.ruoyi.project.erp.mrpPurchase.domain.MrpPurchase;
 import com.ruoyi.project.erp.mrpPurchase.mapper.MrpPurchaseMapper;
+import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
+import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
 import com.ruoyi.project.erp.purchaseDetails.domain.PurchaseDetails;
 import com.ruoyi.project.erp.purchaseDetails.mapper.PurchaseDetailsMapper;
 import com.ruoyi.project.erp.supplier.domain.Supplier;
 import com.ruoyi.project.erp.supplier.mapper.SupplierMapper;
+import com.ruoyi.project.system.ser.domain.Ser;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.ibatis.annotations.Param;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.regexp.RE;
@@ -74,6 +78,9 @@ public class PurchaseServiceImpl implements IPurchaseService {
 
     @Autowired
     private MrpPurchaseMapper mrpPurchaseMapper;
+
+    @Autowired
+    private OrderDetailsMapper orderDetailsMapper;
 
     /**
      * 查询采购单信息
@@ -151,6 +158,9 @@ public class PurchaseServiceImpl implements IPurchaseService {
             for (PurchaseDetails detail : purchaseDetails) {
                 // mrp状态更新为采购中
                 mrp = mrpMapper.selectMrpById(detail.getMrpId());
+                if (MrpConstants.MRP_MAT_NOTCG.equals(mrp.getmStatus())) {
+                    throw new BusinessException("勾选中已有物料充足无需采购");
+                }
                 if (MrpConstants.MRP_MAT_CGING.equals(mrp.getmStatus())) {
                     throw new BusinessException("勾选中已有生成采购单记录，勿重复操作");
                 }
@@ -380,6 +390,10 @@ public class PurchaseServiceImpl implements IPurchaseService {
      */
     @Override
     public int closePurchase(Purchase purchase) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) {
+            return 0;
+        }
         //采购单主表id
         Integer purId = purchase.getId();
         Purchase purchase1 = purchaseMapper.selectPurchaseById(purId);
@@ -400,6 +414,25 @@ public class PurchaseServiceImpl implements IPurchaseService {
             // mrp状态更新为采购完成
             mrp.setmStatus(MrpConstants.MRP_MAT_CGFINISH);
 
+            mrpMapper.updateMrp(mrp);
+        }
+        OrderDetails orderDetails = new OrderDetails();
+        orderDetails.setCompanyId(user.getCompanyId());
+        List<OrderDetails> orderDetailsList = orderDetailsMapper.selectOrderDetailsListDifPro(orderDetails);
+        List<Mrp> mrpList = null;
+        for (OrderDetails details : orderDetailsList) {
+            mrpList = mrpMapper.selectMrpByOIdAndPid(details.getOrderId(),details.getProductId());
+            if (mrpList.size() > 0) {
+                int sumStatus = 0;
+                int finishTag = mrpList.size() * MrpConstants.MRP_MAT_CGFINISH;
+                for (Mrp m : mrpList) {
+                    sumStatus += m.getmStatus();
+                }
+                if (sumStatus == finishTag) {
+                    details.setMatStatus(MrpConstants.MAT_STATUS_ENOUGH);
+                }
+                orderDetailsMapper.updateOrderDetails(details);
+            }
         }
         return purchaseMapper.updatePurchase(purchase);
     }

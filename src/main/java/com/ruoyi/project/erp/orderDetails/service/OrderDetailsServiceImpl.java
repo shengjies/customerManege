@@ -1,6 +1,11 @@
 package com.ruoyi.project.erp.orderDetails.service;
 
+import java.util.Collections;
 import java.util.List;
+
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
@@ -14,7 +19,7 @@ import com.ruoyi.common.support.Convert;
  * @author zqm
  * @date 2019-05-08
  */
-@Service
+@Service("orderdetail")
 public class OrderDetailsServiceImpl implements IOrderDetailsService 
 {
 	@Autowired
@@ -98,5 +103,18 @@ public class OrderDetailsServiceImpl implements IOrderDetailsService
 	@Override
 	public List<OrderDetails> selectOrderDetailsListDifPro(OrderDetails orderDetails) {
 		return orderDetailsMapper.selectOrderDetailsListDifPro(orderDetails);
+	}
+
+	/**
+	 * 查询所差数量即需要生产数量大于0的订单明细
+	 * @return 结果
+	 */
+	@Override
+	public List<OrderDetails> selectLackNumAllOrder() {
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		return orderDetailsMapper.selectLackNumAllOrder(user.getCompanyId());
 	}
 }

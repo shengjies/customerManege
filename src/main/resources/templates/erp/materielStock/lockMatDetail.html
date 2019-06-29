@@ -8,17 +8,20 @@
     <div class="row">
         <div class="col-sm-12 search-collapse">
             <form id="formId">
-                <input type="hidden" id="orderId" name="orderId" th:value="${orderId}">
-                <input type="hidden" id="productId" name="productId" th:value="${productId}">
+                <input type="hidden" name="materielId" id="materielId" th:value="${materielId}">
                 <div class="select-list">
                     <ul>
                         <li>
-                            物料编号：<input type="text" name="materielCode"/>
+                            订单编号：
+                            <select name="orderCode" id="orderCode" th:with="allOrder=${@mrp.selectAllOrderCode()}">
+                                <option value="">所有</option>
+                                <option th:each="order:${allOrder}" th:utext="${order.orderCode}" th:value="${order.orderCode}"></option>
+                            </select>
                         </li>
 
                         <li>
                             采购状态：
-                            <select id="mStatus" name="mStatus">
+                            <select id="mStatus" name="mStatus" style="width: 100px;">
                                 <option value="-1">请选择</option>
                                 <option value="0">需采购</option>
                                 <option value="1">采购中</option>
@@ -26,9 +29,12 @@
                                 <option value="3">不采购</option>
                             </select>
                         </li>
+
                         <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
                     </ul>
                 </div>
@@ -41,60 +47,50 @@
 </div>
 <div th:include="include :: footer"></div>
 <script th:inline="javascript">
+    var cancelFlag = [[${@permission.hasPermi('erp:mrp:cancel')}]];
     var prefix = ctx + "erp/mrp";
-    $(function() {
+
+    $(function () {
         var options = {
-            url: prefix + "/listByPIdAndOId",
+            url: prefix + "/showLockMatDetail",
             modalName: "MRP记录",
             search: false,
             showExport: false,
-            showSearch: false,
-            showRefresh: false,
-            showColumns: false,
-            showToggle: false,
+            showSearch:false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
             columns: [
                 {
-                    field : 'id',
-                    title : '主键自增长id',
+                    field: 'mrpId',
+                    title: '主键自增长id',
                     visible: false
                 },
                 {
-                    field : 'mCode',
-                    title : 'MRP编号',
+                    field: 'orderCode',
+                    title: '订单编号',
                     sortable: true
                 },
                 {
-                    field : 'materielCode',
-                    title : '物料编号',
+                    field: 'productCode',
+                    title: '产品编号',
                     sortable: true
                 },
                 {
-                    field : 'needNumber',
-                    title : '所需数量',
+                    field: 'productName',
+                    title: '产品名称',
                     sortable: true
                 },
                 {
-                    field : 'lockMatNumber',
-                    title : '锁定物料库存数量',
+                    field: 'lockMatNumber',
+                    title: '锁定物料库存数量',
                     sortable: true
                 },
                 {
-                    field : 'delNumber',
-                    title : '所差数量',
+                    field: 'mStatus',
+                    title: '采购状态',
                     sortable: true,
-                    formatter:function (value,row,index) {
-                        if (row.delNumber < 0) {
-                            return '0';
-                        } else {
-                            return row.delNumber;
-                        }
-                    }
-                },
-                {
-                    field : 'mStatus',
-                    title : '采购状态',
-                    sortable: true,
-                    formatter:function (value,row,index) {
+                    formatter: function (value, row, index) {
                         if (row.mStatus == 0) {
                             return '<span style="color: red">需采购</span>';
                         } else if (row.mStatus == 1) {
@@ -105,12 +101,16 @@
                             return '<span style="color: black">不需要采购</span>';
                         }
                     }
-                }]
+                },
+              ]
         };
         $.table.init(options);
         $.table.search("formId");
     });
 
+    /**
+     * 关闭弹窗
+     */
     function submitHandler() {
         $.modal.close();
         window.parent.$.table.refresh();

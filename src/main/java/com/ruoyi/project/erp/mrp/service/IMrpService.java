@@ -64,4 +64,29 @@ public interface IMrpService
 	 * @return 结果
 	 */
 	int cancelMrp(Mrp mrp);
+
+	/**
+	 * mrp的所有订单信息
+	 * @return 结果
+	 */
+	List<Mrp> selectAllOrderCode();
+
+	/**
+	 * mrp的所有物料信息
+	 * @return 结果
+	 */
+	List<Mrp> selectAllMatCode();
+
+	/**
+	 * 查看锁定物料的mrp订单信息
+	 * @param mrp mrp信息
+	 * @return 结果
+	 */
+	List<Mrp> selectMrpLockMatList(Mrp mrp);
+	/**
+	 * 查看订单锁定的物料信息
+	 * @param mrp mrp信息
+	 * @return 结果
+	 */
+	List<Mrp> selectMrpListByPIdAndOId(Mrp mrp);
 }

@@ -350,6 +350,23 @@ ADD COLUMN `total_number` INT NULL DEFAULT 0 COMMENT '对应mrp差的总数量(�
 ALTER TABLE `octopus`.`tab_mrp_purchase`
 ADD COLUMN `init_lock_mat_number` INT NULL DEFAULT 0 COMMENT 'mrp初始化时锁定库存数量' AFTER `lock_mat_number`;
 
+# 2019-06-28 服务器数据库未执行sql
+# 新增库存出入库MRP操作关联表
+CREATE TABLE `octopus`.`tab_erp_relation` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '库存出入库MRP操作关联主键id',
+  `mp_id` INT NULL COMMENT 'MRP采购单关联主键id',
+  `mat_detail_id` INT NULL COMMENT '物料出入库明细主键id',
+  `pro_detail_id` INT NULL COMMENT '产品出入库明细主键id',
+  `re_status` INT NULL COMMENT '类型(0、物料入库，1、物料退货，2、产品出库，3、客户退货)',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = '库存出入库MRP操作关联表';
+ALTER TABLE `octopus`.`tab_erp_relation`
+ADD COLUMN `line_detail_id` INT NULL COMMENT '生产出入明细主键id' AFTER `pro_detail_id`,
+ADD COLUMN `line_type` INT NULL COMMENT '生产出入库的类型(0、物料，1、半成品，2、成品)' AFTER `line_detail_id`;
+
+
 
 
 

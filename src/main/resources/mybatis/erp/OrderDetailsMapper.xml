@@ -238,6 +238,11 @@
 
     <!--通过产品id和订单id查询订单明细-->
     <select id="selectOrderDetailsListByOIdAndPid" resultMap="OrderDetailsResult">
-        SELECT * FROM tab_order_details where company_id = #{companyId} and order_id = #{orderId} and product_id = #{productId} limit 1;
+        SELECT * FROM tab_order_details where company_id = #{companyId} and order_id = #{orderId} and product_id = #{productId} limit 1
+    </select>
+
+    <!--查询所需生产数量大于0的订单明细，页面搜索条件-->
+    <select id="selectLackNumAllOrder" resultMap="OrderDetailsResult">
+        select * from tab_order_details where company_id = #{companyId} and (number-deliver_num-lock_number) > 0 group by order_id
     </select>
 </mapper>

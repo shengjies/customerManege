@@ -84,4 +84,39 @@ public interface MrpMapper
 	 * @return 结果
 	 */
 	public int deleteMrpByMcode(@Param("mCode") String mCode);
+
+	/**
+	 * 查询mrp所有的订单编号信息
+	 * @param companyId 公司id
+	 * @return 结果
+	 */
+    List<Mrp> selectAllOrderCode(@Param("companyId") Integer companyId);
+
+	/**
+	 * 通过订单id和产品id查询mrp记录
+	 * @param orderId 订单id
+	 * @param productId 产品id
+	 * @return 结果
+	 */
+	List<Mrp> selectMrpByOIdAndPid(@Param("orderId") Integer orderId,@Param("productId") Integer productId);
+
+	/**
+	 * 锁定物料的mrp信息
+	 * @param mrp mrp信息
+	 * @return 结果
+	 */
+	List<Mrp> selectMrpLockMatList(Mrp mrp);
+
+	/**
+	 * 查看订单锁定的物料信息
+	 * @param mrp mrp信息
+	 * @return 结果
+	 */
+	List<Mrp> selectMrpListByPIdAndOId(Mrp mrp);
+
+	/**
+	 * mrp的所有物料信息
+	 * @return 结果
+	 */
+	List<Mrp> selectAllMatCode(@Param("companyId") Integer companyId);
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.project.erp.mrp.service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author sj
  * @date 2019-06-24
  */
-@Service
+@Service("mrp")
 public class MrpServiceImpl implements IMrpService {
     @Autowired
     private MrpMapper mrpMapper;
@@ -221,7 +222,7 @@ public class MrpServiceImpl implements IMrpService {
         OrderDetails orderDetails = null;
         MaterielStock materielStock = null;
         for (Mrp m : mrpList) {
-            if (!MrpConstants.MRP_MAT_NEEDCG.equals(m.getmStatus())) {
+            if (MrpConstants.MRP_MAT_CGING.equals(m.getmStatus())) {
                 throw new BusinessException("MRP编号"+ m.getmCode() + "批次已有采购信息，勿取消操作");
             }
             // mrp对应订单操作
@@ -237,5 +238,51 @@ public class MrpServiceImpl implements IMrpService {
             materielStockMapper.updateMaterielStock(materielStock);
         }
         return mrpMapper.deleteMrpByMcode(mCode);
+    }
+
+    /**
+     * mrp的所有订单信息
+     * @return 结果
+     */
+    @Override
+    public List<Mrp> selectAllOrderCode() {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return mrpMapper.selectAllOrderCode(user.getCompanyId());
+    }
+
+    /**
+     * mrp的所有物料信息
+     * @return 结果
+     */
+    @Override
+    public List<Mrp> selectAllMatCode() {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return mrpMapper.selectAllMatCode(user.getCompanyId());
+    }
+
+    /**
+     * 锁定物料的mrp信息
+     * @param mrp mrp信息
+     * @return 结果
+     */
+    @Override
+    public List<Mrp> selectMrpLockMatList(Mrp mrp) {
+        return mrpMapper.selectMrpLockMatList(mrp);
+    }
+
+    /**
+     * 查看订单锁定的物料信息
+     * @param mrp mrp信息
+     * @return 结果
+     */
+    @Override
+    public List<Mrp> selectMrpListByPIdAndOId(Mrp mrp) {
+        return mrpMapper.selectMrpListByPIdAndOId(mrp);
     }
 }

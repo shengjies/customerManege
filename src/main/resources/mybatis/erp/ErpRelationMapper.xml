@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.erp.erpRelation.mapper.ErpRelationMapper">
+    
+    <resultMap type="ErpRelation" id="ErpRelationResult">
+        <result property="id"    column="id"    />
+        <result property="mpId"    column="mp_id"    />
+        <result property="matDetailId"    column="mat_detail_id"    />
+        <result property="proDetailId"    column="pro_detail_id"    />
+        <result property="reStatus"    column="re_status"    />
+        <result property="lineDetailId"    column="line_detail_id"    />
+        <result property="lineType"    column="line_type"    />
+    </resultMap>
+	
+	<sql id="selectErpRelationVo">
+        select id, mp_id, mat_detail_id, pro_detail_id, re_status,line_detail_id,line_type from tab_erp_relation
+    </sql>
+	
+    <select id="selectErpRelationList" parameterType="ErpRelation" resultMap="ErpRelationResult">
+        <include refid="selectErpRelationVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="mpId != null "> and mp_id = #{mpId}</if>
+             <if test="matDetailId != null "> and mat_detail_id = #{matDetailId}</if>
+             <if test="proDetailId != null "> and pro_detail_id = #{proDetailId}</if>
+             <if test="reStatus != null "> and re_status = #{reStatus}</if>
+         </where>
+    </select>
+    
+    <select id="selectErpRelationById" parameterType="Integer" resultMap="ErpRelationResult">
+        <include refid="selectErpRelationVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertErpRelation" parameterType="ErpRelation" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_erp_relation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="mpId != null  ">mp_id,</if>
+			<if test="matDetailId != null  ">mat_detail_id,</if>
+			<if test="proDetailId != null  ">pro_detail_id,</if>
+			<if test="reStatus != null  ">re_status,</if>
+            <if test="lineDetailId != null  ">line_detail_id,</if>
+            <if test="lineType != null  ">line_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="mpId != null  ">#{mpId},</if>
+			<if test="matDetailId != null  ">#{matDetailId},</if>
+			<if test="proDetailId != null  ">#{proDetailId},</if>
+			<if test="reStatus != null  ">#{reStatus},</if>
+            <if test="lineDetailId != null  ">#{lineDetailId},</if>
+            <if test="lineType != null  ">#{lineType},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateErpRelation" parameterType="ErpRelation">
+        update tab_erp_relation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mpId != null  ">mp_id = #{mpId},</if>
+            <if test="matDetailId != null  ">mat_detail_id = #{matDetailId},</if>
+            <if test="proDetailId != null  ">pro_detail_id = #{proDetailId},</if>
+            <if test="reStatus != null  ">re_status = #{reStatus},</if>
+            <if test="lineDetailId != null  ">line_detail_id = #{lineDetailId},</if>
+            <if test="lineType != null  ">line_type = #{lineType},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteErpRelationById" parameterType="Integer">
+        delete from tab_erp_relation where id = #{id}
+    </delete>
+	
+    <delete id="deleteErpRelationByIds" parameterType="String">
+        delete from tab_erp_relation where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过物料出入库查询关联表信息-->
+    <select id="selectErpRelationByMatDetailId" resultMap="ErpRelationResult">
+        SELECT * FROM tab_erp_relation where mat_detail_id = #{matDetailId} and re_status = #{reStatus}
+    </select>
+    
+</mapper>

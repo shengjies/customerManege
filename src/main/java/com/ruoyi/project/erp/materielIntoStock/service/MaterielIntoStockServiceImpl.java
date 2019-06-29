@@ -1,10 +1,13 @@
 package com.ruoyi.project.erp.materielIntoStock.service;
 
+import com.ruoyi.common.constant.MrpConstants;
 import com.ruoyi.common.constant.StockConstants;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.erp.erpRelation.domain.ErpRelation;
+import com.ruoyi.project.erp.erpRelation.mapper.ErpRelationMapper;
 import com.ruoyi.project.erp.materielIntoStock.domain.MaterielIntoStock;
 import com.ruoyi.project.erp.materielIntoStock.mapper.MaterielIntoStockMapper;
 import com.ruoyi.project.erp.materielIntoStockDetails.domain.MaterielIntoStockDetails;
@@ -75,6 +78,9 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
     @Autowired
     private OrderDetailsMapper orderDetailsMapper;
 
+    @Autowired
+    private ErpRelationMapper erpRelationMapper;
+
     /**
      * 查询物料入库信息
      *
@@ -142,6 +148,7 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
             List<MrpPurchase> mrpPurchaseList = null;
             Mrp mrp = null;
             OrderDetails orderDetails = null;
+            ErpRelation erpRelation = null;
             List<MaterielIntoStockDetails> materielIntoStockDetails = materielIntoStock.getMaterielIntoStockDetails();
             for (MaterielIntoStockDetails materielIntoStockDetail : materielIntoStockDetails) {
                 /**
@@ -216,6 +223,15 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
                             if (mrpNumber <= 0) {
                                 break;
                             }
+
+                            // 新增erp出入库关联记录
+                            erpRelation = new ErpRelation();
+                            erpRelation.setMpId(mrpPurchase.getId());
+                            erpRelation.setMatDetailId(materielIntoStockDetail.getId());
+                            // 物料入库类型
+                            erpRelation.setReStatus(MrpConstants.MAT_INTOSTOCK);
+                            erpRelationMapper.insertErpRelation(erpRelation);
+
                             // 差的总数大于本次入库数量
                             if (mrpPurchase.getTotalNumber() >= mrpNumber) {
                                 // mrp采购单关联表
@@ -314,7 +330,8 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
         // 物料iqc状态
         MaterielStockIqc materielStockIqc = materielStockIqcMapper.selectMaterielStockIqcByComId(user.getCompanyId());
         MaterielStock materielStock = null;
-        List<MrpPurchase> mrpPurchaseList = null;
+        MrpPurchase mrpPurchase = null;
+        ErpRelation erpRelation = null;
         Mrp mrp = null;
         OrderDetails orderDetails = null;
         for (MaterielIntoStockDetails intoStockDetails : materielIntoStockDetailsList) {
@@ -352,14 +369,10 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
                     /**
                      * MRP关联操作
                      */
-                    // 查询实际锁定库存大于0的mrp采购单关联信息
-                    mrpPurchaseList = mrpPurchaseMapper.selectMrpPurchaseByPurIdAndMatCodeGtLockNum(purchase.getId(),intoStockDetails.getMaterielCode());
-                    // mrp判断依据入库数量，递减
+                    erpRelation = erpRelationMapper.selectErpRelationByMatDetailId(intoStockDetails.getId(), MrpConstants.MAT_INTOSTOCK);
                     Integer mrpNumber = intoStockDetails.getIntoNumber();
-                    for (MrpPurchase mrpPurchase : mrpPurchaseList) {
-                        if (mrpNumber <= 0) {
-                            break;
-                        }
+                    if (StringUtils.isNotNull(erpRelation)) {
+                        mrpPurchase = mrpPurchaseMapper.selectMrpPurchaseById(erpRelation.getMpId());
                         // 实际库存锁定数量
                         int realNumber = mrpPurchase.getInitLockMatNumber();
                         // 作废入库单的数量小于实际库存锁定数量
@@ -400,9 +413,11 @@ public class MaterielIntoStockServiceImpl implements IMaterielIntoStockService {
 
                             mrpNumber = (mrpNumber - realNumber);
                         }
+
                         orderDetailsMapper.updateOrderDetails(orderDetails);
                         mrpPurchaseMapper.updateMrpPurchase(mrpPurchase);
                         mrpMapper.updateMrp(mrp);
+                        // mrp表记录以及订单明细操作
                     }
                     materielStock.setTotalNumber(materielStock.getTotalNumber() - intoStockDetails.getIntoNumber());
                     materielStock.setGoodNumber(materielStock.getGoodNumber() - mrpNumber);

@@ -213,6 +213,15 @@
             createMenuItem(url,"新增库存管理");
         }
 
+        /**
+		 * 查看锁定该物料的订单信息
+         * @param materielId
+         */
+        function showLockDetail(materielId) {
+			var url = "/erp/mrp/showLockMatDetail?materielId=" + materielId;
+			$.modal.open("锁定物料的订单明细",url);
+        }
+
     </script>
 </body>
 </html>

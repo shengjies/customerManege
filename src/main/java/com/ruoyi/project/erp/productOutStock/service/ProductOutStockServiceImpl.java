@@ -38,22 +38,22 @@ import java.util.List;
 @Service
 public class ProductOutStockServiceImpl implements IProductOutStockService {
     @Autowired
-    private ProductOutStockMapper productOutStockMapper; // 产品出库单数据层
+    private ProductOutStockMapper productOutStockMapper;
 
     @Autowired
-    private ProductOutStockDetailsMapper productOutStockDetailsMapper; // 产品出库清单数据层
+    private ProductOutStockDetailsMapper productOutStockDetailsMapper;
 
     @Autowired
-    private ProductStockMapper productStockMapper; // 产品库存数据层
+    private ProductStockMapper productStockMapper;
 
     @Autowired
-    private OrderDetailsMapper orderDetailsMapper; // 订单明细数据层
+    private OrderDetailsMapper orderDetailsMapper;
 
     @Autowired
-    private OrderInfoMapper orderInfoMapper; // 订单数据层
+    private OrderInfoMapper orderInfoMapper;
 
     @Autowired
-    private ProductCustomerMapper productCustomerMapper; // 客户产品关联
+    private ProductCustomerMapper productCustomerMapper;
 
     /**
      * 查询产品出库信息

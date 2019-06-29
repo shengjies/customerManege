@@ -11,11 +11,15 @@
                 <div class="select-list">
                     <ul>
                         <li>
-                            订单号：<input type="text" name="orderCode"/>
+                            订单号：
+                            <select id="orderId" name="orderId" th:with="lackNumAllOrder=${@orderdetail.selectLackNumAllOrder()}">
+                                <option value="">所有</option>
+                                <option th:each="order:${lackNumAllOrder}" th:utext="${order.orderCode}" th:value="${order.orderId}"></option>
+                            </select>
                         </li>
 
                         <li>
-                            客户：<select style="width: 240px"  name="customerId" id="customerId"
+                            客户：<select  name="customerId" id="customerId"
                                        th:with="customer = ${@customer.selectCustomerAllByCompanyId(#httpServletRequest.getCookies())}">
                             <option value="-1">请选择</option>
                             <option th:each="item : ${customer}" th:value="${item.id}" th:utext="${item.customerName}"></option>
@@ -51,7 +55,11 @@
             addMrpUrl: "/erp/mrp/addMrpByOrDeIds",
             modalName: "订单明细",
             search: false,
-            showExport: true,
+            showExport: false,
+            showSearch:true,
+            showRefresh:true,
+            showColumns:false,
+            showToggle:true,
             sortOrder:"desc",
             sortName:"createTime",
             columns: [{
@@ -98,11 +106,6 @@
                     }
                 },
                 {
-                    field : 'lockMatNumber',
-                    title : '锁定物料库存数',
-                    sortable: true,
-                },
-                {
                     field : 'tiaoNumber',
                     title : '调整数量',
                     width:100,
@@ -115,10 +118,10 @@
                     title : '物料状态',
                     sortable: true,
                     formatter:function (value,row,index) {
-                        if (row.matStatus != 0) {
-                            return '<a href="javascript:void(0)" onclick="showMatDetail('+ row.orderId+','+ row.productId +')"><span style="color: red;font-weight: bold">物料不足</span></a>'
-                        } else {
+                        if (row.matStatus == 0) {
                             return '<a href="javascript:void(0)" onclick="showMatDetail('+ row.orderId+','+ row.productId +')"><span style="color: green;font-weight: bold">物料充足</span></a>'
+                        } else {
+                            return '<a href="javascript:void(0)" onclick="showMatDetail('+ row.orderId+','+ row.productId +')"><span style="color: red;font-weight: bold">物料不足</span></a>'
                         }
                     }
                 },

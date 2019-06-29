@@ -173,4 +173,11 @@ public interface OrderDetailsMapper {
     OrderDetails selectOrderDetailsListByOIdAndPid(@Param("companyId") Integer companyId,
                                                    @Param("orderId") Integer orderId,
                                                    @Param("productId") Integer productId);
+
+    /**
+     * 查询所差数量即需要生产数量大于0的订单明细
+     * @param companyId 公司id
+     * @return 结果
+     */
+    List<OrderDetails> selectLackNumAllOrder(@Param("companyId") Integer companyId);
 }
