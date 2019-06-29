@@ -89,10 +89,10 @@ public class ProductBomController extends BaseController {
     @Log(title = "产品BOM单", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(MultipartFile file, int pid) {
+    public AjaxResult addSave(MultipartFile[] files) {
         String message = null;
         try {
-            message = productBomService.insertProductBom(file, pid);
+            message = productBomService.insertProductBom(files);
         } catch (Exception e) {
             return AjaxResult.error(e.getMessage());
         }

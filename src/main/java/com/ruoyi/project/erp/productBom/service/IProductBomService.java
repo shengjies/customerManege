@@ -43,12 +43,12 @@ public interface IProductBomService
 
 
 	/**
-	 * 导入bom单
-	 * @param file 导入文件
-	 * @param pid 产品id
-	 * @return 结果
+	 * 导入bom单 多文件
+	 * @param files
+	 * @return
+	 * @throws Exception
 	 */
-	public String insertProductBom(MultipartFile file, int pid) throws Exception;
+	public String insertProductBom(MultipartFile[] files) throws Exception;
 	
 	/**
      * 修改产品BOM单

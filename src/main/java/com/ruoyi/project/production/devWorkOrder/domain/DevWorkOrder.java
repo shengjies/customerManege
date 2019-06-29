@@ -186,6 +186,9 @@ public class DevWorkOrder extends BaseEntity {
      */
     private Integer sign;
 
+    /** 标记工单是否作废 */
+    private Integer abolish;
+
     public Integer getProductId() {
         return productId;
     }
@@ -682,6 +685,14 @@ public class DevWorkOrder extends BaseEntity {
 
     public void setSignHuor(Float signHuor) {
         this.signHuor = signHuor;
+    }
+
+    public Integer getAbolish() {
+        return abolish;
+    }
+
+    public void setAbolish(Integer abolish) {
+        this.abolish = abolish;
     }
 
     @Override

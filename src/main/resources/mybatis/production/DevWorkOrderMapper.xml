@@ -47,12 +47,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="putIntoNumber"    column="put_into_number"    />
         <result property="signTime"    column="sign_time"    />
         <result property="signHuor"    column="sign_huor"    />
+        <result property="abolish"    column="abolish"    />
     </resultMap>
     <sql id="selectDevWorkOrderVo">
         select id, workorder_name, workorder_number, company_id, line_id, product_name, product_code, product_number, production_start, production_end, start_time, end_time, product_standard_hour, create_time, create_by, update_time, device_liable, update_by, people_number, working_hour, overtime_hour,
         overtime_race, manual_time, workorder_status, operation_status, init_date, work_sign, scrap_num, actual_warehouse_num,
         cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign,
-         put_into_number,sign_time,sign_huor from dev_work_order
+         put_into_number,sign_time,sign_huor,abolish from dev_work_order
     </sql>
 
     <select id="selectDevWorkOrderList" parameterType="DevWorkOrder" resultMap="DevWorkOrderResult">
@@ -87,6 +88,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="workSign != null "> and work_sign = #{workSign}</if>
             <if test="scrapNum != null "> and scrap_num = #{scrapNum}</if>
             <if test="actualWarehouseNum != null "> and actual_warehouse_num = #{actualWarehouseNum}</if>
+            <if test="abolish != null and abolish > -1"> and abolish = #{abolish}</if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(production_start,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
             </if>
@@ -116,7 +118,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="startTime != null  ">start_time,</if>
 			<if test="endTime != null  ">end_time,</if>
 			<if test="productStandardHour != null  ">product_standard_hour,</if>
-			<if test="createTime != null  ">create_time,</if>
+
 			<if test="createBy != null  and createBy != ''  ">create_by,</if>
 			<if test="updateTime != null  ">update_time,</if>
 			<if test="deviceLiable != null  ">device_liable,</if>
@@ -156,7 +158,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="startTime != null  ">#{startTime},</if>
 			<if test="endTime != null  ">#{endTime},</if>
 			<if test="productStandardHour != null  ">#{productStandardHour},</if>
-			<if test="createTime != null  ">#{createTime},</if>
+
 			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
 			<if test="updateTime != null  ">#{updateTime},</if>
 			<if test="deviceLiable != null  ">#{deviceLiable},</if>
@@ -181,7 +183,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderCode != null  ">#{orderCode},</if>
             <if test="ecnStatus != null  ">#{ecnStatus},</if>
             <if test="ecnText != null  ">#{ecnText},</if>
-            sysdate()
+            now()
          </trim>
     </insert>
 
@@ -353,4 +355,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectWorkByLineId" resultMap="DevWorkOrderResult">
         SELECT * FROM dev_work_order where line_id =#{lineId} and  workorder_status != 2 limit 1;
     </select>
+
+    <!--将工单作废-->
+    <update id="updateWorkOrderAbolish">
+        update dev_work_order set abolish = 1 where id = #{workId}
+    </update>
 </mapper>

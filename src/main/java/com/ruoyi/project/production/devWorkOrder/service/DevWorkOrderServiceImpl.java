@@ -1,12 +1,12 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.CodeUtils;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
@@ -89,7 +89,13 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private WorkDayHourMapper workDayHourMapper;
 
+    @Autowired
+    private WorkOrderChangeMapper workOrderChangeMapper;
 
+
+    public String getWorkOrderCode(){
+        return CodeUtils.getWorkOrderCode(JwtUtil.getTokenUser(ServletUtils.getRequest()).getCompanyId());
+    }
 
     /**
      * 查询工单信息
@@ -580,5 +586,254 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             }
         }
         return order;
+    }
+
+    /**
+     * 工单合并验证，合并的前提是 所以工单是未进行工单并且是同一产品
+     * @param workIds 需合并工单id
+     *                * @param type 0、合单 1、拆单
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public String workMergeVerif(int[] workIds,int type) throws Exception {
+        int failNum = 0;//统计错误次数
+        StringBuilder failMsg = new StringBuilder();//错误提示信息
+        StringBuilder successMsg = new StringBuilder();
+        if(workIds == null){
+            failMsg.insert(0,"很抱歉，您没有选中需要操作的工单");
+            throw new Exception(failMsg.toString());
+        }
+        if(type == 1 && workIds.length != 1){
+            failMsg.insert(0,"很抱歉，拆除的工单操作，需要选择一条工单信息");
+            throw new Exception(failMsg.toString());
+        }
+        if(type ==0 &&  workIds.length <= 1){
+            failMsg.insert(0,"很抱歉，合并的工单操作，工单条数至少2条以上");
+            throw new Exception(failMsg.toString());
+        }
+        String pCode = null;//用于记录第一次查询出来的工单不为空的产品编码
+        int index =0;//用于记录循环次数
+        DevWorkOrder order = null;
+        for (int workId : workIds) {
+            index ++;
+            //根据id查询对应工单信息
+            order = devWorkOrderMapper.selectDevWorkOrderById(workId);
+            if(order == null){
+                failNum ++;
+                failMsg.append("<br/>很抱歉，您选中的第"+(index)+"工单信息不存在");
+                continue;
+            }
+            if(order.getAbolish() == 1){//工单已经作废
+                failNum ++;
+                failMsg.append("<br/>很抱歉，您选中的第"+(index)+"工单信息已经作废，不能进行操作");
+                continue;
+            }
+            if(StringUtils.isEmpty(pCode)){
+                pCode = order.getProductCode();
+            }
+            //判断工单是否是未进行
+            if(order.getWorkorderStatus() !=  WorkConstants.WORK_STATUS_NOSTART){
+                failNum++;
+                failMsg.append("<br/>很抱歉，请选择工单状态为未进行状态，您选中的第"+(index)+"工单状态不是未进行状态");
+                continue;
+            }
+            //判断是否是同一产品
+            if(!pCode.equals(order.getProductCode())){
+                failNum++;
+                failMsg.append("<br/>很抱歉，请选择同一产品的工单，您选中的第"+(index)+"工单所生产的产品与选中的第一条工单所生产的产品不同");
+                continue;
+            }
+        }
+        if(failNum > 0){
+            failMsg.insert(0,"很抱歉，操作失败:");
+            throw new Exception(failMsg.toString());
+        }
+        successMsg.insert(0,"验证通过");
+        return successMsg.toString();
+    }
+
+    /**
+     * 初始化合并工单信息
+     * @param workIds 工单id
+     * @return
+     */
+    @Override
+    public Map<String, Object> workMergePage(String workIds) {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        Map<String,Object> map = new HashMap<>();
+        String[] ids = workIds.split(",");
+        DevWorkOrder order = null;
+        int num = 0;
+        for (String id : ids) {
+            //查询工单
+            order = devWorkOrderMapper.selectDevWorkOrderById(Integer.parseInt(id));
+            num += order.getProductNumber();
+        }
+        //查询产品
+        DevProductList productList = productListMapper.selectDevProductByCode(u.getCompanyId(),order.getProductCode());
+        map.put("code",CodeUtils.getWorkOrderCode(u.getCompanyId()));
+        map.put("num",num);
+        map.put("product",productList);
+        return map;
+    }
+
+    /**
+     * 合并工单信息
+     * @param order 工单信息
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public int workMerge(DevWorkOrder order) throws Exception {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        ProductionLine line = null;
+        StringBuilder hCode =new StringBuilder();
+        WorkOrderChange change =null;
+        String ids[] = order.getParam1().split(",");
+        for (String id : ids) {
+            //查询工单信息
+            DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(Integer.parseInt(id));
+            hCode.append(workOrder.getWorkorderNumber()+"<br/>");
+            devWorkOrderMapper.updateWorkOrderAbolish(workOrder.getId());
+           line = productionLineMapper.selectProductionLineById(workOrder.getLineId());
+            //添加工单变更记录
+            change = new WorkOrderChange();
+            change.setCompanyId(u.getCompanyId());
+            change.setOrderId(workOrder.getId());
+            change.setOrderCode(workOrder.getOrderCode());
+            change.setLineId(workOrder.getLineId());
+            change.setLineName(line.getLineName());
+            change.setDeviceLiable(userMapper.selectUserInfoById(line.getDeviceLiable()).getUserName());
+            change.setDeviceLiable2(userMapper.selectUserInfoById(line.getDeviceLiableTow()).getUserName());
+            change.setProductionStart(workOrder.getProductionStart());
+            change.setProductionEnd(workOrder.getProductionEnd());
+            change.setCreatePeople(u.getUserName());
+            change.setProductNumber(workOrder.getProductNumber());
+            change.setCreateTime(new Date());
+            change.setcStatus(1);
+            change.setRemark("该工单合并为"+order.getWorkorderNumber()+"工单");
+            workOrderChangeMapper.insertWorkOrderChange(change);
+        }
+        line =productionLineMapper.selectProductionLineById(order.getLineId());
+        order.setCompanyId(u.getCompanyId());
+        order.setCreateTime(new Date());
+        order.setCreateBy(u.getUserName());
+        order.setDeviceLiable(line.getDeviceLiable());
+        //查询产线
+        devWorkOrderMapper.insertDevWorkOrder(order);
+        //添加工单变更记录
+        change = new WorkOrderChange();
+        change.setCompanyId(u.getCompanyId());
+        change.setOrderId(order.getId());
+        change.setOrderCode(order.getOrderCode());
+        change.setLineId(order.getLineId());
+        change.setLineName(line.getLineName());
+        change.setDeviceLiable(userMapper.selectUserInfoById(line.getDeviceLiable()).getUserName());
+        change.setDeviceLiable2(userMapper.selectUserInfoById(line.getDeviceLiableTow()).getUserName());
+        change.setProductionStart(order.getProductionStart());
+        change.setProductionEnd(order.getProductionEnd());
+        change.setCreatePeople(u.getUserName());
+        change.setProductNumber(order.getProductNumber());
+        change.setCreateTime(new Date());
+        change.setcStatus(1);
+        change.setRemark("该工单由"+hCode.toString()+"工单合并而成;");
+        workOrderChangeMapper.insertWorkOrderChange(change);
+
+       DevProductList devProductList = productListMapper.selectDevProductByCode(u.getCompanyId(),order.getProductCode());
+        if(order.getEcnStatus() == 1 ){//添加ecn备注信息
+            // 新增工单变更记录
+            EcnLog ecnLog = new EcnLog();
+            ecnLog.setCompanyId(u.getCompanyId());
+            ecnLog.setSaveId(order.getId());
+            ecnLog.setSaveCode(order.getWorkorderNumber());
+            ecnLog.setEcnType(2);
+            ecnLog.setEcnText(order.getEcnText());
+            ecnLog.setCreatePeople(order.getCreateBy());
+            ecnLog.setCreateId(u.getUserId().intValue());
+            ecnLog.setCreateTime(new Date());
+            ecnLogMapper.insertEcnLog(ecnLog);
+            // 更新产品ECN备注信息
+            if (!devProductList.getEcnText().equals(order.getEcnText())) { // 新建工单时更改了产品ECN
+                // 更新ECN日志
+                EcnLog proEcnLog = new EcnLog();
+                proEcnLog.setCompanyId(u.getCompanyId());
+                proEcnLog.setSaveId(devProductList.getId());
+                proEcnLog.setSaveCode(devProductList.getProductCode());
+                proEcnLog.setEcnType(1);
+                proEcnLog.setEcnText(order.getEcnText());
+                proEcnLog.setCreatePeople(order.getCreateBy());
+                proEcnLog.setCreateId(u.getUserId().intValue());
+                proEcnLog.setCreateTime(new Date());
+                ecnLogMapper.insertEcnLog(proEcnLog);
+                // 更新产品ECN
+                devProductList.setEcnText(order.getEcnText());
+                productListMapper.updateDevProductList(devProductList);
+            }
+        }
+        return 1;
+    }
+
+    /**
+     * 拆分工单
+     * @param orders 拆单详情
+     * @return
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public int workDismantleInfo(List<DevWorkOrder> orders) throws Exception {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        //获取原始工单
+        if(orders == null)return 0;
+        DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(orders.get(0).getSign());
+        ProductionLine line =null;
+        DevProductList devProductList =null;
+        WorkOrderChange change =null;
+        for (DevWorkOrder order : orders) {
+            order.setWorkorderNumber(CodeUtils.getWorkOrderCode(u.getCompanyId()));
+            try {
+                Thread.sleep(5000);
+            }catch (Exception e){ }
+            order.setCompanyId(u.getCompanyId());
+            order.setSign(1);
+            line = productionLineMapper.selectProductionLineById(order.getLineId());
+            order.setDeviceLiable(line.getDeviceLiable());
+            order.setCreateTime(new Date());
+            order.setCreateBy(u.getUserName());
+            devWorkOrderMapper.insertDevWorkOrder(order);
+            if(order.getEcnStatus() == 1 ){//添加ecn备注信息
+                // 新增工单变更记录
+                EcnLog ecnLog = new EcnLog();
+                ecnLog.setCompanyId(u.getCompanyId());
+                ecnLog.setSaveId(order.getId());
+                ecnLog.setSaveCode(order.getWorkorderNumber());
+                ecnLog.setEcnType(2);
+                ecnLog.setEcnText(order.getEcnText());
+                ecnLog.setCreatePeople(order.getCreateBy());
+                ecnLog.setCreateId(u.getUserId().intValue());
+                ecnLog.setCreateTime(new Date());
+                ecnLogMapper.insertEcnLog(ecnLog);
+                // 更新产品ECN备注信息
+                if (!devProductList.getEcnText().equals(order.getEcnText())) { // 新建工单时更改了产品ECN
+                    // 更新ECN日志
+                    EcnLog proEcnLog = new EcnLog();
+                    proEcnLog.setCompanyId(u.getCompanyId());
+                    proEcnLog.setSaveId(devProductList.getId());
+                    proEcnLog.setSaveCode(devProductList.getProductCode());
+                    proEcnLog.setEcnType(1);
+                    proEcnLog.setEcnText(order.getEcnText());
+                    proEcnLog.setCreatePeople(order.getCreateBy());
+                    proEcnLog.setCreateId(u.getUserId().intValue());
+                    proEcnLog.setCreateTime(new Date());
+                    ecnLogMapper.insertEcnLog(proEcnLog);
+                    // 更新产品ECN
+                    devProductList.setEcnText(order.getEcnText());
+                    productListMapper.updateDevProductList(devProductList);
+                }
+            }
+        }
+        return 0;
     }
 }

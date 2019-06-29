@@ -96,15 +96,14 @@ public class ProductBomServiceImpl implements IProductBomService {
     }
 
     /**
-     * 导入bom单
-     *
-     * @param file 导入文件
-     * @param pid  产品id
-     * @return 结果
+     * 导入bom单 多文件
+     * @param files
+     * @return
+     * @throws Exception
      */
     @Override
-    @Transactional
-    public String insertProductBom(MultipartFile file, int pid) throws Exception {
+    @Transactional(rollbackFor = Exception.class)
+    public String insertProductBom(MultipartFile[] files) throws Exception {
         StringBuilder successMsg = new StringBuilder();
         StringBuilder failureMsg = new StringBuilder();
         User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
@@ -122,147 +121,170 @@ public class ProductBomServiceImpl implements IProductBomService {
         int placeNumber = config.getPlaceNumber() == null ? 0 : config.getPlaceNumber();
         /** 备注下标 */
         int remarkIndex = config.getRemarkIndex() == null ? 0 : config.getRemarkIndex();
-        //查询对应产品是否存在
-        DevProductList productList = productListMapper.selectDevProductListById(pid);
-        if (productList == null) {
-            failureMsg.insert(0, "很抱歉，导入失败！您选择的产品不存在");
-            throw new Exception(failureMsg.toString());
-        }
-        //查询对应产品是否已经导入bom
-        ProductBom productBom = productBomMapper.selectBomByProductId(productList.getId());
-        if (productBom != null) {
-            failureMsg.insert(0, "很抱歉，导入失败！该产品已经导入BOM单");
-            throw new Exception(failureMsg.toString());
-        }
+        //文件名称
+        String fileName = null;
+        //产品编码
+        String code =null;
+        //excel 文档对象
         Workbook wb = null;
-        try {
-            //进行数据解析
-            wb = WorkbookFactory.create(file.getInputStream());
-        } catch (Exception e) {
-            failureMsg.insert(0, "很抱歉，导入失败！系统出错，请联系系统管理员");
-            throw new Exception(failureMsg.toString());
-        }
-        if (wb == null) {
-            failureMsg.insert(0, "很抱歉，导入失败！系统出错，请联系系统管理员");
-            throw new Exception(failureMsg.toString());
-        }
-        Sheet sheet = wb.getSheetAt(0);
-        int rows = sheet.getPhysicalNumberOfRows();
-        if (rows <= 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！导入的文件中行数为0");
-            throw new Exception(failureMsg.toString());
-        }
-        if (rows < config.getRowIndex()) {
-            failureMsg.insert(0, "很抱歉，导入失败！导入的文件中行数小于BOM配置中开始解析行数");
-            throw new Exception(failureMsg.toString());
-        }
+        // sheet 对象
+        Sheet sheet = null;
+        //行对象
         Row row = null;
+        //BOM 详情对象
         ProductBomDetails details = null;
-        List<ProductBomDetails> list = new ArrayList<>();
-        for (int i = config.getRowIndex() - 1; i < rows; i++) {
-            try {
-                row = sheet.getRow(i);
-                if (row == null) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据为空");
-                    continue;
-                }
-                //判断对应的物料编号是否存在
-                String wCode = ExcelUtil.getCellValue1(row, config.getMaterielCode() - 1).toString().trim();
-                if (StringUtils.isEmpty(wCode)) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,物料编码为空");
-                    continue;
-                }
-                details = new ProductBomDetails();
-                //查询物料是否存在
-                Materiel materiel = materielMapper.selectMaterielByMaterielCode(wCode, companyId);
-                if (materiel == null) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,导入的物料不存在，请先导入对应的物料信息");
-                    continue;
-                }
-                details.setBomDetailsType(0);
-                details.setDetailId(materiel.getId());
-                details.setDetailCode(materiel.getMaterielCode());
-                //获取物料名称
-                String wName = ExcelUtil.getCellValue1(row, config.getMaterielName() - 1).toString().trim();
-                if (StringUtils.isEmpty(wName)) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,物料名称为空");
-                    continue;
-                }
-                //判断物料名称是否相等
-                if (!wName.equals(materiel.getMaterielName())) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,物料编码:" + wCode + ",物料名称与系统中的物料名称不同");
-                    continue;
-                }
-                details.setDetailName(materiel.getMaterielName());
-                //判断物料型号
-                String wModel = ExcelUtil.getCellValue1(row, config.getMaterielModel() - 1).toString().trim();
-                if (StringUtils.isEmpty(wModel)) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,物料型号为空");
-                    continue;
-                }
-                //判断物料型号是否相等
-                if (!wModel.equals(materiel.getMaterielModel())) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,物料编码:" + wCode + ",物料型号与系统中的物料型号不同");
-                    continue;
-                }
-                details.setDetailModel(materiel.getMaterielModel());
-                //判断用量
-                try {
-                    int number = Convert.toInt(ExcelUtil.getCellValue1(row, config.getNumber() - 1));
-                    if (number <= 0) {
-                        failureNum++;
-                        failureMsg.append("<br/>第" + (i + 1) + "行数据,物料用量必须大于0");
-                        continue;
-                    }
-                    details.setOneNum(number);
-                    details.setPrice(materiel.getPrice());
-                    details.setTotalPrice(new BigDecimal(materiel.getPrice().floatValue() * number));
-                } catch (Exception e) {
-                    failureNum++;
-                    failureMsg.append("<br/>第" + (i + 1) + "行数据,物料用量必须为数字");
-                    continue;
-                }
-                details.setCreateId(u.getUserId().intValue());
-                details.setCreateTime(new Date());
-                //单位
-                if (unit > 0) {
-                    String wUnit = ExcelUtil.getCellValue1(row, unit - 1).toString().trim();
-                    details.setUnit(wUnit);
-                }
-                //位号
-                if (placeNumber > 0) {
-                    String wh = ExcelUtil.getCellValue1(row, placeNumber - 1).toString().trim();
-                    details.setPlaceNumber(wh);
-                }
-                //备注
-                if (remarkIndex > 0) {
-                    String remark = ExcelUtil.getCellValue1(row, remarkIndex - 1).toString().trim();
-                    details.setRemark(remark);
-                }
-                list.add(details);
-            } catch (Exception e) {
+        //详情集合对象
+        List<ProductBomDetails> list = null;
+        //BOM对象
+        ProductBom bom = null;
+        //BOM 对象集合
+        List<ProductBom> boms = new ArrayList<>();
+        for (MultipartFile file : files) {
+            fileName = file.getOriginalFilename();
+            code = fileName.substring(0,fileName.lastIndexOf("."));
+            //查询对应产品是否存在
+            DevProductList productList = productListMapper.selectDevProductByCode(companyId,code);
+            if (productList == null) {
                 failureNum++;
-                failureMsg.append("<br/>第" + (i + 1) + "行数据导入失败");
+                failureMsg.append("很抱歉，导入"+fileName+"文件失败！产品不存在");
                 continue;
             }
-        }
-        if (failureNum > 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！");
-            return failureMsg.toString();
-        }
-        if (list.size() <= 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！");
-            return failureMsg.toString();
-        } else {
+            //查询对应产品是否已经导入bom
+            ProductBom productBom = productBomMapper.selectBomByProductId(productList.getId());
+            if (productBom != null) {
+                failureNum++;
+                failureMsg.append( "很抱歉，导入"+fileName+"文件失败！该产品:"+code+"已经导入BOM单");
+                continue;
+            }
+            try {
+                //进行数据解析
+                wb = WorkbookFactory.create(file.getInputStream());
+            } catch (Exception e) {
+                failureNum++;
+                failureMsg.append( "很抱歉，系统解析"+fileName+"文件失败！");
+                continue;
+            }
+            if (wb == null) {
+                failureNum++;
+                failureMsg.append( "很抱歉，系统解析"+fileName+"文件失败！");
+                continue;
+            }
+             sheet = wb.getSheetAt(0);
+            if(sheet == null){
+                failureNum++;
+                failureMsg.append( "很抱歉，系统解析"+fileName+"文件失败！");
+                continue;
+            }
+            int rows = sheet.getPhysicalNumberOfRows();
+            if (rows <= 0) {
+                failureNum++;
+                failureMsg.append("很抱歉，导入失败！导入文件"+fileName+"中行数为0");
+                continue;
+            }
+            if (rows < config.getRowIndex()) {
+                failureNum++;
+                failureMsg.append("很抱歉，导入失败！导入文件"+fileName+"中行数小于BOM配置中开始解析行数");
+                continue;
+            }
+            //创建详情对象集合
+            list = new ArrayList<>();
+            for (int i = config.getRowIndex() - 1; i < rows; i++) {
+                try {
+                    row = sheet.getRow(i);
+                    if (row == null) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据为空");
+                        continue;
+                    }
+                    //判断对应的物料编号是否存在
+                    String wCode = ExcelUtil.getCellValue1(row, config.getMaterielCode() - 1).toString().trim();
+                    if (StringUtils.isEmpty(wCode)) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料编码为空");
+                        continue;
+                    }
+                    //创建详情对象
+                    details = new ProductBomDetails();
+                    //查询物料是否存在
+                    Materiel materiel = materielMapper.selectMaterielByMaterielCode(wCode, companyId);
+                    if (materiel == null) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,导入的物料不存在，请先导入对应的物料信息");
+                        continue;
+                    }
+                    details.setBomDetailsType(0);
+                    details.setDetailId(materiel.getId());
+                    details.setDetailCode(materiel.getMaterielCode());
+                    //获取物料名称
+                    String wName = ExcelUtil.getCellValue1(row, config.getMaterielName() - 1).toString().trim();
+                    if (StringUtils.isEmpty(wName)) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料名称为空");
+                        continue;
+                    }
+                    //判断物料名称是否相等
+                    if (!wName.equals(materiel.getMaterielName())) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料编码:" + wCode + ",物料名称与系统中的物料名称不同");
+                        continue;
+                    }
+                    details.setDetailName(materiel.getMaterielName());
+                    //判断物料型号
+                    String wModel = ExcelUtil.getCellValue1(row, config.getMaterielModel() - 1).toString().trim();
+                    if (StringUtils.isEmpty(wModel)) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料型号为空");
+                        continue;
+                    }
+                    //判断物料型号是否相等
+                    if (!wModel.equals(materiel.getMaterielModel())) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料编码:" + wCode + ",物料型号与系统中的物料型号不同");
+                        continue;
+                    }
+                    details.setDetailModel(materiel.getMaterielModel());
+                    //判断用量
+                    try {
+                        int number = Convert.toInt(ExcelUtil.getCellValue1(row, config.getNumber() - 1));
+                        if (number <= 0) {
+                            failureNum++;
+                            failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料用量必须大于0");
+                            continue;
+                        }
+                        details.setOneNum(number);
+                        details.setPrice(materiel.getPrice());
+                        details.setTotalPrice(new BigDecimal(materiel.getPrice().floatValue() * number));
+                    } catch (Exception e) {
+                        failureNum++;
+                        failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据,物料用量必须为数字");
+                        continue;
+                    }
+                    details.setCreateId(u.getUserId().intValue());
+                    details.setCreateTime(new Date());
+                    //单位
+                    if (unit > 0) {
+                        String wUnit = ExcelUtil.getCellValue1(row, unit - 1).toString().trim();
+                        details.setUnit(wUnit);
+                    }
+                    //位号
+                    if (placeNumber > 0) {
+                        String wh = ExcelUtil.getCellValue1(row, placeNumber - 1).toString().trim();
+                        details.setPlaceNumber(wh);
+                    }
+                    //备注
+                    if (remarkIndex > 0) {
+                        String remark = ExcelUtil.getCellValue1(row, remarkIndex - 1).toString().trim();
+                        details.setRemark(remark);
+                    }
+                    list.add(details);
+                } catch (Exception e) {
+                    failureNum++;
+                    failureMsg.append("<br/>在文件"+fileName+"的第" + (i + 1) + "行数据导入失败");
+                    continue;
+                }
+            }
             //创建主表
-            ProductBom bom = new ProductBom();
+            bom = new ProductBom();
             bom.setCompanyId(companyId);
             bom.setBomCode(CodeUtils.getBomCode());
             bom.setBomVersion(1);
@@ -274,15 +296,39 @@ public class ProductBomServiceImpl implements IProductBomService {
             bom.setCreateTime(new Date());
             bom.setsSign(1);
             bom.setRemark("初始版本");
-            //新增BOM
-            productBomMapper.insertProductBom(bom);
-            //新增bom详情
-            int i = 1;
-            for (ProductBomDetails bomDetails : list) {
-                bomDetails.setBomId(bom.getId());
-                bomDetails.setbIndex(i);
-                productBomDetailsMapper.insertProductBomDetails(bomDetails);
-                i++;
+            bom.setDetails(list);
+            boms.add(bom);
+        }
+        if (failureNum > 0) {
+            failureMsg.insert(0, "<br/>很抱歉，导入失败！");
+            throw new Exception(failureMsg.toString());
+        }
+        if (boms.size() <= 0) {
+            failureMsg.insert(0, "<br/>很抱歉，系统导入失败！");
+            throw new Exception(failureMsg.toString());
+        } else {
+            for (ProductBom productBom : boms) {
+                try {
+                    //新增BOM
+                    productBomMapper.insertProductBom(productBom);
+                    //新增bom详情
+                    int i = 1;
+                    for (ProductBomDetails bomDetails : productBom.getDetails()) {
+                        bomDetails.setBomId(productBom.getId());
+                        bomDetails.setbIndex(i);
+                        productBomDetailsMapper.insertProductBomDetails(bomDetails);
+                        i++;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    failureNum++;
+                    failureMsg.append( "<br/>很抱歉，系统出错,在导入产品:"+productBom.getProductCode()+" BOM时出错!");
+                    throw new Exception(failureMsg.toString());
+                }
+            }
+            if (failureNum > 0) {
+                failureMsg.insert(0, "很抱歉，导入失败！");
+                throw new Exception(failureMsg.toString());
             }
             successMsg.insert(0, "恭喜您，数据导入成功");
             return successMsg.toString();

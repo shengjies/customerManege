@@ -19,7 +19,7 @@
             <div class="col-sm-8">
                 <!--<input id="lineId" name="lineId" th:field="*{lineId}" class="form-control" type="text">-->
                 <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId" class="form-control"
-                        th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                        th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
                     <option th:each="line : ${productionLine}" th:text="${line.lineName}"
                             th:value="${line.Id}" th:selected="*{lineId}==${line.Id}?true:false"></option>
                 </select>

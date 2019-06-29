@@ -118,6 +118,7 @@ $(function() {
 		var ids = $("#bootstrap-table").bootstrapTable("getSelections");
 		$('#toolbar .btn-del').toggleClass('disabled', !ids.length);
 		$('#toolbar .btn-edit').toggleClass('disabled', ids.length!=1);
+		$('#toolbar .btn-hd').toggleClass('disabled', ids.length <= 1);
     });
 	// tree表格树 展开/折叠
 	var expandFlag = false;

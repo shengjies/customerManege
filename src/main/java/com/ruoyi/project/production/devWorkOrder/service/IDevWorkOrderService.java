@@ -5,6 +5,7 @@ import com.ruoyi.project.system.user.domain.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 工单 服务层
@@ -129,4 +130,36 @@ public interface IDevWorkOrderService {
      * @return
      */
     DevWorkOrder selectWorkOrderEcn(int workId);
+
+    /**
+     * 工单合并验证，合并的前提是 所以工单是未进行工单并且是同一产品
+     * @param workIds 需合并工单id
+     * @param type 0、合单 1、拆单
+     * @return
+     * @throws Exception
+     */
+    String workMergeVerif(int[] workIds,int type) throws Exception;
+
+    /**
+     * 初始化合并工单信息
+     * @param workIds 工单id
+     * @return
+     */
+    Map<String,Object> workMergePage(String workIds);
+
+    /**
+     * 合并工单信息
+     * @param order 工单信息
+     * @return
+     * @throws Exception
+     */
+    int workMerge(DevWorkOrder order) throws Exception;
+
+    /**
+     * 拆分工单
+     * @param orders 拆单详情
+     * @return
+     * @throws Exception
+     */
+    int workDismantleInfo(List<DevWorkOrder> orders) throws Exception;
 }

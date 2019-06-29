@@ -52,140 +52,128 @@ public class ProductBomDetails extends BaseEntity
 	private Integer bIndex;
 
 
-	public void setId(Integer id)
-	{
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getId() 
-	{
-		return id;
+	public Integer getBomId() {
+		return bomId;
 	}
-	public void setBomId(Integer bomId) 
-	{
+
+	public void setBomId(Integer bomId) {
 		this.bomId = bomId;
 	}
 
-	public Integer getBomId() 
-	{
-		return bomId;
+	public Integer getBomDetailsType() {
+		return bomDetailsType;
 	}
-	public void setBomDetailsType(Integer bomDetailsType) 
-	{
+
+	public void setBomDetailsType(Integer bomDetailsType) {
 		this.bomDetailsType = bomDetailsType;
 	}
 
-	public Integer getBomDetailsType() 
-	{
-		return bomDetailsType;
+	public Integer getDetailId() {
+		return detailId;
 	}
-	public void setDetailId(Integer detailId) 
-	{
+
+	public void setDetailId(Integer detailId) {
 		this.detailId = detailId;
 	}
 
-	public Integer getDetailId() 
-	{
-		return detailId;
+	public String getDetailCode() {
+		return detailCode;
 	}
-	public void setDetailCode(String detailCode) 
-	{
+
+	public void setDetailCode(String detailCode) {
 		this.detailCode = detailCode;
 	}
 
-	public String getDetailCode() 
-	{
-		return detailCode;
+	public String getDetailModel() {
+		return detailModel;
 	}
-	public void setDetailModel(String detailModel) 
-	{
+
+	public void setDetailModel(String detailModel) {
 		this.detailModel = detailModel;
 	}
 
-	public String getDetailModel() 
-	{
-		return detailModel;
+	public String getDetailName() {
+		return detailName;
 	}
-	public void setDetailName(String detailName) 
-	{
+
+	public void setDetailName(String detailName) {
 		this.detailName = detailName;
 	}
 
-	public String getDetailName() 
-	{
-		return detailName;
+	public Integer getOneNum() {
+		return oneNum;
 	}
-	public void setOneNum(Integer oneNum) 
-	{
+
+	public void setOneNum(Integer oneNum) {
 		this.oneNum = oneNum;
 	}
 
-	public Integer getOneNum() 
-	{
-		return oneNum;
+	public BigDecimal getPrice() {
+		return price;
 	}
-	public void setPrice(BigDecimal price) 
-	{
+
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 
-	public BigDecimal getPrice() 
-	{
-		return price;
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
 	}
-	public void setTotalPrice(BigDecimal totalPrice) 
-	{
+
+	public void setTotalPrice(BigDecimal totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 
-	public BigDecimal getTotalPrice() 
-	{
-		return totalPrice;
+	public Integer getCreateId() {
+		return createId;
 	}
-	public void setCreateId(Integer createId) 
-	{
+
+	public void setCreateId(Integer createId) {
 		this.createId = createId;
 	}
 
-	public Integer getCreateId() 
-	{
-		return createId;
+	@Override
+	public Date getCreateTime() {
+		return createTime;
 	}
-	public void setCreateTime(Date createTime) 
-	{
+
+	@Override
+	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
 
-	public Date getCreateTime() 
-	{
-		return createTime;
+	public String getPlaceNumber() {
+		return StringUtils.isEmpty(placeNumber)?"":placeNumber;
 	}
-	public void setPlaceNumber(String placeNumber) 
-	{
+
+	public void setPlaceNumber(String placeNumber) {
 		this.placeNumber = placeNumber;
 	}
 
-	public String getPlaceNumber() 
-	{
-		return StringUtils.isEmpty(placeNumber)?"":placeNumber;
+	public String getUnit() {
+		return StringUtils.isEmpty(unit)?"":unit;
 	}
-	public void setUnit(String unit) 
-	{
+
+	public void setUnit(String unit) {
 		this.unit = unit;
 	}
 
-	public String getUnit() 
-	{
-		return StringUtils.isEmpty(unit)?"":unit;
-	}
-	public void setRemark(String remark) 
-	{
-		this.remark = remark;
+	@Override
+	public String getRemark() {
+		return StringUtils.isEmpty(remark)?"":remark;
 	}
 
-	public String getRemark() 
-	{
-		return StringUtils.isEmpty(remark)?"":remark;
+	@Override
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 	public Integer getbIndex() {

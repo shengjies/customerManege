@@ -6,17 +6,7 @@
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-productBom-add">
         <div class="col-xs-offset-1">
-            <input type="file" id="file" name="file"/>
-            <div class="mt10 pt5">
-                产品编码：
-                <select style="width: 100%" id="pid" class="form-control"
-                        name="pid" onchange="supplierChange(this)"
-                        th:with="pns = ${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}">
-                    <option value="-1">请选择</option>
-                    <option th:each="item : ${pns}" th:text="${item.productCode}"
-                            th:value="${item.id}"></option>
-                </select>
-            </div>
+            <input type="file" id="file" multiple max="2" name="files"/>
             <font color="red" class="pull-left mt10">
                 提示：仅允许导入“xls”或“xlsx”格式文件！
             </font>
@@ -26,51 +16,59 @@
 <div th:include="include::footer"></div>
 <script type="text/javascript">
     var prefix = ctx + "erp/productBom"
+
     function submitHandler() {
         var file = $('#file').val();
         if (file == '' || (!$.common.endWith(file, '.xls') && !$.common.endWith(file, '.xlsx'))) {
             $.modal.msgWarning("请选择后缀为 “xls”或“xlsx”的文件。");
             return false;
         }
-        var pid = $("#pid option:selected").val();
-        if(pid=='' || pid == -1){
-            $.modal.msgWarning("请选择产品编码。");
+        var isSubmit = true;
+        for (var i = 0; i < $('#file')[0].files.length; i++) {
+            if ((!$.common.endWith($('#file')[0].files[i].name, '.xls') && !$.common.endWith($('#file')[0].files[i].name, '.xlsx'))) {
+                $.modal.msgWarning("请选择后缀为 “xls”或“xlsx”的文件。");
+                isSubmit = false;
+                return false;
+            }
+        }
+        if ($('#file')[0].files.length > 10) {
+            $.modal.msgWarning("一次最多能上传10个BOM文件");
             return false;
         }
-        var index = layer.load(2, {shade: false});
-        $.modal.disable();
-        var formData = new FormData();
-        formData.append("file", $('#file')[0].files[0]);
-        formData.append("pid", pid);
-        $.ajax({
-            url: prefix+"/add",
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            type: 'POST',
-            success: function (result) {
-                if (result.code == web_status.SUCCESS) {
-                    // $.modal.closeAll();
-                    // $.modal.alertSuccess(result.msg);
-                    if (window.parent.$("#bootstrap-table").length > 0) {
-                        $.modal.close();
-                        window.parent.$.modal.alertSuccess(result.msg);
-                        window.parent.$.table.refresh();
-                    } else if (window.parent.$("#bootstrap-tree-table").length > 0) {
-                        $.modal.close();
-                        window.parent.$.modal.alertSuccess(result.msg);
-                        window.parent.$.treeTable.refresh();
+        if (isSubmit) {
+            var index = layer.load(2, {shade: false});
+            $.modal.disable();
+            var formData = new FormData($("#form-productBom-add")[0]);
+            $.ajax({
+                url: prefix + "/add",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function (result) {
+                    if (result.code == web_status.SUCCESS) {
+                        // $.modal.closeAll();
+                        // $.modal.alertSuccess(result.msg);
+                        if (window.parent.$("#bootstrap-table").length > 0) {
+                            $.modal.close();
+                            window.parent.$.modal.alertSuccess(result.msg);
+                            window.parent.$.table.refresh();
+                        } else if (window.parent.$("#bootstrap-tree-table").length > 0) {
+                            $.modal.close();
+                            window.parent.$.modal.alertSuccess(result.msg);
+                            window.parent.$.treeTable.refresh();
+                        } else {
+                            $.modal.msgReload("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                        }
                     } else {
-                        $.modal.msgReload("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                        layer.close(index);
+                        $.modal.enable();
+                        $.modal.alertError(result.msg);
                     }
-                } else {
-                    layer.close(index);
-                    $.modal.enable();
-                    $.modal.alertError(result.msg);
                 }
-            }
-        });
+            });
+        }
     }
 </script>
 </body>

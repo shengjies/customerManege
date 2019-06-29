@@ -368,7 +368,17 @@ ADD COLUMN `line_type` INT NULL COMMENT '生产出入库的类型(0、物料，1
 
 
 
+#2019-06-28 zsj 服务器未执行sql
 
+#标记工单是否作废
+ALTER TABLE `octopus`.`dev_work_order`
+ADD COLUMN `abolish` TINYINT(1) NULL DEFAULT 0 COMMENT '标记工单是否作废' AFTER `sign_huor`;
+
+
+#2019-06-29 zsj 服务器未执行sql
+#添加工单变更状态
+ALTER TABLE `octopus`.`dev_work_order_change`
+ADD COLUMN `c_status` INT NULL DEFAULT 0 AFTER `remark`;
 
 
 

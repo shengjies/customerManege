@@ -56,6 +56,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="placeNumber != null  and placeNumber != ''  ">place_number,</if>
 			<if test="unit != null  and unit != ''  ">unit,</if>
 			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="bIndex != null  and bIndex != ''  ">b_index,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="bomId != null  ">#{bomId},</if>
@@ -72,6 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="placeNumber != null  and placeNumber != ''  ">#{placeNumber},</if>
 			<if test="unit != null  and unit != ''  ">#{unit},</if>
 			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="bIndex != null  and bIndex != ''  ">#{bIndex},</if>
          </trim>
     </insert>
 	 

@@ -8,9 +8,11 @@ import java.util.Map;
 import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.monitor.server.domain.Server;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
 import com.ruoyi.project.system.user.domain.User;
@@ -18,11 +20,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
@@ -324,5 +322,78 @@ public class DevWorkOrderController extends BaseController {
         DevWorkOrder order = devWorkOrderService.selectWorkOrderEcn(workId);
         mmap.put("work",order);
         return prefix+"/workecn";
+    }
+
+    /**
+     * 工单合并
+     * @param workids 需要合并的id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/merge/verif")
+    public AjaxResult workMergeVerif(@RequestParam(value = "workids[]")  int[] workids,int type){
+        try {
+            return AjaxResult.success(devWorkOrderService.workMergeVerif(workids,type));
+        }catch (Exception e){
+            return AjaxResult.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 进行工单合并信息确认
+     * @param workids 需要合并工单id
+     * @param mmap
+     * @return
+     */
+    @RequestMapping("/merge/page")
+    public String workMergePage(String workids,ModelMap mmap){
+        mmap.put("data",devWorkOrderService.workMergePage(workids));
+        mmap.put("workids",workids);
+        return prefix+"/merge";
+    }
+
+    /**
+     * 工单合并
+     * @param order 工单信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/merge")
+    public AjaxResult workMerge(DevWorkOrder order){
+        try
+        {
+            return toAjax(devWorkOrderService.workMerge(order));
+        }catch (Exception e){
+            e.printStackTrace();
+            return error();
+        }
+    }
+
+    /**
+     * 拆单
+     * @return
+     */
+    @RequestMapping("/dismantle")
+    public String workDismantle(int id,ModelMap mmap){
+        mmap.put("order",devWorkOrderService.selectDevWorkOrderById(id));
+        return prefix+"/dismantle";
+    }
+
+    /**
+     * 工单拆除
+     * @param list 拆单详情
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/workDismantle")
+    public AjaxResult workDismantleInfo(@RequestBody List<DevWorkOrder> list){
+        try {
+            for (DevWorkOrder order : list) {
+                System.out.println(order);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AjaxResult.error();
     }
 }

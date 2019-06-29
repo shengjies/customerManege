@@ -216,4 +216,11 @@ public interface DevWorkOrderMapper {
      * @return
      */
     DevWorkOrder selectWorkByLineId(@Param("lineId")int lineId);
+
+    /**
+     * 将工单作废
+     * @param workId 工单id
+     * @return
+     */
+    int updateWorkOrderAbolish(@Param("workId")int workId);
 }

@@ -44,6 +44,9 @@ public class WorkOrderChange extends BaseEntity
 
 	private String remark;
 
+	/** 工单变更状态 0、修改 1、合单 2、拆单  */
+	private Integer cStatus;
+
 	public void setId(Integer id) 
 	{
 		this.id = id;
@@ -170,6 +173,14 @@ public class WorkOrderChange extends BaseEntity
 	@Override
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public Integer getcStatus() {
+		return cStatus;
+	}
+
+	public void setcStatus(Integer cStatus) {
+		this.cStatus = cStatus;
 	}
 
 	public String toString() {
