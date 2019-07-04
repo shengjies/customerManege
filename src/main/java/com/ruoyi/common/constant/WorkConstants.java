@@ -108,4 +108,10 @@ public class WorkConstants {
      */
     public final static String WORKERORDER_NUMBER_UNIQUE = "0";
     public final static String WORKERORDER_NUMBER_NOT_UNIQUE = "1";
+
+    /**
+     * 单工位车间名称是否唯一的返回结果
+     */
+    public final static String WORKHOUSE_NAME_UNIQUE = "0";
+    public final static String WORKHOUSE_NAME_NOT_UNIQUE = "1";
 }

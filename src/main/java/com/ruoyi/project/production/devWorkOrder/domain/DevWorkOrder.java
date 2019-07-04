@@ -173,8 +173,8 @@ public class DevWorkOrder extends BaseEntity {
      * 封装产品id
      */
     private Integer productId;
-
-    private String remark;//备注信息
+    /** 备注信息 */
+    private String remark;
 
     private String orderCode;
 
@@ -188,6 +188,36 @@ public class DevWorkOrder extends BaseEntity {
 
     /** 标记工单是否作废 */
     private Integer abolish;
+    /** 工位是在车间还是在单工位生产标记(0、流水线默认值，1、单工位) */
+    private Integer wlSign;
+    /** 工单生产类型(0、默认值生产的是成品，1、生产半成品) */
+    private Integer makeType;
+    /** 工单生产单价 */
+    private Float workPrice;
+
+    public Integer getWlSign() {
+        return wlSign;
+    }
+
+    public void setWlSign(Integer wlSign) {
+        this.wlSign = wlSign;
+    }
+
+    public Integer getMakeType() {
+        return makeType;
+    }
+
+    public void setMakeType(Integer makeType) {
+        this.makeType = makeType;
+    }
+
+    public Float getWorkPrice() {
+        return workPrice;
+    }
+
+    public void setWorkPrice(Float workPrice) {
+        this.workPrice = workPrice;
+    }
 
     public Integer getProductId() {
         return productId;
@@ -740,6 +770,10 @@ public class DevWorkOrder extends BaseEntity {
                 ", ecnStatus=" + ecnStatus +
                 ", ecnText='" + ecnText + '\'' +
                 ", sign=" + sign +
+                ", abolish=" + abolish +
+                ", wlSign=" + wlSign +
+                ", makeType=" + makeType +
+                ", workPrice=" + workPrice +
                 ", cumulativeNumber=" + cumulativeNumber +
                 ", directPassRate=" + directPassRate +
                 ", paramConfig='" + paramConfig + '\'' +

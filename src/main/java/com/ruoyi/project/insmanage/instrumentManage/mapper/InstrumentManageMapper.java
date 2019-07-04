@@ -1,7 +1,9 @@
 package com.ruoyi.project.insmanage.instrumentManage.mapper;
 
 import com.ruoyi.project.insmanage.instrumentManage.domain.InstrumentManage;
-import java.util.List;	
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 仪器设备管理 数据层
@@ -58,5 +60,35 @@ public interface InstrumentManageMapper
      * @return 结果
      */
 	public int deleteInstrumentManageByIds(String[] ids);
-	
+
+	/**
+	 * 通过设备编码查询设备信息
+	 * @param imCode 设备编码
+	 * @param companyId 公司id
+	 * @return 结果
+	 */
+    InstrumentManage selectInstrumentManageByImCode(@Param("imCode") String imCode,@Param("companyId") Integer companyId);
+
+	/**
+	 * 通过设备类型id查询设备列表
+	 * @param inType 设备类型id
+	 * @return 结果
+	 */
+	List<InstrumentManage> selectInstrumentManageByInsTypeId(@Param("inType") Integer inType);
+
+	/**
+	 * 通过设备标记状态查询设备列表信息
+	 * @param companyId 公司id
+	 * @param imTag 设备标记状态
+	 * @return 结果
+	 */
+	List<InstrumentManage> selectInstrumentManageListByImTag(@Param("companyId") Integer companyId, @Param("imTag") Integer imTag);
+
+	/**
+	 * 通过设备id更新设备标记使用状态
+	 * @param id 设备id
+	 * @param imTag 设备标记状态
+	 * @return 结果
+	 */
+	int updateInstrumentManageImTag(@Param("id") Integer id,@Param("imTag") Integer imTag);
 }

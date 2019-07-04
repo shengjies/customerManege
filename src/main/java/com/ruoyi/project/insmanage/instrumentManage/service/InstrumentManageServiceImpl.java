@@ -1,21 +1,25 @@
 package com.ruoyi.project.insmanage.instrumentManage.service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
+import com.ruoyi.common.constant.InstrumentConstants;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.insmanage.instrumentManage.domain.InstrumentManage;
+import com.ruoyi.project.insmanage.instrumentManage.mapper.InstrumentManageMapper;
+import com.ruoyi.project.insmanage.instrumentType.domain.InstrumentType;
+import com.ruoyi.project.insmanage.instrumentType.mapper.InstrumentTypeMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.insmanage.instrumentManage.mapper.InstrumentManageMapper;
-import com.ruoyi.project.insmanage.instrumentManage.domain.InstrumentManage;
-import com.ruoyi.project.insmanage.instrumentManage.service.IInstrumentManageService;
-import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 仪器设备管理 服务层实现
@@ -23,11 +27,14 @@ import javax.servlet.http.HttpServletRequest;
  * @author sj
  * @date 2019-06-19
  */
-@Service
+@Service("im")
 public class InstrumentManageServiceImpl implements IInstrumentManageService 
 {
 	@Autowired
 	private InstrumentManageMapper instrumentManageMapper;
+
+	@Autowired
+	private InstrumentTypeMapper instrumentTypeMapper;
 
 	/**
      * 查询仪器设备管理信息
@@ -65,14 +72,39 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
      * @return 结果
      */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public int insertInstrumentManage(InstrumentManage instrumentManage,User user)
 	{
+		// 设备名称
+		String inTypeName = instrumentManage.getInTypeName();
+		if (StringUtils.isNotEmpty(inTypeName)) {
+			updateInsType(instrumentManage, user, inTypeName);
+		}
 		instrumentManage.setCompanyId(user.getCompanyId());
 		instrumentManage.setCreateId(user.getUserId().intValue());
 		instrumentManage.setCreateTime(new Date());
 	    return instrumentManageMapper.insertInstrumentManage(instrumentManage);
 	}
-	
+
+	/**
+	 * 更新设备的类型，没有就新增一条设备类型记录
+	 * @param instrumentManage 设备对象
+	 * @param user 用户
+	 * @param inTypeName 设备类型名称
+	 */
+	private void updateInsType(InstrumentManage instrumentManage, User user, String inTypeName) {
+		InstrumentType instrumentType = instrumentTypeMapper.selectInstrumentTypeByName(inTypeName, user.getCompanyId());
+		if (StringUtils.isNull(instrumentType)) {
+			instrumentType = new InstrumentType();
+			instrumentType.setInType(inTypeName);
+			instrumentType.setCompanyId(user.getCompanyId());
+			instrumentType.setCreateId(user.getUserId().intValue());
+			instrumentType.setCreateTime(new Date());
+			instrumentTypeMapper.insertInstrumentType(instrumentType);
+		}
+		instrumentManage.setInType(instrumentType.getId());
+	}
+
 	/**
      * 修改仪器设备管理
      * 
@@ -82,6 +114,15 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 	@Override
 	public int updateInstrumentManage(InstrumentManage instrumentManage)
 	{
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (user == null) {
+		    throw new BusinessException("未登录请登录再进行操作");
+		}
+		// 设备名称
+		String inTypeName = instrumentManage.getInTypeName();
+		if (StringUtils.isNotNull(inTypeName)) {
+			updateInsType(instrumentManage, user, inTypeName);
+		}
 	    return instrumentManageMapper.updateInstrumentManage(instrumentManage);
 	}
 
@@ -94,6 +135,21 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 	@Override
 	public int deleteInstrumentManageByIds(String ids)
 	{
+		Integer[] ims = Convert.toIntArray(ids);
+		InstrumentManage instrumentManage;
+		int failureNum = 0;
+		StringBuffer failureMsg = new StringBuffer();
+		for (Integer id : ims) {
+			instrumentManage = instrumentManageMapper.selectInstrumentManageById(id);
+			if (StringUtils.isNotNull(instrumentManage) && instrumentManage.getImTag().equals(InstrumentConstants.IM_TAG_USED)) {
+				failureNum++;
+				failureMsg.append("<br/>" + failureNum + "、设备编号 " + instrumentManage.getImCode() + " 已配置单工位，请先删除其关联");
+			}
+		}
+		if (failureNum > 0) {
+			failureMsg.insert(0, "很抱歉，删除失败！错误如下：");
+			throw new BusinessException(failureMsg.toString());
+		}
 		return instrumentManageMapper.deleteInstrumentManageByIds(Convert.toStrArray(ids));
 	}
 
@@ -112,9 +168,89 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 		}
 		InstrumentManage ins= instrumentManageMapper.selectInstrumentManageById(instrumentManage.getId());
 		if (StringUtils.isNotNull(ins) && StringUtils.isNull(ins.getImStartTime())) {
-			// 设置启用日期
+			// 设置启用日期为第一次开启的时间
 			instrumentManage.setImStartTime(new Date());
 		}
 		return instrumentManageMapper.updateInstrumentManage(instrumentManage);
+	}
+
+	/**
+	 * 校验设备编码唯一性
+	 * @param imCode 设备编号
+	 * @return 结果
+	 */
+	@Override
+	public String checkImCodeUnique(String imCode) {
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (StringUtils.isNotNull(user)) {
+			InstrumentManage ins = instrumentManageMapper.selectInstrumentManageByImCode(imCode,user.getCompanyId());
+			if (StringUtils.isNull(ins)) {
+			    return InstrumentConstants.IM_CODE_UNIQUE;
+			}
+		}
+		return InstrumentConstants.IM_CODE_NOT_UNIQUE;
+	}
+
+	/**
+	 * 导入仪器设备列表
+	 * @param imList 设备列表
+	 * @param updateSupport 是否更新原来的数据
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public String importInstrumentManageList(List<InstrumentManage> imList, boolean updateSupport) {
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (user == null) {
+		    throw new BusinessException("请先登录再进行操作");
+		}
+		if (StringUtils.isEmpty(imList) || imList.size() == 0) {
+		    throw new BusinessException("导入数据不能为空");
+		}
+		int successNum = 0;
+		int failureNum = 0;
+		InstrumentManage instrumentManage = null;
+		StringBuilder successMsg = new StringBuilder();
+		StringBuilder failureMsg = new StringBuilder();
+		for (InstrumentManage im : imList) {
+			try {
+				if (StringUtils.isNotEmpty(im.getImCode())) {
+					// 验证是否有这个仪器编号
+					instrumentManage = instrumentManageMapper.selectInstrumentManageByImCode(im.getImCode(), user.getCompanyId());
+					if (StringUtils.isNull(instrumentManage)) {
+						this.insertInstrumentManage(im,user);
+						successNum++;
+						successMsg.append("<br/>" + successNum + "、编号 " + im.getImCode() + " 导入成功");
+						// 更新操作
+					} else if (updateSupport) {
+						im.setId(instrumentManage.getId());
+						this.updateInstrumentManage(im);
+						successNum++;
+						successMsg.append("<br/>" + successNum + "、编号 " + im.getImCode() + " 更新成功");
+					} else {
+						failureNum++;
+						failureMsg.append("<br/>" + failureNum + "、编号 " + im.getImCode() + " 已存在");
+					}
+				}
+			} catch (Exception e) {
+				failureNum++;
+				String msg = "<br/>" + failureNum + "、编号 " + im.getImCode() + " 导入失败：";
+				failureMsg.append(msg + e.getMessage());
+			}
+		}
+		return ExcelUtil.getResultString(successNum, failureNum, successMsg, failureMsg);
+	}
+
+	/**
+	 * 通过设备标记状态查询设备信息
+	 * @return 结果
+	 */
+	@Override
+	public List<InstrumentManage> selectAllIm(Integer imTag) {
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		return instrumentManageMapper.selectInstrumentManageListByImTag(user.getCompanyId(),imTag);
 	}
 }

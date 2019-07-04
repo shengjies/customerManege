@@ -1,29 +1,25 @@
 package com.ruoyi.project.insmanage.instrumentManage.controller;
 
-import java.util.List;
-
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.insmanage.instrumentManage.domain.InstrumentManage;
+import com.ruoyi.project.insmanage.instrumentManage.service.IInstrumentManageService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.insmanage.instrumentManage.domain.InstrumentManage;
-import com.ruoyi.project.insmanage.instrumentManage.service.IInstrumentManageService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 仪器设备管理 信息操作处理
@@ -71,8 +67,37 @@ public class InstrumentManageController extends BaseController
     {
     	List<InstrumentManage> list = instrumentManageService.selectInstrumentManageList(instrumentManage,request);
         ExcelUtil<InstrumentManage> util = new ExcelUtil<InstrumentManage>(InstrumentManage.class);
-        return util.exportExcel(list, "instrumentManage");
+        return util.exportExcel(list, "仪器设备");
     }
+
+	/**
+	 * 导出仪器设备模板
+	 */
+	@RequiresPermissions("insmanage:instrumentManage:view")
+	@GetMapping("/importTemplate")
+	@ResponseBody
+	public AjaxResult importTemplate() {
+		ExcelUtil<InstrumentManage> imListExcelUtil = new ExcelUtil<>(InstrumentManage.class);
+		return imListExcelUtil.importTemplateExcel("仪器设备");
+	}
+
+	/**
+	 * 导入仪器设备
+	 */
+	@RequiresPermissions("insmanage:instrumentManage:import")
+	@PostMapping("/importData")
+	@ResponseBody
+	public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
+		ExcelUtil<InstrumentManage> util = new ExcelUtil<>(InstrumentManage.class);
+		List<InstrumentManage> imList = util.importExcel(file.getInputStream());
+		String message = null;
+		try {
+			message = instrumentManageService.importInstrumentManageList(imList, updateSupport);
+		} catch (BusinessException e) {
+			return AjaxResult.error(e.getMessage());
+		}
+		return AjaxResult.success(message);
+	}
 	
 	/**
 	 * 新增仪器设备管理
@@ -118,8 +143,12 @@ public class InstrumentManageController extends BaseController
 	@PostMapping("/edit")
 	@ResponseBody
 	public AjaxResult editSave(InstrumentManage instrumentManage)
-	{		
-		return toAjax(instrumentManageService.updateInstrumentManage(instrumentManage));
+	{
+		try {
+			return toAjax(instrumentManageService.updateInstrumentManage(instrumentManage));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 	
 	/**
@@ -130,8 +159,12 @@ public class InstrumentManageController extends BaseController
 	@PostMapping( "/remove")
 	@ResponseBody
 	public AjaxResult remove(String ids)
-	{		
-		return toAjax(instrumentManageService.deleteInstrumentManageByIds(ids));
+	{
+		try {
+			return toAjax(instrumentManageService.deleteInstrumentManageByIds(ids));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 	/**
@@ -147,5 +180,13 @@ public class InstrumentManageController extends BaseController
 			return error(e.getMessage());
 		}
 	}
-	
+
+	/**
+	 * 校验设备编码唯一性
+	 */
+	@PostMapping("/checkImCodeUnique")
+	@ResponseBody
+	public String checkImCodeUnique(InstrumentManage instrumentManage){
+		return instrumentManageService.checkImCodeUnique(instrumentManage.getImCode());
+	}
 }

@@ -111,14 +111,6 @@ public interface IUserService
     public String checkLoginNameUnique(String loginName);
 
     /**
-     * 校验手机号码是否唯一
-     *
-     * @param user 用户信息
-     * @return 结果
-     */
-    //public String checkPhoneUnique(User user);
-
-    /**
      * 校验email是否唯一
      *
      * @param user 用户信息

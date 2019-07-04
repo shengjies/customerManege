@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-instrumentType-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">设备类型名称：</label>
+				<div class="col-sm-8">
+					<input id="inType" name="inType" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "insmanage/instrumentType"
+		$("#form-instrumentType-add").validate({
+			rules:{
+				inType:{
+					required:true,
+					remote: {
+						url: prefix + "/checkInsTypeUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							name : function() {
+								return $.common.trim($("#imCode").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
+				},
+			},
+			messages:{
+				"inType":{
+					remote: "设备类型名称已存在"
+				}
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-instrumentType-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

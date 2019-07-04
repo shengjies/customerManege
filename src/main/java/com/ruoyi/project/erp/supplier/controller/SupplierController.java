@@ -1,26 +1,22 @@
 package com.ruoyi.project.erp.supplier.controller;
 
-import java.util.List;
-
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.erp.supplier.domain.Supplier;
+import com.ruoyi.project.erp.supplier.service.ISupplierService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.erp.supplier.domain.Supplier;
-import com.ruoyi.project.erp.supplier.service.ISupplierService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * 供应商数据 信息操作处理
@@ -38,7 +34,7 @@ public class SupplierController extends BaseController {
 
     @RequiresPermissions("erp:supplier:view")
     @GetMapping()
-    public String supplier() {
+    public String supplier(HttpServletResponse response) {
         return prefix + "/supplier";
     }
 
@@ -48,7 +44,7 @@ public class SupplierController extends BaseController {
     @RequiresPermissions("erp:supplier:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(Supplier supplier, HttpServletRequest request) {
+    public TableDataInfo list(Supplier supplier, HttpServletRequest request,HttpServletResponse response) {
         startPage();
         List<Supplier> list = supplierService.selectSupplierList(supplier,request);
         return getDataTable(list);

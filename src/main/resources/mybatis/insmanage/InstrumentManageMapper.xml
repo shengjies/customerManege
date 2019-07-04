@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="imCode"    column="im_code"    />
         <result property="imName"    column="im_name"    />
         <result property="imModel"    column="im_model"    />
+        <result property="inType"    column="in_type"    />
         <result property="imDepartment"    column="im_department"    />
         <result property="imLiable"    column="im_liable"    />
         <result property="imStatus"    column="im_status"    />
@@ -21,13 +22,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="imStartTime"    column="im_start_time"    />
         <result property="createId"    column="create_id"    />
         <result property="createTime"    column="create_time"    />
+        <result property="imTag"    column="im_tag"    />
         <association property="imLiableName" column="im_liable" select="selectLiableName">
             <result property="imLiableName" column="user_name"/>
+        </association>
+        <association property="inTypeName" column="in_type" select="selectInstype">
+            <result property="inTypeName" column="in_type"/>
         </association>
     </resultMap>
 	
 	<sql id="selectInstrumentManageVo">
-        select id, company_id, im_code, im_name, im_model, im_department, im_liable, im_status, im_check_number, im_check_period, im_check_book, im_check_mechanism, im_supplier, im_start_time, create_id, create_time from tab_instrument_manage
+        select id, company_id, im_code, im_name, im_model,in_type, im_department, im_liable, im_status, im_check_number, im_check_period, im_check_book,
+        im_check_mechanism, im_supplier, im_start_time, create_id, create_time,im_tag from tab_instrument_manage
     </sql>
 	
     <select id="selectInstrumentManageList" parameterType="InstrumentManage" resultMap="InstrumentManageResult">
@@ -45,6 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="imDepartment != null  and imDepartment != '' ">
                  and im_department like concat ('%',#{imDepartment},'%')
              </if>
+             <if test="inType != null and  inType != -1"> and in_type = #{inType}</if>
              <if test="imLiable != null "> and im_liable = #{imLiable}</if>
              <if test="imStatus != null  and imStatus != '' "> and im_status = #{imStatus}</if>
              <if test="imCheckNumber != null  and imCheckNumber != '' "> and im_check_number = #{imCheckNumber}</if>
@@ -67,6 +74,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectLiableName" resultType="java.lang.String">
         SELECT user_name FROM sys_user where user_id = #{imLiable};
     </select>
+
+    <!--查询设备类型名称-->
+    <select id="selectInstype" resultType="java.lang.String">
+        SELECT in_type FROM tab_instrument_type where id = #{inType};
+    </select>
         
     <insert id="insertInstrumentManage" parameterType="InstrumentManage" useGeneratedKeys="true" keyProperty="id">
         insert into tab_instrument_manage
@@ -75,6 +87,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="imCode != null  and imCode != ''  ">im_code,</if>
 			<if test="imName != null  and imName != ''  ">im_name,</if>
 			<if test="imModel != null  and imModel != ''  ">im_model,</if>
+            <if test="inType != null  and inType != ''  ">in_type,</if>
 			<if test="imDepartment != null  and imDepartment != ''  ">im_department,</if>
 			<if test="imLiable != null  ">im_liable,</if>
 			<if test="imStatus != null  and imStatus != ''  ">im_status,</if>
@@ -86,12 +99,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="imStartTime != null  ">im_start_time,</if>
 			<if test="createId != null  ">create_id,</if>
 			<if test="createTime != null  ">create_time,</if>
+            <if test="imTag != null  ">im_tag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
 			<if test="imCode != null  and imCode != ''  ">#{imCode},</if>
 			<if test="imName != null  and imName != ''  ">#{imName},</if>
 			<if test="imModel != null  and imModel != ''  ">#{imModel},</if>
+            <if test="inType != null  and inType != ''  ">#{inType},</if>
 			<if test="imDepartment != null  and imDepartment != ''  ">#{imDepartment},</if>
 			<if test="imLiable != null  ">#{imLiable},</if>
 			<if test="imStatus != null  and imStatus != ''  ">#{imStatus},</if>
@@ -103,6 +118,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="imStartTime != null  ">#{imStartTime},</if>
 			<if test="createId != null  ">#{createId},</if>
 			<if test="createTime != null  ">#{createTime},</if>
+            <if test="imTag != null  ">#{imTag},</if>
          </trim>
     </insert>
 	 
@@ -113,6 +129,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="imCode != null  and imCode != ''  ">im_code = #{imCode},</if>
             <if test="imName != null  and imName != ''  ">im_name = #{imName},</if>
             <if test="imModel != null  and imModel != ''  ">im_model = #{imModel},</if>
+            <if test="inType != null  and inType != ''  ">in_type = #{inType},</if>
             <if test="imDepartment != null  and imDepartment != ''  ">im_department = #{imDepartment},</if>
             <if test="imLiable != null  ">im_liable = #{imLiable},</if>
             <if test="imStatus != null  and imStatus != ''  ">im_status = #{imStatus},</if>
@@ -124,6 +141,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="imStartTime != null  ">im_start_time = #{imStartTime},</if>
             <if test="createId != null  ">create_id = #{createId},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="imTag != null  ">im_tag = #{imTag},</if>
         </trim>
         where id = #{id}
     </update>
@@ -138,5 +156,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <!--通过设备编码查询设备信息-->
+    <select id="selectInstrumentManageByImCode" resultMap="InstrumentManageResult">
+        SELECT * FROM tab_instrument_manage where im_code = #{imCode} and company_id = #{companyId} limit 1
+    </select>
+
+    <!--通过设备类型id查询设备信息-->
+    <select id="selectInstrumentManageByInsTypeId" resultMap="InstrumentManageResult">
+        <include refid="selectInstrumentManageVo"/>
+        where in_type = #{inType}
+    </select>
+
+    <!--通过设备标记状态查询设备列表-->
+    <select id="selectInstrumentManageListByImTag" resultMap="InstrumentManageResult">
+        SELECT * FROM tab_instrument_manage where  company_id = #{companyId}
+        <if test="imTag != null  "> and im_tag = #{imTag}</if>
+    </select>
+
+    <!--更新设备是否被配置的标记状态-->
+    <update id="updateInstrumentManageImTag">
+        update tab_instrument_manage set im_tag = #{imTag} where id = #{id}
+    </update>
     
 </mapper>

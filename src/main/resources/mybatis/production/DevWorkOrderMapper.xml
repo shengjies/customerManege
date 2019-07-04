@@ -48,12 +48,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="signTime"    column="sign_time"    />
         <result property="signHuor"    column="sign_huor"    />
         <result property="abolish"    column="abolish"    />
+        <result property="wlSign"    column="wl_sign"    />
+        <result property="makeType"    column="make_type"    />
+        <result property="workPrice"    column="work_price"    />
     </resultMap>
     <sql id="selectDevWorkOrderVo">
-        select id, workorder_name, workorder_number, company_id, line_id, product_name, product_code, product_number, production_start, production_end, start_time, end_time, product_standard_hour, create_time, create_by, update_time, device_liable, update_by, people_number, working_hour, overtime_hour,
-        overtime_race, manual_time, workorder_status, operation_status, init_date, work_sign, scrap_num, actual_warehouse_num,
-        cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign,
-         put_into_number,sign_time,sign_huor,abolish from dev_work_order
+        select id, workorder_name, workorder_number, company_id, line_id, product_name, product_code, product_number, production_start,
+         production_end, start_time, end_time, product_standard_hour, create_time, create_by, update_time, device_liable, update_by, people_number,
+          working_hour, overtime_hour,overtime_race, manual_time, workorder_status, operation_status, init_date, work_sign, scrap_num,
+          actual_warehouse_num,cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign,
+         put_into_number,sign_time,sign_huor,abolish,wl_sign,make_type,work_price from dev_work_order
     </sql>
 
     <select id="selectDevWorkOrderList" parameterType="DevWorkOrder" resultMap="DevWorkOrderResult">
@@ -118,7 +122,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="startTime != null  ">start_time,</if>
 			<if test="endTime != null  ">end_time,</if>
 			<if test="productStandardHour != null  ">product_standard_hour,</if>
-
 			<if test="createBy != null  and createBy != ''  ">create_by,</if>
 			<if test="updateTime != null  ">update_time,</if>
 			<if test="deviceLiable != null  ">device_liable,</if>
@@ -143,6 +146,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderCode != null  ">order_code,</if>
             <if test="ecnStatus != null  ">ecn_status,</if>
             <if test="ecnText != null  ">ecn_text,</if>
+            <if test="wlSign != null  ">wl_sign,</if>
+            <if test="makeType != null  ">make_type,</if>
+            <if test="workPrice != null  ">work_price,</if>
             create_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -158,7 +164,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="startTime != null  ">#{startTime},</if>
 			<if test="endTime != null  ">#{endTime},</if>
 			<if test="productStandardHour != null  ">#{productStandardHour},</if>
-
 			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
 			<if test="updateTime != null  ">#{updateTime},</if>
 			<if test="deviceLiable != null  ">#{deviceLiable},</if>
@@ -183,6 +188,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="orderCode != null  ">#{orderCode},</if>
             <if test="ecnStatus != null  ">#{ecnStatus},</if>
             <if test="ecnText != null  ">#{ecnText},</if>
+            <if test="wlSign != null  ">#{wlSign},</if>
+            <if test="makeType != null  ">#{makeType},</if>
+            <if test="workPrice != null  ">#{workPrice},</if>
             now()
          </trim>
     </insert>
@@ -229,6 +237,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="putIntoNumber != null  ">put_into_number =#{putIntoNumber},</if>
             <if test="signTime != null  ">sign_time =#{signTime},</if>
             <if test="signHuor != null  ">sign_huor =#{signHuor},</if>
+            <if test="wlSign != null  ">wl_sign =#{wlSign},</if>
+            <if test="makeType != null  ">make_type =#{makeType},</if>
+            <if test="workPrice != null  ">work_price =#{workPrice},</if>
             update_time = sysdate()
         </trim>
         where id = #{id}

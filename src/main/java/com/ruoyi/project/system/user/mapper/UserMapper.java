@@ -118,14 +118,6 @@ public interface UserMapper
     public int checkLoginNameUnique(String loginName);
 
     /**
-     * 校验手机号码是否唯一
-     *
-     * @param phonenumber 手机号码
-     * @return 结果
-     */
-    //public User checkPhoneUnique(String phonenumber);
-
-    /**
      * 校验email是否唯一
      *
      * @param email 用户邮箱

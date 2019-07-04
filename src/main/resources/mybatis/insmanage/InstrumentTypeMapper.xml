@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.insmanage.instrumentType.mapper.InstrumentTypeMapper">
+    
+    <resultMap type="InstrumentType" id="InstrumentTypeResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="inType"    column="in_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createId"    column="create_id"    />
+    </resultMap>
+	
+	<sql id="selectInstrumentTypeVo">
+        select id, company_id, in_type, create_time, create_id from tab_instrument_type
+    </sql>
+	
+    <select id="selectInstrumentTypeList" parameterType="InstrumentType" resultMap="InstrumentTypeResult">
+        <include refid="selectInstrumentTypeVo"/>
+        <where>  
+             <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="inType != null  and inType != '' ">
+                and in_type like concat ('%',#{inType},'%')
+              </if>
+             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                 AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+             </if>
+             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                 AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+             </if>
+             <if test="createId != null "> and create_id = #{createId}</if>
+         </where>
+    </select>
+    
+    <select id="selectInstrumentTypeById" parameterType="Integer" resultMap="InstrumentTypeResult">
+        <include refid="selectInstrumentTypeVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertInstrumentType" parameterType="InstrumentType" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_instrument_type
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="inType != null  and inType != ''  ">in_type,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="createId != null  ">create_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="inType != null  and inType != ''  ">#{inType},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="createId != null  ">#{createId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateInstrumentType" parameterType="InstrumentType">
+        update tab_instrument_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="inType != null  and inType != ''  ">in_type = #{inType},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createId != null  ">create_id = #{createId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteInstrumentTypeById" parameterType="Integer">
+        delete from tab_instrument_type where id = #{id}
+    </delete>
+	
+    <delete id="deleteInstrumentTypeByIds" parameterType="String">
+        delete from tab_instrument_type where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过设备类型名称查询设备类型信息-->
+    <select id="selectInstrumentTypeByName" resultMap="InstrumentTypeResult">
+        <include refid="selectInstrumentTypeVo"/>
+        where in_type = #{inType} and  company_id = #{companyId}
+    </select>
+    
+</mapper>

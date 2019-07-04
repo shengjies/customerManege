@@ -8,7 +8,6 @@ import com.ruoyi.common.feign.user.UserApi;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.DataScope;
 import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
 import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
@@ -382,22 +381,6 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
-     * 校验用户手机号是否唯一
-     *
-     * @param user 用户信息
-     * @return
-     */
-    //@Override
-    //public String checkPhoneUnique(User user) {
-    //    Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
-    //    User info = userMapper.checkPhoneUnique(user.getPhonenumber());
-    //    if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue()) {
-    //        return UserConstants.USER_PHONE_NOT_UNIQUE;
-    //    }
-    //    return UserConstants.USER_PHONE_UNIQUE;
-    //}
-
-    /**
      * 校验email是否唯一
      *
      * @param user 用户信息
@@ -527,7 +510,7 @@ public class UserServiceImpl implements IUserService {
         if (User.isAdmin(user.getUserId())) {
             throw new BusinessException("不允许修改超级管理员用户");
         }
-        if (JwtUtil.getTokenUser(request).getUserId() == user.getUserId()) { // 不能自己停用自己
+        if (JwtUtil.getTokenUser(request).getUserId() == user.getUserId()) {
             throw new BusinessException("不允许停用本人");
         }
         return userMapper.updateUser(user);

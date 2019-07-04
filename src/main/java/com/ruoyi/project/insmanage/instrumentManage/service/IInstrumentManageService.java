@@ -5,7 +5,6 @@ import com.ruoyi.project.system.user.domain.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.logging.Handler;
 
 /**
  * 仪器设备管理 服务层
@@ -62,4 +61,25 @@ public interface IInstrumentManageService
 	 * @return 结果
 	 */
 	int changeStatus(InstrumentManage instrumentManage, HttpServletRequest request);
+
+	/**
+	 * 校验设备编码唯一性
+	 * @param imCode 设备编号
+	 * @return 结果
+	 */
+    String checkImCodeUnique(String imCode);
+
+	/**
+	 * 导入仪器设备
+	 * @param imList 设备列表
+	 * @param updateSupport 是否更新原来的数据
+	 * @return 结果
+	 */
+    String importInstrumentManageList(List<InstrumentManage> imList, boolean updateSupport);
+
+	/**
+	 * 查询各公司所有配置过的设备信息
+	 * @return 结果
+	 */
+	public List<InstrumentManage> selectAllIm(Integer imTag);
 }

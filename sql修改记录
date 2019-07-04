@@ -238,7 +238,7 @@ ADD COLUMN `lock_number` INT NULL DEFAULT 0 COMMENT '产品库存锁定数量' A
 
 
 # ======================================= MRP功能模块 ====================================
-# 2019-06-24 服务器未执行sql
+# 2019-06-24 zqm 服务器未执行sql
 
 ALTER TABLE `octopus`.`tab_product_bom_details`
 ADD COLUMN `place_number` TEXT NULL COMMENT '位号' AFTER `create_time`,
@@ -310,7 +310,7 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COMMENT = 'MRP记录表';
 
-# 2019-06-25 服务器数据库未执行sql
+# 2019-06-25 zqm 服务器数据库未执行sql
 ALTER TABLE `octopus`.`tab_order_details`
 ADD COLUMN `tiao_number` INT NULL DEFAULT 0 COMMENT '调整数量' AFTER `mat_status`;
 ALTER TABLE `octopus`.`tab_order_details`
@@ -318,7 +318,7 @@ ADD COLUMN `mrp_status` INT NULL DEFAULT 0 COMMENT '是否已经生成mrp记录(
 ALTER TABLE `octopus`.`tab_product_bom`
 CHANGE COLUMN `bom_version` `bom_version` INT NOT NULL COMMENT 'bom版本号' ;
 
-# 2019-06-26 服务器数据库未执行sql
+# 2019-06-26 zqm 服务器数据库未执行sql
 ALTER TABLE `octopus`.`tab_mrp`
 ADD COLUMN `lock_mat_number` INT NULL DEFAULT 0 COMMENT '锁定的物料库存数量' AFTER `m_status`;
 ALTER TABLE `octopus`.`tab_mrp`
@@ -340,7 +340,7 @@ ALTER TABLE `octopus`.`tab_mrp_purchase`
 ADD COLUMN `pur_detail_id` INT NULL COMMENT '采购单详表id' AFTER `pur_id`,
 CHANGE COLUMN `pur_id` `pur_id` INT(11) NULL DEFAULT NULL COMMENT '采购单主表id' ;
 
-# 2019-06-27 服务器数据库未执行sql
+# 2019-06-27 zqm 服务器数据库未执行sql
 ALTER TABLE `octopus`.`tab_mrp_purchase`
 ADD COLUMN `del_number` INT NULL DEFAULT 0 COMMENT '对应mrp还差的数量' AFTER `pur_detail_id`,
 ADD COLUMN `tiao_number` INT NULL DEFAULT 0 COMMENT '对应mrp生成采购单调整的数量' AFTER `del_number`,
@@ -350,7 +350,7 @@ ADD COLUMN `total_number` INT NULL DEFAULT 0 COMMENT '对应mrp差的总数量(�
 ALTER TABLE `octopus`.`tab_mrp_purchase`
 ADD COLUMN `init_lock_mat_number` INT NULL DEFAULT 0 COMMENT 'mrp初始化时锁定库存数量' AFTER `lock_mat_number`;
 
-# 2019-06-28 服务器数据库未执行sql
+# 2019-06-28 zqm 服务器数据库未执行sql
 # 新增库存出入库MRP操作关联表
 CREATE TABLE `octopus`.`tab_erp_relation` (
   `id` INT NOT NULL AUTO_INCREMENT COMMENT '库存出入库MRP操作关联主键id',
@@ -379,6 +379,62 @@ ADD COLUMN `abolish` TINYINT(1) NULL DEFAULT 0 COMMENT '标记工单是否作废
 #添加工单变更状态
 ALTER TABLE `octopus`.`dev_work_order_change`
 ADD COLUMN `c_status` INT NULL DEFAULT 0 AFTER `remark`;
+
+# 设备管理新增设备了类型表单
+# 2019-07-02 zqm 服务器未执行sql
+CREATE TABLE `octopus`.`tab_instrument_type` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '设备类型主键id',
+  `company_id` INT NULL COMMENT '公司id',
+  `in_type` VARCHAR(45) NULL COMMENT '设备类型名称',
+  `create_time` DATETIME NULL COMMENT '创建时间',
+  `create_id` INT NULL COMMENT '创建者',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = '设备类型';
+
+ALTER TABLE `octopus`.`tab_instrument_manage`
+ADD COLUMN `in_type` INT NULL COMMENT '仪器设备的类型' AFTER `im_model`;
+
+# 新增单工位数据库表
+# 2019-07-03 zqm 服务器未执行sql
+CREATE TABLE `octopus`.`tab_single_work` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '单工位主键id',
+  `company_id` INT NULL COMMENT '公司主键id',
+  `workshop_name` VARCHAR(45) NULL COMMENT '车间名称',
+  `im_id` INT NULL COMMENT '设备主键id',
+  `sign` INT NULL DEFAULT 1 COMMENT '标记(0、车间 1、设备)',
+  `liable_one` INT NULL COMMENT '责任人1(如果是车间则是责任人，是设备则是员工)',
+  `liable_two` INT NULL,
+  `dev_id` INT NULL DEFAULT 0 COMMENT '硬件id(默认是0、未配置)',
+  `dev_code` VARCHAR(45) NULL COMMENT '硬件编号',
+  `c_time` DATETIME NULL,
+  `parent_id` INT NULL DEFAULT 0 COMMENT '上一级id(父id)',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = '单工位数据表';
+
+# 工单数据表新增字段，服务器未执行sql
+ALTER TABLE `octopus`.`dev_work_order`
+ADD COLUMN `wl_sign` INT NULL DEFAULT 0 COMMENT '工位是在车间还是在单工位生产标记(0、流水线默认值，1、单工位)' AFTER `abolish`,
+ADD COLUMN `make_type` INT NULL DEFAULT 0 COMMENT '工单生产类型(0、默认值生产的是成品，1、生产半成品)' AFTER `wl_sign`,
+ADD COLUMN `work_price` FLOAT(10,2) NULL DEFAULT 0.00 COMMENT '工单生产单价' AFTER `make_type`;
+
+# 新增工单单工位关联表，服务器未执行sql
+CREATE TABLE `octopus`.`tab_nect_work_single` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '工单单工位关联表主键id',
+  `work_id` INT NULL COMMENT '工单id',
+  `sw_id` INT NULL COMMENT '单工位主键id',
+  `c_time` DATETIME NULL COMMENT '配置时间',
+  PRIMARY KEY (`id`))
+COMMENT = '工单单工位关联表';
+
+# 新增设备标记状态
+ALTER TABLE `octopus`.`tab_instrument_manage`
+ADD COLUMN `im_tag` INT NULL DEFAULT 0 COMMENT '设备标记状态(0、未配置过，1、配置过了)' AFTER `create_time`;
+
+
 
 
 

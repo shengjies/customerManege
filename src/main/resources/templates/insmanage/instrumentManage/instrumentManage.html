@@ -19,6 +19,14 @@
 							</li>
 
 							<li>
+								设备类型：
+								<select id="inType" name="inType" th:with="allInsType=${@ins.selectAllInsType()}">
+									<option value="-1">全部</option>
+									<option th:each="insType:${allInsType}" th:utext="${insType.inType}" th:value="${insType.id}"></option>
+								</select>
+							</li>
+
+							<li>
 								使用部门：<input type="text" name="imDepartment"/>
 							</li>
 
@@ -59,6 +67,9 @@
 				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="insmanage:instrumentManage:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
+				<a class="btn btn-info" onclick="$.table.importExcel('importImListForm')" shiro:hasPermission="insmanage:instrumentManage:import">
+					<i class="fa fa-upload"></i> 导入
+				</a>
 				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="insmanage:instrumentManage:export">
 						<i class="fa fa-download"></i> 导出
 				 </a>
@@ -81,9 +92,15 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
+				importUrl: prefix + "/importData",
+				importTemplateUrl: prefix + "/importTemplate",
                 modalName: "仪器设备管理",
 				search: false,
-		        showExport: true,
+				showExport: false,
+				showSearch:true,
+				showRefresh:true,
+				showColumns:false,
+				showToggle:true,
                 columns: [{
 		            checkbox: true
 		        },
@@ -106,6 +123,14 @@
 					field : 'imModel', 
 					title : '仪器型号',
 					sortable: true
+				},
+				{
+					field : 'inType',
+					title : '设备类型',
+					sortable: true,
+					formatter:function (value,row,index) {
+						return row.inTypeName;
+					}
 				},
 				{
 					field : 'imDepartment', 
@@ -193,4 +218,16 @@
 
     </script>
 </body>
+<form id="importImListForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+	<div class="col-xs-offset-1">
+		<input type="file" id="file" name="file"/>
+		<div class="mt10 pt5">
+			<input type="checkbox" id="updateSupport" name="updateSupport" title="如果仪器设备编码已经存在，更新这条数据。"> 是否更新已经存在的产品数据，以仪器设备编码作为标识
+			&nbsp;	<a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> 下载模板</a>
+		</div>
+		<font color="red" class="pull-left mt10">
+			提示：仅允许导入“xls”或“xlsx”格式文件！
+		</font>
+	</div>
+</form>
 </html>
