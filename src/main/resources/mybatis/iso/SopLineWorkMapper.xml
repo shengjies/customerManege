@@ -13,10 +13,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pageId"    column="page_id"    />
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
+        <result property="sopTag"    column="sop_tag"    />
     </resultMap>
 	
 	<sql id="selectSopLineWorkVo">
-        select id, company_id, line_id, sop_id, w_id, page_id, c_id, c_time from tab_sop_line_work
+        select id, company_id, line_id, sop_id, w_id, page_id, c_id, c_time,sop_tag from tab_sop_line_work
     </sql>
 
     
@@ -35,6 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="pageId != null  ">page_id,</if>
 			<if test="cId != null  ">c_id,</if>
 			<if test="cTime != null  ">c_time,</if>
+            <if test="sopTag != null  ">sop_tag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -44,6 +46,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="pageId != null  ">#{pageId},</if>
 			<if test="cId != null  ">#{cId},</if>
 			<if test="cTime != null  ">#{cTime},</if>
+            <if test="sopTag != null  ">#{sopTag},</if>
          </trim>
     </insert>
 
@@ -64,6 +67,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--根据公司id 产线id SOP id 工位id查询对应工位配置的手册-->
     <select id="selectInfoByApi" resultMap="SopLineWorkResult">
       SELECT * FROM tab_sop_line_work where company_id = #{companyId} and line_id= #{lineId}
-       and sop_id = #{sopId} and w_id = #{wId} limit 1;
+       and sop_id = #{sopId} and w_id = #{wId} and sop_tag = #{sopTag} limit 1;
     </select>
 </mapper>

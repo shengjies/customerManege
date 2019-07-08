@@ -4,7 +4,6 @@ import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 作业指导书  产线 配置 服务层
@@ -61,7 +60,7 @@ public interface ISopLineService
 	 * @param sopId SOP id
 	 * @return
 	 */
-	List<SopLine> selectLineAllSopConfig(int companyId,int lineId,int sopId);
+	List<SopLine> selectLineAllSopConfig(int companyId,int lineId,int sopId,int sopTag);
 
 	/**
 	 * 根据公司id 产线id SOP id查询所以的工位配置信息
@@ -88,4 +87,22 @@ public interface ISopLineService
 	 * @return 结果
 	 */
 	List<SopLineWork> selectSopLineWorkListBySopId(Integer companyId, Integer isoId);
+
+	/**
+	 * 单工位SOP配置列表
+	 * @param sopLine sop信息
+	 * @return 结果
+	 */
+	List<SopLine> selectSopLineList2(SopLine sopLine);
+
+	/**
+	 * 查询对应单工位的工位配置信息
+	 * @param companyId 公司id
+	 * @param lineId 父id车间产线id
+	 * @param sopId sopid
+	 * @param wId 工位id
+	 * @param sopTag  sop生产配置标记
+	 * @return 结果
+	 */
+	SopLineWork selectInfoByApi(int companyId, int lineId, int sopId, int wId, int sopTag);
 }

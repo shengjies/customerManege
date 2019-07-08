@@ -16,4 +16,11 @@ public class DevConstants {
      * 硬件正在使用
      */
     public static final int DEV_BEING_USE = 2;
+
+    /**
+     * 硬件是否被配置sign标记
+     * 0、未配置，1、被配置
+     */
+    public static final int DEV_SIGN_NOT_USE = 0;
+    public static final int DEV_SIGN_USED = 1;
 }

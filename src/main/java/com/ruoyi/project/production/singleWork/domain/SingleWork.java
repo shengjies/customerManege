@@ -33,30 +33,19 @@ public class SingleWork extends BaseEntity
 	/** 责任人2 */
 	private Integer liableTwo;
 	private String liableTwoName;
-	/** 硬件id(默认是0、未配置) */
+	/** 计数器硬件信息硬件id(默认是0、未配置) */
 	private Integer devId;
-	/** 硬件编号 */
 	private String devCode;
-	/**  */
+	/** 看板硬件信息(默认是0、未配置)*/
+	private Integer watchId;
+	private String watchCode;
+	/** 扫码枪硬件信息(默认是0、未配置)*/
+	private Integer eId;
+	private String eCode;
+	/** 创建时间 */
 	private Date cTime;
 	/** 上一级id(父id) */
 	private Integer parentId;
-
-	public String getLiableTwoName() {
-		return liableTwoName;
-	}
-
-	public void setLiableTwoName(String liableTwoName) {
-		this.liableTwoName = liableTwoName;
-	}
-
-	public String getImCode() {
-		return imCode;
-	}
-
-	public void setImCode(String imCode) {
-		this.imCode = imCode;
-	}
 
 	public Integer getId() {
 		return id;
@@ -88,6 +77,14 @@ public class SingleWork extends BaseEntity
 
 	public void setImId(Integer imId) {
 		this.imId = imId;
+	}
+
+	public String getImCode() {
+		return imCode;
+	}
+
+	public void setImCode(String imCode) {
+		this.imCode = imCode;
 	}
 
 	public Integer getSign() {
@@ -122,6 +119,14 @@ public class SingleWork extends BaseEntity
 		this.liableTwo = liableTwo;
 	}
 
+	public String getLiableTwoName() {
+		return liableTwoName;
+	}
+
+	public void setLiableTwoName(String liableTwoName) {
+		this.liableTwoName = liableTwoName;
+	}
+
 	public Integer getDevId() {
 		return devId;
 	}
@@ -136,6 +141,38 @@ public class SingleWork extends BaseEntity
 
 	public void setDevCode(String devCode) {
 		this.devCode = devCode;
+	}
+
+	public Integer getWatchId() {
+		return watchId;
+	}
+
+	public void setWatchId(Integer watchId) {
+		this.watchId = watchId;
+	}
+
+	public String getWatchCode() {
+		return watchCode;
+	}
+
+	public void setWatchCode(String watchCode) {
+		this.watchCode = watchCode;
+	}
+
+	public Integer geteId() {
+		return eId;
+	}
+
+	public void seteId(Integer eId) {
+		this.eId = eId;
+	}
+
+	public String geteCode() {
+		return eCode;
+	}
+
+	public void seteCode(String eCode) {
+		this.eCode = eCode;
 	}
 
 	public Date getcTime() {
@@ -161,12 +198,18 @@ public class SingleWork extends BaseEntity
 				", companyId=" + companyId +
 				", workshopName='" + workshopName + '\'' +
 				", imId=" + imId +
+				", imCode='" + imCode + '\'' +
 				", sign=" + sign +
 				", liableOne=" + liableOne +
 				", liableOneName='" + liableOneName + '\'' +
 				", liableTwo=" + liableTwo +
+				", liableTwoName='" + liableTwoName + '\'' +
 				", devId=" + devId +
 				", devCode='" + devCode + '\'' +
+				", watchId=" + watchId +
+				", watchCode='" + watchCode + '\'' +
+				", eId=" + eId +
+				", eCode='" + eCode + '\'' +
 				", cTime=" + cTime +
 				", parentId=" + parentId +
 				'}';

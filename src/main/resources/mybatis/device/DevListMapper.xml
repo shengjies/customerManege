@@ -180,4 +180,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and def_id = 0  and sign = 0 and device_status = 1
         </where>
     </select>
+
+    <!--通过硬件id更新硬件是否被配置状态-->
+    <update id="updateDevBySign">
+        update dev_list set sign = #{sign} where id = #{id} and company_id = #{companyId}
+    </update>
 </mapper>

@@ -53,10 +53,11 @@ public interface SopLineMapper
 	 * @param companyId 公司id
 	 * @param lineId 产线id
 	 * @param sopId SOP id
-	 * @return
+	 * @param sopTag sop配置标记流水线或者单工位
+	 * @return 结果
 	 */
 	List<SopLine> selectLineAllSopConfig(@Param("companyId") int companyId,@Param("lineId") int lineId,
-										 @Param("sopId") int sopId);
+										 @Param("sopId") int sopId,@Param("sopTag") int sopTag);
 
 	/**
 	 * 通过作业指导书id查询产线配置列表信息
@@ -76,4 +77,11 @@ public interface SopLineMapper
 	SopLine selectSopByCompanyAndLineAndCode(@Param("companyId") int companyId,@Param("lineId") int lineId,
                                              @Param("code")String code);
 
+
+	/**
+	 * 单工位SOP配置列表
+	 * @param sopLine sop信息
+	 * @return 结果
+	 */
+	List<SopLine> selectSopLineList2(SopLine sopLine);
 }

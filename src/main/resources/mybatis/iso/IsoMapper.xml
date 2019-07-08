@@ -151,6 +151,6 @@
     <!--根据父id和产线id查询对应产线所以未配置的SOP指导书-->
     <select id="selectNotConfigByPidAndLineId" resultMap="IsoResult">
          SELECT i.iso_id,i.c_name,i.i_type FROM tab_iso as i left join
-         (select * from tab_sop_line where  line_id = #{lineId}) as l on i.iso_id = l.sop_id where i.parent_id = #{pid} and l.sop_id is null;
+         (select * from tab_sop_line where  line_id = #{lineId} and sop_tag = #{sopTag}) as l on i.iso_id = l.sop_id where i.parent_id = #{pid} and l.sop_id is null;
     </select>
 </mapper>

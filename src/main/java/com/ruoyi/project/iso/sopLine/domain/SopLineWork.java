@@ -1,8 +1,7 @@
 package com.ruoyi.project.iso.sopLine.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -31,6 +30,18 @@ public class SopLineWork extends BaseEntity
 	private Integer cId;
 	/** 修改时间 */
 	private Date cTime;
+	/**
+	 * sop配置标记(默认0、流水线，1、车间单工位)
+	 */
+	private Integer sopTag;
+
+	public Integer getSopTag() {
+		return sopTag;
+	}
+
+	public void setSopTag(Integer sopTag) {
+		this.sopTag = sopTag;
+	}
 
 	public Integer getId() {
 		return id;
@@ -107,6 +118,7 @@ public class SopLineWork extends BaseEntity
 				", pageId=" + pageId +
 				", cId=" + cId +
 				", cTime=" + cTime +
+				", sopTag=" + sopTag +
 				'}';
 	}
 }

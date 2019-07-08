@@ -1,7 +1,5 @@
 package com.ruoyi.project.product.list.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import org.apache.ibatis.annotations.Param;
 
@@ -145,9 +143,10 @@ public interface DevProductListMapper {
     /**
      * 根据产线id查询所以未配置的产品信息
      * @param lineId 产线id
-     * @return
+     * @param sopTag sop配置标记流水线或者车间
+     * @return 结果
      */
-    List<DevProductList> selectNotConfigByLineId(@Param("lineId")int lineId,@Param("companyid")int companyid);
+    List<DevProductList> selectNotConfigByLineId(@Param("lineId")int lineId,@Param("companyid")int companyid,@Param("sopTag") int sopTag);
 
     /**
      * 根据作业指导书id查询所有配置的产品信息

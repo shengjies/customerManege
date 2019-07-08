@@ -1,7 +1,5 @@
 package com.ruoyi.project.iso.sopLine.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
 import java.util.Arrays;
@@ -26,6 +24,10 @@ public class SopLine extends BaseEntity
 	private Integer sopId;
 	/** 产线id */
 	private Integer lineId;
+	/**
+	 * 设备编码
+	 */
+	private String imName;
 	/** 产品id */
 	private Integer pnId;
 	/** 产品编码 */
@@ -34,11 +36,31 @@ public class SopLine extends BaseEntity
 	private Integer cId;
 	/** 修改时间 */
 	private Date cTime;
+	/**
+	 * sop配置标记(默认0、流水线，1、单工位)
+	 */
+	private Integer sopTag;
 
 	private Integer[] pns;//产品编码
 	private List<SopLineWork> sopLineWorks;//工位配置
 	private String lineName;//产线名称
 	private String sopName;//SOP名称
+
+	public String getImName() {
+		return imName;
+	}
+
+	public void setImName(String imName) {
+		this.imName = imName;
+	}
+
+	public Integer getSopTag() {
+		return sopTag;
+	}
+
+	public void setSopTag(Integer sopTag) {
+		this.sopTag = sopTag;
+	}
 
 	public Integer getId() {
 		return id;
@@ -147,8 +169,11 @@ public class SopLine extends BaseEntity
 				", pnCode='" + pnCode + '\'' +
 				", cId=" + cId +
 				", cTime=" + cTime +
+				", sopTag=" + sopTag +
 				", pns=" + Arrays.toString(pns) +
 				", sopLineWorks=" + sopLineWorks +
+				", lineName='" + lineName + '\'' +
+				", sopName='" + sopName + '\'' +
 				'}';
 	}
 }

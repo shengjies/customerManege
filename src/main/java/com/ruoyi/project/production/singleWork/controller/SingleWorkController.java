@@ -19,148 +19,172 @@ import java.util.List;
 
 /**
  * 单工位数据 信息操作处理
- * 
+ *
  * @author sj
  * @date 2019-07-03
  */
 @Controller
 @RequestMapping("/production/singleWork")
-public class SingleWorkController extends BaseController
-{
+public class SingleWorkController extends BaseController {
     private String prefix = "production/singleWork";
-	
-	@Autowired
-	private ISingleWorkService singleWorkService;
-	
-	@RequiresPermissions("production:singleWork:view")
-	@GetMapping()
-	public String singleWork()
-	{
-	    return prefix + "/singleWork";
-	}
-	
-	/**
-	 * 查询单工位数据列表
-	 */
-	@RequiresPermissions("production:singleWork:list")
-	@PostMapping("/list")
-	@ResponseBody
-	public TableDataInfo list(SingleWork singleWork)
-	{
-		startPage();
+
+    @Autowired
+    private ISingleWorkService singleWorkService;
+
+    @RequiresPermissions("production:singleWork:view")
+    @GetMapping()
+    public String singleWork() {
+        return prefix + "/singleWork";
+    }
+
+    /**
+     * 查询单工位数据列表
+     */
+    @RequiresPermissions("production:singleWork:list")
+    @PostMapping("/list")
+    @ResponseBody
+    public TableDataInfo list(SingleWork singleWork) {
+        startPage();
         List<SingleWork> list = singleWorkService.selectSingleWorkList(singleWork);
-		return getDataTable(list);
-	}
-	
-	
-	/**
-	 * 导出单工位数据列表
-	 */
-	@RequiresPermissions("production:singleWork:export")
+        return getDataTable(list);
+    }
+
+
+    /**
+     * 导出单工位数据列表
+     */
+    @RequiresPermissions("production:singleWork:export")
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(SingleWork singleWork)
-    {
-    	List<SingleWork> list = singleWorkService.selectSingleWorkList(singleWork);
+    public AjaxResult export(SingleWork singleWork) {
+        List<SingleWork> list = singleWorkService.selectSingleWorkList(singleWork);
         ExcelUtil<SingleWork> util = new ExcelUtil<SingleWork>(SingleWork.class);
         return util.exportExcel(list, "singleWork");
     }
-	
-	/**
-	 * 新建车间
-	 */
-	@GetMapping("/add")
-	public String add()
-	{
-	    return prefix + "/add";
-	}
 
-	/**
-	 * 新增设备
-	 */
-	@GetMapping("/addIm/{id}")
-	public String addIm(@PathVariable("id") Integer parentId, ModelMap mmap)
-	{
-		mmap.put("parentId", parentId);
-		return prefix + "/addIm";
-	}
+    /**
+     * 新建车间
+     */
+    @GetMapping("/add")
+    public String add() {
+        return prefix + "/add";
+    }
+
+    /**
+     * 新增设备
+     */
+    @GetMapping("/addIm/{id}")
+    public String addIm(@PathVariable("id") Integer parentId, ModelMap mmap) {
+        mmap.put("parentId", parentId);
+        return prefix + "/addIm";
+    }
 
 
-	
-	/**
-	 * 新增保存单工位数据
-	 */
-	@RequiresPermissions("production:singleWork:add")
-	@Log(title = "单工位数据", businessType = BusinessType.INSERT)
-	@PostMapping("/add")
-	@ResponseBody
-	public AjaxResult addSave(SingleWork singleWork)
-	{
-		try {
-			return toAjax(singleWorkService.insertSingleWork(singleWork));
-		} catch (BusinessException e) {
-			return error(e.getMessage());
-		}
-	}
+    /**
+     * 新增保存单工位数据
+     */
+    @RequiresPermissions("production:singleWork:add")
+    @Log(title = "单工位数据", businessType = BusinessType.INSERT)
+    @PostMapping("/add")
+    @ResponseBody
+    public AjaxResult addSave(SingleWork singleWork) {
+        try {
+            return toAjax(singleWorkService.insertSingleWork(singleWork));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
+    }
 
-	/**
-	 * 修改车间数据
-	 */
-	@GetMapping("/edit/{id}")
-	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
-	{
-		SingleWork singleWork = singleWorkService.selectSingleWorkById(id);
-		mmap.put("singleWork", singleWork);
-		return prefix + "/edit";
-	}
+    /**
+     * 修改车间数据
+     */
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable("id") Integer id, ModelMap mmap) {
+        SingleWork singleWork = singleWorkService.selectSingleWorkById(id);
+        mmap.put("singleWork", singleWork);
+        return prefix + "/edit";
+    }
 
 
-	/**
-	 * 修改单工位信息
-	 */
-	@GetMapping("/editIm/{id}")
-	public String editIm(@PathVariable("id") Integer id, ModelMap mmap)
-	{
-		SingleWork singleWork = singleWorkService.selectSingleWorkById(id);
-		mmap.put("singleWork", singleWork);
-		return prefix + "/editIm";
-	}
-	
-	/**
-	 * 修改保存单工位数据
-	 */
-	@RequiresPermissions("production:singleWork:edit")
-	@Log(title = "单工位数据", businessType = BusinessType.UPDATE)
-	@PostMapping("/edit")
-	@ResponseBody
-	public AjaxResult editSave(SingleWork singleWork)
-	{		
-		return toAjax(singleWorkService.updateSingleWork(singleWork));
-	}
-	
-	/**
-	 * 删除单工位数据
-	 */
-	@RequiresPermissions("production:singleWork:remove")
-	@Log(title = "单工位数据", businessType = BusinessType.DELETE)
-	@PostMapping( "/remove")
-	@ResponseBody
-	public AjaxResult remove(String ids)
-	{
-		try {
-			return toAjax(singleWorkService.deleteSingleWorkByIds(ids));
-		} catch (BusinessException e) {
-			return error(e.getMessage());
-		}
-	}
+    /**
+     * 修改单工位信息
+     */
+    @GetMapping("/editIm/{id}")
+    public String editIm(@PathVariable("id") Integer id, ModelMap mmap) {
+        SingleWork singleWork = singleWorkService.selectSingleWorkById(id);
+        mmap.put("singleWork", singleWork);
+        return prefix + "/editIm";
+    }
 
-	/**
-	 * 校验车间名称的唯一性
-	 */
-	@PostMapping("/checkNameUnique")
-	@ResponseBody
-	public String checkNameUnique(SingleWork singleWork){
-		return singleWorkService.checkNameUnique(singleWork);
-	}
-	
+    /**
+     * 修改保存单工位数据
+     */
+    @RequiresPermissions("production:singleWork:edit")
+    @Log(title = "单工位数据", businessType = BusinessType.UPDATE)
+    @PostMapping("/edit")
+    @ResponseBody
+    public AjaxResult editSave(SingleWork singleWork) {
+        return toAjax(singleWorkService.updateSingleWork(singleWork));
+    }
+
+    /**
+     * 删除单工位数据
+     */
+    @RequiresPermissions("production:singleWork:remove")
+    @Log(title = "单工位数据", businessType = BusinessType.DELETE)
+    @PostMapping("/remove")
+    @ResponseBody
+    public AjaxResult remove(String ids) {
+        try {
+            return toAjax(singleWorkService.deleteSingleWorkByIds(ids));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    /**
+     * 校验车间名称的唯一性
+     */
+    @PostMapping("/checkNameUnique")
+    @ResponseBody
+    public String checkNameUnique(SingleWork singleWork) {
+        return singleWorkService.checkNameUnique(singleWork);
+    }
+
+    /**
+     * 跳转单工位设备硬件配置
+     */
+    @GetMapping("/configDev")
+    @RequiresPermissions("production:singleWork:configDev")
+    public String configDev(Integer id, ModelMap modelMap) {
+        SingleWork singleWork = singleWorkService.selectSingleWorkById(id);
+        modelMap.put("singleWork", singleWork);
+        return prefix + "/configDev";
+    }
+
+    /**
+     * 单工位设备配置保存硬件信息
+     */
+    @PostMapping("/saveConfigDev")
+    @RequiresPermissions("production:singleWork:configDev")
+    @ResponseBody
+    public AjaxResult saveConfigDev(SingleWork singleWork) {
+        try {
+            return toAjax(singleWorkService.saveConfigDev(singleWork));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    /**
+     * 跳转单工位配置SOP页面
+     */
+    @GetMapping("/configSop")
+    @RequiresPermissions("production:singleWork:configSop")
+    public String configSop(Integer parentId, Integer id, ModelMap modelMap) {
+        modelMap.put("parentId",parentId);
+        modelMap.put("id",id);
+        return prefix + "/configSop";
+    }
+
 }

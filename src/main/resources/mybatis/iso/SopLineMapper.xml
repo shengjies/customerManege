@@ -13,6 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pnCode"    column="pn_code"    />
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
+        <result property="sopTag"    column="sop_tag"    />
         <association property="lineName" column="line_id" select="selectLineName">
             <result property="lineName" column="line_name"/>
         </association>
@@ -39,9 +40,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectSopLineVo">
-        select id, company_id, sop_id, line_id, pn_id, pn_code, c_id, c_time from tab_sop_line
+        select id, company_id, sop_id, line_id, pn_id, pn_code, c_id, c_time,sop_tag from tab_sop_line
     </sql>
-	
+
+    <!--流水线SOP配置列表-->
     <select id="selectSopLineList" parameterType="SopLine" resultMap="SopLineResult">
         SELECT
             `sop_id`,
@@ -49,12 +51,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           GROUP_CONCAT(pn_code) AS pn_code
         FROM
             tab_sop_line
-        <where>
+        where sop_tag = 0
             <if test="sopId != null and sopId > 0 "> and sop_id = #{sopId}</if>
             <if test="lineId != null and lineId > 0 "> and line_id = #{lineId}</if>
             <if test="pnCode != null  and pnCode != '' "> and pn_code like concat('%', #{pnCode}, '%')</if>
-        </where>
-          GROUP BY
+        GROUP BY
+        `sop_id`,
+        `line_id`
+    </select>
+
+    <!--车间单工位SOP配置列表-->
+    <select id="selectSopLineList2" parameterType="SopLine" resultMap="SopLineResult">
+        SELECT
+        `sop_id`,
+        `line_id`,
+        GROUP_CONCAT(pn_code) AS pn_code
+        FROM
+        tab_sop_line
+        where sop_tag = 1
+          <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
+          <if test="lineId != null and lineId > 0 "> and line_id = #{lineId}</if>
+        GROUP BY
         `sop_id`,
         `line_id`
     </select>
@@ -82,6 +99,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="pnCode != null  and pnCode != ''  ">pn_code,</if>
 			<if test="cId != null  ">c_id,</if>
 			<if test="cTime != null  ">c_time,</if>
+            <if test="sopTag != null  ">sop_tag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -91,6 +109,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="pnCode != null  and pnCode != ''  ">#{pnCode},</if>
 			<if test="cId != null  ">#{cId},</if>
 			<if test="cTime != null  ">#{cTime},</if>
+            <if test="sopTag != null  ">#{sopTag},</if>
          </trim>
     </insert>
 
@@ -101,7 +120,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--根据公司id 产线id SOP id查询所以的产线SOP 配置细心-->
     <select id="selectLineAllSopConfig" resultMap="SopLineResult1">
-      SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
+      SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId} and sop_tag = #{sopTag};
     </select>
 
     <!--根据公司id 产线id 产品编号查询对应SOP 配置-->

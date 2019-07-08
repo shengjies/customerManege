@@ -57,4 +57,11 @@ public interface ISingleWorkService
 	 * @return 结果
 	 */
     String checkNameUnique(SingleWork singleWork);
+
+	/**
+	 * 单工位硬件配置
+	 * @param singleWork 单工位信息
+	 * @return 结果
+	 */
+	int saveConfigDev(SingleWork singleWork);
 }

@@ -113,4 +113,12 @@ public interface DevListMapper
 	 */
 	List<DevList> selectDevNotConfig();
 
+	/**
+	 * 通过硬件id更新是否被配置标记状态
+	 * @param companyId 公司id
+	 * @param id 硬件id
+	 * @param sign 是否被配置标记
+	 * @return 结果
+	 */
+	int updateDevBySign(@Param("companyId") Integer companyId,@Param("id") Integer id, @Param("sign") int sign);
 }

@@ -255,11 +255,12 @@ public class IsoServiceImpl implements IIsoService {
      *
      * @param pid    父id
      * @param lineId 产线id
+     * @param sopTag sop配置标记状态流水线或者车间
      * @return
      */
     @Override
-    public List<Iso> selectNotConfigByPidAndLineId(Integer pid, Integer lineId) {
-        return isoMapper.selectNotConfigByPidAndLineId(pid, lineId);
+    public List<Iso> selectNotConfigByPidAndLineId(Integer pid, Integer lineId,Integer sopTag) {
+        return isoMapper.selectNotConfigByPidAndLineId(pid, lineId,sopTag);
     }
 
     /**
@@ -338,7 +339,7 @@ public class IsoServiceImpl implements IIsoService {
         SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(), line.getId(), workOrder.getProductCode());
         if (sopLine == null) throw new Exception("没有配置SOP");
         //查询对应的指导书页
-        SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(workstation.getCompanyId(), line.getId(), sopLine.getSopId(), workstation.getId());
+        SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(workstation.getCompanyId(), line.getId(), sopLine.getSopId(), workstation.getId(),FileConstants.SOP_TAG_LINE);
         if (sopLineWork == null) throw new Exception("产线没有配置SOP");
         //查询对应SOP
         Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
@@ -362,5 +363,10 @@ public class IsoServiceImpl implements IIsoService {
         sopApi.setIsoPath(iso.getPath());
         map.put("data",sopApi);
         return map;
+    }
+
+    @Override
+    public List<Iso> selectNotConfigBySwId(int parentId, int lineId) {
+        return null;
     }
 }

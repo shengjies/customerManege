@@ -1,16 +1,9 @@
 package com.ruoyi.project.product.list.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
@@ -28,10 +21,14 @@ import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 产品管理 服务层实现
@@ -435,11 +432,12 @@ public class DevProductListServiceImpl implements IDevProductListService {
     /**
      * 根据产线id查询所以未配置的产品信息
      * @param lineId 产线id
+     * @param sopTag sop配置标记
      * @return
      */
     @Override
-    public List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid) {
-        return devProductListMapper.selectNotConfigByLineId(lineId,companyid);
+    public List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid,Integer sopTag) {
+        return devProductListMapper.selectNotConfigByLineId(lineId,companyid,sopTag);
     }
 
     /**

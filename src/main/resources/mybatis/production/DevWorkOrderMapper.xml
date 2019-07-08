@@ -371,4 +371,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateWorkOrderAbolish">
         update dev_work_order set abolish = 1 where id = #{workId}
     </update>
+
+    <!--通过工单下发标记查询对应的所有工单列表-->
+    <select id="selectWorkListInSw" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as id,workorder_number as workorderNumber FROM dev_work_order where company_id = #{companyId} and wl_sign = #{wlSign} order by create_time desc
+    </select>
 </mapper>

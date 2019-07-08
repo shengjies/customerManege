@@ -14,6 +14,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="liableTwo"    column="liable_two"    />
         <result property="devId"    column="dev_id"    />
         <result property="devCode"    column="dev_code"    />
+        <result property="watchId"    column="watch_id"    />
+        <result property="watchCode"    column="watch_code"    />
+        <result property="eId"    column="e_id"    />
+        <result property="eCode"    column="e_code"    />
         <result property="cTime"    column="c_time"    />
         <result property="parentId"    column="parent_id"    />
         <association property="liableOneName" column="liable_one" select="selectOneName">
@@ -28,7 +32,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectSingleWorkVo">
-        select id, company_id, workshop_name, im_id, sign, liable_one, liable_two, dev_id, dev_code, c_time, parent_id from tab_single_work
+        select id, company_id, workshop_name, im_id, sign, liable_one, liable_two, dev_id, dev_code, c_time, parent_id,
+         watch_id,watch_code,e_id,e_code from tab_single_work
     </sql>
 	
     <select id="selectSingleWorkList" parameterType="SingleWork" resultMap="SingleWorkResult">
@@ -36,12 +41,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="id != null "> and id = #{id}</if>
              <if test="companyId != null "> and company_id = #{companyId}</if>
-             <if test="workshopName != null  and workshopName != '' "> and workshop_name = #{workshopName}</if>
+             <if test="workshopName != null  and workshopName != '' ">
+                and workshop_name like concat('%',#{workshopName},'%')
+              </if>
              <if test="imId != null and imId != -1"> and im_id = #{imId}</if>
              <if test="sign != null "> and sign = #{sign}</if>
              <if test="liableOne != null and liableOne != -1"> and liable_one = #{liableOne}</if>
              <if test="liableTwo != null "> and liable_two = #{liableTwo}</if>
-             <if test="devId != null and devId != -1 "> and dev_id = #{devId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
              <if test="devCode != null  and devCode != '' "> and dev_code = #{devCode}</if>
              <if test="cTime != null "> and c_time = #{cTime}</if>
              <if test="parentId != null "> and parent_id = #{parentId}</if>
@@ -77,6 +84,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="liableTwo != null  ">liable_two,</if>
 			<if test="devId != null  ">dev_id,</if>
 			<if test="devCode != null  and devCode != ''  ">dev_code,</if>
+            <if test="watchId != null  ">watch_id,</if>
+            <if test="watchCode != null  and watchCode != ''  ">watch_code,</if>
+            <if test="eId != null  ">e_id,</if>
+            <if test="eCode != null  and eCode != ''  ">e_code,</if>
 			<if test="cTime != null  ">c_time,</if>
 			<if test="parentId != null  ">parent_id,</if>
          </trim>
@@ -89,6 +100,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="liableTwo != null  ">#{liableTwo},</if>
 			<if test="devId != null  ">#{devId},</if>
 			<if test="devCode != null  and devCode != ''  ">#{devCode},</if>
+            <if test="watchId != null  ">#{watchId},</if>
+            <if test="watchCode != null  and watchCode != ''  ">#{watchCode},</if>
+            <if test="eId != null  ">#{eId},</if>
+            <if test="eCode != null  and eCode != ''  ">#{eCode},</if>
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="parentId != null  ">#{parentId},</if>
          </trim>
@@ -105,6 +120,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="liableTwo != null  ">liable_two = #{liableTwo},</if>
             <if test="devId != null  ">dev_id = #{devId},</if>
             <if test="devCode != null  and devCode != ''  ">dev_code = #{devCode},</if>
+            <if test="watchId != null  ">watch_id = #{watchId},</if>
+            <if test="watchCode != null  and watchCode != ''  ">watch_code = #{watchCode},</if>
+            <if test="eId != null  ">e_id = #{eId},</if>
+            <if test="eCode != null  and eCode != ''  ">e_code = #{eCode},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="parentId != null  ">parent_id = #{parentId},</if>
         </trim>

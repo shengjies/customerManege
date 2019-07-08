@@ -162,4 +162,11 @@ public interface IDevWorkOrderService {
      * @throws Exception
      */
     int workDismantleInfo(List<DevWorkOrder> orders) throws Exception;
+
+    /**
+     * 查询所有下到车间的工单信息
+     * @param wlSign 工单车间流水线标记状态
+     * @return 结果
+     */
+    public List<DevWorkOrder> selectWorkListInSw(Integer wlSign);
 }

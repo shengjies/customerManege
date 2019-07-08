@@ -1,27 +1,21 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
-import java.math.BigDecimal;
-import java.util.*;
-
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.device.devIo.domain.DevIo;
-import com.ruoyi.project.device.devIo.mapper.DevIoMapper;
-import com.ruoyi.project.device.devList.domain.DevList;
-import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.devWorkData.domain.DevWorkData;
 import com.ruoyi.project.production.devWorkData.mapper.DevWorkDataMapper;
+import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -38,14 +32,13 @@ import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
-import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
-import com.ruoyi.common.support.Convert;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 工单 服务层实现
@@ -835,5 +828,18 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             }
         }
         return 0;
+    }
+
+    /**
+     * 查询所有下到车间的工单信息
+     * @return 结果
+     */
+    @Override
+    public List<DevWorkOrder> selectWorkListInSw(Integer wlSign) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return devWorkOrderMapper.selectWorkListInSw(user.getCompanyId(),wlSign);
     }
 }

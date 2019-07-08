@@ -434,6 +434,48 @@ COMMENT = '工单单工位关联表';
 ALTER TABLE `octopus`.`tab_instrument_manage`
 ADD COLUMN `im_tag` INT NULL DEFAULT 0 COMMENT '设备标记状态(0、未配置过，1、配置过了)' AFTER `create_time`;
 
+# 2019-07-04 zqm 服务器未执行sql
+# 新增我的计件数据表
+CREATE TABLE `octopus`.`tab_count_piece` (
+  `cp_id` INT NOT NULL AUTO_INCREMENT COMMENT '计件管理主键id',
+  `cp_user_id` INT NULL COMMENT '计件记录归属人',
+  `cp_date` DATE NULL COMMENT '计件日期',
+  `work_id` INT NULL COMMENT '工单id',
+  `work_number` VARCHAR(45) NULL COMMENT '工单号',
+  `work_price` FLOAT(10,2) NULL DEFAULT 0.00 COMMENT '工价',
+  `cp_number` INT NULL DEFAULT 0 COMMENT '计件数量',
+  `total_price` FLOAT(10,2) NULL DEFAULT 0.00 COMMENT '总价((计件数量-不良品数量)*工价)',
+  `cp_bad_number` INT NULL DEFAULT 0 COMMENT '不良品',
+  `cp_remark` TEXT NULL COMMENT '备注',
+  `cp_last_update` DATETIME NULL COMMENT '最后修改时间',
+  `cp_last_id` INT NULL COMMENT '最后修改人',
+  PRIMARY KEY (`cp_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = '计件管理数据表';
+ALTER TABLE `octopus`.`tab_count_piece`
+ADD COLUMN `company_id` INT NULL COMMENT '公司id' AFTER `cp_id`;
+
+# 2019-07-05 zqm 服务器未执行sql
+# 单工位新增看板扫码枪硬件字段
+ALTER TABLE `octopus`.`tab_single_work`
+ADD COLUMN `watch_id` INT NULL DEFAULT 0 COMMENT '看板硬件id' AFTER `dev_code`,
+ADD COLUMN `watch_code` VARCHAR(45) NULL COMMENT '看板硬件编码' AFTER `watch_id`,
+ADD COLUMN `e_id` INT NULL DEFAULT 0 COMMENT '扫码枪硬件id' AFTER `watch_code`,
+ADD COLUMN `e_code` VARCHAR(45) NULL COMMENT '扫码枪硬件编码' AFTER `e_id`,
+CHANGE COLUMN `dev_id` `dev_id` INT(11) NULL DEFAULT '0' COMMENT '计数器id(默认是0、未配置)' ,
+CHANGE COLUMN `dev_code` `dev_code` VARCHAR(45) NULL DEFAULT NULL COMMENT '计数器硬件编号' ;
+
+# 单工位配置SOP
+ALTER TABLE `octopus`.`tab_sop_line`
+ADD COLUMN `sop_tag` INT NULL DEFAULT 0 COMMENT 'sop配置标记(默认0、流水线，1、单工位)' AFTER `c_time`,
+CHANGE COLUMN `line_id` `line_id` INT(11) NULL DEFAULT NULL COMMENT '产线id/单工位id' ;
+
+ALTER TABLE `octopus`.`tab_sop_line_work`
+ADD COLUMN `sop_tag` INT NULL DEFAULT 0 COMMENT 'sop配置标记(默认0、流水线，1、车间单工位)' AFTER `c_time`,
+CHANGE COLUMN `line_id` `line_id` INT(11) NULL DEFAULT NULL COMMENT '产线id/车间id' ,
+CHANGE COLUMN `w_id` `w_id` INT(11) NULL DEFAULT NULL COMMENT '工位id/单工位id' ;
+
 
 
 

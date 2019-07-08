@@ -1,11 +1,8 @@
 package com.ruoyi.project.production.devWorkOrder.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -223,4 +220,12 @@ public interface DevWorkOrderMapper {
      * @return
      */
     int updateWorkOrderAbolish(@Param("workId")int workId);
+
+    /**
+     * 通过工单下发车间或流水线状态查询对应的所有工单信息
+     * @param companyId 公司id
+     * @param wlSign 工单车间流水标记
+     * @return 结果
+     */
+    List<DevWorkOrder> selectWorkListInSw(@Param("companyId") Integer companyId,@Param("wlSign")Integer wlSign);
 }

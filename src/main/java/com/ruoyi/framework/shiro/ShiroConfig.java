@@ -1,6 +1,7 @@
 package com.ruoyi.framework.shiro;
 
 
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import com.ruoyi.framework.jwt.filter.JwtFilter;
 import com.ruoyi.framework.shiro.realm.UserRealm;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
@@ -101,5 +102,14 @@ public class ShiroConfig {
         AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();
         advisor.setSecurityManager(securityManager);
         return advisor;
+    }
+
+    /**
+     * thymeleaf模板引擎和shiro框架的整合
+     */
+    @Bean
+    public ShiroDialect shiroDialect()
+    {
+        return new ShiroDialect();
     }
 }

@@ -72,9 +72,10 @@ public interface IsoMapper {
 	 * 根据父id和产线id查询对应产线所以未配置的SOP指导书
 	 * @param pid 父id
 	 * @param lineId 产线id
+     * @param sopTag sop配置标记状态流水线或者车间
 	 * @return
 	 */
-	List<Iso> selectNotConfigByPidAndLineId(@Param("pid")int pid,@Param("lineId")int lineId);
+	List<Iso> selectNotConfigByPidAndLineId(@Param("pid")int pid,@Param("lineId")int lineId,@Param("sopTag") int sopTag);
 
 	/**
 	 * 根据祖父id查询对应的子目录 注册生成文件夹

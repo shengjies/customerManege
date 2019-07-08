@@ -1,7 +1,7 @@
 package com.ruoyi.common.constant;
 
 /**
- * 文件常量信息
+ * 文件体系ISO常量信息
  * @ProjectName deviceManage
  * @PackageName com.ruoyi.common.constant
  * @Author: Administrator
@@ -44,5 +44,12 @@ public class FileConstants {
      * 作业指导书 7
      */
     public static final Integer FOLDER_SOP = 7;
+
+    /**
+     * 作业指导书sop配置标记
+     * 默认0、流水线配置，1、车间单工位配置
+     */
+    public static final Integer SOP_TAG_LINE = 0;
+    public static final Integer SOP_TAG_SINGWORK = 1;
 
 }

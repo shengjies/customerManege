@@ -138,7 +138,7 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 		Integer[] ims = Convert.toIntArray(ids);
 		InstrumentManage instrumentManage;
 		int failureNum = 0;
-		StringBuffer failureMsg = new StringBuffer();
+		StringBuilder failureMsg = new StringBuilder();
 		for (Integer id : ims) {
 			instrumentManage = instrumentManageMapper.selectInstrumentManageById(id);
 			if (StringUtils.isNotNull(instrumentManage) && instrumentManage.getImTag().equals(InstrumentConstants.IM_TAG_USED)) {

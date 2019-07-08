@@ -26,19 +26,6 @@
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">硬件编码：</label>
-            <div class="col-sm-8">
-                <select style="width: 100%" id="devId" class="form-control"
-                        name="devId"
-                        th:with="devList = ${@devList.selectDevNotConfig()}">
-                    <option th:if="${singleWork.devId != null and singleWork.devId != 0}"  th:text="${singleWork.devCode}"
-                            th:value="${singleWork.devId}"></option>
-                    <option th:each="item : ${devList}"  th:text="${item.deviceId}" th:field="*{devId}"
-                            th:value="${item.id}"></option>
-                </select>
-            </div>
-        </div>
     </form>
 </div>
 <div th:include="include::footer"></div>

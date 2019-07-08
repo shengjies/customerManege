@@ -135,9 +135,10 @@ public interface IDevProductListService
 	/**
 	 * 根据产线id查询所以未配置的产品信息
 	 * @param lineId 产线id
+	 * @param sopTag sop配置标记
 	 * @return
 	 */
-	List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid);
+	List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid,Integer sopTag);
 
 	/**
 	 * 根据作业指导书id查询所以未配置的产品信息

@@ -1,19 +1,22 @@
 package com.ruoyi.project.iso.sopLine.service;
 
-import java.util.Date;
-import java.util.List;
-
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.insmanage.instrumentManage.mapper.InstrumentManageMapper;
+import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
 import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
+import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
-import com.ruoyi.project.iso.sopLine.domain.SopLine;
-import com.ruoyi.project.iso.sopLine.service.ISopLineService;
-import com.ruoyi.common.support.Convert;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 作业指导书  产线 配置 服务层实现
@@ -170,8 +173,8 @@ public class SopLineServiceImpl implements ISopLineService
 	 * @return
 	 */
 	@Override
-	public List<SopLine> selectLineAllSopConfig(int companyId, int lineId, int sopId) {
-		return sopLineMapper.selectLineAllSopConfig(companyId,lineId,sopId);
+	public List<SopLine> selectLineAllSopConfig(int companyId, int lineId, int sopId,int sopTag) {
+		return sopLineMapper.selectLineAllSopConfig(companyId,lineId,sopId,sopTag);
 	}
 
 	/**
@@ -206,5 +209,39 @@ public class SopLineServiceImpl implements ISopLineService
 	@Override
 	public List<SopLineWork> selectSopLineWorkListBySopId(Integer companyId, Integer isoId) {
 		return sopLineWorkMapper.selectSopLineWorkListBySopId(companyId,isoId);
+	}
+
+
+
+	/******************************  单工位SOP配置 ***********************************************/
+
+	@Autowired
+	private InstrumentManageMapper instrumentManageMapper;
+	@Autowired
+	private SingleWorkMapper singleWorkMapper;
+	/**
+	 * 查询单工位SOP配置列表
+	 * @param sopLine sop信息
+	 * @return 结果
+	 */
+	@Override
+	public List<SopLine> selectSopLineList2(SopLine sopLine) {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		sopLine.setCompanyId(user.getCompanyId());
+		List<SopLine> sopLines = sopLineMapper.selectSopLineList2(sopLine);
+		for (SopLine line : sopLines) {
+			Integer imId = singleWorkMapper.selectSingleWorkById(line.getLineId()).getImId();
+			String imCode = instrumentManageMapper.selectInstrumentManageById(imId).getImCode();
+			line.setImName(imCode);
+		}
+		return sopLines;
+	}
+
+	@Override
+	public SopLineWork selectInfoByApi(int companyId, int lineId, int sopId, int wId, int sopTag) {
+		return sopLineWorkMapper.selectInfoByApi(companyId,lineId,sopId,wId,sopTag);
 	}
 }

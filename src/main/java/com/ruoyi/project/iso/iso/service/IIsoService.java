@@ -1,13 +1,10 @@
 package com.ruoyi.project.iso.iso.service;
 
-import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.iso.iso.domain.Iso;
-import com.ruoyi.project.page.pageInfo.domain.SopApi;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,9 +74,10 @@ public interface IIsoService
 	 * 根据父id和产线id查询对应产线所以未配置的SOP指导书
 	 * @param pid 父id
 	 * @param lineId 产线id
+	 * @param sopTag sop配置标记状态流水线或者车间
 	 * @return
 	 */
-	List<Iso> selectNotConfigByPidAndLineId(Integer pid,Integer lineId);
+	List<Iso> selectNotConfigByPidAndLineId(Integer pid,Integer lineId,Integer sopTag);
 
 	/**
 	 * 上传sop文件
@@ -96,4 +94,12 @@ public interface IIsoService
 	 * @return
 	 */
 	Map<String,Object> selectSopByDevCode(String code) throws Exception;
+
+	/**
+	 * 通过单工位id查询所有配置sop的iso列表
+	 * @param parentId 父id
+	 * @param lineId 单工位id
+	 * @return 结果
+	 */
+	List<Iso> selectNotConfigBySwId(int parentId, int lineId);
 }
