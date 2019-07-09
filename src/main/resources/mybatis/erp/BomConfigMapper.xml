@@ -19,7 +19,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectBomConfigVo">
-        select id, company_id, materiel_code, materiel_name, materiel_model, number, unit, place_number, remark_index, create_time, row_index from tab_bom_config
+        select id, company_id, materiel_code, materiel_name, materiel_model, `number`, unit,
+         place_number, remark_index, create_time, row_index from tab_bom_config
     </sql>
 	
 

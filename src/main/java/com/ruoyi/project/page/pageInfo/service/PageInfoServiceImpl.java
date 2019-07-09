@@ -28,6 +28,8 @@ import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
 import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
@@ -90,6 +92,9 @@ public class PageInfoServiceImpl implements IPageInfoService {
 
     @Autowired
     private DevDataLogMapper devDataLogMapper;
+
+    @Autowired
+    private ISingleWorkService singleWorkService;
 
     @Value("${page.url}")
     private String pageUrl;
@@ -270,6 +275,8 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 return selectLineHz(info);
             } else if (info.getPageType() == PageTypeConstants.PAGE_TYPE_XQ) {
                 return selectLineDetail(info);
+            }else if(info.getPageType() == PageTypeConstants.PAGE_TYPE_CJ){
+                return info;
             }
         }
         return null;
@@ -428,6 +435,27 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 }
             }
             return lines;
+        }
+        return null;
+    }
+
+    /**
+     * 查询所以车间
+     * @param pid 页面id
+     * @return
+     */
+    @Override
+    public List<SingleWork> selectSingleWork(int pid) {
+        List<SingleWork> works = singleWorkService.selectSingleWorkListSign0();
+        if(works != null && works.size()>0){
+            for (SingleWork work : works) {
+                work.setParentId(0);
+                PageInfoConfig config = pageInfoConfigMapper.selectPageConfigByPidAndLineId(pid,work.getId());
+                if(config != null){
+                    work.setParentId(1);
+                }
+            }
+            return works;
         }
         return null;
     }

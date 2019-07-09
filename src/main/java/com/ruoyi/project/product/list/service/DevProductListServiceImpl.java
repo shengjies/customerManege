@@ -1,9 +1,19 @@
 package com.ruoyi.project.product.list.service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.exception.BusinessException;
-import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.common.utils.poi.ExcelUtils;
+import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
+import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
@@ -13,14 +23,22 @@ import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
 import com.ruoyi.project.erp.productCustomer.mapper.ProductCustomerMapper;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ruoyi.common.support.Convert;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -58,6 +76,9 @@ public class DevProductListServiceImpl implements IDevProductListService {
 
     @Autowired
     private FileSourceInfoMapper fileSourceInfoMapper;
+
+    @Autowired
+    private ImportConfigMapper configMapper;
 
     public boolean isSys(Cookie[] cookies) {
         User user = JwtUtil.getTokenCookie(cookies);
@@ -180,69 +201,177 @@ public class DevProductListServiceImpl implements IDevProductListService {
             if (!StringUtils.isEmpty(fileSourceInfos)) {
                 throw new BusinessException("请先删除" + product.getProductCode() + "的关联文件");
             }
-            // 校验是否有相关的客户关联信息
-            List<ProductCustomer> productCustomers = productCustomerMapper.selectProductCustomerByProIdOrCusId(productId, null);
-            if (!StringUtils.isEmpty(productCustomers)) {
-                throw new BusinessException("请先删除" + product.getProductCode() + "的客户关联");
-            }
-            /**
-             * 查询对应产品是否存在库存记录，存在库存记录则不允许删除
-             */
-            ProductStock productStock = productStockMapper.selectProductStockByProId(productId);
-            if (!StringUtils.isNull(productStock)) {  // 存在库存记录
-                throw new BusinessException(product.getProductCode() + "存在库存记录不允许删除");
-            }
+//            // 校验是否有相关的客户关联信息
+//            List<ProductCustomer> productCustomers = productCustomerMapper.selectProductCustomerByProIdOrCusId(productId, null);
+//            if (!StringUtils.isEmpty(productCustomers)) {
+//                throw new BusinessException("请先删除" + product.getProductCode() + "的客户关联");
+//            }
+//            /**
+//             * 查询对应产品是否存在库存记录，存在库存记录则不允许删除
+//             */
+//            ProductStock productStock = productStockMapper.selectProductStockByProId(productId);
+//            if (!StringUtils.isNull(productStock)) {  // 存在库存记录
+//                throw new BusinessException(product.getProductCode() + "存在库存记录不允许删除");
+//            }
         }
         return devProductListMapper.deleteDevProductListByIds(Convert.toStrArray(ids));
     }
 
     @Override
-    public String importProduct(List<DevProductList> list, boolean isUpdateSupport,HttpServletRequest request) {
-        if (StringUtils.isNull(list) || list.size() == 0) {
-            throw new BusinessException("导入产品数据不能为空！");
-        }
-        int successNum = 0;
-        int failureNum = 0;
+    public String importProduct(MultipartFile file, boolean isUpdateSupport,int cType) throws Exception {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        int failNum =  0;
+        int inserNum =0;
+        int updateNum = 0;
+        String code = cType ==0?"产品":"半成品";
+        StringBuilder failMsg = new StringBuilder();
         StringBuilder successMsg = new StringBuilder();
-        StringBuilder failureMsg = new StringBuilder();
-
-        User currentUser = JwtUtil.getTokenUser(request);
-        if (StringUtils.isNull(currentUser)) {
-            throw new BusinessException("操作异常!");
+        ImportConfig config = configMapper.selectImportConfigByType(cType);//查询产品导入配置
+        if(config == null){
+            failMsg.insert(0,"很抱歉，导入失败，请先进行"+code+"导入信息配置");
+            throw  new Exception(failMsg.toString());
         }
-        for (DevProductList product : list) {
+        //创建excel 文档对象
+        Workbook wb = null;
+        Sheet sheet = null;
+        try {
+            wb = WorkbookFactory.create(file.getInputStream());
+        }catch (Exception e){
+            failMsg.insert(0,"很抱歉，导入失败，系统异常");
+            throw  new Exception(failMsg.toString());
+        }
+        if(wb == null){
+            failMsg.insert(0,"很抱歉，导入失败，系统异常");
+            throw  new Exception(failMsg.toString());
+        }
+        sheet = wb.getSheetAt(0);
+        if(sheet == null){
+            failMsg.insert(0,"很抱歉，导入失败，系统异常");
+            throw  new Exception(failMsg.toString());
+        }
+        //获取导入行数
+        int rows = sheet.getPhysicalNumberOfRows();
+        if(rows <=0){
+            failMsg.insert(0,"很抱歉，导入失败，导入excel不能为空");
+            throw  new Exception(failMsg.toString());
+        }
+        if(rows < config.getRowIndex()){
+            failMsg.insert(0,"很抱歉，导入失败，导入excel行数必须大配置开始解析行数");
+            throw  new Exception(failMsg.toString());
+        }
+        Row row = null;
+        List<DevProductList> productList = new ArrayList<>();
+        DevProductList product = null;
+        //开始信息验证
+        for (int i= config.getRowIndex() -1;i<rows;i++){
+            row = sheet.getRow(i);
+            if(row == null){
+                failNum++;
+                failMsg.append("<br/>第"+(i+1)+"行数据为空");
+                continue;
+            }
+            product = new DevProductList();
+            //获取产品编码
+            String pCode = ExcelUtil.getCellValue1(row,config.getCon1()-1).toString().trim();
+            if(StringUtils.isEmpty(pCode)){
+                failNum ++;
+                failMsg.append("<br/>第"+(i+1)+"行，"+code+"编码为空");
+                continue;
+            }
+            product.setCompanyId(u.getCompanyId());
+            product.setProductCode(pCode);
+            //获取产品名称
+            String pName = ExcelUtil.getCellValue1(row,config.getCon2()-1).toString().trim();
+            if(StringUtils.isEmpty(pName)){
+                failNum ++;
+                failMsg.append("<br/>第"+(i+1)+"行，"+code+"编码为空");
+                continue;
+            }
+            product.setProductName(pName);
+            //获取产品型号
+            String pModel = ExcelUtil.getCellValue1(row,config.getCon3() -1).toString().trim();
+            if(StringUtils.isEmpty(pModel)){
+                failNum ++;
+                failMsg.append("<br/>第"+(i+1)+"行，"+code+"型号为空");
+                continue;
+            }
+            product.setProductModel(pModel);
+            //获取产品标准工时
             try {
-                // 验证是否存在这个用户
-                if (product == null || StringUtils.isEmpty(product.getProductCode().trim())) {
-                    throw new Exception("导入的产品或者产品编码不能为空！");
+                Integer hours = Integer.parseInt(ExcelUtil.getCellValue1(row,config.getCon4()-1).toString());
+                if(hours == null || hours <=0){
+                    failNum++;
+                    failMsg.append("<br/>第"+(i+1)+"行，标准工时必须大于0");
+                    continue;
                 }
-                DevProductList devProductList = devProductListMapper.selectDevProductByCode(currentUser.getCompanyId(), product.getProductCode().trim());
-                if (StringUtils.isNull(devProductList)) {
-                    product.setDef_id(0);
-                    successNum++;
-                    this.insertDevProductList(product,request);
-                    successMsg.append("<br/>" + successNum + "、产品 " + product.getProductCode() + " 导入成功");
-                } else if (isUpdateSupport) {
-                    product.setId(devProductList.getId());
-                    product.setCompanyId(currentUser.getCompanyId());
-                    this.updateDevProductList(product);
-                    successNum++;
-                    successMsg.append("<br/>" + successNum + "、产品 " + product.getProductCode() + " 更新成功");
-                } else {
-                    failureNum++;
-                    failureMsg.append("<br/>" + failureNum + "、产品 " + product.getProductCode() + " 已存在");
+                product.setStandardHourYield(hours);
+            }catch (Exception e){
+                failNum++;
+                failMsg.append("<br/>第"+(i+1)+"行,标准工时解析失败");
+                continue;
+            }
+            //获取单价
+            if(config.getPrice() > 0 ){
+                try {
+                    float price = Float.parseFloat(ExcelUtil.getCellValue1(row,config.getPrice()-1).toString());
+                    product.setPriceImport(price);
+                    product.setPrice(new BigDecimal(price));
+                }catch (Exception e){
+                    failNum++;
+                    failMsg.append("<br/>第"+(i+1)+"行,"+code+"单价解析失败");
+                    continue;
                 }
-            } catch (Exception e) {
-                failureNum++;
-                String msg = "<br/>" + failureNum + "、产品 " + product.getProductCode() + " 导入失败：";
-                failureMsg.append(msg + e.getMessage());
+            }
+            //获取产品单位
+            if(config.getUnit() >0){
+                String unit = ExcelUtil.getCellValue1(row,config.getUnit() -1).toString().trim();
+                product.setUnit(unit);
+            }
+            //获取备注信息
+            if(config.getCon5() > 0){
+                String remark = ExcelUtil.getCellValue1(row,config.getCon5() -1).toString();
+                product.setRemark(remark);
+            }
+            product.setCreate_by(u.getLoginName());
+            product.setCreateTime(new Date());
+            product.setSign(0);
+            product.setDef_id(0);
+            productList.add(product);
+         }
+        if(productList.size() <=0 || failNum > 0){
+            failMsg.insert(0,"很抱歉，导入失败");
+            throw new Exception(failMsg.toString());
+        }
+        failNum = 0;
+        int a =0;
+        for (DevProductList devProductList : productList) {
+            devProductList.setSign(cType);
+            try {
+                a++;
+                //根据产品编码产线对应的产品是否存在
+                DevProductList productList1 = devProductListMapper.selectDevProductByCodeAndSign(u.getCompanyId(),devProductList.getProductCode(),cType);
+                if(StringUtils.isNull(productList1)){
+                    devProductList.setDef_id(0);
+                    inserNum++;
+                    devProductListMapper.insertDevProductList(devProductList);
+                }else if(isUpdateSupport){
+                    devProductList.setId(productList1.getId());
+                    devProductList.setCompanyId(u.getCompanyId());
+                    devProductList.setCreateTime(productList1.getCreateTime());
+                    devProductListMapper.updateDevProductList(devProductList);
+                    updateNum++;
+                    successMsg.append("<br/>"+code+devProductList.getProductCode()+"修改成功");
+                }else {
+                    successMsg.append("<br/>"+a+"、"+code+devProductList.getProductCode()+"已存在");
+                }
+            }catch (Exception e){
+                failNum ++;
+                failMsg.append("<br/>"+failNum+"、"+code+devProductList.getProductCode()+"导入失败："+e.getMessage());
             }
         }
-        if (failureNum > 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-            throw new BusinessException(failureMsg.toString());
-        } else {
-            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+        if(failNum > 0){
+                failMsg.insert(0,"很抱歉，导入失败！共"+failNum+"条数据:");
+                throw new Exception(failMsg.toString());
         }
         return successMsg.toString();
     }
@@ -253,10 +382,10 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return
      */
     @Override
-    public List<DevProductList> selectProductAllByCompanyId(Cookie[] cookies) {
-        User user = JwtUtil.getTokenCookie(cookies);
+    public List<DevProductList> selectProductAllByCompanyId(int sign) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if (user == null) return Collections.emptyList();
-        return devProductListMapper.selectProductAllByCompanyId(user.getCompanyId());
+        return devProductListMapper.selectProductAllByCompanyId(user.getCompanyId(),sign);
     }
 
     /**
@@ -357,36 +486,6 @@ public class DevProductListServiceImpl implements IDevProductListService {
         return product;
     }
 
-    /**
-     * ecn 信息操作
-     *
-     * @param productList
-     * @return
-     */
-    @Override
-    public int ecnChange(DevProductList productList,HttpServletRequest request) {
-        if (productList == null) return 0;
-        User u = JwtUtil.getTokenUser(request);
-        if (u == null) return 0;
-        // 查询产品信息
-        DevProductList product = devProductListMapper.selectDevProductListById(productList.getId());
-        if (productList.getEcnStatus() == 1) {
-            //保存相关ecn信息
-            EcnLog ecnLog = new EcnLog();
-            ecnLog.setCompanyId(u.getCompanyId());
-            ecnLog.setCreateId(u.getUserId().intValue());
-            ecnLog.setCreatePeople(u.getUserName());
-            ecnLog.setEcnText(productList.getEcnText());
-            ecnLog.setEcnType(1);
-            ecnLog.setSaveCode(product.getProductCode());
-            ecnLog.setSaveId(productList.getId());
-            ecnLog.setCreateTime(new Date());
-            ecnLogMapper.insertEcnLog(ecnLog);
-            //修改对应公司对应产品下未进行的工单的ecn状态
-            workOrderMapper.editCompanyProductWorkOrderEcn(u.getCompanyId(), productList.getProductCode());
-        }
-        return devProductListMapper.updateDevProductList(productList);
-    }
 
     /**
      * 根据订单id查询对应的产品信息
@@ -397,7 +496,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Override
     public List<DevProductList> selectProductAllByOrderId(int orderId,HttpServletRequest request) {
         if (orderId == -1) {
-            return this.selectProductAllByCompanyId(request.getCookies());
+            return this.selectProductAllByCompanyId(0);
         } else {
             return devProductListMapper.findProductByOrderId(orderId);
         }
@@ -410,12 +509,12 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return 结果
      */
     @Override
-    public List<DevProductList> selectProNameAllByComId(Cookie[] cookies) {
-        User user = JwtUtil.getTokenCookie(cookies);
+    public List<DevProductList> selectProNameAllByComId(int sign) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if (user == null) {
             return Collections.emptyList();
         }
-        return devProductListMapper.selectProNameAllByComId(user.getCompanyId());
+        return devProductListMapper.selectProNameAllByComId(user.getCompanyId(),sign);
     }
 
     /**

@@ -22,7 +22,7 @@
                         <label class="col-sm-3 control-label">选择产品：</label>
                         <div class="col-sm-8">
                             <select id="productCode" name="productCode"
-                                    class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}">
+                                    class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(0)}">
                                 <option value="">请选择</option>
                                 <option th:each="pro : ${productList}"  th:text="${pro.productCode}" th:value="${pro.productCode}"></option>
                             </select>

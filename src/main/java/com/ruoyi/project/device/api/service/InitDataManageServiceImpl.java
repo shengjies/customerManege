@@ -2,6 +2,7 @@ package com.ruoyi.project.device.api.service;
 
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.api.form.ApiWorkForm;
 import com.ruoyi.project.device.api.form.WorkDataForm;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
@@ -19,6 +20,8 @@ import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
 import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
@@ -64,6 +67,9 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
     @Autowired
     private WorkstationMapper workstationMapper;
 
+    @Autowired
+    private SingleWorkMapper singleWorkMapper;
+
     /**
      * 根据硬件编码查询对应的工单信息
      * @param code 硬件编码
@@ -82,12 +88,19 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             }
             //查询对应硬件产线配置工位
             Workstation  workstation = workstationMapper.selectInfoByDevice(devList.getId(),0,0);
-            if(workstation == null || workstation.getLineId() == null){
-                map.put("code",4);//硬件未配置产线
-                map.put("data",null);
-                return  map;
+            SingleWork singleWork = null;
+            ApiWorkForm workForm = null;
+            if(workstation != null || workstation.getLineId() != null){
+                workForm = findLineAndWork(devList,workstation,null);
+            }else if(workstation == null){
+                singleWork =  singleWorkMapper.selectSingleWorkByCode(devList.getId(),0,0);
+                if(singleWork == null){
+                    map.put("code",4);//硬件未配置产线
+                    map.put("data",null);
+                    return  map;
+                }
+                workForm = findLineAndWork(devList,null,singleWork);
             }
-            ApiWorkForm workForm = findLineAndWork(devList,workstation);
             if(workForm == null){
                 map.put("code",2);//硬件为归属公司或者硬件未配置产线
                 map.put("data",null);
@@ -242,7 +255,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 map.put("status",0);//上报失败
                 return  map;
             }
-            ApiWorkForm workForm = findLineAndWork(devList,workstation);
+            ApiWorkForm workForm = findLineAndWork(devList,workstation,null);
             if(workForm == null || workForm.getWorkId() == null){
                 map.put("code",2);//不存在对应工单信息
                 map.put("status",0);//上报失败
@@ -281,22 +294,41 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
      * @param workstation
      * @return
      */
-    private ApiWorkForm findLineAndWork(DevList devList,Workstation workstation) throws Exception{
+    private ApiWorkForm findLineAndWork(DevList devList,Workstation workstation,SingleWork singleWork) throws Exception{
+        int companyId = 0;
+        if(workstation != null){
+            companyId = workstation.getCompanyId();
+        }else if(singleWork != null){
+            companyId = singleWork.getCompanyId();
+        }
         ApiWorkForm workForm = new ApiWorkForm();
         //查询公司信息
-        DevCompany devCompany = devCompanyMapper.selectDevCompanyById(workstation.getCompanyId());
+        DevCompany devCompany = devCompanyMapper.selectDevCompanyById(companyId);
         if(devCompany ==null)return null;
         workForm.setCompanyId(devCompany.getCompanyId());
         workForm.setCompanyLogo(devCompany.getComLogo());
         workForm.setCompanyName(devCompany.getComName());
-        //查询对应的产线信息
-        ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
-        if(line == null)return  null;
-        workForm.setLineName(line.getLineName()+"-"+workstation.getwName());
-        workForm.setLineId(line.getId());
         //查询对应产线正在进行的工单信息
+        DevWorkOrder workOrder = null;
+        //查询对应的产线信息
+        ProductionLine line = null;
+        if(workstation != null){
+            line = productionLineMapper.selectProductionLineById(workstation.getLineId());
+            if(line == null)return  null;
+            workForm.setLineName(line.getLineName()+"-"+workstation.getwName());
+            workForm.setLineId(line.getId());
+            workOrder = workOrderMapper.selectWorkByCompandAndLine(devCompany.getCompanyId(),line.getId());
+        }else if(singleWork != null){
+            //查询对应的车间信息
+            SingleWork work =  singleWorkMapper.selectSingleWorkById(singleWork.getParentId());
+            if(work == null)return  null;
+            workForm.setLineName(work.getWorkshopName()+"-"+singleWork.getWorkshopName());
+            workForm.setLineId(work.getId());
+        }else {
+            return null;
+        }
+        //设置工单默认状态
         workForm.setWorkorderStatus(0);
-        DevWorkOrder workOrder = workOrderMapper.selectWorkByCompandAndLine(devCompany.getCompanyId(),line.getId());
         workForm.setActualNum(0);
         if(workOrder != null){
             workForm.setWorkId(workOrder.getId());
@@ -312,8 +344,24 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 workForm.setActualNum(workData.getCumulativeNum());
             }
         }
-
         return workForm;
     }
 
+    /**
+     * 根据机器设备上扫描上传工单，对工单进行绑定开始操作
+     * @param code 设备绑定的硬件编号
+     * @param orderCode 工单号
+     * @return
+     */
+    @Override
+    public AjaxResult startWorkOrder(String code, String orderCode) {
+        //查询对应硬件是否存在
+        DevList devList = devListMapper.selectDevListByCode(code);
+        if(devList == null){
+            return AjaxResult.api(1,"硬件编号不存在",null);
+        }
+        //查询对应的工单
+
+        return AjaxResult.api(0,"操作成功",null);
+    }
 }

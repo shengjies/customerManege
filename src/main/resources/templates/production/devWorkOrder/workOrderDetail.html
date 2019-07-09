@@ -28,13 +28,13 @@
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <label class="col-sm-4">产线：</label>
+            <label class="col-sm-4">产线/车间：</label>
             <div class="col-sm-8">
-                <span th:utext="${devWorkOrder.productionLine.lineName}"></span>
+                <span th:utext="${devWorkOrder.param1}"></span>
             </div>
         </div>
         <div class="col-sm-6">
-            <label class="col-sm-4">产品编码：</label>
+            <label class="col-sm-4">产品/半产品编码：</label>
             <div class="col-sm-8">
                 <span th:utext="${devWorkOrder.productCode}"></span>
             </div>
@@ -44,11 +44,11 @@
         <div class="col-sm-6">
             <label class="col-sm-4">责任人一:</label>
             <div class="col-sm-8">
-                <span th:utext="${devWorkOrder.productionLine.deviceLiableName}"></span>
+                <span th:utext="${devWorkOrder.param2}"></span>
             </div>
         </div>
         <div class="col-sm-6">
-            <label class="col-sm-4">产品名称：</label>
+            <label class="col-sm-4">产品/半产品名称：</label>
             <div class="col-sm-8">
                 <span th:utext="${devWorkOrder.productName}"></span>
             </div>
@@ -58,7 +58,7 @@
         <div class="col-sm-6">
             <label class="col-sm-4">责任人二：</label>
             <div class="col-sm-8">
-                <span th:utext="${devWorkOrder.productionLine.deviceLiableTowName}"></span>
+                <span th:utext="${devWorkOrder.param3}"></span>
             </div>
         </div>
         <div class="col-sm-6">
@@ -135,6 +135,20 @@
             <label class="col-sm-4">不良品数量：</label>
             <div class="col-sm-8">
                 <span th:utext="${devWorkOrder.badNumber}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <label class="col-sm-4">工价：</label>
+            <div class="col-sm-8">
+                <span th:utext="${devWorkOrder.workPrice}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">生产用时：</label>
+            <div class="col-sm-8">
+                <span th:utext="${devWorkOrder.signHuor}"></span>
             </div>
         </div>
     </div>

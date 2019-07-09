@@ -12,6 +12,9 @@ public class PageTypeConstants {
      * 2、产线详情
      */
     public static final int PAGE_TYPE_XQ = 2;
-
+    /**
+     * 车间看板
+     */
+    public static final int PAGE_TYPE_CJ = 3;
 
 }

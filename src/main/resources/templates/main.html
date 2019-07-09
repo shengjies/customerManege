@@ -67,10 +67,10 @@
                         <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="8">
                             <thead>
                             <tr>
-                                <th>生产产线</th>
+                                <th>产线/车间</th>
                                 <th>工单号</th>
-                                <th>产品编码</th>
-                                <th>产品名称</th>
+                                <th>产品/半成品编码</th>
+                                <th>产品/半成品名称</th>
                                 <th>生产数量</th>
                                 <th>工单状态</th>
                             </tr>
@@ -78,7 +78,7 @@
                             <tbody th:with="allWorkerToday = ${@workOrder.selectWorkOrderAllToday(#httpServletRequest.getCookies())}">
                             <!--循环列表-->
                             <tr th:each="worker : ${allWorkerToday}">
-                                <td th:text="${worker.productionLine.lineName}"></td>
+                                <td th:text="${worker.param1}"></td>
                                 <td th:text="${worker.workorderNumber}"></td>
                                 <td th:text="${worker.productCode}"></td>
                                 <td th:text="${worker.productName}"></td>

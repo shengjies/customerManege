@@ -20,6 +20,8 @@ import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.workData.domain.WorkData;
 import com.ruoyi.project.production.workData.mapper.WorkDataMapper;
 import com.ruoyi.project.production.workDayHour.domain.WorkDayHour;
@@ -85,6 +87,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private WorkOrderChangeMapper workOrderChangeMapper;
 
+    @Autowired
+    private SingleWorkMapper singleWorkMapper;
+
 
     public String getWorkOrderCode(){
         return CodeUtils.getWorkOrderCode(JwtUtil.getTokenUser(ServletUtils.getRequest()).getCompanyId());
@@ -99,12 +104,28 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Override
     public DevWorkOrder selectDevWorkOrderById(Integer id) {
         DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
-        ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
-        User  user = userMapper.selectUserInfoById(productionLine.getDeviceLiable());
-        productionLine.setDeviceLiableName(user == null?"":user.getUserName());
-        user = userMapper.selectUserInfoById(productionLine.getDeviceLiableTow());
-        productionLine.setDeviceLiableTowName(user == null?"":user.getUserName());
-        workOrder.setProductionLine(productionLine);
+        if(workOrder.getWlSign() ==  0){
+            ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
+            workOrder.setParam1(productionLine.getLineName());
+            User  user = userMapper.selectUserInfoById(productionLine.getDeviceLiable());
+            workOrder.setParam2(user == null?"":user.getUserName());
+            productionLine.setDeviceLiableName(user == null?"":user.getUserName());
+            user = userMapper.selectUserInfoById(productionLine.getDeviceLiableTow());
+            workOrder.setParam3(user == null?"":user.getUserName());
+            productionLine.setDeviceLiableTowName(user == null?"":user.getUserName());
+            workOrder.setProductionLine(productionLine);
+        }else if(workOrder.getWlSign() == 1){
+            //查询车间
+            SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
+            if(work != null){
+                workOrder.setSingle(work.getId());
+                workOrder.setParam1(work.getWorkshopName());
+                User  user = userMapper.selectUserInfoById(work.getLiableOne());
+                workOrder.setParam2(user == null?"":user.getUserName());
+                user = userMapper.selectUserInfoById(work.getLiableTwo());
+                workOrder.setParam3(user == null?"":user.getUserName());
+            }
+        }
         return workOrder;
     }
 
@@ -116,22 +137,23 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     public List<DevWorkOrder> selectDevWorkOrderList(DevWorkOrder devWorkOrder,HttpServletRequest request) {
-        User sysUser = JwtUtil.getTokenUser(request);
+        User sysUser = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if (sysUser == null) {
             return Collections.emptyList();
         }
-        if (!User.isSys(sysUser)) {
-            devWorkOrder.setCompanyId(sysUser.getCompanyId());
-        }
+        devWorkOrder.setCompanyId(sysUser.getCompanyId());
         List<DevWorkOrder> workOrders = devWorkOrderMapper.selectDevWorkOrderList(devWorkOrder);
         for (DevWorkOrder workOrder : workOrders) {
-            User user = userMapper.selectUserInfoById(workOrder.getDeviceLiable());
-            ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
-            if (null != user) {
-                workOrder.setUser(user);
-            }
-            if (null != productionLine) {
-                workOrder.setProductionLine(productionLine);
+            if(workOrder.getWlSign() == 0){
+                ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
+                if (null != productionLine) {
+                    workOrder.setParam1(productionLine.getLineName());
+                }
+            }else if(workOrder.getWlSign() == 1){
+                SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
+                if(work != null){
+                    workOrder.setParam1(work.getWorkshopName());
+                }
             }
         }
         return workOrders;
@@ -144,50 +166,30 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return 结果
      */
     @Override
-    public int insertDevWorkOrder(DevWorkOrder devWorkOrder,HttpServletRequest request) {
-        User u = JwtUtil.getTokenUser(request);
+    public int insertDevWorkOrder(DevWorkOrder devWorkOrder) {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if(u == null)return  0;
         Integer productId = Integer.valueOf(devWorkOrder.getProductCode());
         DevProductList devProductList = productListMapper.selectDevProductListById(productId);
+        if(devProductList == null)return 0;//产品不存在
+        devWorkOrder.setMakeType(devProductList.getSign());
+        if(devWorkOrder.getWlSign() == 1){//是车间
+            //查询车间
+            SingleWork work = singleWorkMapper.selectSingleWorkById(devWorkOrder.getLineId());
+            if(work == null){ return 0; }
+            devWorkOrder.setDeviceLiable(work.getLiableOne());
+        }
         // 设置工单产品的名称
-        devWorkOrder.setProductName(devProductList ==null?"":devProductList.getProductName());
+        devWorkOrder.setProductName(devProductList.getProductName());
         // 设置工单产品编码
-        devWorkOrder.setProductCode(devProductList ==null?"":devProductList.getProductCode());
+        devWorkOrder.setProductCode(devProductList.getProductCode());
+        //产品型号
+        devWorkOrder.setProductModel(devProductList.getProductModel());
         // 设置工单属于哪个公司
         devWorkOrder.setCompanyId(u.getCompanyId());
         // 创建者
         devWorkOrder.setCreateBy(u.getUserName());
         devWorkOrderMapper.insertDevWorkOrder(devWorkOrder);
-        if(devWorkOrder.getEcnStatus() == 1 ){//添加ecn备注信息
-            // 新增工单变更记录
-            EcnLog ecnLog = new EcnLog();
-            ecnLog.setCompanyId(u.getCompanyId());
-            ecnLog.setSaveId(devWorkOrder.getId());
-            ecnLog.setSaveCode(devWorkOrder.getWorkorderNumber());
-            ecnLog.setEcnType(2);
-            ecnLog.setEcnText(devWorkOrder.getEcnText());
-            ecnLog.setCreatePeople(devWorkOrder.getCreateBy());
-            ecnLog.setCreateId(u.getUserId().intValue());
-            ecnLog.setCreateTime(new Date());
-            ecnLogMapper.insertEcnLog(ecnLog);
-            // 更新产品ECN备注信息
-            if (!devProductList.getEcnText().equals(devWorkOrder.getEcnText())) { // 新建工单时更改了产品ECN
-                // 更新ECN日志
-                EcnLog proEcnLog = new EcnLog();
-                proEcnLog.setCompanyId(u.getCompanyId());
-                proEcnLog.setSaveId(devProductList.getId());
-                proEcnLog.setSaveCode(devProductList.getProductCode());
-                proEcnLog.setEcnType(1);
-                proEcnLog.setEcnText(devWorkOrder.getEcnText());
-                proEcnLog.setCreatePeople(devWorkOrder.getCreateBy());
-                proEcnLog.setCreateId(u.getUserId().intValue());
-                proEcnLog.setCreateTime(new Date());
-                ecnLogMapper.insertEcnLog(proEcnLog);
-                // 更新产品ECN
-                devProductList.setEcnText(devWorkOrder.getEcnText());
-                productListMapper.updateDevProductList(devProductList);
-            }
-        }
         return 1;
     }
 
@@ -198,12 +200,23 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return 结果
      */
     @Override
-    public int updateDevWorkOrder(DevWorkOrder devWorkOrder,User user) {
+    public int updateDevWorkOrder(DevWorkOrder devWorkOrder) {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
         DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(devWorkOrder.getId());
-        Long userId = user.getUserId(); // 登录用户id
-        ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
+        Long userId = u.getUserId(); // 登录用户id
+        int one =0;
+        int tow = 0;
+        if(workOrder.getWlSign() == 0){
+            ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
+            one = productionLine.getDeviceLiable();
+            tow = productionLine.getDeviceLiableTow();
+        }else if(workOrder.getWlSign() == 1){
+            SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
+            one = work.getLiableOne();
+            tow = work.getLiableTwo();
+        }
         // 不是工单负责人
-        if (productionLine.getDeviceLiable() != userId.intValue() && productionLine.getDeviceLiableTow() != userId.intValue()) {
+        if (one != userId.intValue() && tow != userId.intValue()) {
             throw new BusinessException("不是工单负责人");
         }
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
@@ -244,18 +257,16 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int editWorkerOrderById(Integer id,HttpServletRequest request) {
-        User user = JwtUtil.getTokenUser(request);
-        Long userId = user.getUserId();
+    public int editWorkerOrderById(Integer id) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
-
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
         // 不是工单负责人
-        if (productionLine.getDeviceLiable() != userId.intValue() && productionLine.getDeviceLiableTow() != userId.intValue()) {
+        if (productionLine.getDeviceLiable() != user.getUserId().intValue() && productionLine.getDeviceLiableTow() != user.getUserId().intValue()) {
             throw new BusinessException("不是工单负责人");
         }
         if (devWorkOrder.getOperationStatus() == 0) {
-            Long count = devWorkOrderMapper.checkWorkLineUnique(devWorkOrder.getLineId());
+            Long count = devWorkOrderMapper.checkWorkLineUnique(devWorkOrder.getLineId(),WorkConstants.SING_LINE);
             // 判断流水线是否只有一个正在进行生产的工单
             if (count > 0) {
                 throw new BusinessException("该流水线有工单未完成");
@@ -337,7 +348,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     public Long checkWorkLineUnique(Integer lineId) {
-        return devWorkOrderMapper.checkWorkLineUnique(lineId);
+        return devWorkOrderMapper.checkWorkLineUnique(lineId,WorkConstants.SING_LINE);
     }
 
     /**
@@ -389,8 +400,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (devWorkOrder.getWorkSign().equals(WorkConstants.WORK_SIGN_YES)) {
             throw new BusinessException("该工单已经提交过，不能重复提交");
         }
-        //计数生产用时
-//        devWorkOrder.setSignHuor(devWorkOrder.getSignHuor()+TimeUtil.getDateDel(devWorkOrder.getSignTime(),new Date()));
         devWorkOrder.setWorkSign(WorkConstants.WORK_SIGN_YES); // 设置状态为已确认数据不可进行修改和删除
         devWorkOrder.setUpdateTime(new Date());
         devWorkOrder.setUpdateBy(tokenUser.getUserName());
@@ -524,26 +533,43 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return
      */
     @Override
-    public int changeOrder(DevWorkOrder order,HttpServletRequest request) {
+    public int changeOrder(DevWorkOrder order) {
         if(order == null)return 0;
-        User user = JwtUtil.getTokenUser(request);
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if(user == null)return 0;
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(order.getId());
         if(devWorkOrder == null)return 0;
-        //查询对应的产线信息
-        ProductionLine line = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
-        if (line ==null)return 0;
-        //保存变更记录
         WorkOrderChange change = new WorkOrderChange();
         change.setCompanyId(user.getCompanyId());
         change.setOrderId(devWorkOrder.getId());
         change.setOrderCode(devWorkOrder.getWorkorderNumber());
-        change.setLineId(line.getId());
-        change.setLineName(line.getLineName());
-        User  u1 = userMapper.selectUserInfoById(line.getDeviceLiable());
-        change.setDeviceLiable(u1 ==null?"":u1.getUserName());
-        u1 = userMapper.selectUserInfoById(line.getDeviceLiableTow());
-        change.setDeviceLiable2(u1==null?"":u1.getUserName());
+        change.setOrderCodeInfo(devWorkOrder.getOrderCode());
+        if(order.getWlSign() == WorkConstants.SING_LINE){//产线
+            //查询对应的产线信息
+            ProductionLine line = productionLineMapper.selectProductionLineById(order.getLineId());
+            if (line ==null)return 0;
+            //保存变更记录
+            change.setLineId(line.getId());
+            change.setLineName(line.getLineName());
+            User  u1 = userMapper.selectUserInfoById(line.getDeviceLiable());
+            change.setDeviceLiable(u1 ==null?"":u1.getUserName());
+            u1 = userMapper.selectUserInfoById(line.getDeviceLiableTow());
+            change.setDeviceLiable2(u1==null?"":u1.getUserName());
+        }else if(order.getWlSign() == WorkConstants.SING_SINGLE){
+            SingleWork work = singleWorkMapper.selectSingleWorkById(order.getSingle());
+            if(work == null)return  0;
+            //保存变更记录
+            change.setLineId(work.getId());
+            change.setLineName(work.getWorkshopName());
+            User  u1 = userMapper.selectUserInfoById(work.getLiableOne());
+            change.setDeviceLiable(u1 ==null?"":u1.getUserName());
+            u1 = userMapper.selectUserInfoById(work.getLiableTwo());
+            change.setDeviceLiable2(u1==null?"":u1.getUserName());
+            change.setWorkPrice(devWorkOrder.getWorkPrice());
+            order.setLineId(order.getSingle());
+        }else{
+            return 0;
+        }
         change.setProductNumber(devWorkOrder.getProductNumber());
         change.setProductionStart(devWorkOrder.getProductionStart());
         change.setProductionEnd(devWorkOrder.getProductionEnd());
@@ -778,6 +804,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Transactional
     public int workDismantleInfo(List<DevWorkOrder> orders) throws Exception {
         User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        StringBuilder code = new StringBuilder();
         //获取原始工单
         if(orders == null)return 0;
         DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(orders.get(0).getSign());
@@ -787,7 +814,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         for (DevWorkOrder order : orders) {
             order.setWorkorderNumber(CodeUtils.getWorkOrderCode(u.getCompanyId()));
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1100);
             }catch (Exception e){ }
             order.setCompanyId(u.getCompanyId());
             order.setSign(1);
@@ -796,7 +823,26 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             order.setCreateTime(new Date());
             order.setCreateBy(u.getUserName());
             devWorkOrderMapper.insertDevWorkOrder(order);
+            code.append("<br/>"+order.getWorkorderNumber());
+            //添加工单变更记录
+            change = new WorkOrderChange();
+            change.setCompanyId(u.getCompanyId());
+            change.setOrderId(order.getId());
+            change.setOrderCode(order.getOrderCode());
+            change.setLineId(order.getLineId());
+            change.setLineName(line.getLineName());
+            change.setDeviceLiable(userMapper.selectUserInfoById(line.getDeviceLiable()).getUserName());
+            change.setDeviceLiable2(userMapper.selectUserInfoById(line.getDeviceLiableTow()).getUserName());
+            change.setProductionStart(order.getProductionStart());
+            change.setProductionEnd(order.getProductionEnd());
+            change.setCreatePeople(u.getUserName());
+            change.setProductNumber(order.getProductNumber());
+            change.setCreateTime(new Date());
+            change.setcStatus(2);
+            change.setRemark("该工单由"+workOrder.getWorkorderNumber()+"工单拆分而成;");
+            workOrderChangeMapper.insertWorkOrderChange(change);
             if(order.getEcnStatus() == 1 ){//添加ecn备注信息
+                devProductList = productListMapper.selectDevProductByCode(u.getCompanyId(),order.getProductCode());
                 // 新增工单变更记录
                 EcnLog ecnLog = new EcnLog();
                 ecnLog.setCompanyId(u.getCompanyId());
@@ -827,7 +873,27 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 }
             }
         }
-        return 0;
+        //作废工单
+        devWorkOrderMapper.updateWorkOrderAbolish(workOrder.getId());
+        line =productionLineMapper.selectProductionLineById(workOrder.getLineId());
+        //添加工单变更记录
+        change = new WorkOrderChange();
+        change.setCompanyId(u.getCompanyId());
+        change.setOrderId(workOrder.getId());
+        change.setOrderCode(workOrder.getOrderCode());
+        change.setLineId(workOrder.getLineId());
+        change.setLineName(line.getLineName());
+        change.setDeviceLiable(userMapper.selectUserInfoById(line.getDeviceLiable()).getUserName());
+        change.setDeviceLiable2(userMapper.selectUserInfoById(line.getDeviceLiableTow()).getUserName());
+        change.setProductionStart(workOrder.getProductionStart());
+        change.setProductionEnd(workOrder.getProductionEnd());
+        change.setCreatePeople(u.getUserName());
+        change.setProductNumber(workOrder.getProductNumber());
+        change.setCreateTime(new Date());
+        change.setcStatus(2);
+        change.setRemark("该工单拆分为:"+code.toString()+"多个工单");
+        workOrderChangeMapper.insertWorkOrderChange(change);
+        return 1;
     }
 
     /**

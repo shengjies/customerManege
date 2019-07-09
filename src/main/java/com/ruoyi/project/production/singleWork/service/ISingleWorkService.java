@@ -18,7 +18,14 @@ public interface ISingleWorkService
      * @return 单工位数据信息
      */
 	public SingleWork selectSingleWorkById(Integer id);
-	
+
+	/**
+	 * 根据id查询车间信息，并获取相关责任人信息
+	 * @param id 车间id
+	 * @return
+	 */
+	public SingleWork selectSingleWorkByIdGetUser(Integer id);
+
 	/**
      * 查询单工位数据列表
      * 
@@ -26,7 +33,13 @@ public interface ISingleWorkService
      * @return 单工位数据集合
      */
 	public List<SingleWork> selectSingleWorkList(SingleWork singleWork);
-	
+
+	/**
+	 * 查询所以车间
+	 * @return
+	 */
+	public List<SingleWork> selectSingleWorkListSign0();
+
 	/**
      * 新增单工位数据
      * 
@@ -64,6 +77,13 @@ public interface ISingleWorkService
 	 * @return 结果
 	 */
 	int saveConfigDev(SingleWork singleWork);
+
+	/**
+	 * 根据车间id查询所以单位信息
+	 * @param pid 车间id
+	 * @return
+	 */
+	List<SingleWork> selectAllNotConfigChildren(int pid);
 
 	/**
 	 * 查询未配置sop的单工位信息

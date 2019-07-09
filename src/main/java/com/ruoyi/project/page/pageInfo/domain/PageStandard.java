@@ -138,8 +138,17 @@ public class PageStandard {
         if(this.getDevWorkOrder() == null){
             return  0;
         }
+        int startHour = TimeUtil.getHour(this.getDevWorkOrder().getStartTime());
+        if(startHour > date){
+            return 0;
+        }
+        if(startHour == date){
+            //实时计算
+            float val = TimeUtil.getDateDel(this.getDevWorkOrder().getStartTime(),TimeUtil.getEndHour(this.getDevWorkOrder().getStartTime()));
+            return (int) (this.getDevWorkOrder().getProductStandardHour() *val);
+        }
         //获取当前系统小时数
-        int hour = TimeUtil.getHour();
+        int hour = TimeUtil.getHour(new Date());
         if(hour == date){
             //实时计算
            float val = TimeUtil.getDateDel(TimeUtil.getSystemDate(),new Date());

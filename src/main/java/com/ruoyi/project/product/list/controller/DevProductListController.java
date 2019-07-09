@@ -5,6 +5,8 @@ import java.util.jar.JarEntry;
 
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
@@ -38,8 +40,13 @@ import javax.servlet.http.HttpServletRequest;
 public class DevProductListController extends BaseController {
     private String prefix = "product/list";
 
+    private String prefixPart = "product/part";
+
     @Autowired
     private IDevProductListService devProductListService;
+
+    @Autowired
+    private IImportConfigService configService;
 
     @RequiresPermissions("device:devProductList:view")
     @GetMapping()
@@ -56,6 +63,7 @@ public class DevProductListController extends BaseController {
     public TableDataInfo list(DevProductList devProductList,HttpServletRequest request) {
         startPage();
         devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
+        devProductList.setSign(0);
         List<DevProductList> list = devProductListService.selectDevProductListList(devProductList);
         return getDataTable(list);
     }
@@ -68,9 +76,10 @@ public class DevProductListController extends BaseController {
     @PostMapping("/export")
     @ResponseBody
     public AjaxResult export(DevProductList devProductList) {
+        devProductList.setSign(0);//编辑为产品
         List<DevProductList> list = devProductListService.selectDevProductListList(devProductList);
         ExcelUtil<DevProductList> util = new ExcelUtil<DevProductList>(DevProductList.class);
-        return util.exportExcel(list, "devProductList");
+        return util.exportExcel(list, "产品编码");
     }
 
     /**
@@ -146,12 +155,10 @@ public class DevProductListController extends BaseController {
     @RequiresPermissions("device:devProductList:import")
     @PostMapping("/importData")
     @ResponseBody
-    public AjaxResult importData(MultipartFile file, boolean updateSupport,HttpServletRequest request) throws Exception {
-        ExcelUtil<DevProductList> util = new ExcelUtil<>(DevProductList.class);
-        List<DevProductList> devProductList = util.importExcel(file.getInputStream());
+    public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
         try {
-            return AjaxResult.success(devProductListService.importProduct(devProductList, updateSupport,request));
-        } catch (BusinessException e) {
+            return AjaxResult.success(devProductListService.importProduct(file, updateSupport,0));
+        } catch (Exception e) {
             return error(e.getMessage());
         }
     }
@@ -220,17 +227,6 @@ public class DevProductListController extends BaseController {
     }
 
     /**
-     * ecn 变更
-     * @param productList
-     * @return
-     */
-    @ResponseBody
-    @RequestMapping("/ecn")
-    public AjaxResult ecnChange(DevProductList productList,HttpServletRequest request) {
-        return toAjax(devProductListService.ecnChange(productList,request));
-    }
-
-    /**
      * 查询对应的产品数据
      *
      * @param orderId
@@ -240,5 +236,158 @@ public class DevProductListController extends BaseController {
     @RequestMapping("/selectProductAllByOrderId")
     public AjaxResult selectProductAllByOrderId(int orderId,HttpServletRequest request){
         return AjaxResult.success("success",devProductListService.selectProductAllByOrderId(orderId,request));
+    }
+
+
+    /********************产品导入配置**********************/
+
+    @RequestMapping("/importProductConfig")
+    @RequiresPermissions("device:devProductList:importConfig")
+    public String importProductConfig(int type,ModelMap mmap){
+        mmap.put("config",configService.selectImportConfigByType(type));
+        return prefix+"/pconfig";
+    }
+
+    /**
+     * 添加产品导入配置
+     * @param config 配置信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/addProductConfig")
+    @RequiresPermissions("device:devProductList:importConfig")
+    public AjaxResult addImportConfig(ImportConfig config){
+        config.setcType(0);
+        return toAjax(configService.insertImportConfig(config));
+    }
+
+
+    /********************半成品相关操作**********************/
+
+
+    @GetMapping("/part")
+    @RequiresPermissions("device:devPart:view")
+    public String devPartList() {
+        return prefixPart + "/part";
+    }
+
+    /**
+     * 半成品导入配置
+     * @param type 配置类型
+     * @param mmap 缓存数据
+     * @return
+     */
+    @RequestMapping("/importPartConfig")
+    @RequiresPermissions("device:devPart:importConfig")
+    public String importPartConfig(int type,ModelMap mmap){
+        mmap.put("config",configService.selectImportConfigByType(type));
+        return prefixPart+"/partconfig";
+    }
+
+    /**
+     * 添加半成品导入配置
+     * @param config 配置信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/addPartConfig")
+    @RequiresPermissions("device:devPart:importConfig")
+    public AjaxResult addImportPartConfig(ImportConfig config){
+        config.setcType(1);
+        return toAjax(configService.insertImportConfig(config));
+    }
+
+    /**
+     * 新增半成品管理
+     */
+    @GetMapping("/addPart")
+    public String addPart() {
+        return prefixPart + "/add";
+    }
+
+    /**
+     * 新增保存半成品管理
+     */
+    @RequiresPermissions("device:devPart:add")
+    @Log(title = "半成品管理", businessType = BusinessType.INSERT)
+    @PostMapping("/addPartSave")
+    @ResponseBody
+    public AjaxResult addPartSave(DevProductList devProductList,HttpServletRequest request) {
+        return toAjax(devProductListService.insertDevProductList(devProductList,request));
+    }
+    /**
+     * 查询半成品管理列表
+     */
+    @RequiresPermissions("device:devPart:list")
+    @PostMapping("/partList")
+    @ResponseBody
+    public TableDataInfo partList(DevProductList devProductList,HttpServletRequest request) {
+        startPage();
+        devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
+        devProductList.setSign(1);
+        List<DevProductList> list = devProductListService.selectDevProductListList(devProductList);
+        return getDataTable(list);
+    }
+
+    /**
+     * 修改半成品管理
+     */
+    @GetMapping("/editPart/{id}")
+    public String editPart(@PathVariable("id") Integer id, ModelMap mmap) {
+        DevProductList devProductList = devProductListService.selectDevProductListById(id);
+        mmap.put("product", devProductList);
+        return prefixPart + "/edit";
+    }
+
+    /**
+     * 修改保存半成品管理
+     */
+    @RequiresPermissions("device:devPart:edit")
+    @Log(title = "半成品管理", businessType = BusinessType.UPDATE)
+    @PostMapping("/editPart")
+    @ResponseBody
+    public AjaxResult editPartSave(DevProductList devProductList,HttpServletRequest request) {
+        devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
+        return toAjax(devProductListService.updateDevProductList(devProductList));
+    }
+
+    /**
+     * 删除产品管理
+     */
+    @RequiresPermissions("device:devPart:remove")
+    @Log(title = "半成品管理", businessType = BusinessType.DELETE)
+    @PostMapping("/removePart")
+    @ResponseBody
+    public AjaxResult removePart(String ids,HttpServletRequest request) {
+        try {
+            return toAjax(devProductListService.deleteDevProductListByIds(ids,request));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    @Log(title = "半成品导入", businessType = BusinessType.IMPORT)
+    @RequiresPermissions("device:devPart:import")
+    @PostMapping("/importPart")
+    @ResponseBody
+    public AjaxResult importPart(MultipartFile file, boolean updateSupport) throws Exception {
+        try {
+            return AjaxResult.success(devProductListService.importProduct(file, updateSupport,1));
+        } catch (Exception e) {
+            return error(e.getMessage());
+        }
+    }
+
+    /**
+     * 导出产品管理列表
+     */
+    @RequiresPermissions("device:devPart:export")
+    @PostMapping("/exportPart")
+    @ResponseBody
+    public AjaxResult exportPart(DevProductList devProductList) {
+        devProductList.setSign(1);//编辑为产品
+        List<DevProductList> list = devProductListService.selectDevProductListList(devProductList);
+        ExcelUtil<DevProductList> util = new ExcelUtil<DevProductList>(DevProductList.class);
+        return util.exportExcel(list, "半成品编码");
     }
 }

@@ -46,6 +46,12 @@ public class WorkOrderChange extends BaseEntity
 
 	/** 工单变更状态 0、修改 1、合单 2、拆单  */
 	private Integer cStatus;
+	/** 用于标记 0、产线 1、车间  */
+	private Integer sign;
+	/** 工价 */
+	private Float workPrice;
+	/** 订单编号  */
+	private String orderCodeInfo;
 
 	public void setId(Integer id) 
 	{
@@ -183,21 +189,49 @@ public class WorkOrderChange extends BaseEntity
 		this.cStatus = cStatus;
 	}
 
+	public Integer getSign() {
+		return sign;
+	}
+
+	public void setSign(Integer sign) {
+		this.sign = sign;
+	}
+
+	public Float getWorkPrice() {
+		return workPrice;
+	}
+
+	public void setWorkPrice(Float workPrice) {
+		this.workPrice = workPrice;
+	}
+
+	public String getOrderCodeInfo() {
+		return orderCodeInfo;
+	}
+
+	public void setOrderCodeInfo(String orderCodeInfo) {
+		this.orderCodeInfo = orderCodeInfo;
+	}
+
+	@Override
 	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("companyId", getCompanyId())
-            .append("orderId", getOrderId())
-            .append("orderCode", getOrderCode())
-            .append("lineId", getLineId())
-            .append("lineName", getLineName())
-            .append("deviceLiable", getDeviceLiable())
-            .append("deviceLiable2", getDeviceLiable2())
-            .append("productionStart", getProductionStart())
-            .append("productionEnd", getProductionEnd())
-            .append("productNumber", getProductNumber())
-            .append("createPeople", getCreatePeople())
-            .append("createTime", getCreateTime())
-            .toString();
-    }
+		return "WorkOrderChange{" +
+				"id=" + id +
+				", companyId=" + companyId +
+				", orderId=" + orderId +
+				", orderCode='" + orderCode + '\'' +
+				", lineId=" + lineId +
+				", lineName='" + lineName + '\'' +
+				", deviceLiable='" + deviceLiable + '\'' +
+				", deviceLiable2='" + deviceLiable2 + '\'' +
+				", productionStart=" + productionStart +
+				", productionEnd=" + productionEnd +
+				", productNumber=" + productNumber +
+				", createPeople='" + createPeople + '\'' +
+				", createTime=" + createTime +
+				", remark='" + remark + '\'' +
+				", cStatus=" + cStatus +
+				", sign=" + sign +
+				'}';
+	}
 }

@@ -37,25 +37,11 @@ public interface IEcnLogService
 	public int insertEcnLog(EcnLog ecnLog);
 
 	/**
-	 * 修改ECN 变更记录
+	 * 关闭ECN 状态变更记录
 	 *
-	 * @param ecnLog ECN 变更记录信息
+	 * @param  type 变更记录信息
 	 * @return 结果
 	 */
-	public int updateEcnLog(EcnLog ecnLog);
+	public int updateEcnLog(int type,int save_id);
 
-	/**
-	 * 删除ECN 变更记录信息
-	 *
-	 * @param ids 需要删除的数据ID
-	 * @return 结果
-	 */
-	public int deleteEcnLogByIds(String ids);
-
-	/**
-	 * 删除ECN变更记录
-	 * @param id ECN变更记录id
-	 * @return 结果
-	 */
-	int deleteEcnLogById(Integer id);
 }

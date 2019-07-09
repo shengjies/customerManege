@@ -20,11 +20,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="remark"    column="remark"    />
         <result property="cStatus"    column="c_status"    />
+        <result property="sign"    column="sign"    />
+        <result property="workPrice"    column="work_price"    />
+        <result property="orderCodeInfo"    column="order_code_info"    />
     </resultMap>
 	
 	<sql id="selectWorkOrderChangeVo">
         select id, company_id, order_id, order_code,remark, line_id, line_name, device_liable, device_liable2,
-         production_start, production_end, product_number, create_people, create_time,c_status from dev_work_order_change
+         production_start, production_end, product_number, create_people, create_time,c_status,sign,work_price,order_code_info from dev_work_order_change
     </sql>
 	
     <select id="selectWorkOrderChangeList" parameterType="WorkOrderChange" resultMap="WorkOrderChangeResult">
@@ -51,6 +54,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createTime != null  ">create_time,</if>
 			<if test="remark != null  ">remark,</if>
 			<if test="cStatus != null  ">c_status,</if>
+			<if test="sign != null  ">sign,</if>
+			<if test="workPrice != null  ">work_price,</if>
+			<if test="orderCodeInfo != null  ">order_code_info,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -67,6 +73,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createTime != null  ">#{createTime},</if>
 			<if test="remark != null  ">#{remark},</if>
 			<if test="cStatus != null  ">#{cStatus},</if>
+			<if test="sign != null  ">#{sign},</if>
+			<if test="workPrice != null  ">#{workPrice},</if>
+			<if test="orderCodeInfo != null  ">#{orderCodeInfo},</if>
          </trim>
     </insert>
 </mapper>

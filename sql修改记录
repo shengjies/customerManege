@@ -489,4 +489,8 @@ ADD COLUMN `im_code` VARCHAR(125) NULL COMMENT '设备编号' AFTER `im_id`;
 
 
 
+#2019-07-03 zsj 服务器未执行sql 产品编码用于区分是否产品、半成品
+ALTER TABLE `octopus`.`dev_product_list`
+ADD COLUMN `sign` INT NULL DEFAULT 0 COMMENT '标记 0、产品 1、半成品' AFTER `ecn_text`,
+ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '单位' AFTER `sign`;
 

@@ -19,7 +19,7 @@ public class EcnLog extends BaseEntity
 	private Integer id;
 	/** 公司id */
 	private Integer companyId;
-	/** 保存ecn信息类别  1、产品ecn 2、工单ecn  */
+	/** 保存ecn信息类别  1、产品ecn 2、工单ecn  3、半成品 */
 	private Integer ecnType;
 	/** 保存对应类型的id */
 	private Integer saveId;

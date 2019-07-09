@@ -36,7 +36,7 @@ public interface IDevWorkOrderService {
      * @param devWorkOrder 工单信息
      * @return 结果
      */
-    public int insertDevWorkOrder(DevWorkOrder devWorkOrder,HttpServletRequest request);
+    public int insertDevWorkOrder(DevWorkOrder devWorkOrder);
 
     /**
      * 修改工单
@@ -44,7 +44,7 @@ public interface IDevWorkOrderService {
      * @param devWorkOrder 工单信息
      * @return 结果
      */
-    public int updateDevWorkOrder(DevWorkOrder devWorkOrder, User user);
+    public int updateDevWorkOrder(DevWorkOrder devWorkOrder);
 
     /**
      * 删除工单信息
@@ -65,7 +65,7 @@ public interface IDevWorkOrderService {
      * @param id
      * @return
      */
-    int editWorkerOrderById(Integer id,HttpServletRequest request);
+    int editWorkerOrderById(Integer id);
 
     /**
      * 校验流水线是否只有一个处于生产状态的工单
@@ -122,7 +122,7 @@ public interface IDevWorkOrderService {
      * @param order
      * @return
      */
-    int changeOrder(DevWorkOrder order,HttpServletRequest request);
+    int changeOrder(DevWorkOrder order);
 
     /**
      * 根据工单id查询对应的ECN信息

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-ecnLog-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">变更信息：</label>
+            <div class="col-sm-8">
+                <input type="hidden" id="saveId" name="saveId" th:value="${save_id}">
+                <input type="hidden" id="ecnType" name="ecnType" th:value="${type}">
+                <textarea rows="8" id="ecnText" name="ecnText" class="form-control" type="text"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "production/ecnLog";
+    $("#form-ecnLog-add").validate({
+        rules: {
+            ecnText: {
+                required: true,
+            },
+        },
+        messages: {
+            ecnText: {
+                required: "请填写变更信息",
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.modal.confirm("确认添加变更信息", function (e) {
+                if (e) {
+                    var config = {
+                        url: prefix+"/addSave",
+                        type: "post",
+                        dataType: "json",
+                        data: $('#form-ecnLog-add').serialize(),
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                            $.modal.disable();
+                        },
+                        success: function (result) {
+                            if (result.code == web_status.SUCCESS) {
+                                $.modal.close();
+                                window.parent.$.modal.msgSuccess(result.msg);
+                                window.parent.$.table.refresh();
+                                window.parent.parent.$.table.refresh();
+                                window.parent.$("#ecn-status").attr("data-status",1).removeClass("btn-default").addClass("btn-primary").find("span").text("关闭变更")
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                            $.modal.enable();
+                        }
+                    };
+                    $.ajax(config)
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

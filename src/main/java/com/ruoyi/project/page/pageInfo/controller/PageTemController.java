@@ -81,6 +81,9 @@ public class PageTemController extends BaseController {
             case PageTypeConstants.PAGE_TYPE_XQ:
                 to = prefix +"/tem2";
                 break;
+            case PageTypeConstants.PAGE_TYPE_CJ:
+                to = prefix +"/tem3";
+                break;
         }
         return to;
     }

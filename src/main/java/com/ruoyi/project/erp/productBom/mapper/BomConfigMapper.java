@@ -1,6 +1,7 @@
 package com.ruoyi.project.erp.productBom.mapper;
 
 import com.ruoyi.project.erp.productBom.domain.BomConfig;
+import org.apache.ibatis.annotations.Param;
 
 
 /**

@@ -39,7 +39,7 @@ public class JwtUtil {
      */
     public static Date getExpirationDate() {
         System.out.println();
-        return new Date(System.currentTimeMillis() + 60 * 1000);
+        return new Date(System.currentTimeMillis() +12*60*60 * 1000);
     }
 
     /**

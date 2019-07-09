@@ -60,35 +60,41 @@ public class EcnLogController extends BaseController {
     }
 
     /**
-     * 修改ECN 变更记录
+     * 添加变更信息
+     * @param type 变更类型
+     * @param save_id 保存id
+     * @param mmap 缓存数据
+     * @return
      */
-    @GetMapping("/edit/{id}")
-    public String edit(@PathVariable("id") Integer id, ModelMap mmap) {
-        EcnLog ecnLog = ecnLogService.selectEcnLogById(id);
-        mmap.put("ecnLog", ecnLog);
-        return prefix + "/edit";
+    @GetMapping("/add")
+    public String add(int type,int save_id,ModelMap mmap){
+        mmap.put("type",type);
+        mmap.put("save_id",save_id);
+        return prefix+"/add";
     }
+
+    /**
+     * 新增保存变更记录
+     */
+    @RequiresPermissions("production:ecnLog:add")
+    @Log(title = "新增变更记录", businessType = BusinessType.INSERT)
+    @PostMapping("/addSave")
+    @ResponseBody
+    public AjaxResult addSave(EcnLog ecnLog){
+        return toAjax(ecnLogService.insertEcnLog(ecnLog));
+    }
+
 
     /**
      * 修改保存ECN 变更记录
      */
     @RequiresPermissions("production:ecnLog:edit")
-    @Log(title = "ECN 变更记录", businessType = BusinessType.UPDATE)
+    @Log(title = "关闭ECN状态", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(EcnLog ecnLog) {
-        return toAjax(ecnLogService.updateEcnLog(ecnLog));
+    public AjaxResult editSave(int type,int save_id) {
+        return toAjax(ecnLogService.updateEcnLog(type,save_id));
     }
 
-    /**
-     * 删除ECN 变更记录
-     */
-    @RequiresPermissions("production:ecnLog:remove")
-    @Log(title = "ECN 变更记录", businessType = BusinessType.DELETE)
-    @PostMapping("/remove")
-    @ResponseBody
-    public AjaxResult remove(Integer id) {
-        return toAjax(ecnLogService.deleteEcnLogById(id));
-    }
 
 }

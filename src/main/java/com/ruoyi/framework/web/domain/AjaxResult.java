@@ -107,6 +107,7 @@ public class AjaxResult extends HashMap<String, Object>
         json.put("data", data);
         return json;
     }
+
     public static AjaxResult login(String path,String token,int sign,String u){
         AjaxResult register = new AjaxResult();
         register.put("path", path);
@@ -115,5 +116,20 @@ public class AjaxResult extends HashMap<String, Object>
         register.put("token", token);
         register.put("sign", sign);
         return register;
+    }
+
+    /**
+     * 用于API 接口交付
+     * @param code 状态码
+     * @param msg 提示信息
+     * @param data 相关数据
+     * @return
+     */
+    public static AjaxResult api(int code,String msg,Object data){
+        AjaxResult result = new AjaxResult();
+        result.put("code",code);
+        result.put("msg",msg);
+        result.put("data",data);
+        return result;
     }
 }

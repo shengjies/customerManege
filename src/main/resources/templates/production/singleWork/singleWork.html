@@ -84,6 +84,7 @@
     var removeFlag = [[${@permission.hasPermi('production:singleWork:remove')}]];
     var configDevFlag = [[${@permission.hasPermi('production:singleWork:configDev')}]];
     var configSopFlag = [[${@permission.hasPermi('production:singleWork:configSop')}]];
+    var singleWork = [[${@permission.hasPermi('production:singleWorkOrder:list')}]];
     var prefix = ctx + "production/singleWork";
 
     $(function () {
@@ -160,6 +161,7 @@
                         if (row.parentId != 0) {
                             actions.push('<a class="btn btn-xs  btn-primary ' + configDevFlag + '" href="javascript:void(0)" onclick="configDev(\'' + row.id + '\')">配置硬件</a> ');
                             actions.push('<a class="btn btn-xs  btn-primary ' + configSopFlag + '" href="javascript:void(0)" onclick="configSop(\'' + row.id + '\')">配置SOP</a> ');
+                            actions.push('<a class="btn btn-xs  btn-primary ' + singleWork + '" href="javascript:void(0)" onclick="configSingle(' + row.id + ',\''+row.imCode+'\')">配置工单</a> ');
                         }
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 
@@ -271,6 +273,15 @@
             var data = {"ids": id};
             $.operate.submit(url, "post", "json", data);
         });
+    }
+
+    /**
+     * 单工位工单配置
+     * @param id
+     * @param name
+     */
+    function configSingle(id,name) {
+        $.modal.open(name+" 工位配置","/production/singleWorkOrder?type=0&orderId=0&singleId="+id);
     }
 </script>
 </body>

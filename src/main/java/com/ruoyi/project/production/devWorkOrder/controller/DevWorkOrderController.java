@@ -103,8 +103,8 @@ public class DevWorkOrderController extends BaseController {
     @Log(title = "工单", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(DevWorkOrder devWorkOrder,HttpServletRequest request) {
-        return toAjax(devWorkOrderService.insertDevWorkOrder(devWorkOrder,request));
+    public AjaxResult addSave(DevWorkOrder devWorkOrder) {
+        return toAjax(devWorkOrderService.insertDevWorkOrder(devWorkOrder));
     }
 
     /**
@@ -124,17 +124,12 @@ public class DevWorkOrderController extends BaseController {
     @Log(title = "工单", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(DevWorkOrder devWorkOrder,HttpServletRequest request) {
-        User u = JwtUtil.getTokenUser(request);
-        if (u == null) {
-            return error();
-        }
+    public AjaxResult editSave(DevWorkOrder devWorkOrder) {
         try {
-            return toAjax(devWorkOrderService.updateDevWorkOrder(devWorkOrder,u));
+            return toAjax(devWorkOrderService.updateDevWorkOrder(devWorkOrder));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
-
     }
 
     /**
@@ -171,13 +166,9 @@ public class DevWorkOrderController extends BaseController {
      */
     @PostMapping("/editWorkerOrderById")
     @ResponseBody
-    public AjaxResult editWorkerOrderById(Integer id,HttpServletRequest request) {
-        User u =JwtUtil.getTokenUser(request);
-        if (u == null) {
-            return error();
-        }
+    public AjaxResult editWorkerOrderById(Integer id) {
         try {
-            return toAjax(devWorkOrderService.editWorkerOrderById(id,request));
+            return toAjax(devWorkOrderService.editWorkerOrderById(id));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -257,24 +248,23 @@ public class DevWorkOrderController extends BaseController {
     public String showWorkOrderDetail(@PathVariable("id") Integer id, ModelMap mmap) {
         DevWorkOrder devWorkOrder = devWorkOrderService.selectDevWorkOrderById(id);
         if(devWorkOrder.getWorkorderStatus() == 1){
-            //达成率 = 累计产量/标准工时*(实际用时) *100
+            //达成率 = 累计产量/标准工时*(生产用时) *100
             devWorkOrder.setReachRate(0.00F);
             if(devWorkOrder.getCumulativeNumber() != 0){
-                float standardTotal = devWorkOrder.getProductStandardHour() * TimeUtil.getDateDel(devWorkOrder.getStartTime());
+
+                float standardTotal = devWorkOrder.getProductStandardHour() * (TimeUtil.getDateDel(devWorkOrder.getSignTime())+devWorkOrder.getSignHuor());
                 devWorkOrder.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) devWorkOrder.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
             }
         }
         if(devWorkOrder.getWorkorderStatus() == 2){
             devWorkOrder.setReachRate(0.00F);
             if(devWorkOrder.getCumulativeNumber() != 0){
-                float standardTotal = devWorkOrder.getProductStandardHour() * TimeUtil.getDateDel(devWorkOrder.getStartTime(),devWorkOrder.getEndTime());
+                float standardTotal = devWorkOrder.getProductStandardHour() * devWorkOrder.getSignHuor();
                 devWorkOrder.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) devWorkOrder.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
             }
         }
         ProductionLine productionLine = productionLineService.selectProductionLineById(devWorkOrder.getLineId());
-        if (StringUtils.isNotNull(productionLine) && !StringUtils.isEmpty(productionLine.getParamConfig())) {
-            productionLine.setParamArray(JSON.parseArray(productionLine.getParamConfig(), String.class));
-        }
+
         mmap.put("line", productionLine);
         mmap.put("devWorkOrder", devWorkOrder);
         return prefix + "/workOrderDetail";
@@ -310,8 +300,13 @@ public class DevWorkOrderController extends BaseController {
      */
     @ResponseBody
     @RequestMapping("/chang")
-    public AjaxResult changeOrder(DevWorkOrder order,HttpServletRequest request){
-        return toAjax(devWorkOrderService.changeOrder(order,request));
+    public AjaxResult changeOrder(DevWorkOrder order){
+        try {
+            return toAjax(devWorkOrderService.changeOrder(order));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return AjaxResult.error();
     }
 
     @RequestMapping("/workecn")
@@ -385,9 +380,8 @@ public class DevWorkOrderController extends BaseController {
     @RequestMapping("/workDismantle")
     public AjaxResult workDismantleInfo(@RequestBody List<DevWorkOrder> list){
         try {
-            for (DevWorkOrder order : list) {
-                System.out.println(order);
-            }
+            devWorkOrderService.workDismantleInfo(list);
+            return success();
         }catch (Exception e){
             e.printStackTrace();
         }

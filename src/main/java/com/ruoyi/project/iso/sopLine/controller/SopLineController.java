@@ -95,7 +95,7 @@ public class SopLineController extends BaseController {
         // 查询未配置该作业指导书的所有产线信息
         modelMap.put("lineList", lineService.selectLineNotConfigByIsoId(isoId, user.getCompanyId()));
         // 查询该公司的所有产品信息
-        modelMap.put("proList", productListService.selectProductAllByCompanyId(request.getCookies()));
+        modelMap.put("proList", productListService.selectProductAllByCompanyId(0));
         modelMap.put("isoId", isoId);
         return prefix + "/add";
     }
@@ -107,8 +107,8 @@ public class SopLineController extends BaseController {
     @Log(title = "作业指导书  产线 配置", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(@RequestBody SopLine sopLine, HttpServletRequest request) {
-        User u = JwtUtil.getTokenUser(request);
+    public AjaxResult addSave(@RequestBody SopLine sopLine) {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
         sopLine.setcId(u.getUserId().intValue());
         sopLine.setCompanyId(u.getCompanyId());
         try {
@@ -250,20 +250,7 @@ public class SopLineController extends BaseController {
         return getDataTable(list);
     }
 
-    /**
-     * 单工位调转添加SOP作业指导书页面
-     */
-    @GetMapping("/addSop/{parentId}/{id}")
-    public String addSop(@PathVariable("parentId") int parentId, @PathVariable("id") int id, ModelMap mmap) {
-        User user = JwtUtil.getUser();
-        // 查询该单工位所有未配置的SOP书
-        mmap.put("iso", iIsoService.selectNotConfigByPidAndLineId(FileConstants.FOLDER_SOP, id, FileConstants.SOP_TAG_SINGWORK));
-        // 根据单工位id查询所以未配置的产品信息
-        mmap.put("pns", productListService.selectNotConfigByLineId(id, user.getCompanyId(), FileConstants.SOP_TAG_SINGWORK));
-        mmap.put("parentId", parentId);
-        mmap.put("lineId", id);
-        return "production/singleWork/addSop";
-    }
+
 
     /**
      * 单工位调转修改SOP作业指导书页面
@@ -319,7 +306,7 @@ public class SopLineController extends BaseController {
         SingleWork singleWork = new SingleWork();
         singleWork.setSign(FileConstants.SIGN_HOUSE);
         modelMap.put("house",singleWorkService.selectSingleWorkList(singleWork));
-        modelMap.put("pns",productListService.selectProductAllByCompanyId(ServletUtils.getRequest().getCookies()));
+        modelMap.put("pns",productListService.selectProductAllByCompanyId(0));
         modelMap.put("pages", iIsoService.selectIsoByParentId(isoId));
         return prefix + "/addSingWork";
     }

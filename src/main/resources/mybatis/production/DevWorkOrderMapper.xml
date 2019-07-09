@@ -70,7 +70,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and workorder_number like concat('%', #{workorderNumber}, '%')
             </if>
             <if test="companyId != null "> and company_id = #{companyId}</if>
-            <if test="lineId != null "> and line_id = #{lineId}</if>
+            <if test="lineId != null and lineId >0"> and line_id = #{lineId} and wl_sign = 0</if>
+            <if test="single != null and single > 0 "> and line_id = #{single} and wl_sign = 1</if>
             <if test="productName != null  and productName != '' "> and product_name = #{productName}</if>
             <if test="productCode != null  and productCode != '' "> and product_code = #{productCode}</if>
             <if test="orderCode != null and orderCode != '' "> and order_code like concat(#{orderCode}, '%')</if>
@@ -263,7 +264,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--校验一条流水线是否只存在一个处于生产状态的工单-->
     <select id="checkWorkLineUnique" resultType="Long">
-        SELECT count(1) FROM dev_work_order where line_id = #{lineId} and workorder_status = 1;
+        SELECT count(1) FROM dev_work_order where line_id = #{lineId} and wl_sign =#{sign} and workorder_status = 1;
     </select>
 
     <!--查询所有生产状态处于正在进行的工单-->

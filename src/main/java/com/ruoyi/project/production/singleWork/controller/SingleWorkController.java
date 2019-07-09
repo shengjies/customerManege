@@ -200,6 +200,22 @@ public class SingleWorkController extends BaseController {
         return prefix + "/configSop";
     }
 
+	/**
+	 * 根据id查询对应的
+	 * @param id
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("/selectById")
+	public AjaxResult selectSingleById(int id){
+		try {
+			return AjaxResult.success(singleWorkService.selectSingleWorkByIdGetUser(id));
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return AjaxResult.error();
+	}
+
     /**
      * 查询还未配置sop的车间单工位信息
      */

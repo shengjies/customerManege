@@ -15,7 +15,7 @@
 					<ul>
 						<li>
 							产品编码：
-							<select id="productCode" style="width:100px" name="productCode" th:with="allProductCode=${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}">
+							<select id="productCode" style="width:140px" name="productCode" th:with="allProductCode=${@product.selectProductAllByCompanyId(0)}">
 								<option value="">请选择</option>
 								<option th:each="pro:${allProductCode}" th:text="${pro.productCode}" th:value="${pro.productCode}"></option>
 							</select>
@@ -23,7 +23,7 @@
 
 						<li>
 							产品型号：
-							<select id="productModel" style="width: 100px" name="productModel" th:with="allProductCode=${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}">
+							<select id="productModel" style="width: 140px" name="productModel" th:with="allProductCode=${@product.selectProductAllByCompanyId(0)}">
 								<option value="">请选择</option>
 								<option th:each="pro:${allProductCode}" th:text="${pro.productModel}" th:value="${pro.productModel}"></option>
 							</select>
@@ -31,16 +31,10 @@
 
 						<li>
 							产品名称：
-							<select id="productName" style="width: 100px" name="productName" th:with="allProName=${@product.selectProNameAllByComId(#httpServletRequest.getCookies())}">
+							<select id="productName" style="width: 140px" name="productName" th:with="allProName=${@product.selectProNameAllByComId(0)}">
 								<option value="">请选择</option>
 								<option th:each="pro:${allProName}" th:text="${pro.productName}" th:value="${pro.productName}"></option>
 							</select>
-						</li>
-						<li th:if="${@product.isSys(#httpServletRequest.getCookies())}">
-							所属公司：<select id="companyId" name="companyId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
-							<option value="-1">所有</option>
-							<option th:each="com : ${Company}" th:text="${com.comName}" th:value="${com.companyId}"></option>
-						</select>
 						</li>
 						<li class="select-time">
 							<label>创建时间： </label>
@@ -58,6 +52,9 @@
 		</div>
 
 		<div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+			<a class="btn btn-success" onclick="importConfig()" shiro:hasPermission="device:devProductList:importConfig">
+				<i class="fa fa-gear"></i> 导入配置
+			</a>
 			<a class="btn btn-success" onclick="add()" shiro:hasPermission="device:devProductList:add">
 				<i class="fa fa-plus"></i> 添加
 			</a>
@@ -86,7 +83,7 @@
 <script th:inline="javascript">
     $(function () {
         $("select").select2({
-            width:"100px",
+            width:"160px",
             placeholder:'请选择'
         });
     })
@@ -102,6 +99,7 @@
 	var removeFlag = [[${@permission.hasPermi('device:devProductList:remove')}]];
     var viewFileFlag = [[${@permission.hasPermi('erp:fileSourceInfo:list')}]];
     var ecnFlag = [[${@permission.hasPermi('production:ecnLog:list')}]];
+    var customerFlag = [[${@permission.hasPermi('erp:customer:list')}]];
 	var prefix = ctx + "product";
 
 	$(function() {
@@ -174,14 +172,24 @@
                             actions.push('<a class="btn btn-default btn-xs ' + viewFileFlag + '" href="javascript:void(0)" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>上传文件</a> ');
 						}
                         if (row.productCustomer != null ) { // 关联过客户信息
-                            actions.push('<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="connectCustomer(\'' + row.id + '\')"><i></i>关联客户</a> ');
+                            actions.push('<a class="btn btn-primary btn-xs '+customerFlag+'" href="javascript:void(0)" onclick="connectCustomer(\'' + row.id + '\')"><i></i>关联客户</a> ');
                         } else { // 未关联过客户信息或者已经删除
-                            actions.push('<a class="btn btn-default btn-xs" href="javascript:void(0)" onclick="connectCustomer(\'' + row.id + '\')"><i></i>关联客户</a> ');
+                            actions.push('<a class="btn btn-default btn-xs '+customerFlag+'" href="javascript:void(0)" onclick="connectCustomer(\'' + row.id + '\')"><i></i>关联客户</a> ');
 						}
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a>');
                         return actions.join('');
                     }
                 },
+				{
+					field : 'price',
+					title : '单价',
+					sortable: true
+				},
+				{
+					field : 'unit',
+					title : '单位',
+					sortable: true
+				},
 				{
 					field : 'standardHourYield',
 					title : '标准工时[UPH]',
@@ -237,7 +245,7 @@
 	 * 添加
 	 */
 	function add() {
-		$.modal.open("添加产品",prefix+"/add",800,520);
+		$.modal.open("添加产品",prefix+"/add",800,560);
 	}
 
 	/**
@@ -256,7 +264,7 @@
 			}
 			url = $.table._option.updateUrl.replace("{id}", id);
 		}
-		$.modal.open("修改产品",url,800,520);
+		$.modal.open("修改产品",url,800,560);
 	}
 
     /**
@@ -265,7 +273,7 @@
      */
     function connectCustomer(id) {
         var url = '/erp/productCustomer/connectCustomer/'+id;
-        $.modal.open("关联客户",url,900,600)
+        $.modal.open("关联客户",url,900,660)
     }
 
     /**
@@ -276,7 +284,14 @@
     }
 
     function ecnView(id,ecn_status) {
-		$.modal.open("ECN变更","/production/ecnLog?ecn_type=1&save_id="+id+"&ecn_status="+ecn_status)
+		$.modal.open("产品变更信息","/production/ecnLog?ecn_type=1&save_id="+id+"&ecn_status="+ecn_status,900,600)
+	}
+
+	/**
+	 * 产品导入配置
+	 */
+	function importConfig() {
+		createMenuItem(prefix+"/importProductConfig?type=0","产品导入配置")
 	}
 </script>
 </body>

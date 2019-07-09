@@ -215,7 +215,7 @@ public class PageReal {
      */
     private int getData(int date,int val){
         //获取当前系统小时数
-        int hour = TimeUtil.getHour();
+        int hour = TimeUtil.getHour(new Date());
         if(hour == date){
             return r;
         }else{

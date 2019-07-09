@@ -39,9 +39,9 @@ public class TimeUtil {
      *
      * @return
      */
-    public static int getHour() {
+    public static int getHour(Date date) {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT+08:00"));
-        c.setTime(new Date());
+        c.setTime(date);
         return c.get(Calendar.HOUR_OF_DAY);
     }
 
@@ -65,14 +65,24 @@ public class TimeUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        System.out.println(getSystemDate());
-    }
+        System.out.println(getEndHour(new Date()));
+}
 
     public static Date getSystemDate(){
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
             SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             return  format1.parse(format.format(new Date()));
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    public static Date getEndHour(Date date){
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:59:59");
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return  format1.parse(format.format(date));
         }catch (Exception e){
             return null;
         }

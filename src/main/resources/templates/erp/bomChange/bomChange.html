@@ -11,7 +11,7 @@
 					<div class="select-list">
 						<ul>
 							<li>
-								产品编码：<select id="pId" name="pId" th:with="product=${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}" >
+								产品编码：<select id="pId" name="pId" th:with="product=${@product.selectProductAllByCompanyId(0)}" >
 									<option value="-1">所有</option>
 									<option th:each="item:${product}" th:value="${item.id}" th:utext="${item.productCode}"></option>
 								</select>

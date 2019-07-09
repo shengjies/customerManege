@@ -14,6 +14,7 @@ import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import java.util.List;
  * @author sj
  * @date 2019-07-03
  */
-@Service
+@Service("single")
 public class SingleWorkServiceImpl implements ISingleWorkService {
     @Autowired
     private SingleWorkMapper singleWorkMapper;
@@ -40,18 +41,50 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     private InstrumentManageMapper instrumentManageMapper;
 
     @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
     private SopLineMapper sopLineMapper;
 
     @Autowired
     private SopLineWorkMapper sopLineWorkMapper;
 
     /**
+	@Autowired
+	private UserMapper userMapper;
+
+	/**
      * 查询单工位数据信息
      *
      * @param id 单工位数据ID
      * @return 单工位数据信息
      */
     @Override
+	public SingleWork selectSingleWorkById(Integer id)
+	{
+	    return singleWorkMapper.selectSingleWorkById(id);
+	}
+
+	/**
+	 * 根据id查询车间信息，并获取相关责任人信息
+	 * @param id 车间id
+	 * @return
+	 */
+	@Override
+	public SingleWork selectSingleWorkByIdGetUser(Integer id) {
+		SingleWork work = singleWorkMapper.selectSingleWorkById(id);
+		if(work != null){
+			if(work.getLiableOne() != null){
+				work.setLiableOneName(userMapper.selectUserById(work.getLiableOne().longValue()).getUserName());
+			}
+			if(work.getLiableTwo() != null){
+				work.setLiableTwoName(userMapper.selectUserById(work.getLiableTwo().longValue()).getUserName());
+			}
+		}
+		return work;
+	}
+
+	/**
     public SingleWork selectSingleWorkById(Integer id) {
         return singleWorkMapper.selectSingleWorkById(id);
     }
@@ -73,6 +106,34 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     }
 
     /**
+	@Override
+	public List<SingleWork> selectSingleWorkList(SingleWork singleWork)
+	{
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		singleWork.setCompanyId(user.getCompanyId());
+		return singleWorkMapper.selectSingleWorkList(singleWork);
+	}
+
+	/**
+	 * 查询所以车间
+	 * @return
+	 */
+	@Override
+	public List<SingleWork> selectSingleWorkListSign0() {
+		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+		if (user == null) {
+			return Collections.emptyList();
+		}
+		SingleWork singleWork = new SingleWork();
+		singleWork.setSign(0);
+		singleWork.setCompanyId(user.getCompanyId());
+		return singleWorkMapper.selectSingleWorkList(singleWork);
+	}
+
+	/**
      * 新增单工位数据
      *
      * @param singleWork 单工位数据信息
@@ -301,6 +362,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             }
         }
         return singleWorkMapper.updateSingleWork(singleWork);
+    }
+
+    /**
+     * 根据车间id查询所以单位信息
+     * @param pid 车间id
+     * @return
+     */
+    @Override
+    public List<SingleWork> selectAllNotConfigChildren(int pid) {
+        return singleWorkMapper.selectAllNotConfigChildren(pid);
     }
 
     /**

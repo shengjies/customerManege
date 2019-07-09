@@ -45,7 +45,6 @@ public interface DevWorkOrderMapper {
      * @param devWorkOrder 工单信息
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     public int updateDevWorkOrder(DevWorkOrder devWorkOrder);
 
     /**
@@ -97,12 +96,11 @@ public interface DevWorkOrderMapper {
 
     /**
      * 判断流水线是否只有一个正在进行状态的工单
-     *
-     * @param lineId
+     * @param lineId 产线/车间id
+     * @param sign 标记  0、产线 1、车间
      * @return
      */
-//    @DataSource(value = DataSourceType.SLAVE)
-    Long checkWorkLineUnique(@Param("lineId") Integer lineId);
+    Long checkWorkLineUnique(@Param("lineId") Integer lineId,@Param("sign")int sign);
 
     /**
      * 查询生产状态处于正在进行的所有工单

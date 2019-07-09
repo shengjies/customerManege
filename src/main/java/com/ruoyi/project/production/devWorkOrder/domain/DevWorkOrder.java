@@ -195,6 +195,16 @@ public class DevWorkOrder extends BaseEntity {
     /** 工单生产单价 */
     private Float workPrice;
 
+    private Integer single;//用于查询车间
+
+    public Integer getSingle() {
+        return single;
+    }
+
+    public void setSingle(Integer single) {
+        this.single = single;
+    }
+
     public Integer getWlSign() {
         return wlSign;
     }
@@ -774,6 +784,7 @@ public class DevWorkOrder extends BaseEntity {
                 ", wlSign=" + wlSign +
                 ", makeType=" + makeType +
                 ", workPrice=" + workPrice +
+                ", single=" + single +
                 ", cumulativeNumber=" + cumulativeNumber +
                 ", directPassRate=" + directPassRate +
                 ", paramConfig='" + paramConfig + '\'' +

@@ -73,7 +73,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="companyId != null  ">company_id,</if>
 			<if test="workshopName != null  and workshopName != ''  ">workshop_name,</if>
 			<if test="imId != null  ">im_id,</if>
-            <if test="imCode != null  ">im_code,</if>
 			<if test="sign != null  ">sign,</if>
 			<if test="liableOne != null  ">liable_one,</if>
 			<if test="liableTwo != null  ">liable_two,</if>
@@ -151,11 +150,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT * FROM tab_single_work where company_id = #{companyId} and parent_id = #{parentId}
     </select>
 
+    <!--根据硬件id查询对应的工位配置信息，没次调用只能使用一个参数-->
+    <select id="selectSingleWorkByCode" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work
+        <where>
+            <if test="dev_id > 0">and dev_id = #{dev_id}</if>
+            <if test="watch_id > 0">and watch_id = #{watch_id}</if>
+            <if test="e_id > 0">and e_id = #{e_id}</if>
+        </where>
+          limit 1;
+    </select>
+
+    <!--根据车间id查询所以单位信息-->
+    <select id="selectAllNotConfigChildren" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work where parent_id = #{pid};
+    </select>
+
     <!--查询未配置sop的单工位信息-->
     <select id="selectNotConfigSop" resultMap="SingleWorkResult">
         SELECT * FROM tab_single_work as a  left join tab_sop_line_work as b on a.id = b.w_id
         and b.line_id = #{parentId} and b.sop_tag = #{sopTag} and b.sop_id = #{sopId}
         and b.company_id = #{companyId} where a.parent_id = #{parentId} and b.w_id is null;
     </select>
-    
+
 </mapper>

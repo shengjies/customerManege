@@ -38,7 +38,6 @@ public interface EcnLogMapper
      * @param ecnLog ECN 变更记录信息
      * @return 结果
      */
-//	@DataSource(DataSourceType.SLAVE)
 	public int insertEcnLog(EcnLog ecnLog);
 
 	/**

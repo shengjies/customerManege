@@ -21,11 +21,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="imgSize"    column="img_size"    />
         <result property="ecnStatus"    column="ecnstatus"    />
         <result property="ecnText"    column="ecn_text"    />
+        <result property="sign"    column="sign"    />
+        <result property="unit"    column="unit"    />
     </resultMap>
 	
 	<sql id="selectDevProductListVo">
         select id, company_id, product_code, product_name, remark, create_time, standard_hour_yield,create_by,product_model,price,
-        product_img,img_size,ecnstatus,ecn_text from dev_product_list
+        product_img,img_size,ecnstatus,ecn_text,sign,unit from dev_product_list
     </sql>
 	
     <select id="selectDevProductListList" parameterType="DevProductList" resultMap="DevProductListResult">
@@ -33,6 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             and def_id = 0
             <if test="id != null "> and id = #{id}</if>
+            <if test="sign != null "> and sign = #{sign}</if>
              <if test="companyId != null and  companyId > 0"> and company_id = #{companyId}</if>
              <if test="productCode != null  and productCode != '' "> and product_code  like concat(#{productCode}, '%') </if>
              <if test="productName != null  and productName != '' "> and product_name like concat(#{productName}, '%') </if>
@@ -68,6 +71,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="price != null  ">price,</if>
             <if test="productImg != null  ">product_img,</if>
             <if test="imgSize != null  ">img_size,</if>
+            <if test="sign != null  ">sign,</if>
+            <if test="unit != null  ">unit,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -81,6 +86,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="price != null  ">#{price},</if>
             <if test="productImg != null  ">#{productImg},</if>
             <if test="imgSize != null  ">#{imgSize},</if>
+            <if test="sign != null  ">#{sign},</if>
+            <if test="unit != null  ">#{unit},</if>
          </trim>
     </insert>
 	 
@@ -97,6 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="standardHourYield != null  ">standard_hour_yield = #{standardHourYield},</if>
             <if test="ecnStatus != null  ">ecnstatus = #{ecnStatus},</if>
             <if test="ecnText != null  ">ecn_text = #{ecnText},</if>
+            <if test="unit != null  ">unit = #{unit},</if>
         </trim>
         where id = #{id}
     </update>
@@ -114,8 +122,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过公司id查询该公司所有的产品信息-->
     <select id="selectProductAllByCompanyId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
-        select id as Id,product_code as productCode,product_model as productModel,product_name as productName,ecnstatus as ecnStatus from dev_product_list
-         where company_id = #{companyId} and def_id = 0;
+        select id as Id,product_code as productCode,product_model as productModel,product_name as productName,ecnstatus as ecnStatus, sign as  sign from dev_product_list
+         where company_id = #{companyId} and def_id = 0
+          <if test="sign > -1">
+              and sign=#{sign}
+          </if>
+
     </select>
 
     <!--通过产品id查询产品编码和标准小时产量-->
@@ -127,6 +139,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDevProductByCode" resultMap="DevProductListResult">
         <include refid="selectDevProductListVo"/>
          where company_id = #{company_id} and product_code=#{code} and def_id = 0 limit 1;
+    </select>
+    <select id="selectDevProductByCodeAndSign" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+        where company_id = #{company_id} and product_code=#{code} and def_id = 0 and sign=#{sign} limit 1;
     </select>
 
     <!--通过产品编码查询产品信息-->
@@ -161,7 +177,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询各公司的产品名称信息-->
     <select id="selectProNameAllByComId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
-        select distinct product_name as productName from dev_product_list where company_id = #{companyId} and def_id = 0;
+        select distinct product_name as productName from dev_product_list where company_id = #{companyId} and def_id = 0
+        <if test="sign > -1">
+            and sign=#{sign}
+        </if>
     </select>
 
     <!--根据产线id查询所以未配置的产品信息-->

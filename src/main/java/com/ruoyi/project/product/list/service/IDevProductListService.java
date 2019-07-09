@@ -1,6 +1,7 @@
 package com.ruoyi.project.product.list.service;
 
 import com.ruoyi.project.product.list.domain.DevProductList;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -56,17 +57,17 @@ public interface IDevProductListService
 
 	/**
 	 * 导入产品数据
-	 * @param list
+	 * @param file
 	 * @param isUpdateSupport
 	 * @return
 	 */
-	String importProduct(List<DevProductList> list,boolean isUpdateSupport,HttpServletRequest request);
+	String importProduct(MultipartFile file, boolean isUpdateSupport,int cType) throws Exception;
 
 	/**
 	 * 查询所属公司所有的产品信息
 	 * @return
 	 */
-	public List<DevProductList> selectProductAllByCompanyId(Cookie[] cookies);
+	public List<DevProductList> selectProductAllByCompanyId(int sign);
 
 	/**
 	 * 通过产品id查询产品信息
@@ -104,12 +105,6 @@ public interface IDevProductListService
 	 */
 	List<DevProductList> selectProductByCustomerId(int customerId);
 
-	/**
-	 * ecn 信息操作
-	 * @param productList
-	 * @return
-	 */
-	int ecnChange(DevProductList productList,HttpServletRequest request);
 
 	/**
 	 * 根据订单id查询对应的产品信息
@@ -122,7 +117,7 @@ public interface IDevProductListService
 	 * 查询各公司的产品名称信息
 	 * @return 结果
 	 */
-	List<DevProductList> selectProNameAllByComId(Cookie[] cookies);
+	List<DevProductList> selectProNameAllByComId(int sign);
 
 	/**
 	 * 根据公司id和产品编号查询对应的产品信息

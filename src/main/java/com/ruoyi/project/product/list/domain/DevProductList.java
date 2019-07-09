@@ -34,27 +34,27 @@ public class DevProductList extends BaseEntity {
     /**
      * 产品编码
      */
-    @Excel(name = "产品编码")
+    @Excel(name = "编码")
     private String productCode;
     /**
      * 产品型号
      */
-    @Excel(name = "产品型号")
+    @Excel(name = "型号")
     private String productModel;
     /**
      * 产品名称
      */
-    @Excel(name = "产品名称")
+    @Excel(name = "名称")
     private String productName;
     /**
      * 导入价格
      */
-    @Excel(name = "产品价格", type = Excel.Type.IMPORT)
+    @Excel(name = "价格", type = Excel.Type.IMPORT)
     private float priceImport;
     /**
      * 产品价格
      */
-    @Excel(name = "产品价格", type = Excel.Type.EXPORT)
+    @Excel(name = "价格", type = Excel.Type.EXPORT)
     private BigDecimal price;
     /**
      * 标准工时
@@ -91,6 +91,8 @@ public class DevProductList extends BaseEntity {
     private Integer ecnStatus;
     /** ecn修改信息 */
     private String ecnText;
+
+    private Integer ecnType;
     /**
      * 封装产品关联客户信息
      */
@@ -103,6 +105,22 @@ public class DevProductList extends BaseEntity {
      * 库存良品数量
      */
     private Integer goodNumber;
+
+
+    /** 标记 0、产品 1、半成品 */
+    private Integer sign;
+    /** 单位 */
+    @Excel(name = "单位")
+    private String unit;
+
+
+    public Integer getEcnType() {
+        return ecnType;
+    }
+
+    public void setEcnType(Integer ecnType) {
+        this.ecnType = ecnType;
+    }
 
     public Integer getGoodNumber() {
         return goodNumber;
@@ -269,6 +287,22 @@ public class DevProductList extends BaseEntity {
 
     public void setEcnText(String ecnText) {
         this.ecnText = ecnText;
+    }
+
+    public Integer getSign() {
+        return sign;
+    }
+
+    public void setSign(Integer sign) {
+        this.sign = sign;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     @Override

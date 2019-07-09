@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.ruoyi.common.utils.PasswordUtil;
+import com.ruoyi.common.utils.security.ShiroUtils;
 import com.ruoyi.framework.jwt.JwtToken;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.user.service.IUserService;

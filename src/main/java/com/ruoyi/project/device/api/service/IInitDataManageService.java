@@ -1,5 +1,6 @@
 package com.ruoyi.project.device.api.service;
 
+import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.device.api.form.WorkDataForm;
 
 import java.util.Map;
@@ -28,4 +29,12 @@ public interface IInitDataManageService {
      * @return
      */
     Map<String,Object> workEx(String code);
+
+    /**
+     * 根据机器设备上扫描上传工单，对工单进行绑定开始操作
+     * @param code 设备绑定的硬件编号
+     * @param orderCode 工单号
+     * @return
+     */
+    AjaxResult startWorkOrder(String code, String orderCode);
 }

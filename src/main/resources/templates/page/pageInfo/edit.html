@@ -102,6 +102,30 @@
 											</div>
 										</div>
 									</div>
+									<div class="col-sm-12" th:if="${lay.layout_type == 3}">
+										<div th:if="${#lists.isEmpty(singles)}" class="col-sm-6">
+											<h4 style="color: red">请建立车间...</h4>
+										</div>
+										<div class="panel panel-primary" th:if="${not #lists.isEmpty(singles)}">
+											<div class="panel-heading">
+												<span>请选择相关车间</span>
+											</div>
+											<div class="panel-body">
+												<div class="form-group">
+													<div data-checke-info class="col-sm-12">
+														<label class="checkbox-inline" th:data-line-id="${item.id}"
+															   th:each="item,start:${singles}">
+															<input type="radio" name="line"
+																   th:checked="${item.parentId == 1?true:false}"
+																   style="width: 20px;height: 20px"><span
+																style="line-height: 25px;margin-left: 10px;"
+																th:utext="${item.workshopName}"></span>
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -267,6 +291,9 @@
 				data.configs = lattice(layout);
 				break;
 			case "2"://轮播布局
+				data.configs = roll(layout);
+				break;
+			case "3"://轮播布局
 				data.configs = roll(layout);
 				break;
 		}

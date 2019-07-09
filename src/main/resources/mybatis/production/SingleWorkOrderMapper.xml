@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper">
+    
+    <resultMap type="SingleWorkOrder" id="SingleWorkOrderResult">
+        <result property="id"    column="id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="singleId"    column="single_id"    />
+        <result property="singleP"    column="single_p"    />
+        <result property="cTime"    column="c_time"    />
+    </resultMap>
+	
+	<sql id="selectSingleWorkOrderVo">
+        select id, work_id, work_code, single_id, single_p, c_time from tab_single_work_order
+    </sql>
+	
+    <select id="selectSingleWorkOrderList" parameterType="SingleWorkOrder" resultMap="SingleWorkOrderResult">
+        <include refid="selectSingleWorkOrderVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="workId != null "> and work_id = #{workId}</if>
+             <if test="workCode != null  and workCode != '' "> and work_code = #{workCode}</if>
+             <if test="singleId != null "> and single_id = #{singleId}</if>
+             <if test="singleP != null "> and single_p = #{singleP}</if>
+             <if test="cTime != null "> and c_time = #{cTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectSingleWorkOrderById" parameterType="Integer" resultMap="SingleWorkOrderResult">
+        <include refid="selectSingleWorkOrderVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSingleWorkOrder" parameterType="SingleWorkOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_single_work_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="workId != null  ">work_id,</if>
+			<if test="workCode != null  and workCode != ''  ">work_code,</if>
+			<if test="singleId != null  ">single_id,</if>
+			<if test="singleP != null  ">single_p,</if>
+			<if test="cTime != null  ">c_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="workId != null  ">#{workId},</if>
+			<if test="workCode != null  and workCode != ''  ">#{workCode},</if>
+			<if test="singleId != null  ">#{singleId},</if>
+			<if test="singleP != null  ">#{singleP},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSingleWorkOrder" parameterType="SingleWorkOrder">
+        update tab_single_work_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="workCode != null  and workCode != ''  ">work_code = #{workCode},</if>
+            <if test="singleId != null  ">single_id = #{singleId},</if>
+            <if test="singleP != null  ">single_p = #{singleP},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteSingleWorkOrderById" parameterType="Integer">
+        delete from tab_single_work_order where id = #{id}
+    </delete>
+	
+    <delete id="deleteSingleWorkOrderByIds" parameterType="String">
+        delete from tab_single_work_order where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -78,6 +78,22 @@ public interface SingleWorkMapper {
     List<SingleWork> selectSingleWorkByParentId(@Param("companyId") Integer companyId, @Param("parentId") Integer parentId);
 
     /**
+     * 根据硬件id查询对应的工位配置信息，没次调用只能使用一个参数
+     * @param dev_id 计数器硬件id
+     * @param watch_id 看板硬件id
+     * @param e_id mes id
+     * @return
+     */
+    SingleWork selectSingleWorkByCode(@Param("dev_id")int dev_id,@Param("watch_id")int watch_id,@Param("e_id")int e_id);
+
+    /**
+     * 根据车间id查询所以单位信息
+     * @param pid 车间id
+     * @return
+     */
+    List<SingleWork> selectAllNotConfigChildren(@Param("pid")int pid);
+
+    /**
      * 查询还未配置的单工位信息
      * @param companyId 公司id
      * @param parentId 车间id

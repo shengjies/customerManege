@@ -7,6 +7,7 @@ import com.ruoyi.project.page.pageInfo.domain.PageInfo;
 import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -100,4 +101,11 @@ public interface IPageInfoService
 	 * @return
 	 */
 	List<ProductionLine> selectPageLineByPid(int pid,int companyId);
+
+	/**
+	 * 查询所以车间
+	 * @param pid 页面id
+	 * @return
+	 */
+	List<SingleWork> selectSingleWork(int pid);
 }

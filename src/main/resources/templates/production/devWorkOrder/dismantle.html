@@ -191,9 +191,9 @@
                         dataType: 'json',
                         data: JSON.stringify(rows),
                         contentType: 'application/json',
-                        async: false,  //同步请求，
-                        error : function(request) {
-                            $.modal.alertError("系统错误");
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                            $.modal.disable();
                         },
                         success : function(result) {
                             if (result.code == web_status.SUCCESS) {
@@ -201,6 +201,8 @@
                             }else{
                                 $.modal.alertError(result.msg);
                             }
+                            $.modal.closeLoading();
+                            $.modal.enable();
                         }
                     });
                 }

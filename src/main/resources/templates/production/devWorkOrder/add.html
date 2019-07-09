@@ -12,155 +12,320 @@
 <body class="white-bg">
 <div class="ibox-content">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-        <form class="form-horizontal m" id="form-devWorkOrder-add">
-            <div class="col-sm-1"></div>
-            <div class="col-sm-10">
-                <div class="col-sm-6">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">工单号(唯一)：</label>
-                            <div class="col-sm-8">
-                                <input id="workorderNumber" name="workorderNumber" class="form-control" type="text" th:value="${workorderNumber}">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#line" data-toggle="tab" aria-expanded="true">产线工单</a></li>
+                <li><a href="#single" data-toggle="tab" aria-expanded="false">车间工单</a></li>
+            </ul>
+            <div class="tab-content">
+                <!--产线-->
+                <div class="tab-pane active" id="line">
+                    <form class="form-horizontal m" id="form-devWorkOrder-add">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-10">
+                            <div class="col-sm-6">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">工单号(唯一)：</label>
+                                        <div class="col-sm-8">
+                                            <input id="workorderNumber" name="workorderNumber" class="form-control" type="text" th:value="${workorderNumber}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">选择产线：</label>
+                                        <div class="col-sm-8">
+                                            <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId" class="form-control"
+                                                    th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
+                                                <option value="">请选择</option>
+                                                <option th:if="${line.defId == 0}" th:each="line : ${productionLine}" th:text="${line.lineName}"
+                                                        th:value="${line.Id}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">责任人1：</label>
+                                        <div class="col-sm-8">
+                                            <!--显示责任人名称-->
+                                            <input id="userName1" name="userName1" class="form-control" type="text" readonly="true">
+                                            <!--隐藏责任人id-->
+                                            <input id="deviceLiable" name="deviceLiable" type="hidden" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">责任人2：</label>
+                                        <div class="col-sm-8">
+                                            <!--显示责任人名称-->
+                                            <input id="userName2" name="userName2" class="form-control" type="text" readonly="true">
+                                            <!--隐藏责任人id-->
+                                            <input id="deviceLiableTow" name="deviceLiableTow" type="hidden" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">生产数量：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productNumber" name="productNumber" class="form-control" type="number">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">有无ECN变更：</label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="ecnStatus" name="ecnStatus">
+                                                <option value="0">无</option>
+                                                <option value='1'>有</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">ECN变更内容：</label>
+                                        <div class="col-sm-8">
+                                            <textarea rows="4" id="ecnText" name="ecnText" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">选择产线：</label>
-                            <div class="col-sm-8">
-                                <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId" class="form-control"
-                                        th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
-                                    <option value="">请选择</option>
-                                    <option th:if="${line.defId == 0}" th:each="line : ${productionLine}" th:text="${line.lineName}"
-                                            th:value="${line.Id}"></option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">责任人1：</label>
-                            <div class="col-sm-8">
-                                <!--显示责任人名称-->
-                                <input id="userName1" name="userName1" class="form-control" type="text" readonly="true">
-                                <!--隐藏责任人id-->
-                                <input id="deviceLiable" name="deviceLiable" type="hidden" value="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">责任人2：</label>
-                            <div class="col-sm-8">
-                                <!--显示责任人名称-->
-                                <input id="userName2" name="userName2" class="form-control" type="text" readonly="true">
-                                <!--隐藏责任人id-->
-                                <input id="deviceLiableTow" name="deviceLiableTow" type="hidden" value="">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">生产数量：</label>
-                            <div class="col-sm-8">
-                                <input id="productNumber" name="productNumber" class="form-control" type="number">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">ECN：</label>
-                            <div class="col-sm-8">
-                                <select class="form-control" id="ecnStatus" name="ecnStatus">
-                                    <option value="0">无</option>
-                                    <option value='1'>有</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">ECN备注：</label>
-                            <div class="col-sm-8">
-                                <textarea rows="4" id="ecnText" name="ecnText" class="form-control"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">订单：</label>
-                            <div class="col-sm-8">
-                                <select class="form-control" id="orderCode" name="orderCode" onchange="orderChangeCode(this)" th:with="order=${@order.selectAllOrder(#httpServletRequest.getCookies())}">
-                                    <option value="NaN" data-order-id="-1">无</option>
-                                    <option  th:data-order-id="${item.id}" th:value="${item.orderCode}" th:text="${item.orderCode}"
-                                            th:each="item:${order}" ></option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">产品编码：</label>
-                            <div class="col-sm-8">
-                                <select id="productCode" name="productCode" onchange="findProductCode(this)"
-                                        class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(#httpServletRequest.getCookies())}">
-                                    <option value="">请选择</option>
-                                    <option th:each="pro : ${productList}"
-                                            th:data-code="${pro.productCode}"  th:text="${pro.productCode}" th:value="${pro.id}"></option>
-                                </select>
-                                <input type="hidden" id="ecn-status" value="0">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">产品名称：</label>
-                            <div class="col-sm-8">
-                                <input id="productName" name="productName" class="form-control" type="text"
-                                       readonly="true">
-                            </div>
-                        </div>
-                    </div>
+                            <div class="col-sm-6">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">订单：</label>
+                                        <div class="col-sm-8">
+                                            <input id="orderCode" name="orderCode" class="form-control" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">产品/半成品编码：</label>
+                                        <div class="col-sm-8">
+                                            <select id="productCode" name="productCode" onchange="findProductCode(this)"
+                                                    class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                                                <option value="">请选择</option>
+                                                <option th:each="pro : ${productList}"
+                                                        th:data-code="${pro.productCode}" th:date-sign="${pro.sign}"
+                                                        th:text="${pro.productName+ ' - ' +pro.productCode}" th:value="${pro.id}"></option>
+                                            </select>
+                                            <input type="hidden" id="ecn-status" value="0">
+                                            <input type="hidden" name="wlSign" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">产品/半成品名称：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productName" name="productName" class="form-control" type="text"
+                                                   readonly="true">
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">标准小时产量：</label>
-                            <div class="col-sm-8">
-                                <input id="productStandardHour" name="productStandardHour" class="form-control" type="text"
-                                       readonly="true">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">标准小时产量：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productStandardHour" name="productStandardHour" class="form-control" type="text"
+                                                   readonly="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">计划生产开始时间：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productionStart" name="productionStart" class="form-control layer-date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">计划生产完成时间：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productionEnd" name="productionEnd" class="form-control layer-date">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">计划生产开始时间：</label>
-                            <div class="col-sm-8">
-                                <input id="productionStart" name="productionStart" class="form-control layer-date">
+                        <div class="col-sm-1"></div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div style="text-align: center;margin-top: 20px;">
+                                    <button class="btn btn-primary" type="submit" id="btnSubmit">确认</button>
+                                    <button class="btn btn-warning" type="button" onclick="refreshLine()">清除</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="col-sm-3 control-label">计划生产完成时间：</label>
-                            <div class="col-sm-8">
-                                <input id="productionEnd" name="productionEnd" class="form-control layer-date">
+                    </form>
+                </div>
+                <!--车间-->
+                <div class="tab-pane" id="single">
+                    <form class="form-horizontal m" id="form-devWorkOrder-add-single">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-10">
+                            <div class="col-sm-6">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">工单号(唯一)：</label>
+                                        <div class="col-sm-8">
+                                            <input id="workorderNumber1"  name="workorderNumber" class="form-control" type="text" th:value="${workorderNumber}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">选择车间：</label>
+                                        <div class="col-sm-8">
+                                            <select onchange="findDeviceLiableBySingle(this)" id="lineId1" name="lineId"  class="form-control"
+                                                    th:with="single=${@single.selectSingleWorkListSign0()}">
+                                                <option value="">请选择</option>
+                                                <option  th:each="s : ${single}" th:text="${s.workshopName}"
+                                                        th:value="${s.id}"></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">责任人1：</label>
+                                        <div class="col-sm-8">
+                                            <!--显示责任人名称-->
+                                            <input id="liableOne"  class="form-control" type="text" readonly="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">责任人2：</label>
+                                        <div class="col-sm-8">
+                                            <!--显示责任人名称-->
+                                            <input id="liableTwoName"  class="form-control" type="text" readonly="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">生产数量：</label>
+                                        <div class="col-sm-8">
+                                            <input  name="productNumber" class="form-control" type="number">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">工价：</label>
+                                        <div class="col-sm-8">
+                                            <input  name="workPrice" class="form-control" type="number" value="0">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">有无ECN变更：</label>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" id="ecnStatus1" name="ecnStatus">
+                                                <option value="0">无</option>
+                                                <option value='1'>有</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">订单：</label>
+                                        <div class="col-sm-8">
+                                            <input id="orderCode1" name="orderCode" class="form-control" type="text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">产品/半成品编码：</label>
+                                        <div class="col-sm-8">
+                                            <select id="productCode1" name="productCode" onchange="findProductCodeSingle(this)"
+                                                    class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                                                <option value="">请选择</option>
+                                                <option th:each="pro : ${productList}"
+                                                        th:data-code="${pro.productCode}" th:date-sign="${pro.sign}"
+                                                        th:text="${pro.productName+ ' - ' +pro.productCode}" th:value="${pro.id}"></option>
+                                            </select>
+                                            <input type="hidden" id="ecn-status1" value="0">
+                                            <input type="hidden" name="wlSign" value="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">产品/半成品名称：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productName1" name="productName" class="form-control" type="text"
+                                                   readonly="true">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">标准小时产量：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productStandardHour1" name="productStandardHour" class="form-control" type="text"
+                                                   readonly="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">计划生产开始时间：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productionStart1" name="productionStart" class="form-control layer-date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">计划生产完成时间：</label>
+                                        <div class="col-sm-8">
+                                            <input id="productionEnd1" name="productionEnd" class="form-control layer-date">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">ECN变更内容：</label>
+                                        <div class="col-sm-8">
+                                            <textarea rows="4" id="ecnText1" name="ecnText" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="col-sm-1"></div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div style="text-align: center;margin-top: 20px;">
+                                    <button class="btn btn-primary" type="submit" id="btnSubmit1">确认</button>
+                                    <button class="btn btn-warning" type="button" onclick="refreshSingle()">清除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="col-sm-1"></div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div style="text-align: center;margin-top: 20px;">
-                        <button class="btn btn-primary" type="submit" id="btnSubmit">确认</button>
-                        <button class="btn btn-white" type="submit">取消</button>
-                    </div>
-                </div>
-            </div>
-        </form>
+        </div>
+
     </div>
 </div>
 <script th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>
@@ -195,7 +360,9 @@
     laydate(end);
 
     var prefix = ctx + "device/devWorkOrder"
-
+    /**
+     * 产线工单
+     */
     $("#form-devWorkOrder-add").validate({
         rules: {
             productCode: {
@@ -234,6 +401,21 @@
             "workorderNumber": {
                 remote: "工单号已经存在"
             },
+            productionStart:{
+                required: "请选择开始生产时间",
+            },
+            productionEnd:{
+                required: "请选择结束生产时间",
+            },
+            productNumber:{
+                required: "请输入生产数量",
+            },
+            productCode: {
+                required: "请选择产品/半成品",
+            },
+            lineId: {
+                required: "请选择产线",
+            },
         },
         onsubmit:true,
         submitHandler:function (form) {
@@ -251,7 +433,7 @@
             var t = $("#ecnText").val();
             if(!t){
                 if(ecn == 1 && p_ecn == 0 ){
-                    $.modal.alertWarning("请填写ECN备注");
+                    $.modal.alertWarning("请填写ECN变更内容");
                     return;
                 }
             }
@@ -269,14 +451,7 @@
                         success : function(result) {
                             if (result.code == web_status.SUCCESS) {
                                 $.modal.alertSuccess("新增工单成功");
-                                $.form.reset(); // 重置
-                                $("#productCode").select2().val("").trigger("change");
-                                $("#orderCode").select2().val("NaN").trigger("change");
-                                $("#lineId").select2().val("").trigger("change");
-                                $("#ecnStatus").select2().val("0").trigger("change");
-                                $.post(prefix+"/getWorkOrderCode",function (data) {
-                                    $("#workorderNumber").val(data);
-                                })
+                                refreshLine();
                             }else{
                                 $.modal.alertError(result.msg);
                             }
@@ -329,7 +504,11 @@
                     if(data.data){
                         $("#ecn-status").val(data.data.ecnStatus);
                         $("#ecnStatus").select2().val(data.data.ecnStatus).trigger("change");
-                        $("#ecnText").val(data.data.ecnText);
+                        if(data.data.ecnStatus == 1){
+                            $("#ecnText").val(data.data.ecnText);
+                        }else{
+                            $("#ecnText").val("");
+                        }
                     }else{
                         $("#ecnStatus").select2().val("0").trigger("change");
                         $("#ecn-status").val(0);
@@ -344,45 +523,222 @@
             $("#ecn-status").val(0);
             $("#ecnText").val("");
             $("#productName").val("");
-            $("#productStandardHour").val("")
+            $("#productStandardHour").val("");
+        }
+    }
+    /*******************   车间操作 ***************************/
+
+        //日期范围限制
+    var start1 = {
+            elem: '#productionStart1',
+            format: 'YYYY/MM/DD hh:mm',
+            min: laydate.now(), //设定最小日期为当前日期
+            max: '2099-06-16 23:59:59', //最大日期
+            istime: true,
+            istoday: false,
+            choose: function (datas) {
+                end1.min = datas; //开始日选好后，重置结束日的最小日期
+                end1.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+    var end1 = {
+        elem: '#productionEnd1',
+        format: 'YYYY/MM/DD hh:mm',
+        min: laydate.now(),
+        max: '2099-06-16 23:59:59',
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start1.max = datas; //结束日选好后，重置开始日的最大日期
+        }
+    };
+    laydate(start1);
+    laydate(end1);
+
+    /**
+     * 点击产线查询产线责任人
+     */
+    function findDeviceLiableBySingle(value) {
+        var id = value.value;
+        if(id){
+            $.ajax({
+                type: 'POST',
+                url: '/production/singleWork/selectById',
+                data: {
+                    "id": id,
+                },
+                dataType: 'json',
+                async: false,  //同步请求，
+                success: function (res) {
+                    if(res.code == 0){
+                        $("#liableOne").val(res.data.liableOneName);
+                        $("#liableTwoName").val(res.data.liableTwoName);
+                    }else{
+                        $.modal.alertError("操作异常");
+                    }
+                }
+            });
+        }else {
+            $("#liableOne").val("");
+            $("#liableTwoName").val("");
         }
     }
 
     /**
-     * 订单改变
-     * @param val
+     * 点击产品编码查询产品以及标准小时产量
      */
-    function orderChangeCode(val) {
-        var orderId = $(val).find("option:selected").attr("data-order-id");
-        $.ajax({
-            type: 'POST',
-            url: '/product/selectProductAllByOrderId',
-            data: {
-                "orderId": orderId,
-            },
-            dataType: 'json',
-            async: false,  //同步请求，
-            success: function (data) {
-                console.log(data);
-                var item = [];
-                if(data.data){
-                    $("#ecnStatus").select2().val("0").trigger("change");
-                    $("#ecn-status").val(0);
-                    var v = data.data;
-                    for(var i = 0;i<v.length;i++){
-                        item.push({id:v[i].id,text:v[i].productCode})
-                    };
+    function findProductCodeSingle(value) {
+        var productId = value.value;
+        if(productId){
+            $.ajax({
+                type: 'POST',
+                url: '/product/findProductInfo',
+                data: {
+                    "productId": productId,
+                },
+                dataType: 'json',
+                async: false,  //同步请求，
+                success: function (data) {
+                    if(data.data){
+                        $("#ecn-status1").val(data.data.ecnStatus);
+                        $("#ecnStatus1").select2().val(data.data.ecnStatus).trigger("change");
+                        $("#ecnText1").val(data.data.ecnText);
+                    }else{
+                        $("#ecnStatus1").select2().val("0").trigger("change");
+                        $("#ecn-status1").val(0);
+                        $("#ecnText1").val("");
+                    }
+                    $("#productName1").val(data.data.productName);
+                    $("#productStandardHour1").val(data.data.standardHourYield)
                 }
-                $("#productCode").find("option:eq(0)").siblings().remove();
-                $("#productCode").select2({
-                    data:item
-                });
+            });
+        } else {
+            $("#ecnStatus1").select2().val("0").trigger("change");
+            $("#ecn-status1").val(0);
+            $("#ecnText1").val("");
+            $("#productName1").val("");
+            $("#productStandardHour1").val("");
+        }
+    }
+    $("#form-devWorkOrder-add-single").validate({
+        rules: {
+            productCode: {
+                required: true,
             },
-            error:function (error) {
-                $.modal.alertWarning("操作异常");
+            lineId: {
+                required: true,
+            },
+            workorderNumber: {
+                required: true,
+                remote: {
+                    url: prefix + "/checkWorkOrderNumber",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name: function () {
+                            return $.common.trim($("#workorderNumber").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+            productionStart:{
+                required: true,
+            },
+            productionEnd:{
+                required: true,
+            },
+            productNumber:{
+                required: true,
             }
-        });
-}
+        },
+        messages: {
+            "workorderNumber": {
+                remote: "工单号已经存在"
+            },
+            productionStart:{
+                required: "请选择开始生产时间",
+            },
+            productionEnd:{
+                required: "请选择结束生产时间",
+            },
+            productNumber:{
+                required: "请输入生产数量",
+            },
+            productCode: {
+                required: "请选择产品/半成品",
+            },
+            lineId: {
+                required: "请选择车间",
+            },
+        },
+        onsubmit:true,
+        submitHandler:function (form) {
+            // 时间判断
+            var productionStart = $("#productionStart1").val();
+            var productionEnd = $("#productionEnd1").val();
+            var start = new Date(productionStart.replace(/\-/g, "\/"));
+            var end = new Date(productionEnd.replace(/\-/g, "\/"));
+            if (productionStart != "" && productionEnd != "" && start > end) {
+                $.modal.alertWarning("开始时间不能大于结束时间");
+                return;
+            }
+            var p_ecn = $("#ecn-status1").val();
+            var ecn = $("#ecnStatus1").val();
+            var t = $("#ecnText1").val();
+            if(!t){
+                if(ecn == 1 && p_ecn == 0 ){
+                    $.modal.alertWarning("请填写ECN变更内容");
+                    return;
+                }
+            }
+            $.modal.confirm("工单号是否已经确认？",function (callBack) {
+                if(callBack){
+                    $.ajax({
+                        type: 'POST',
+                        url: prefix + "/add",
+                        dataType: 'json',
+                        data: $('#form-devWorkOrder-add-single').serialize(),
+                        async: false,  //同步请求，
+                        error : function(request) {
+                            $.modal.alertError("系统错误");
+                        },
+                        success : function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                $.modal.alertSuccess("新增工单成功");
+                                refreshSingle();
+                            }else{
+                                $.modal.alertError(result.msg);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+    function refreshLine() {
+        $.post(prefix+"/getWorkOrderCode",function (data) {
+            $("#workorderNumber").val(data);
+            $("#workorderNumber1").val(data);
+        })
+        $.form.reset("form-devWorkOrder-add"); // 重置
+        $("#productCode").select2().val("").trigger("change");
+        $("#lineId").select2().val("").trigger("change");
+        $("#ecnStatus").select2().val("0").trigger("change");
+
+    }
+    function refreshSingle() {
+        $.post(prefix+"/getWorkOrderCode",function (data) {
+            $("#workorderNumber").val(data);
+            $("#workorderNumber1").val(data);
+        })
+        $.form.reset("form-devWorkOrder-add-single"); // 重置
+        $("#productCode1").select2().val("").trigger("change");
+        $("#lineId1").select2().val("").trigger("change");
+        $("#ecnStatus1").select2().val("0").trigger("change");
+    }
 </script>
 </body>
 </html>

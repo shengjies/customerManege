@@ -31,6 +31,15 @@ public interface DevProductListMapper {
     DevProductList selectDevProductByCode(@Param("company_id") int company_id, @Param("code") String code);
 
     /**
+     * 根据公司 产品/半成品编码 查询信息
+     * @param company_id
+     * @param code
+     * @param sign
+     * @return
+     */
+    DevProductList selectDevProductByCodeAndSign(@Param("company_id") int company_id, @Param("code") String code,@Param("sign")int sign);
+
+    /**
      * 查询产品管理列表
      *
      * @param devProductList 产品管理信息
@@ -80,7 +89,7 @@ public interface DevProductListMapper {
      * @return
      */
 //    @DataSource(value = DataSourceType.SLAVE)
-    List<DevProductList> selectProductAllByCompanyId(@Param("companyId") Integer companyId);
+    List<DevProductList> selectProductAllByCompanyId(@Param("companyId") Integer companyId,@Param("sign")int sign);
 
     /**
      * 通过产品id查询产品信息
@@ -138,7 +147,7 @@ public interface DevProductListMapper {
      * @return 结果
      */
 //    @DataSource(value = DataSourceType.SLAVE)
-    List<DevProductList> selectProNameAllByComId(@Param("companyId") Integer companyId);
+    List<DevProductList> selectProNameAllByComId(@Param("companyId") Integer companyId,@Param("sign")int sign);
 
     /**
      * 根据产线id查询所以未配置的产品信息

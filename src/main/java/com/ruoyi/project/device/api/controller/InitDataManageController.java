@@ -7,6 +7,7 @@ import java.util.Map;
 import com.ruoyi.project.device.api.form.WorkDataForm;
 import com.ruoyi.project.device.api.service.IInitDataManageService;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -138,18 +139,29 @@ public class InitDataManageController extends BaseController
 		return iInitDataManageService.workEx(code);
 	}
 
+//	/**
+//	 * 获取各个用户的服务器请求地址
+//	 * @return
+//	 */
+//	@ResponseBody
+//	@RequestMapping("/path/{code}")
+//	public Map<String,Object> getPath(@PathVariable("code")String code){
+//		Map<String,Object> map = new HashMap<>();
+//		map.put("status",1);
+//		map.put("path","http://39.108.187.126:8088");
+//		return map;
+//	}
+
 	/**
-	 * 获取各个用户的服务器请求地址
+	 * 车间工单通过在机器设备上扫描绑定开始操作
+	 * @param code 设置绑定的硬件编号
+	 * @param orderCode 工单号
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping("/path/{code}")
-	public Map<String,Object> getPath(@PathVariable("code")String code){
-		Map<String,Object> map = new HashMap<>();
-		map.put("status",1);
-		map.put("path","http://39.108.187.126:8088");
-		return map;
+	@RequestMapping("/startWork/{code}/{orderCode}")
+	public AjaxResult startWorkOrder(@PathVariable("code")String code,@PathVariable("orderCode")String orderCode){
+		return iInitDataManageService.startWorkOrder(code,orderCode);
 	}
-
 
 }

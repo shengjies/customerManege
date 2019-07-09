@@ -1,5 +1,7 @@
 package com.ruoyi.common.utils.security;
 
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.Session;
@@ -62,12 +64,12 @@ public class ShiroUtils
 
     public static Long getUserId()
     {
-        return getSysUser().getUserId().longValue();
+        return JwtUtil.getTokenUser(ServletUtils.getRequest()).getUserId().longValue();
     }
 
     public static String getLoginName()
     {
-        return getSysUser().getLoginName();
+        return JwtUtil.getTokenUser(ServletUtils.getRequest()).getLoginName();
     }
 
     public static String getIp()

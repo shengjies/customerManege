@@ -9,6 +9,7 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -118,6 +119,8 @@ public class LoginService
         //}
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
 //        recordLoginInfo(user);
+        UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+
         Map<String,Object> map = new HashMap<>();
         map.put(JwtUtil.CLAIM_KEY_USER, JSON.toJSONString(user));
         return AjaxResult.login(null,JwtUtil.getToken(map),1,username);
