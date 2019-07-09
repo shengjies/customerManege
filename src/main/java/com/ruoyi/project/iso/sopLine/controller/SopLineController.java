@@ -1,6 +1,8 @@
 package com.ruoyi.project.iso.sopLine.controller;
 
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -14,6 +16,8 @@ import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -50,6 +54,9 @@ public class SopLineController extends BaseController {
 
     @Autowired
     private IProductionLineService lineService;
+
+    @Autowired
+    private ISingleWorkService singleWorkService;
 
 
     @RequiresPermissions("iso:sopLine:list")
@@ -104,7 +111,11 @@ public class SopLineController extends BaseController {
         User u = JwtUtil.getTokenUser(request);
         sopLine.setcId(u.getUserId().intValue());
         sopLine.setCompanyId(u.getCompanyId());
-        return toAjax(sopLineService.insertSopLine(sopLine));
+        try {
+            return toAjax(sopLineService.insertSopLine(sopLine));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
     }
 
     /**
@@ -159,7 +170,7 @@ public class SopLineController extends BaseController {
     @ResponseBody
     public AjaxResult remove(int lineId, int sopId,
                              HttpServletRequest request) {
-        return toAjax(sopLineService.deleteSopLine(JwtUtil.getTokenUser(request).getCompanyId(), lineId, sopId));
+        return toAjax(sopLineService.deleteSopLine(JwtUtil.getTokenUser(request).getCompanyId(), lineId, sopId,FileConstants.SOP_TAG_LINE));
     }
 
     /******************    产线SOP 配置 *************************/
@@ -225,7 +236,7 @@ public class SopLineController extends BaseController {
     }
 
 
-    /******************   单工位SOP配置 *************************/
+    /******************   单工位  SOP配置 *************************/
 
     /**
      * 查询作业指导书  单工位 配置列表
@@ -275,7 +286,82 @@ public class SopLineController extends BaseController {
         }
         mmap.put("pages", pages);
         // 查询单工位配置的页信息
-        SopLineWork sopLineWork = sopLineService.selectInfoByApi(user.getCompanyId(),parentId,sopId,lineId,FileConstants.SOP_TAG_SINGWORK);
+        SopLineWork sopLineWork = sopLineService.selectSopLineWorkInfo(user.getCompanyId(),parentId,sopId,lineId,FileConstants.SOP_TAG_SINGWORK);
+        mmap.put("sopLineWork",sopLineWork);
+        mmap.put("parentId", parentId);
+        mmap.put("lineId", lineId);
         return "production/singleWork/editSop";
+    }
+
+    /******************   SOP 单工位配置 *************************/
+
+    /**
+     * 通过指定sop查询相关的所有单工位配置信息
+     */
+    @RequiresPermissions("production:singleWork:configSop")
+    @GetMapping("/singWorkView/{id}")
+    public String singWorkView(@PathVariable("id") Integer isoId, ModelMap mmap) {
+        User user = JwtUtil.getUser();
+        mmap.put("isoId", isoId);
+        SingleWork singleWork = new SingleWork();
+        singleWork.setCompanyId(user.getCompanyId());
+        singleWork.setSign(FileConstants.SIGN_SINGWORK);
+        mmap.put("allSw",singleWorkService.selectSingleWorkList(singleWork));
+        return prefix + "/singleWork";
+    }
+
+    /**
+     * 跳转 SOP 单工位配置新增页面
+     */
+    @GetMapping("/addSingWork/{id}")
+    public String addSingWork(@PathVariable("id")Integer isoId,ModelMap modelMap){
+        modelMap.put("isoId", isoId);
+        SingleWork singleWork = new SingleWork();
+        singleWork.setSign(FileConstants.SIGN_HOUSE);
+        modelMap.put("house",singleWorkService.selectSingleWorkList(singleWork));
+        modelMap.put("pns",productListService.selectProductAllByCompanyId(ServletUtils.getRequest().getCookies()));
+        modelMap.put("pages", iIsoService.selectIsoByParentId(isoId));
+        return prefix + "/addSingWork";
+    }
+
+    /**
+     * 跳转 SOP 单工位修改页面
+     */
+    @GetMapping("/editSingWork/{isoId}/{lineId}")
+    public String editSingWork(@PathVariable("isoId") int isoId,@PathVariable("lineId") int lineId,ModelMap modelMap){
+        User user = JwtUtil.getUser();
+        modelMap.put("isoId", isoId);
+        // 查询所有的车间
+        modelMap.put("house",singleWorkService.selectSingleWorkByParentId(user.getCompanyId(),0));
+        // 查询单工位SOP 所有已配置信息
+        List<SopLine> sopLines = sopLineService.selectLineAllSopConfig(user.getCompanyId(), lineId, isoId,FileConstants.SOP_TAG_SINGWORK);
+        modelMap.put("sopLines", sopLines);
+        SingleWork singleWork = singleWorkService.selectSingleWorkById(lineId);
+        // 查询对应的指导书的页数
+        List<Iso> pages = null;
+        if (sopLines != null && sopLines.size() > 0) {
+            pages = iIsoService.selectIsoByParentId(isoId);
+        }
+        modelMap.put("pages", pages);
+        // 查询单工位配置的页信息
+        SopLineWork sopLineWork = sopLineService.selectSopLineWorkInfo(user.getCompanyId(),singleWork.getParentId(),isoId,lineId,FileConstants.SOP_TAG_SINGWORK);
+        // 查询所有的对应车间的所有单工位信息
+        modelMap.put("swList",singleWorkService.selectSingleWorkByParentId(user.getCompanyId(),sopLineWork.getLineId()));
+        modelMap.put("sopLineWork",sopLineWork);
+        // 根据单工位id查询所以未配置的产品信息
+        modelMap.put("pns", productListService.selectNotConfigByLineId(lineId, user.getCompanyId(), FileConstants.SOP_TAG_SINGWORK));
+        return prefix + "/editSingWork";
+    }
+
+    /**
+     * 删除sop单工位作业指导书
+     */
+    @RequiresPermissions("iso:sopLine:remove")
+    @Log(title = "作业指导书  产线 配置", businessType = BusinessType.DELETE)
+    @PostMapping("/removeSingWork")
+    @ResponseBody
+    public AjaxResult removeSingWork(int lineId, int sopId) {
+        User user = JwtUtil.getUser();
+        return toAjax(sopLineService.deleteSopLine(user.getCompanyId(), lineId, sopId,FileConstants.SOP_TAG_SINGWORK));
     }
 }

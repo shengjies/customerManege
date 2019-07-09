@@ -476,6 +476,15 @@ ADD COLUMN `sop_tag` INT NULL DEFAULT 0 COMMENT 'sop配置标记(默认0、流�
 CHANGE COLUMN `line_id` `line_id` INT(11) NULL DEFAULT NULL COMMENT '产线id/车间id' ,
 CHANGE COLUMN `w_id` `w_id` INT(11) NULL DEFAULT NULL COMMENT '工位id/单工位id' ;
 
+# 单工位添加sop是否配置标记字段 zqm 服务器未执行sql
+# 2019-07-08
+ALTER TABLE `octopus`.`tab_single_work`
+ADD COLUMN `sop_sign` INT NULL COMMENT '是否配置SOP标志(0、未配置，1、已配置)' AFTER `parent_id`;
+ALTER TABLE `octopus`.`tab_single_work`
+CHANGE COLUMN `sop_sign` `sop_sign` INT(11) NULL DEFAULT 0 COMMENT '是否配置SOP标志(0、未配置，1、已配置)' ;
+ALTER TABLE `octopus`.`tab_single_work`
+ADD COLUMN `im_code` VARCHAR(125) NULL COMMENT '设备编号' AFTER `im_id`;
+
 
 
 

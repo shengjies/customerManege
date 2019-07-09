@@ -25,6 +25,10 @@ public class SopLine extends BaseEntity
 	/** 产线id */
 	private Integer lineId;
 	/**
+	 * 单工位车间id
+	 */
+	private Integer parentId;
+	/**
 	 * 设备编码
 	 */
 	private String imName;

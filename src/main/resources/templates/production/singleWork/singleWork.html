@@ -17,14 +17,15 @@
 
                         <li>
                             设备编号：
-                            <select id="imId" name="imId"  th:with="allIm=${@im.selectAllIm(null)}">
+                            <select id="imId" name="imId" th:with="allIm=${@im.selectAllIm(null)}">
                                 <option value="-1">所有</option>
                                 <option th:each="im:${allIm}" th:utext="${im.imCode}" th:value="${im.id}"></option>
                             </select>
                         </li>
                         <li>
                             责任人/员工:
-                            <select id="liableOne" name="liableOne" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+                            <select id="liableOne" name="liableOne"
+                                    th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
                                 <option value="-1">请选择</option>
                                 <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
                             </select>
@@ -42,10 +43,12 @@
         </div>
 
         <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-            <a id="addHouse" class="btn btn-success" onclick="addHouse(0)" shiro:hasPermission="production:singleWork:add">
+            <a id="addHouse" class="btn btn-success" onclick="addHouse(0)"
+               shiro:hasPermission="production:singleWork:add">
                 <i class="fa fa-plus"></i> 新建车间
             </a>
-            <a id="addIm" class="btn btn-primary" onclick="addIm()" shiro:hasPermission="production:singleWork:add" style="display: none">
+            <a id="addIm" class="btn btn-primary" onclick="addIm()" shiro:hasPermission="production:singleWork:add"
+               style="display: none">
                 <i class="fa fa-gavel"></i> 新增设备
             </a>
             <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"
@@ -65,16 +68,18 @@
 <script th:inline="javascript">
     $(function () {
         $("select").select2({
-            width:"200px",
-            placeholder:'请选择'
+            width: "200px",
+            placeholder: '请选择'
         });
     })
+
     // 重置搜索表单信息
     function formReset(params) {
         $('#formId')[0].reset();//input标签重置
         $("#imId").val(null).trigger("change"); // select2标签重置
         $("#liableOne").val(null).trigger("change");
     }
+
     var editFlag = [[${@permission.hasPermi('production:singleWork:edit')}]];
     var removeFlag = [[${@permission.hasPermi('production:singleWork:remove')}]];
     var configDevFlag = [[${@permission.hasPermi('production:singleWork:configDev')}]];
@@ -120,7 +125,7 @@
                     field: 'sign',
                     title: '类型',
                     sortable: true,
-                    formatter:function (value, row, index) {
+                    formatter: function (value, row, index) {
                         if (row.sign == 0) {
                             return "车间";
                         } else {
@@ -132,11 +137,11 @@
                     field: 'liableOne',
                     title: '责任人/员工',
                     sortable: true,
-                    formatter:function (value, row, index) {
+                    formatter: function (value, row, index) {
                         if (row.sign == 0) {
-                            return row.liableOneName + "/" + (row.liableTwoName == null ? '-':row.liableTwoName);
+                            return row.liableOneName == null ? '-' : row.liableOneName + "/" + (row.liableTwoName == null ? '-' : row.liableTwoName);
                         } else {
-                            return row.liableOneName;
+                            return row.liableOneName == null ? '-' : row.liableOneName;
                         }
                     }
                 },
@@ -156,7 +161,8 @@
                             actions.push('<a class="btn btn-xs  btn-primary ' + configDevFlag + '" href="javascript:void(0)" onclick="configDev(\'' + row.id + '\')">配置硬件</a> ');
                             actions.push('<a class="btn btn-xs  btn-primary ' + configSopFlag + '" href="javascript:void(0)" onclick="configSop(\'' + row.id + '\')">配置SOP</a> ');
                         }
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+
                         return actions.join('');
                     }
                 }]
@@ -224,7 +230,7 @@
                 }
                 url = $.table._option.updateUrl.replace("{id}", id);
             }
-            $.modal.open("修改车间信息", url,800,500);
+            $.modal.open("修改车间信息", url, 800, 500);
         } else {
             var url = "/404.html";
             if ($.common.isNotEmpty(id)) {
@@ -237,7 +243,7 @@
                 }
                 url = $.table._option.updateImUrl.replace("{id}", id);
             }
-            $.modal.open("修改设备信息", url,800,500);
+            $.modal.open("修改设备信息", url, 800, 500);
         }
     }
 
@@ -245,7 +251,7 @@
      * 配置单工位设备硬件
      */
     function configDev(id) {
-        $.modal.open("单工位硬件配置",prefix+"/configDev?id="+id,800,480);
+        $.modal.open("单工位硬件配置", prefix + "/configDev?id=" + id, 800, 480);
     }
 
     /**
@@ -253,7 +259,18 @@
      */
     function configSop(id) {
         var parentId = $("#parentId").val();
-        createMenuItem(prefix + "/configSop?parentId=" + parentId + "&id=" + id,"配置单工位作业指导书");
+        createMenuItem(prefix + "/configSop?parentId=" + parentId + "&id=" + id, "配置单工位作业指导书");
+    }
+
+    /**
+     * 删除单工位配置
+     */
+    function remove(id) {
+        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息以及所有相关SOP配置吗？", function () {
+            var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
+            var data = {"ids": id};
+            $.operate.submit(url, "post", "json", data);
+        });
     }
 </script>
 </body>

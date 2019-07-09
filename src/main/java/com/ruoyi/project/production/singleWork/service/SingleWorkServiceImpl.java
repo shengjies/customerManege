@@ -1,9 +1,6 @@
 package com.ruoyi.project.production.singleWork.service;
 
-import com.ruoyi.common.constant.DevConstants;
-import com.ruoyi.common.constant.InstrumentConstants;
-import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.constant.WorkConstants;
+import com.ruoyi.common.constant.*;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.ServletUtils;
@@ -12,6 +9,8 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.insmanage.instrumentManage.mapper.InstrumentManageMapper;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.system.user.domain.User;
@@ -39,6 +38,12 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
 
     @Autowired
     private InstrumentManageMapper instrumentManageMapper;
+
+    @Autowired
+    private SopLineMapper sopLineMapper;
+
+    @Autowired
+    private SopLineWorkMapper sopLineWorkMapper;
 
     /**
      * 查询单工位数据信息
@@ -85,6 +90,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
         if (StringUtils.isNotNull(parentId) && parentId != 0) {
             Integer imId = singleWork.getImId();
             if (StringUtils.isNotNull(imId) && imId > 0) {
+                singleWork.setImCode(instrumentManageMapper.selectInstrumentManageById(imId).getImCode());
                 // 更新设备已经被配置过
                 instrumentManageMapper.updateInstrumentManageImTag(imId, InstrumentConstants.IM_TAG_USED);
             }
@@ -163,6 +169,9 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.geteId() != null && singleWork.geteId() != 0 ) {
                 devListMapper.updateDevBySign(user.getCompanyId(),singleWork.geteId(),DevConstants.DEV_SIGN_NOT_USE);
             }
+            // 删除单工位配置
+            sopLineMapper.deleteSopLine(user.getCompanyId(),swId,null, FileConstants.SOP_TAG_SINGWORK);
+            sopLineWorkMapper.deleteSopLineWorkByWId(user.getCompanyId(),swId,null,FileConstants.SOP_TAG_SINGWORK);
         }
         return singleWorkMapper.deleteSingleWorkByIds(Convert.toStrArray(ids));
     }
@@ -292,5 +301,28 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             }
         }
         return singleWorkMapper.updateSingleWork(singleWork);
+    }
+
+    /**
+     *
+     * @param parentId 车间id
+     * @param sopId sopid
+     * @param sopTag sop配置标记
+     * @return
+     */
+    @Override
+    public List<SingleWork> selectNotConfigSop(int companyId,int parentId, int sopId, int sopTag) {
+        return singleWorkMapper.selectNotConfigSop(companyId,parentId,sopId,sopTag);
+    }
+
+    /**
+     * 通过父id查询车间信息
+     * @param companyId 公司id
+     * @param parentId 父id
+     * @return 结果
+     */
+    @Override
+    public List<SingleWork> selectSingleWorkByParentId(int companyId, int parentId) {
+        return singleWorkMapper.selectSingleWorkByParentId(companyId,parentId);
     }
 }

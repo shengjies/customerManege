@@ -35,7 +35,7 @@
     </form>
 </div>
 <div th:include="include::footer"></div>
-<script type="text/javascript">
+<script th:inline="javascript">
     $(function () {
         $("#pnId").select2({
             placeholder: '请选择'
@@ -66,7 +66,7 @@
             return;
         }
         var pageId = $("#pageId").find("option:selected").val();
-        if (pageId < 0) {
+        if (pageId <= 0) {
             $.modal.alertWarning("请选择指导书页");
             return;
         }

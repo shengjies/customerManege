@@ -6,14 +6,20 @@
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-sopLine-add">
         <div class="form-group">
-            <input type="hidden" id="parentId" th:value="${parentId}">
-            <input type="hidden" id="lineId" th:value="${lineId}">
-            <label class="col-sm-3 control-label">SOP：</label>
+            <input type="hidden" id="isoId" th:value="${isoId}">
+            <label class="col-sm-3 control-label">车间：</label>
             <div class="col-sm-8">
-                <select style="width: 100%" id="sopId" onchange="sopChange(this)" name="sopId" class="form-control">
+                <select style="width: 100%" id="houseId" onchange="singWorkChange(this)" name="houseId" class="form-control">
                     <option value="0">请选择</option>
-                    <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" selected  th:text="${sopLines[0].sopName}" th:value="${sopLines[0].sopId}"></option>
-                    <option th:each="item : ${iso}" th:text="${item.cName}" th:value="${item.isoId}"></option>
+                    <option th:each="item : ${house}" th:text="${item.workshopName}" th:value="${item.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">单工位：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="swId" class="form-control" name="swId">
+                    <option value="0">请选择</option>
                 </select>
             </div>
         </div>
@@ -21,8 +27,6 @@
             <label class="col-sm-3 control-label">产品编码：</label>
             <div class="col-sm-8">
                 <select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
-                    <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" th:each="pn:${sopLines}"
-                            selected  th:text="${pn.pnCode}" th:value="${pn.pnId}"></option>
                     <option th:each="item : ${pns}" th:text="${item.productCode}" th:value="${item.id}"></option>
                 </select>
             </div>
@@ -31,9 +35,9 @@
             <label class="col-sm-3 control-label">选择作业指导书：</label>
             <div class="col-sm-8">
                 <select id="pageId" style="width: 100%" name="pageId" class="form-control">
+                    <option value="0">请选择</option>
                     <option th:if="${not #lists.isEmpty(pages)}" th:each="item:${pages}"
                             th:value="${item.isoId}" th:utext="${item.cName}"></option>
-                    <option value="0">请选择</option>
                 </select>
             </div>
         </div>
@@ -42,21 +46,22 @@
 <div th:include="include::footer"></div>
 <script th:inline="javascript">
     $(function () {
-        $("#pnId").select2({
-            placeholder: '请选择'
+        $("#houseId").select2({
+            placeholder: '请选择',
+            width: '100%'
         });
-        $("#sopId").select2({
+        $("#pnId").select2({
+            placeholder: '请选择',
+            width: '100%'
+        });
+        $("#swId").select2({
+            placeholder: '请选择',
             width: '100%'
         });
         $("#pageId").select2({
+            placeholder: '请选择',
             width: '100%'
         });
-        $('select').select2();
-        var workConfig =[[${sopLineWork}]];
-        if (workConfig != null) {
-            $("#pageId").val(workConfig.pageId).trigger('change');
-        }
-
     });
     var prefix = ctx + "iso/sopLine";
 
@@ -64,20 +69,26 @@
      * 保存配置
      */
     function submitHandler() {
-        //先验证书
-        var sopId = $("#sopId").find("option:selected").val();
-        if (sopId <= 0) {
-            $.modal.alertWarning("请选择SOP");
+        //先验车间
+        var houseId = $("#houseId").find("option:selected").val();
+        if (houseId <= 0) {
+            $.modal.alertWarning("请选择车间");
             return;
         }
-        //验证产品编码
+        //验证单工位
+        var swId = $("#swId").find("option:selected").val();
+        if (swId <= 0) {
+            $.modal.alertWarning("请选择单工位信息");
+            return;
+        }
+        // 验证产品
         var pnSelect = $("#pnId").find("option:selected");
         if ($(pnSelect).size() <= 0) {
             $.modal.alertWarning("请选择产品编码");
             return;
         }
         var pageId = $("#pageId").find("option:selected").val();
-        if (pageId < 0) {
+        if (pageId <= 0) {
             $.modal.alertWarning("请选择指导书页");
             return;
         }
@@ -88,22 +99,22 @@
         // 单工位信息
         var sopLineWorks = [];
         var work = {
-            lineId: [[${parentId}]],
-            sopId: sopId,
+            lineId: houseId,
+            sopId: [[${isoId}]],
             sopTag: 1,
-            wId: [[${lineId}]],
+            wId: swId,
             pageId: pageId,
         }
         sopLineWorks.push(work);
         var data = {
-            lineId: [[${lineId}]],
-            sopId: sopId,
+            lineId: swId,
+            sopId: [[${isoId}]],
             pns: pns,
             sopTag: 1,
             sopLineWorks: sopLineWorks
         }
         var config = {
-            url: prefix + "/edit",
+            url: prefix + "/add",
             type: "post",
             dataType: "json",
             contentType: 'application/json',
@@ -120,28 +131,29 @@
     }
 
     /**
-     * sop下拉选择
+     * 车间下拉选择
      */
-    function sopChange(val) {
-        var id = $(val).find("option:selected").val();
-        if (id > 0) {
-            $("#pageId option").remove();
-            $("#pageId select").select2({
+    function singWorkChange(val) {
+        // 车间id
+        var parentId = $(val).find("option:selected").val();
+        if (parentId > 0) {
+            $("#swId option").remove();
+            $("#swId select").select2({
                 data: [{id: 0, text: '请选择'}]
             });
-            //获取对应书下的页
-            $.post("/iso/iso/findByPid", {pid: id}, function (res) {
+            //或者对应车间的所有还未配置过的对应iso的单工位信息,以及所有的产品信息
+            $.post("/production/singleWork/selectNotConfigSop", {parentId: parentId,sopId:[[${isoId}]]}, function (res) {
                 if (res.code == 0) {
                     var rows = [{id: 0, text: '请选择'}];
                     var item = res.data;
                     for (var i = 0; i < item.length; i++) {
                         var row = {
-                            id: item[i].isoId,
-                            text: item[i].cName
+                            id: item[i].id,
+                            text: item[i].imCode
                         }
                         rows.push(row);
                     }
-                    $("#pageId").select2({
+                    $("#swId").select2({
                         data: rows
                     });
                 } else {
@@ -150,8 +162,8 @@
             })
         } else {
             var data = [{id: 0, text: '请选择'}];
-            $("#pageId option").remove();
-            $("#pageId").select2({
+            $("#swId option").remove();
+            $("#swId").select2({
                 data: data
             });
         }

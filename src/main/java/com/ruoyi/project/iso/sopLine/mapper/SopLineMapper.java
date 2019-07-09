@@ -43,10 +43,11 @@ public interface SopLineMapper
 	 * @param companyId 公司id
 	 * @param lineId 产线id
 	 * @param sopid SOP id
-	 * @return
+	 * @param sopTag sop配置标记
+	 * @return 结果
 	 */
 	public int deleteSopLine(@Param("companyId")int companyId,
-							 @Param("lineId")int lineId,@Param("sopId")int sopid);
+							 @Param("lineId")int lineId,@Param("sopId")Integer sopid,@Param("sopTag") Integer sopTag);
 
 	/**
 	 * 根据公司id 产线id SOP id查询所以的产线SOP 配置细心

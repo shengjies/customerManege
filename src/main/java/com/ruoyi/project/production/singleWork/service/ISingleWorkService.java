@@ -64,4 +64,21 @@ public interface ISingleWorkService
 	 * @return 结果
 	 */
 	int saveConfigDev(SingleWork singleWork);
+
+	/**
+	 * 查询未配置sop的单工位信息
+	 * @param parentId 车间id
+	 * @param sopId sopid
+	 * @param sopTag sop配置标记
+	 * @return 结果
+	 */
+    List<SingleWork> selectNotConfigSop(int companyId,int parentId, int sopId,int sopTag);
+
+	/**
+	 * 通过父id查询车间信息
+	 * @param companyId 公司id
+	 * @param parentId 父id
+	 * @return 结果
+	 */
+	List<SingleWork> selectSingleWorkByParentId(int companyId,int parentId);
 }

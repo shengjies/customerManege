@@ -26,6 +26,10 @@ public class SopLineWork extends BaseEntity
 	private Integer wId;
 	/** 作业指导书页id */
 	private Integer pageId;
+	/**
+	 * 作业指导书页名
+	 */
+	private String cName;
 	/** 修改者id */
 	private Integer cId;
 	/** 修改时间 */
@@ -34,6 +38,14 @@ public class SopLineWork extends BaseEntity
 	 * sop配置标记(默认0、流水线，1、车间单工位)
 	 */
 	private Integer sopTag;
+
+	public String getcName() {
+		return cName;
+	}
+
+	public void setcName(String cName) {
+		this.cName = cName;
+	}
 
 	public Integer getSopTag() {
 		return sopTag;

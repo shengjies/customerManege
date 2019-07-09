@@ -76,4 +76,15 @@ public interface SingleWorkMapper {
      * @return 结果
      */
     List<SingleWork> selectSingleWorkByParentId(@Param("companyId") Integer companyId, @Param("parentId") Integer parentId);
+
+    /**
+     * 查询还未配置的单工位信息
+     * @param companyId 公司id
+     * @param parentId 车间id
+     * @param sopId sopid
+     * @param sopTag sop配置标记
+     * @return 结果
+     */
+    List<SingleWork> selectNotConfigSop(@Param("companyId") int companyId, @Param("parentId") int parentId,
+                                        @Param("sopId") int sopId,@Param("sopTag") int sopTag);
 }

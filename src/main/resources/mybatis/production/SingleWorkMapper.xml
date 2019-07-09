@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="companyId"    column="company_id"    />
         <result property="workshopName"    column="workshop_name"    />
         <result property="imId"    column="im_id"    />
+        <result property="imCode"    column="im_code"    />
         <result property="sign"    column="sign"    />
         <result property="liableOne"    column="liable_one"    />
         <result property="liableTwo"    column="liable_two"    />
@@ -20,20 +21,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="eCode"    column="e_code"    />
         <result property="cTime"    column="c_time"    />
         <result property="parentId"    column="parent_id"    />
+        <result property="sopSign"    column="sop_sign"    />
         <association property="liableOneName" column="liable_one" select="selectOneName">
             <result property="liableOneName" column="user_name"/>
         </association>
         <association property="liableTwoName" column="liable_two" select="selectTwoName">
             <result property="liableTwoName" column="user_name"/>
         </association>
-        <association property="imCode" column="im_id" select="selectImCode">
-            <result property="imCode" column="im_code"/>
-        </association>
     </resultMap>
 	
 	<sql id="selectSingleWorkVo">
-        select id, company_id, workshop_name, im_id, sign, liable_one, liable_two, dev_id, dev_code, c_time, parent_id,
-         watch_id,watch_code,e_id,e_code from tab_single_work
+        select id, company_id, workshop_name, im_id,im_code, sign, liable_one, liable_two, dev_id, dev_code, c_time, parent_id,
+         watch_id,watch_code,e_id,e_code,sop_sign from tab_single_work
     </sql>
 	
     <select id="selectSingleWorkList" parameterType="SingleWork" resultMap="SingleWorkResult">
@@ -63,11 +62,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT user_name FROM sys_user where user_id = #{liableTwo};
     </select>
 
-    <!--查询设备的编号-->
-    <select id="selectImCode" resultType="java.lang.String">
-        SELECT im_code FROM tab_instrument_manage where id = #{imId};
-    </select>
-    
     <select id="selectSingleWorkById" parameterType="Integer" resultMap="SingleWorkResult">
         <include refid="selectSingleWorkVo"/>
         where id = #{id}
@@ -79,6 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="companyId != null  ">company_id,</if>
 			<if test="workshopName != null  and workshopName != ''  ">workshop_name,</if>
 			<if test="imId != null  ">im_id,</if>
+            <if test="imCode != null  ">im_code,</if>
 			<if test="sign != null  ">sign,</if>
 			<if test="liableOne != null  ">liable_one,</if>
 			<if test="liableTwo != null  ">liable_two,</if>
@@ -89,12 +84,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="eId != null  ">e_id,</if>
             <if test="eCode != null  and eCode != ''  ">e_code,</if>
 			<if test="cTime != null  ">c_time,</if>
-			<if test="parentId != null  ">parent_id,</if>
+            <if test="parentId != null  ">parent_id,</if>
+            <if test="sopSign != null  ">sop_sign,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
 			<if test="workshopName != null  and workshopName != ''  ">#{workshopName},</if>
 			<if test="imId != null  ">#{imId},</if>
+            <if test="imCode != null  ">#{imCode},</if>
 			<if test="sign != null  ">#{sign},</if>
 			<if test="liableOne != null  ">#{liableOne},</if>
 			<if test="liableTwo != null  ">#{liableTwo},</if>
@@ -106,6 +103,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="eCode != null  and eCode != ''  ">#{eCode},</if>
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="parentId != null  ">#{parentId},</if>
+            <if test="sopSign != null  ">#{sopSign},</if>
          </trim>
     </insert>
 	 
@@ -115,6 +113,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="companyId != null  ">company_id = #{companyId},</if>
             <if test="workshopName != null  and workshopName != ''  ">workshop_name = #{workshopName},</if>
             <if test="imId != null  ">im_id = #{imId},</if>
+            <if test="imCode != null  ">im_code = #{imCode},</if>
             <if test="sign != null  ">sign = #{sign},</if>
             <if test="liableOne != null  ">liable_one = #{liableOne},</if>
             <if test="liableTwo != null  ">liable_two = #{liableTwo},</if>
@@ -126,6 +125,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="eCode != null  and eCode != ''  ">e_code = #{eCode},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="parentId != null  ">parent_id = #{parentId},</if>
+            <if test="sopSign != null  ">sop_sign = #{sopSign},</if>
         </trim>
         where id = #{id}
     </update>
@@ -149,6 +149,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--通过父id查询单工位列表-->
     <select id="selectSingleWorkByParentId" resultMap="SingleWorkResult">
         SELECT * FROM tab_single_work where company_id = #{companyId} and parent_id = #{parentId}
+    </select>
+
+    <!--查询未配置sop的单工位信息-->
+    <select id="selectNotConfigSop" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work as a  left join tab_sop_line_work as b on a.id = b.w_id
+        and b.line_id = #{parentId} and b.sop_tag = #{sopTag} and b.sop_id = #{sopId}
+        and b.company_id = #{companyId} where a.parent_id = #{parentId} and b.w_id is null;
     </select>
     
 </mapper>

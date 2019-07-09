@@ -69,4 +69,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
       SELECT * FROM tab_sop_line_work where company_id = #{companyId} and line_id= #{lineId}
        and sop_id = #{sopId} and w_id = #{wId} and sop_tag = #{sopTag} limit 1;
     </select>
+
+    <!--删除单工位sop配置信息-->
+    <delete id="deleteSopLineWorkByWId">
+        delete from tab_sop_line_work where company_id = #{companyId} and w_id = #{wId}
+        <if test="sopId != null">
+            and sop_id = #{sopId}
+        </if>
+         and sop_tag = #{sopTag}
+    </delete>
 </mapper>

@@ -69,6 +69,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM
         tab_sop_line
         where sop_tag = 1
+          <if test="sopId != null and sopId > 0 "> and sop_id = #{sopId}</if>
           <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
           <if test="lineId != null and lineId > 0 "> and line_id = #{lineId}</if>
         GROUP BY
@@ -115,7 +116,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!--根据公司id 产线id SOP id删除对应的配置信息-->
     <delete id="deleteSopLine" >
-      delete from tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId};
+      delete from tab_sop_line where company_id = #{companyId} and line_id = #{lineId}
+        <if test="sopId != null">and sop_id = #{sopId}</if>
     </delete>
 
     <!--根据公司id 产线id SOP id查询所以的产线SOP 配置细心-->

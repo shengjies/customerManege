@@ -51,7 +51,7 @@ public interface ISopLineService
 	 * @param sopId SOP id
 	 * @return
 	 */
-	public int deleteSopLine(int companyId,int lineId,int sopId);
+	public int deleteSopLine(int companyId,int lineId,int sopId,int sopTag);
 
 	/**
 	 * 根据公司id 产线id SOP id查询所以的产线SOP 配置细心
@@ -98,11 +98,11 @@ public interface ISopLineService
 	/**
 	 * 查询对应单工位的工位配置信息
 	 * @param companyId 公司id
-	 * @param lineId 父id车间产线id
+	 * @param lineId 车间id
 	 * @param sopId sopid
 	 * @param wId 工位id
 	 * @param sopTag  sop生产配置标记
 	 * @return 结果
 	 */
-	SopLineWork selectInfoByApi(int companyId, int lineId, int sopId, int wId, int sopTag);
+	SopLineWork selectSopLineWorkInfo(int companyId, int lineId, int sopId, int wId, int sopTag);
 }

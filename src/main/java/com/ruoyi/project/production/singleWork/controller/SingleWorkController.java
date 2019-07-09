@@ -1,14 +1,20 @@
 package com.ruoyi.project.production.singleWork.controller;
 
+import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +36,12 @@ public class SingleWorkController extends BaseController {
 
     @Autowired
     private ISingleWorkService singleWorkService;
+
+    @Autowired
+    private IIsoService iIsoService;
+
+    @Autowired
+    private IDevProductListService productListService;
 
     @RequiresPermissions("production:singleWork:view")
     @GetMapping()
@@ -184,7 +196,21 @@ public class SingleWorkController extends BaseController {
     public String configSop(Integer parentId, Integer id, ModelMap modelMap) {
         modelMap.put("parentId",parentId);
         modelMap.put("id",id);
+        modelMap.put("sops", iIsoService.selectIsoByParentId(FileConstants.FOLDER_SOP));
         return prefix + "/configSop";
     }
 
+    /**
+     * 查询还未配置sop的车间单工位信息
+     */
+    @PostMapping("/selectNotConfigSop")
+    @ResponseBody
+    public AjaxResult notCofigSop(int parentId,int sopId){
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return error(UserConstants.NOT_LOGIN);
+        }
+        List<SingleWork> singleWorkList = singleWorkService.selectNotConfigSop(user.getCompanyId(),parentId,sopId,FileConstants.SOP_TAG_SINGWORK);
+        return AjaxResult.success("success",singleWorkList);
+    }
 }

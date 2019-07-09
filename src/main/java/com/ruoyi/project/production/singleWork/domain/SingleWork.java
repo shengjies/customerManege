@@ -46,6 +46,18 @@ public class SingleWork extends BaseEntity
 	private Date cTime;
 	/** 上一级id(父id) */
 	private Integer parentId;
+	/**
+	 * 是否配置SOP标志(0、未配置，1、已配置)
+	 */
+	private Integer sopSign;
+
+	public Integer getSopSign() {
+		return sopSign;
+	}
+
+	public void setSopSign(Integer sopSign) {
+		this.sopSign = sopSign;
+	}
 
 	public Integer getId() {
 		return id;
@@ -212,6 +224,7 @@ public class SingleWork extends BaseEntity
 				", eCode='" + eCode + '\'' +
 				", cTime=" + cTime +
 				", parentId=" + parentId +
+				", sopSign=" + sopSign +
 				'}';
 	}
 }

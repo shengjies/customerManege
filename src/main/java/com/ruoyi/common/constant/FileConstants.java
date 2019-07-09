@@ -52,4 +52,18 @@ public class FileConstants {
     public static final Integer SOP_TAG_LINE = 0;
     public static final Integer SOP_TAG_SINGWORK = 1;
 
+    /**
+     * 单工位车间标记常量
+     * 0、车间，1、单工位
+     */
+    public static final Integer SIGN_HOUSE = 0;
+    public static final Integer SIGN_SINGWORK = 1;
+
+    /**
+     * 单工位是否配置了SOP标记
+     * 0、默认值未配置，1、已经配置
+     */
+    public static final Integer SOP_SIGN_NO = 0;
+    public static final Integer SOP_SIGN_YES = 1;
+
 }
