@@ -73,6 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="companyId != null  ">company_id,</if>
 			<if test="workshopName != null  and workshopName != ''  ">workshop_name,</if>
 			<if test="imId != null  ">im_id,</if>
+            <if test="imCode != null ">im_code,</if>
 			<if test="sign != null  ">sign,</if>
 			<if test="liableOne != null  ">liable_one,</if>
 			<if test="liableTwo != null  ">liable_two,</if>

@@ -72,6 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           <if test="sopId != null and sopId > 0 "> and sop_id = #{sopId}</if>
           <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
           <if test="lineId != null and lineId > 0 "> and line_id = #{lineId}</if>
+          <if test="pnCode != null  and pnCode != '' "> and pn_code like concat('%', #{pnCode}, '%')</if>
         GROUP BY
         `sop_id`,
         `line_id`

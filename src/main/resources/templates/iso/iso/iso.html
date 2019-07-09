@@ -282,6 +282,14 @@
         var url = $.common.isEmpty(isoId) ? $.table._option.createSopSingWorkUrl : $.table._option.createSopSingWorkUrl.replace("{id}", isoId);
         createMenuItem(url,"SOP单工位配置");
     }
+
+    /**
+     * 单工位配置明细
+     */
+    function showSingWorkInfo(isoId) {
+        var url = $.common.isEmpty(isoId) ? $.table._option.createShowSopSingWorkUrl : $.table._option.createShowSopSingWorkUrl.replace("{id}", isoId);
+        $.modal.open("单工位配置明细", url);
+    }
 </script>
 </body>
 </html>

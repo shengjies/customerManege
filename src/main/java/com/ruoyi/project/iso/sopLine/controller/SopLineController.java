@@ -250,7 +250,20 @@ public class SopLineController extends BaseController {
         return getDataTable(list);
     }
 
-
+    /**
+     * 单工位调转添加SOP作业指导书页面
+     */
+    @GetMapping("/addSop/{parentId}/{id}")
+    public String addSop(@PathVariable("parentId") int parentId, @PathVariable("id") int id, ModelMap mmap) {
+        User user = JwtUtil.getUser();
+        // 查询该单工位所有未配置的SOP书
+        mmap.put("iso", iIsoService.selectNotConfigByPidAndLineId(FileConstants.FOLDER_SOP, id, FileConstants.SOP_TAG_SINGWORK));
+        // 根据单工位id查询所以未配置的产品信息
+        mmap.put("pns", productListService.selectNotConfigByLineId(id, user.getCompanyId(), FileConstants.SOP_TAG_SINGWORK));
+        mmap.put("parentId", parentId);
+        mmap.put("lineId", id);
+        return "production/singleWork/addSop";
+    }
 
     /**
      * 单工位调转修改SOP作业指导书页面
@@ -288,12 +301,7 @@ public class SopLineController extends BaseController {
     @RequiresPermissions("production:singleWork:configSop")
     @GetMapping("/singWorkView/{id}")
     public String singWorkView(@PathVariable("id") Integer isoId, ModelMap mmap) {
-        User user = JwtUtil.getUser();
-        mmap.put("isoId", isoId);
-        SingleWork singleWork = new SingleWork();
-        singleWork.setCompanyId(user.getCompanyId());
-        singleWork.setSign(FileConstants.SIGN_SINGWORK);
-        mmap.put("allSw",singleWorkService.selectSingleWorkList(singleWork));
+        jumpAboutSingWork(isoId, mmap);
         return prefix + "/singleWork";
     }
 
@@ -350,5 +358,28 @@ public class SopLineController extends BaseController {
     public AjaxResult removeSingWork(int lineId, int sopId) {
         User user = JwtUtil.getUser();
         return toAjax(sopLineService.deleteSopLine(user.getCompanyId(), lineId, sopId,FileConstants.SOP_TAG_SINGWORK));
+    }
+
+    /**
+     * 跳转查看单工位配置明细
+     */
+    @GetMapping("/showSingWorkDetail/{id}")
+    public String showSingWorkDetail(@PathVariable("id") int isoId,ModelMap modelMap){
+        jumpAboutSingWork(isoId, modelMap);
+        return prefix + "/singleWorkDetail";
+    }
+
+    /**
+     * sop单工位跳转参数携带
+     * @param isoId sopid
+     * @param modelMap
+     */
+    private void jumpAboutSingWork(@PathVariable("id") int isoId, ModelMap modelMap) {
+        User user = JwtUtil.getUser();
+        modelMap.put("isoId", isoId);
+        SingleWork singleWork = new SingleWork();
+        singleWork.setCompanyId(user.getCompanyId());
+        singleWork.setSign(FileConstants.SIGN_SINGWORK);
+        modelMap.put("allSw", singleWorkService.selectSingleWorkList(singleWork));
     }
 }
