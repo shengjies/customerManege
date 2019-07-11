@@ -375,6 +375,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     }
 
     /**
+     * int order_id,int pid
+     * @param order_id
+     * @param pid
+     * @return
+     */
+    public List<SingleWork> selectAllNotConfigWorkByOrderId(int order_id,int pid ){
+        return singleWorkMapper.selectAllNotConfigWorkByOrderId(order_id,pid);
+    }
+
+    /**
      *
      * @param parentId 车间id
      * @param sopId sopid

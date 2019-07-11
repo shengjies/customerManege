@@ -1,9 +1,12 @@
 package com.ruoyi.project.production.singleWork.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.service.ISingleWorkOrderService;
+import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,6 +37,9 @@ public class SingleWorkOrderController extends BaseController
 	
 	@Autowired
 	private ISingleWorkOrderService singleWorkOrderService;
+
+	@Autowired
+	private ISingleWorkService singleWorkService;
 
 	/**
 	 *
@@ -66,18 +72,7 @@ public class SingleWorkOrderController extends BaseController
 	}
 	
 	
-	/**
-	 * 导出单工位与工单进行配置列表
-	 */
-	@RequiresPermissions("production:singleWorkOrder:export")
-    @PostMapping("/export")
-    @ResponseBody
-    public AjaxResult export(SingleWorkOrder singleWorkOrder)
-    {
-    	List<SingleWorkOrder> list = singleWorkOrderService.selectSingleWorkOrderList(singleWorkOrder);
-        ExcelUtil<SingleWorkOrder> util = new ExcelUtil<SingleWorkOrder>(SingleWorkOrder.class);
-        return util.exportExcel(list, "singleWorkOrder");
-    }
+
 
 	/**
 	 * 新增单工位与工单进行配置
@@ -115,10 +110,21 @@ public class SingleWorkOrderController extends BaseController
 	 * 修改单工位与工单进行配置
 	 */
 	@GetMapping("/edit/{id}")
-	public String edit(@PathVariable("id") Integer id, ModelMap mmap)
+	public String edit(@PathVariable("id") Integer id,int type,int orderId,int singleId, ModelMap modelMap)
 	{
 		SingleWorkOrder singleWorkOrder = singleWorkOrderService.selectSingleWorkOrderById(id);
-		mmap.put("singleWorkOrder", singleWorkOrder);
+		modelMap.put("singleWorkOrder", singleWorkOrder);
+		modelMap.put("type",type);
+		modelMap.put("orderId",orderId);
+		modelMap.put("singleId",singleId);
+		if(type == 1){
+			//工单
+			List<SingleWork> singleWorks = singleWorkService.selectAllNotConfigWorkByOrderId(orderId,singleId);
+			if(singleWorks == null)singleWorks = new ArrayList<>();
+			//查询对应配置工位
+			singleWorks.add(singleWorkService.selectSingleWorkById(singleWorkOrder.getSingleId()));
+			modelMap.put("works",singleWorks);
+		}
 	    return prefix + "/edit";
 	}
 	

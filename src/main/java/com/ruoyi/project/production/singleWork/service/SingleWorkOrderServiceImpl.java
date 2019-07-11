@@ -79,7 +79,7 @@ public class SingleWorkOrderServiceImpl implements ISingleWorkOrderService
 		}
 		singleWorkOrder.setWorkCode(workOrder.getWorkorderNumber());
 		singleWorkOrder.setSingleP(work.getParentId());
-		singleWorkOrder.setCTime(new Date());
+		singleWorkOrder.setcTime(new Date());
 		return singleWorkOrderMapper.insertSingleWorkOrder(singleWorkOrder);
 	}
 	
@@ -92,7 +92,8 @@ public class SingleWorkOrderServiceImpl implements ISingleWorkOrderService
 	@Override
 	public int updateSingleWorkOrder(SingleWorkOrder singleWorkOrder)
 	{
-	    return singleWorkOrderMapper.updateSingleWorkOrder(singleWorkOrder);
+		return 1;
+//	    return singleWorkOrderMapper.updateSingleWorkOrder(singleWorkOrder);
 	}
 
 	/**

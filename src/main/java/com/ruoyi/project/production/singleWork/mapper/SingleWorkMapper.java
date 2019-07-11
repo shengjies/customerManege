@@ -94,6 +94,14 @@ public interface SingleWorkMapper {
     List<SingleWork> selectAllNotConfigChildren(@Param("pid")int pid);
 
     /**
+     * 根据工单id、车间id查询所有未配置的
+     * @param order_id 工单id
+     * @param pid 车间id
+     * @return
+     */
+    List<SingleWork> selectAllNotConfigWorkByOrderId(@Param("order_id")int order_id,@Param("pid") int pid);
+
+    /**
      * 查询还未配置的单工位信息
      * @param companyId 公司id
      * @param parentId 车间id

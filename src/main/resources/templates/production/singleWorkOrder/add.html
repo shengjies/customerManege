@@ -14,8 +14,8 @@
 			<div class="form-group" th:if="${type == 1}">
 				<label class="col-sm-3 control-label">单工位：</label>
 				<div class="col-sm-8" th:with=" singleId =${singleId}">
-					<input id="workId" name="workId" th:value="${orderId}" class="form-control" type="hidden">
-					<select id="singleId" class="form-control"  name="singleId" th:with="singles=${@single.selectAllNotConfigChildren(singleId)}">
+					<input id="workId" name="workId" th:with="orderId=${orderId}" th:value="${orderId}" class="form-control" type="hidden">
+					<select id="singleId" class="form-control"  name="singleId" th:with="singles=${@single.selectAllNotConfigWorkByOrderId(orderId,singleId)}">
 						<option th:each="item : ${singles}"  th:text="${item.imCode}" th:value="${item.id}"></option>
 					</select>
 				</div>

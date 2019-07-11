@@ -86,6 +86,14 @@ public interface ISingleWorkService
 	List<SingleWork> selectAllNotConfigChildren(int pid);
 
 	/**
+	 * 根据工单id、车间id查询所有未配置的
+	 * @param order_id
+	 * @param pid
+	 * @return
+	 */
+	 List<SingleWork> selectAllNotConfigWorkByOrderId(int order_id,int pid);
+
+	/**
 	 * 查询未配置sop的单工位信息
 	 * @param parentId 车间id
 	 * @param sopId sopid

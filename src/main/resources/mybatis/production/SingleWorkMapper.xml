@@ -162,9 +162,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           limit 1;
     </select>
 
-    <!--根据车间id查询所以单位信息-->
+    <!--根据车间id查询所以单工位信息-->
     <select id="selectAllNotConfigChildren" resultMap="SingleWorkResult">
-        SELECT * FROM tab_single_work where parent_id = #{pid};
+        SELECT a.* FROM tab_single_work as a left join tab_single_work_order as b on a.id = b.single_id
+        where a.parent_id = #{pid} and b.work_id is null;
+    </select>
+
+    <!--根据工单id、车间id查询所有未配置的-->
+    <select id="selectAllNotConfigWorkByOrderId" resultMap="SingleWorkResult">
+      SELECT * FROM tab_single_work as a left join tab_single_work_order as b
+      on a.id = b.single_id and b.work_id = #{order_id}
+        where a.parent_id =#{pid} and b.work_id is null;
     </select>
 
     <!--查询未配置sop的单工位信息-->
