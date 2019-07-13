@@ -1,8 +1,7 @@
 package com.ruoyi.project.production.devWorkData.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -45,8 +44,18 @@ public class DevWorkData extends BaseEntity
 	private Date createTime;
 
 	private Integer ioSign;//标记对应端口总数统计
+	/** 车间或者流水线上报日志标记 0、流水线，1、车间 **/
+	private Integer scType;
 
-	public void setDataId(Integer dataId) 
+	public Integer getScType() {
+		return scType;
+	}
+
+	public void setScType(Integer scType) {
+		this.scType = scType;
+	}
+
+	public void setDataId(Integer dataId)
 	{
 		this.dataId = dataId;
 	}
@@ -182,22 +191,25 @@ public class DevWorkData extends BaseEntity
 		this.ioSign = ioSign;
 	}
 
+	@Override
 	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("dataId", getDataId())
-            .append("companyId", getCompanyId())
-            .append("lineId", getLineId())
-            .append("workId", getWorkId())
-            .append("devId", getDevId())
-            .append("devName", getDevName())
-            .append("ioId", getIoId())
-            .append("ioName", getIoName())
-            .append("ioOrder", getIoOrder())
-            .append("dataSign", getDataSign())
-            .append("initialData", getInitialData())
-            .append("cumulativeNum", getCumulativeNum())
-            .append("manualNum", getManualNum())
-            .append("createTime", getCreateTime())
-            .toString();
-    }
+		return "DevWorkData{" +
+				"dataId=" + dataId +
+				", companyId=" + companyId +
+				", lineId=" + lineId +
+				", workId=" + workId +
+				", devId=" + devId +
+				", devName='" + devName + '\'' +
+				", ioId=" + ioId +
+				", ioName='" + ioName + '\'' +
+				", ioOrder=" + ioOrder +
+				", dataSign=" + dataSign +
+				", initialData=" + initialData +
+				", cumulativeNum=" + cumulativeNum +
+				", manualNum=" + manualNum +
+				", createTime=" + createTime +
+				", ioSign=" + ioSign +
+				", scType=" + scType +
+				'}';
+	}
 }

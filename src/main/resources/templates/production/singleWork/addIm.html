@@ -10,7 +10,8 @@
         <div class="form-group">
             <label class="col-sm-3 control-label">设备名称：</label>
             <div class="col-sm-8">
-                <select id="imId" name="imId" class="form-control" th:with="allIm=${@im.selectAllIm(0)}">
+                <select id="imId" name="imId" class="form-control" th:with="allIm=${@im.selectAllIm(1,0)}">
+                    <option value="0">请选择</option>
                     <option th:each="im:${allIm}" th:utext="${im.imCode}" th:value="${im.id}"></option>
                 </select>
             </div>
@@ -20,7 +21,7 @@
             <div class="col-sm-8">
                 <select style="width: 100%"  id="liableOne" name="liableOne" class="form-control"
                         th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
-                    <option value="">请选择</option>
+                    <option value="0">请选择</option>
                     <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
                 </select>
             </div>
@@ -36,6 +37,16 @@
 
     function submitHandler() {
         if ($.validate.form()) {
+            var imId = $("#imId").find("option:selected").val();
+            if (imId <= 0) {
+                $.modal.alertWarning("请选择设备");
+                return;
+            }
+            var liableOne = $("#liableOne").find("option:selected").val();
+            if (liableOne <= 0) {
+                $.modal.alertWarning("请选择设备责任人");
+                return;
+            }
             $.operate.save(prefix + "/add", $('#form-singleWork-add').serialize());
         }
     }

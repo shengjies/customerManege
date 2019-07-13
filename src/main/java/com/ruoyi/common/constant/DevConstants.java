@@ -23,4 +23,11 @@ public class DevConstants {
      */
     public static final int DEV_SIGN_NOT_USE = 0;
     public static final int DEV_SIGN_USED = 1;
+
+    /**
+     * 硬件配置对象标记车间或者流水线
+     * 0、流水线，1、车间
+     */
+    public static final int DEV_TYPE_LINE = 0;
+    public static final int DEV_TYPE_HOUSE = 1;
 }

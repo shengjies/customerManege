@@ -118,7 +118,9 @@ public interface DevListMapper
 	 * @param companyId 公司id
 	 * @param id 硬件id
 	 * @param sign 是否被配置标记
+	 * @param devType 硬件配置对象标记车间或者流水线
 	 * @return 结果
 	 */
-	int updateDevBySign(@Param("companyId") Integer companyId,@Param("id") Integer id, @Param("sign") int sign);
+	int updateDevSignAndType(@Param("companyId") Integer companyId,@Param("id") Integer id,
+							 @Param("sign") int sign,@Param("devType") Integer devType);
 }

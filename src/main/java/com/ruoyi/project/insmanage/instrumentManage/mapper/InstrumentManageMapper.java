@@ -79,10 +79,11 @@ public interface InstrumentManageMapper
 	/**
 	 * 通过设备标记状态查询设备列表信息
 	 * @param companyId 公司id
+	 * @param imStatus 设备开启停用状态
 	 * @param imTag 设备标记状态
 	 * @return 结果
 	 */
-	List<InstrumentManage> selectInstrumentManageListByImTag(@Param("companyId") Integer companyId, @Param("imTag") Integer imTag);
+	List<InstrumentManage> selectInstrumentManageListByImTag(@Param("companyId") Integer companyId,@Param("imStatus")Integer imStatus, @Param("imTag") Integer imTag);
 
 	/**
 	 * 通过设备id更新设备标记使用状态

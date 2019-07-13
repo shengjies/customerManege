@@ -1,7 +1,10 @@
 package com.ruoyi.project.production.countPiece.mapper;
 
 import com.ruoyi.project.production.countPiece.domain.CountPiece;
-import java.util.List;	
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 计件管理数据 数据层
@@ -72,4 +75,15 @@ public interface CountPieceMapper
 	 * @return  结果
 	 */
 	List<CountPiece> selectCountPieceListByDate(CountPiece countPiece);
+
+	/**
+	 * 通过工单id查询个人计件信息
+	 * @param workId 工单id
+	 * @param companyId 公司id
+	 * @param cpUserId 归属人id
+	 * @param cpDate 计件日期
+	 * @return 结果
+	 */
+    CountPiece selectPieceByWorkIdAndUid(@Param("workId") Integer workId, @Param("companyId") Integer companyId,
+										 @Param("cpUserId") Integer cpUserId, @Param("cpDate") Date cpDate);
 }

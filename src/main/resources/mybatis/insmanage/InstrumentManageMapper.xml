@@ -171,7 +171,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--通过设备标记状态查询设备列表-->
     <select id="selectInstrumentManageListByImTag" resultMap="InstrumentManageResult">
         SELECT * FROM tab_instrument_manage where  company_id = #{companyId}
-        <if test="imTag != null  "> and im_tag = #{imTag}</if>
+        <if test="imStatus != null  and imStatus != -1 "> and im_status = #{imStatus}</if>
+        <if test="imTag != null and  imTag != -1"> and im_tag = #{imTag}</if>
     </select>
 
     <!--更新设备是否被配置的标记状态-->

@@ -1,7 +1,6 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
-import com.ruoyi.project.system.user.domain.User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -28,7 +27,7 @@ public interface IDevWorkOrderService {
      * @param devWorkOrder 工单信息
      * @return 工单集合
      */
-    public List<DevWorkOrder> selectDevWorkOrderList(DevWorkOrder devWorkOrder,HttpServletRequest request);
+    public List<DevWorkOrder> selectDevWorkOrderList(DevWorkOrder devWorkOrder);
 
     /**
      * 新增工单
@@ -72,21 +71,21 @@ public interface IDevWorkOrderService {
      * @param lineId
      * @return
      */
-    Long checkWorkLineUnique(Integer lineId);
+    DevWorkOrder checkWorkLineUnique(Integer lineId);
 
     /**
-     * 页面点击完成工单，工单可进行修改
+     * 结束工单
      * @param id
      * @return
      */
     int finishWorkerOrder(Integer id,HttpServletRequest request);
 
     /**
-     * 页面点击提交工单，工单状态不可修改和删除
+     * 提交工单确认工单
      * @param id
      * @return
      */
-    int submitWorkOrder(Integer id,HttpServletRequest request);
+    int submitWorkOrder(Integer id);
 
     /**
      * 根据工单编号查询对应的工单信息
@@ -169,4 +168,22 @@ public interface IDevWorkOrderService {
      * @return 结果
      */
     public List<DevWorkOrder> selectWorkListInSw(Integer wlSign);
+
+    /**
+     * 通过工单的进行状态查询所有的工单信息
+     * @param workOrderStatus 工作进行状态
+     * @return 结果
+     */
+    public List<DevWorkOrder> selectWorkListInWorkStatus(Integer workOrderStatus);
+
+    /**
+     * 查询工位未配置的工单信息
+     * @param lineId 车间id
+     * @param workSign 工单确认标记
+     * @param wlSign 工单下到车间标记
+     * @param singleId 单工位id
+     * @param companyId 公司id
+     * @return 结果
+     */
+    List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId,Integer workSign, Integer wlSign, Integer singleId, Integer companyId);
 }

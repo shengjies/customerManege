@@ -1,7 +1,5 @@
 package com.ruoyi.project.page.pageInfoConfig.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
 import org.apache.ibatis.annotations.Param;
 
@@ -96,4 +94,11 @@ public interface PageInfoConfigMapper
 	 * @return
 	 */
 	PageInfoConfig selectPageConfigByPidAndLineId(@Param("pid")int pid ,@Param("lineId")int lineId);
+
+	/**
+	 * 通过页面id查询车间id信息
+	 * @param pId 页面id
+	 * @return 结果
+	 */
+	PageInfoConfig selectHousePageConfigByPageId(@Param("pId") Integer pId);
 }

@@ -17,6 +17,7 @@
 				<label class="col-sm-3 control-label">车间责任人1：</label>
 				<div class="col-sm-8">
 					<select id="liableOne" name="liableOne" class="form-control" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="0">请选择</option>
 						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
 					</select>
 				</div>
@@ -25,6 +26,7 @@
 				<label class="col-sm-3 control-label">车间责任人2：</label>
 				<div class="col-sm-8">
 					<select id="liableTwo" name="liableTwo" class="form-control" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+						<option value="0">请选择</option>
 						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
 					</select>
 				</div>
@@ -62,6 +64,12 @@
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
+				var liableOne = $("#liableOne").find("option:selected").val();
+				var liableTwo = $("#liableTwo").find("option:selected").val();
+				if (liableOne <= 0 || liableTwo <= 0) {
+					$.modal.alertWarning("请选择车间责任人");
+					return;
+				}
 	            $.operate.save(prefix + "/add", $('#form-singleWork-add').serialize());
 	        }
 	    }

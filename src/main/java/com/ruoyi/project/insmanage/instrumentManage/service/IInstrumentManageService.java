@@ -78,8 +78,8 @@ public interface IInstrumentManageService
     String importInstrumentManageList(List<InstrumentManage> imList, boolean updateSupport);
 
 	/**
-	 * 查询各公司所有配置过的设备信息
+	 * 查询各公司所有未配置过的已开启的设备信息
 	 * @return 结果
 	 */
-	public List<InstrumentManage> selectAllIm(Integer imTag);
+	public List<InstrumentManage> selectAllIm(Integer imStatus,Integer imTag);
 }

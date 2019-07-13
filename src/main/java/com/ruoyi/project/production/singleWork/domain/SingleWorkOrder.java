@@ -1,8 +1,7 @@
 package com.ruoyi.project.production.singleWork.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -43,50 +42,44 @@ public class SingleWorkOrder extends BaseEntity
 
 	private int type;
 
-	public void setId(Integer id) 
-	{
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getId() 
-	{
-		return id;
+	public Integer getWorkId() {
+		return workId;
 	}
-	public void setWorkId(Integer workId) 
-	{
+
+	public void setWorkId(Integer workId) {
 		this.workId = workId;
 	}
 
-	public Integer getWorkId() 
-	{
-		return workId;
+	public String getWorkCode() {
+		return workCode;
 	}
-	public void setWorkCode(String workCode) 
-	{
+
+	public void setWorkCode(String workCode) {
 		this.workCode = workCode;
 	}
 
-	public String getWorkCode() 
-	{
-		return workCode;
+	public Integer getSingleId() {
+		return singleId;
 	}
-	public void setSingleId(Integer singleId) 
-	{
+
+	public void setSingleId(Integer singleId) {
 		this.singleId = singleId;
 	}
 
-	public Integer getSingleId() 
-	{
-		return singleId;
-	}
-	public void setSingleP(Integer singleP) 
-	{
-		this.singleP = singleP;
+	public Integer getSingleP() {
+		return singleP;
 	}
 
-	public Integer getSingleP() 
-	{
-		return singleP;
+	public void setSingleP(Integer singleP) {
+		this.singleP = singleP;
 	}
 
 	public Date getcTime() {
@@ -145,14 +138,21 @@ public class SingleWorkOrder extends BaseEntity
 		this.type = type;
 	}
 
+	@Override
 	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("workId", getWorkId())
-            .append("workCode", getWorkCode())
-            .append("singleId", getSingleId())
-            .append("singleP", getSingleP())
-            .append("cTime", getcTime())
-            .toString();
-    }
+		return "SingleWorkOrder{" +
+				"id=" + id +
+				", workId=" + workId +
+				", workCode='" + workCode + '\'' +
+				", singleId=" + singleId +
+				", singleP=" + singleP +
+				", cTime=" + cTime +
+				", imCode='" + imCode + '\'' +
+				", liableOne=" + liableOne +
+				", liableOneName='" + liableOneName + '\'' +
+				", workorderStatus=" + workorderStatus +
+				", productNumber=" + productNumber +
+				", type=" + type +
+				'}';
+	}
 }

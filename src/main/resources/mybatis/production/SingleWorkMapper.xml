@@ -72,11 +72,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">company_id,</if>
 			<if test="workshopName != null  and workshopName != ''  ">workshop_name,</if>
-			<if test="imId != null  ">im_id,</if>
+			<if test="imId != null and imId != 0 ">im_id,</if>
             <if test="imCode != null ">im_code,</if>
 			<if test="sign != null  ">sign,</if>
-			<if test="liableOne != null  ">liable_one,</if>
-			<if test="liableTwo != null  ">liable_two,</if>
+			<if test="liableOne != null and liableOne != 0 ">liable_one,</if>
+			<if test="liableTwo != null and liableOne != 0  ">liable_two,</if>
 			<if test="devId != null  ">dev_id,</if>
 			<if test="devCode != null  and devCode != ''  ">dev_code,</if>
             <if test="watchId != null  ">watch_id,</if>
@@ -90,11 +90,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
 			<if test="workshopName != null  and workshopName != ''  ">#{workshopName},</if>
-			<if test="imId != null  ">#{imId},</if>
+			<if test="imId != null and imId != 0 ">#{imId},</if>
             <if test="imCode != null  ">#{imCode},</if>
 			<if test="sign != null  ">#{sign},</if>
-			<if test="liableOne != null  ">#{liableOne},</if>
-			<if test="liableTwo != null  ">#{liableTwo},</if>
+			<if test="liableOne != null and liableOne != 0 ">#{liableOne},</if>
+			<if test="liableTwo != null and liableOne != 0  ">#{liableTwo},</if>
 			<if test="devId != null  ">#{devId},</if>
 			<if test="devCode != null  and devCode != ''  ">#{devCode},</if>
             <if test="watchId != null  ">#{watchId},</if>
@@ -118,11 +118,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="liableOne != null  ">liable_one = #{liableOne},</if>
             <if test="liableTwo != null  ">liable_two = #{liableTwo},</if>
             <if test="devId != null  ">dev_id = #{devId},</if>
-            <if test="devCode != null  and devCode != ''  ">dev_code = #{devCode},</if>
+            dev_code = #{devCode},
             <if test="watchId != null  ">watch_id = #{watchId},</if>
-            <if test="watchCode != null  and watchCode != ''  ">watch_code = #{watchCode},</if>
+            watch_code = #{watchCode},
             <if test="eId != null  ">e_id = #{eId},</if>
-            <if test="eCode != null  and eCode != ''  ">e_code = #{eCode},</if>
+            e_code = #{eCode},
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="parentId != null  ">parent_id = #{parentId},</if>
             <if test="sopSign != null  ">sop_sign = #{sopSign},</if>
@@ -182,4 +182,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         and b.company_id = #{companyId} where a.parent_id = #{parentId} and b.w_id is null;
     </select>
 
+    <!--通过车间id查询车间看板明细信息-->
+    <select id="selectHouseDetailByParentId" resultType="com.ruoyi.project.page.pageInfo.domain.PageHouse">
+        SELECT a.liable_one as liableOneId,d.user_name as userName, a.parent_id as parentId,b.work_id as workId,b.work_code as workCode,
+        c.product_code as productCode,c.workorder_status as workOrderStatus,c.operation_status as operationStatus,
+        c.order_code as orderCode,c.product_number as workTotalNum,count(im_code) as imTotalNum
+        FROM tab_single_work as a
+        left join tab_single_work_order as b on a.id = b.single_id
+        left join dev_work_order as c on b.work_id = c.id
+        left join sys_user as d on a.liable_one = d.user_id
+        where a.parent_id = #{parentId} and a.company_id = #{companyId} and b.work_id is not null
+        and c.workorder_status = #{workOrderStatus}
+        group by a.liable_one,b.work_id
+    </select>
+
+    <!--查询对应工单的所有责任人信息-->
+    <select id="selectWorkUserInfo" resultType="com.ruoyi.project.production.singleWork.domain.SingleWork">
+        SELECT b.liable_one as liableOne FROM tab_single_work_order as a
+            left join tab_single_work as b on  a.single_id = b.id
+            where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} group by liable_one
+    </select>
 </mapper>

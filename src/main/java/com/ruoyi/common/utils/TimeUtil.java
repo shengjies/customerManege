@@ -1,9 +1,5 @@
 package com.ruoyi.common.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -64,31 +60,27 @@ public class TimeUtil {
         return hour + m;
     }
 
-    public static void main(String[] args) throws Exception {
-        System.out.println(getEndHour(new Date()));
-}
-
-    public static Date getSystemDate(){
+    public static Date getSystemDate() {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
             SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return  format1.parse(format.format(new Date()));
-        }catch (Exception e){
+            return format1.parse(format.format(new Date()));
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static Date getEndHour(Date date){
+    public static Date getEndHour(Date date) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:59:59");
             SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            return  format1.parse(format.format(date));
-        }catch (Exception e){
+            return format1.parse(format.format(date));
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static float getDateDel(Date startDate,Date endDate){
+    public static float getDateDel(Date startDate, Date endDate) {
         long nd = 1000 * 24 * 60 * 60;
         long nh = 1000 * 60 * 60;
         long nm = 1000 * 60;
@@ -127,5 +119,27 @@ public class TimeUtil {
         c.set(Calendar.SECOND, 0); // 秒钟为0
         c.set(Calendar.MILLISECOND, 0); //毫秒值为0
         return c.getTime();
+    }
+
+    /**
+     * 获取当前年月日
+     * Thu XXX XX 00:00:00 CST XXXX
+     *
+     * @return 结果
+     */
+    public static Date getNYR() {
+        Calendar cal = Calendar.getInstance();
+        cal.get(Calendar.DAY_OF_MONTH);
+        cal.get(Calendar.MONTH);
+        cal.get(Calendar.YEAR);
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE, 0); //设置分钟为0,
+        cal.set(Calendar.SECOND, 0); // 秒钟为0
+        cal.set(Calendar.MILLISECOND, 0); //毫秒值为0
+        return cal.getTime();
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(getNYR());
     }
 }

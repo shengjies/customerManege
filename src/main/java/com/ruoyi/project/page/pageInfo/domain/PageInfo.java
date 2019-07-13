@@ -1,15 +1,14 @@
 package com.ruoyi.project.page.pageInfo.domain;
 
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
+import com.ruoyi.framework.web.domain.BaseEntity;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.page.layout.domain.Layout;
 import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 import java.util.List;
 
@@ -82,7 +81,18 @@ public class PageInfo extends BaseEntity
 	/***  实际产量 */
 	private PageReal real;
 
-	public void setId(Integer id) 
+	/******************* 车间单工位看板详情数据 *****************/
+	private List<PageHouse> pageHouseList;
+
+	public List<PageHouse> getPageHouseList() {
+		return pageHouseList;
+	}
+
+	public void setPageHouseList(List<PageHouse> pageHouseList) {
+		this.pageHouseList = pageHouseList;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}

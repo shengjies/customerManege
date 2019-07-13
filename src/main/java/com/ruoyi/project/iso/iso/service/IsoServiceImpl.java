@@ -1,6 +1,7 @@
 package com.ruoyi.project.iso.iso.service;
 
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.CodeUtils;
@@ -333,7 +334,7 @@ public class IsoServiceImpl implements IIsoService {
         ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
         if (line == null) throw new Exception("产线不存在");
         //查询正在进行的工单
-        DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId());
+        DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
         if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode())) throw new Exception("没有正在进行的工单");
         //查询对应SOP配置
         SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(), line.getId(), workOrder.getProductCode());

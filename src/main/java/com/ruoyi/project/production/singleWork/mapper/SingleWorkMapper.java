@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.singleWork.mapper;
 
+import com.ruoyi.project.page.pageInfo.domain.PageHouse;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import org.apache.ibatis.annotations.Param;
 
@@ -111,4 +112,23 @@ public interface SingleWorkMapper {
      */
     List<SingleWork> selectNotConfigSop(@Param("companyId") int companyId, @Param("parentId") int parentId,
                                         @Param("sopId") int sopId,@Param("sopTag") int sopTag);
+
+    /**
+     * 查询车间id查询车间看板的明细信息
+     * @param companyId 公司id
+     * @param parentId 车间id
+     * @param workOrderStatus 工单生产状态
+     * @return 车间看板封装结果
+     */
+    List<PageHouse> selectHouseDetailByParentId(@Param("companyId") Integer companyId, @Param("parentId") Integer parentId,
+                                                @Param("workOrderStatus")Integer workOrderStatus);
+
+    /**
+     * 查询对应工单的所有责任人信息
+     * @param workId 工单id
+     * @param companyId 公司id
+     * @param sign 车间或者单工位标记
+     * @return 结果
+     */
+    List<SingleWork> selectWorkUserInfo(@Param("workId") Integer workId, @Param("companyId") Integer companyId,@Param("sign") Integer sign);
 }

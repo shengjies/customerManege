@@ -71,6 +71,18 @@ public class WorkData extends BaseEntity {
      * 创建时间
      */
     private Date createTime;
+    /**
+     * 车间或流水线标记字段0、流水线，1、车间
+     */
+    private Integer scType;
+
+    public Integer getScType() {
+        return scType;
+    }
+
+    public void setScType(Integer scType) {
+        this.scType = scType;
+    }
 
     public void setDataId(Integer dataId) {
         this.dataId = dataId;

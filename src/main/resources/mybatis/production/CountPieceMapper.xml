@@ -157,5 +157,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{cpId}
         </foreach>
     </delete>
-    
+
+    <!--通过工单id查询个人计件信息-->
+    <select id="selectPieceByWorkIdAndUid" resultMap="CountPieceResult">
+        SELECT * FROM tab_count_piece where company_id = #{companyId} and cp_user_id = #{cpUserId} and work_id = #{workId} and cp_date = #{cpDate}
+    </select>
 </mapper>

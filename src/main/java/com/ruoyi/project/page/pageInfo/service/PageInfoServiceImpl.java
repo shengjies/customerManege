@@ -1,13 +1,8 @@
 package com.ruoyi.project.page.pageInfo.service;
 
-import java.math.BigDecimal;
-import java.util.*;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.PageTypeConstants;
 import com.ruoyi.common.constant.WorkConstants;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.spring.DevId;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -15,11 +10,12 @@ import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devDeviceCounts.mapper.DevDataLogMapper;
 import com.ruoyi.project.device.devIo.domain.DevIo;
 import com.ruoyi.project.device.devIo.mapper.DevIoMapper;
-import com.ruoyi.project.page.pageInfo.domain.PageReal;
-import com.ruoyi.project.page.pageInfo.domain.PageStandard;
-import com.ruoyi.project.page.pageInfo.domain.PageTem;
+import com.ruoyi.project.page.pageInfo.domain.*;
+import com.ruoyi.project.page.pageInfo.mapper.PageInfoMapper;
 import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
 import com.ruoyi.project.page.pageInfoConfig.mapper.PageInfoConfigMapper;
+import com.ruoyi.project.production.countPiece.domain.CountPiece;
+import com.ruoyi.project.production.countPiece.mapper.CountPieceMapper;
 import com.ruoyi.project.production.devWorkData.domain.DevWorkData;
 import com.ruoyi.project.production.devWorkData.mapper.DevWorkDataMapper;
 import com.ruoyi.project.production.devWorkDayHour.domain.DevWorkDayHour;
@@ -29,10 +25,11 @@ import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
 import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
-import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
@@ -40,14 +37,13 @@ import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.page.pageInfo.mapper.PageInfoMapper;
-import com.ruoyi.project.page.pageInfo.domain.PageInfo;
-import com.ruoyi.common.support.Convert;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 页面管理 服务层实现
@@ -95,6 +91,15 @@ public class PageInfoServiceImpl implements IPageInfoService {
 
     @Autowired
     private ISingleWorkService singleWorkService;
+
+    @Autowired
+    private SingleWorkMapper singleWorkMapper;
+
+    @Autowired
+    private SingleWorkOrderMapper singleWorkOrderMapper;
+
+    @Autowired
+    private CountPieceMapper countPieceMapper;
 
     @Value("${page.url}")
     private String pageUrl;
@@ -276,10 +281,65 @@ public class PageInfoServiceImpl implements IPageInfoService {
             } else if (info.getPageType() == PageTypeConstants.PAGE_TYPE_XQ) {
                 return selectLineDetail(info);
             }else if(info.getPageType() == PageTypeConstants.PAGE_TYPE_CJ){
-                return info;
+                return selectWorkshopDetail(info);
             }
         }
         return null;
+    }
+
+    /**
+     * 车间汇总看板
+     * @param info info对象
+     * @return 结果
+     */
+    private PageInfo selectWorkshopDetail(PageInfo info) {
+        PageInfoConfig pageInfoConfig = pageInfoConfigMapper.selectHousePageConfigByPageId(info.getId());
+        if (pageInfoConfig == null) {
+            return null;
+        }
+        // 查询所有的单工位明细
+        List<PageHouse> pageHouseList = singleWorkMapper.selectHouseDetailByParentId(info.getCompanyId(),pageInfoConfig.getLineId(),WorkConstants.WORK_STATUS_STARTING);
+        if (pageHouseList == null) {
+            return null;
+        }
+        List<WorkExceptionList> wexcList = null;
+        for (PageHouse pageHouse : pageHouseList) {
+            if (pageHouse != null) {
+                // 查询工单异常信息
+                wexcList = workExceptionListMapper.selectWorkExceAllByWorkId(pageHouse.getWorkId());
+                Integer wexStatus = 0;
+                Integer wexStatusTag = 0;
+                if (wexcList != null) {
+                    for (WorkExceptionList wex : wexcList) {
+                        if (wex.getExceStatut() == 0) {
+                            wexStatusTag = 1;
+                        }
+                        wexStatus += wex.getExceStatut();
+                    }
+                    if (wexStatus == wexcList.size() * WorkConstants.WORKEXCE_STATUT_FINISH) {
+                        pageHouse.setWexStatus(null);
+                    } else {
+                        pageHouse.setWexStatus(WorkConstants.WORKEXCE_STATUT_HANDLE);
+                    }
+                    if (wexStatusTag == 1) {
+                        pageHouse.setWexStatus(WorkConstants.WORKEXCE_STATUT_NOHANDLE);
+                    }
+                }
+                pageHouse.setCountNum(0);
+                // 查询个人计件数量信息
+                CountPiece countPiece = countPieceMapper.selectPieceByWorkIdAndUid(pageHouse.getWorkId(), info.getCompanyId(), pageHouse.getLiableOneId(), TimeUtil.getNYR());
+                if (countPiece != null) {
+                    pageHouse.setCountNum(countPiece.getCpNumber());
+                }
+                // PageHouse count = singleWorkOrderMapper.selectWorkInHouseCountNumByUid(info.getCompanyId(),pageHouse.getWorkId(),
+                //         FileConstants.SIGN_SINGWORK,pageHouse.getLiableOneId());
+                // if (count != null && count.getCountNum() != null) {
+                //     pageHouse.setCountNum(count.getCountNum());
+                // }
+            }
+        }
+        info.setPageHouseList(pageHouseList);
+        return info;
     }
 
     /**
@@ -313,7 +373,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 tem.setPersonLiable(user.getUserName());
             }
             //查询各个产线正在进行的工单
-            DevWorkOrder order = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId());
+            DevWorkOrder order = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId(),WorkConstants.SING_LINE);
             if (order != null) {
                 tem.setWorkCode(order.getWorkorderNumber());
                 tem.setProductCode(order.getProductCode());
@@ -326,7 +386,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 Workstation workstation = workstationMapper.selectWorkstationSignByLineId(line.getId(), line.getCompanyId());
                 if (workstation != null) {
                     DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(line.getCompanyId(),
-                            line.getId(), order.getId(), workstation.getDevId(), workstation.getId());
+                            line.getId(), order.getId(), workstation.getDevId(), workstation.getId(),WorkConstants.SING_LINE);
                     if (workData != null) tem.setOutputNum(workData.getCumulativeNum());
                 }
                 //查询对应工单是否出现未处理异常情况
@@ -376,7 +436,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
         //设置产线
         info.setLine(line);
         //查询正在进行工单
-        DevWorkOrder devWorkOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId());
+        DevWorkOrder devWorkOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId(),WorkConstants.SING_LINE);
         if (devWorkOrder != null) {
             info.setWork(devWorkOrder);
             //查询正在进行工单所有异常
@@ -393,14 +453,14 @@ public class PageInfoServiceImpl implements IPageInfoService {
         if (workstation != null && devWorkOrder != null) {
             int devId = workstation.getDevId() == null ? 0 : workstation.getDevId();
             r = devDataLogMapper.selectLineWorkSysTemData(line.getCompanyId(), line.getId(),
-                    devWorkOrder.getId(), devId, workstation.getId());
+                    devWorkOrder.getId(), devId, workstation.getId(),WorkConstants.SING_LINE);
             hour = dayHourMapper.selectInfoByCompanyLineWorkDevIo(line.getCompanyId(), line.getId(), devWorkOrder.getId(), devId, workstation.getId());
         }
         //实际产量
         PageReal real = new PageReal(hour,r);
         info.setReal(real);
         //查询当天工单
-        info.setWorkOrder(devWorkOrderMapper.selectDayWorkOrder(line.getCompanyId(), line.getId()));
+        info.setWorkOrder(devWorkOrderMapper.selectDayWorkOrder(WorkConstants.SING_LINE,line.getCompanyId(), line.getId()));
         return info;
     }
 

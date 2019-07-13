@@ -99,7 +99,7 @@
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
                                     class="fa fa-search"></i>&nbsp;搜索</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
                                     class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
                     </ul>
@@ -144,6 +144,11 @@
     $("select[name='productName']").select2({
         width:200
     })
+    // 重置搜索表单信息
+    function formReset() {
+        $('#formId')[0].reset();//input标签重置
+        $("select").val(null).trigger("change"); // select2标签重置
+    }
     var editFlag = [[${@permission.hasPermi('device:devWorkOrder:edit')}]];
     var removeFlag = [[${@permission.hasPermi('device:devWorkOrder:remove')}]];
     var workChange = [[${@permission.hasPermi('production:workOrderChange:list')}]];
@@ -159,7 +164,11 @@
             exportUrl: prefix + "/export",
             modalName: "工单",
             search: false,
-            showExport: true,
+            showExport: false,
+            showSearch:true,
+            showRefresh:true,
+            showColumns:false,
+            showToggle:true,
             sortName:"productionStart",
             sortOrder:"desc",
             columns: [{
@@ -178,7 +187,6 @@
                 {
                     field: 'param1',
                     title: '产线/车间',
-                    sortable: true,
                     formatter:function (value, row, index) {
                         if(row.wlSign == 1 && workSingle ==""){
                             return '<a class="btn btn-primary btn-xs" href="#" onclick="configSingle('+ row.id +','+row.lineId+',\''+value+'\')">'+value+'</a>';
@@ -364,7 +372,7 @@
                     },
                     success: function (data) {
                         if (data.code == 0) {
-                            $.modal.alertWarning("工单已经开始了。。。。");
+                            $.modal.alertWarning("工单已经开始了...");
                             $.table.refresh(); // 重新刷新
                         } else {
                             $.modal.alertError(data.msg);
@@ -388,7 +396,7 @@
                     },
                     success: function (data) {
                         if (data.code == 0) {
-                            $.modal.alertWarning("工单已经暂停了。。。。");
+                            $.modal.alertWarning("工单已经暂停了...");
                             $.table.refresh();
                         } else {
                             $.modal.alertError(data.msg);
@@ -400,12 +408,11 @@
     }
 
     /**
-     * 工单提交操作，提交的工单不可修改和删除
+     * 提交工单确认工单
      * @param id
      */
     function submitWorkOrder(id) {
         $.modal.confirm("提交工单不可进行修改删除，确认执行该操作吗？", function () {
-            // $.modal.alertWarning("工单已经提交了。。。。");
             $.ajax({
                 type: 'POST',
                 url: prefix + '/submitWorkOrder',
@@ -427,7 +434,7 @@
     }
 
     /**
-     * 工单完成操作，点击完成工单可进行修改
+     * 结束工单
      * @param id
      */
     function finishWorkerOrder(id) {

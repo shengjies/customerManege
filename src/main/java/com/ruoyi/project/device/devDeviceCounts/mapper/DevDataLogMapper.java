@@ -1,10 +1,7 @@
 package com.ruoyi.project.device.devDeviceCounts.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.device.devDeviceCounts.domain.DataLogTask;
 import com.ruoyi.project.device.devDeviceCounts.domain.DevDataLog;
-import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -45,6 +42,7 @@ public interface DevDataLogMapper {
     /**
      * 查询每天正在生产或者已经完成的工单每小时的IO口数据
      *
+     * @param scType 车间或者流水线标记
      * @param devId          硬件id
      * @param ioId           工位id
      * @param workId         工单id
@@ -53,7 +51,7 @@ public interface DevDataLogMapper {
      * @param sysDateTime    当前时间
      * @return 结果包装类
      */
-    DataLogTask selectDataLogBeInOrFinish(@Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("workId") Integer workId,
+    DataLogTask selectDataLogBeInOrFinish(@Param("scType") Integer scType, @Param("devId") Integer devId, @Param("ioId") Integer ioId, @Param("workId") Integer workId,
                                           @Param("lineId") Integer lineId,
                                           @Param("sysDateTimeOld") Date sysDateTimeOld, @Param("sysDateTime") Date sysDateTime);
 
@@ -63,10 +61,12 @@ public interface DevDataLogMapper {
      *
      * @param workId 工单id主键
      * @param companyId 公司Id主键
+     * @param scType 车间或者流水线标记
      * @return 数据上报日志信息
      */
     public List<DevDataLog> selectDevDataLogByWorkId(@Param("workId") Integer workId,
-                                                     @Param("companyId") Integer companyId);
+                                                     @Param("companyId") Integer companyId,
+                                                     @Param("scType") Integer scType);
 
     /**
      * 查询对应产线工单硬件IO口上传回传的数据
@@ -75,11 +75,12 @@ public interface DevDataLogMapper {
      * @param work_id 工单
      * @param dev_id  硬件编号
      * @param io_id   IO口编号
+     * @param scType 流水线或者车间标记
      * @return
      */
 //    @DataSource(DataSourceType.SLAVE)
     DevDataLog selectLineWorkDevIo(@Param("line_id") int line_id, @Param("work_id") int work_id, @Param("dev_id") int dev_id,
-                                   @Param("io_id") int io_id);
+                                   @Param("io_id") int io_id,@Param("scType") int scType);
 
     /**
      * 实时统计当前小时的工位产量
@@ -88,8 +89,9 @@ public interface DevDataLogMapper {
      * @param workId 工单id
      * @param devId 硬件id
      * @param wid 工位id
-     * @return
+     * @param scType 车间或者流水线标记
+     * @return 结果
      */
     int selectLineWorkSysTemData(@Param("companyId")int companyId,@Param("lineId")int lineId,@Param("workId")int workId,
-                                 @Param("devId")int devId,@Param("wid")int wid);
+                                 @Param("devId")int devId,@Param("wid")int wid,@Param("scType") Integer scType);
 }

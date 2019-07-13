@@ -70,7 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 and workorder_number like concat('%', #{workorderNumber}, '%')
             </if>
             <if test="companyId != null "> and company_id = #{companyId}</if>
-            <if test="lineId != null and lineId >0"> and line_id = #{lineId} and wl_sign = 0</if>
+            <if test="lineId != null and lineId > 0 "> and line_id = #{lineId} and wl_sign = 0</if>
             <if test="single != null and single > 0 "> and line_id = #{single} and wl_sign = 1</if>
             <if test="productName != null  and productName != '' "> and product_name = #{productName}</if>
             <if test="productCode != null  and productCode != '' "> and product_code = #{productCode}</if>
@@ -101,11 +101,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 AND date_format(production_end,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="selectDevWorkOrderById" parameterType="Integer" resultMap="DevWorkOrderResult">
         <include refid="selectDevWorkOrderVo"/>
         where id = #{id}
+    </select>
+
+    <!--通过工单id查询工单的基本信息-->
+    <select id="selectWorkOrderInfoById" parameterType="Integer" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT workorder_number as workorderNumber FROM dev_work_order where id = #{workId} and company_id = #{companyId}
     </select>
 
     <insert id="insertDevWorkOrder" parameterType="DevWorkOrder" useGeneratedKeys="true" keyProperty="id">
@@ -258,13 +264,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <!--校验工单号的唯一性-->
-    <select id="checkWorkOrderNumber" resultType="Long">
-        select count(1) from dev_work_order where workorder_number = #{workorderNumber} and company_id = #{companyId}
+    <select id="checkWorkOrderNumber" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        select id as id from dev_work_order where workorder_number = #{workorderNumber} and company_id = #{companyId} limit 1
     </select>
 
     <!--校验一条流水线是否只存在一个处于生产状态的工单-->
-    <select id="checkWorkLineUnique" resultType="Long">
-        SELECT count(1) FROM dev_work_order where line_id = #{lineId} and wl_sign =#{sign} and workorder_status = 1;
+    <select id="checkWorkLineUnique" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as id FROM dev_work_order where line_id = #{lineId} and wl_sign =#{sign} and workorder_status = 1 limit 1
     </select>
 
     <!--查询所有生产状态处于正在进行的工单-->
@@ -275,7 +281,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询对应公司对应产线正在进行中的工单-->
     <select id="selectWorkByCompandAndLine" resultMap="DevWorkOrderResult">
-         SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id}
+         SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id} and wl_sign = #{wlSign}
           and workorder_status = 1  limit 1;
     </select>
 
@@ -288,7 +294,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--查询当天排版计划-->
     <select id="selectDayWorkOrder" resultMap="DevWorkOrderResult">
       select id, workorder_number,  operation_status FROM
-      dev_work_order where company_id= #{company_id} and line_id = #{line_id}
+      dev_work_order where wl_sign = #{wlSign} and company_id= #{company_id} and line_id = #{line_id}
       and production_start = date_format(now(),'%y%m%d');
     </select>
 
@@ -329,7 +335,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询正在生产或者已经完成的所有工单-->
     <select id="selectWorkOrderAllBeInOrFinish" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
-        SELECT id,company_id as companyId,line_id as lineId FROM dev_work_order where workorder_status in (1,2)
+        SELECT id,company_id as companyId,line_id as lineId,wl_sign as wlSign FROM dev_work_order where wl_sign = #{wlSign} and workorder_status in (1,2)
     </select>
 
     <!--通过产品id或者工单id查询已经提交的工单-->
@@ -355,7 +361,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询最近完成工单信息-->
     <select id="selectLatelyCompleteWork" resultMap="DevWorkOrderResult">
-      SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id}
+      SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id} and wl_sign = #{wlSign}
       and workorder_status = 2 order by end_time desc limit 1;
     </select>
 
@@ -375,6 +381,38 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过工单下发标记查询对应的所有工单列表-->
     <select id="selectWorkListInSw" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
-        SELECT id as id,workorder_number as workorderNumber FROM dev_work_order where company_id = #{companyId} and wl_sign = #{wlSign} order by create_time desc
+        SELECT id as id,workorder_number as workorderNumber FROM dev_work_order where company_id = #{companyId}
+        and wl_sign = #{wlSign} order by create_time desc
+    </select>
+
+    <!--通过工单状态查询工单列表信息-->
+    <select id="selectWorkListInWorkStatus" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as id,workorder_number as workorderNumber FROM dev_work_order where company_id = #{companyId} and workorder_status = #{workOrderStatus}
+    </select>
+
+    <!--查询单工位还未配置的工单信息-->
+    <select id="selectAllNotConfigBySwId" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        select a.id as id,a.workorder_number as workorderNumber from dev_work_order as a
+        left join tab_single_work_order as b on a.id = b.work_id
+        and b.single_id = #{singleId} where a.company_id = #{companyId} and a.line_id = #{lineId} and a.work_sign = #{workSign}
+        and a.wl_sign = #{wlSign} and b.work_id is null
+    </select>
+
+    <!--查询正在车间对应单工位生产的工单信息-->
+    <select id="selectWorkInHouseBeInBySingId" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT a.id as id,a.workorder_number as workorderNumber,operation_status as operationStatus,workorder_status as workorderStatus,
+        product_code as productCode,product_number as productNumber,product_name as productName,work_price as workPrice
+        FROM dev_work_order as a left join tab_single_work_order as b on a.id = b.work_id
+            where a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
+            and b.single_id = #{singleId} and a.workorder_status = #{workStatus}
+    </select>
+
+    <!--查询车间对应工单对应工位的最后一条记录-->
+    <select id="selectWorkInHouseLastByWorkStatus" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT a.id as id,a.workorder_number as workorderNumber,operation_status as operationStatus,workorder_status as workorderStatus,
+        product_code as productCode,product_number as productNumber,product_name as productName
+        FROM dev_work_order as a left join tab_single_work_order as b on a.id = b.work_id
+            where a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
+            and b.single_id = #{singleId} and a.workorder_status = #{workStatus} order by end_time desc limit 1
     </select>
 </mapper>

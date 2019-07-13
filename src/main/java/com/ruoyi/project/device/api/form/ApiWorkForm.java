@@ -13,10 +13,19 @@ public class ApiWorkForm {
     private String workCode;//工单编号
     private int workNumber;//工单数量
     private int actualNum; // 实际生产产量信息
+    private Integer perNum; // 个人生产数量
     private Integer workorderStatus; // 工单生产状态
     private String productCode;//产品编码
     private String productName;//产品名称
     private int op =0;
+
+    public Integer getPerNum() {
+        return perNum;
+    }
+
+    public void setPerNum(Integer perNum) {
+        this.perNum = perNum;
+    }
 
     public Integer getWorkorderStatus() {
         return workorderStatus;

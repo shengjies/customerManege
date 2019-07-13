@@ -1,11 +1,11 @@
 package com.ruoyi.project.device.devDeviceCounts.service;
 
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.constant.WorkConstants;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.project.device.devDeviceCounts.domain.DevDataLog;
+import com.ruoyi.project.device.devDeviceCounts.domain.DevDeviceCounts;
 import com.ruoyi.project.device.devDeviceCounts.mapper.DevDataLogMapper;
+import com.ruoyi.project.device.devDeviceCounts.mapper.DevDeviceCountsMapper;
 import com.ruoyi.project.device.devIo.domain.DevIo;
 import com.ruoyi.project.device.devIo.mapper.DevIoMapper;
 import com.ruoyi.project.device.devList.domain.DevList;
@@ -19,9 +19,8 @@ import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ruoyi.common.support.Convert;
-import com.ruoyi.project.device.devDeviceCounts.domain.DevDeviceCounts;
-import com.ruoyi.project.device.devDeviceCounts.mapper.DevDeviceCountsMapper;
+import java.util.Date;
+import java.util.List;
 
 /**
  * IO上报数据 服务层实现
@@ -138,12 +137,12 @@ public class DevDeviceCountsServiceImpl implements IDevDeviceCountsService
 						ProductionLine line = productionLineMapper.selectProductionLineById(io.getLineId());
 						if(line != null)devDataLog.setLineId(line.getId());
 						//查询对应产线正在工作的工单
-						DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(devList.getCompanyId(),io.getLineId());
+						DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(devList.getCompanyId(),io.getLineId(),WorkConstants.SING_LINE);
 						if(workOrder != null && workOrder.getOperationStatus() == WorkConstants.OPERATION_STATUS_STARTING){
 							devDataLog.setWorkId(workOrder.getId());
 							//对相关数据进行记录
 							DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(devList.getCompanyId(),io.getLineId(),workOrder.getId(),
-									devList.getId(),io.getId());
+									devList.getId(),io.getId(),WorkConstants.SING_LINE);
 							if(workData != null){
 								if(io.getIsSign() == 1){
 									workData.setIoSign(1);//标记数据 为报表数据
@@ -183,7 +182,7 @@ public class DevDeviceCountsServiceImpl implements IDevDeviceCountsService
 							//添加日志
 							if(workData != null  && workOrder.getOperationStatus() == WorkConstants.OPERATION_STATUS_STARTING && devDataLog.getLineId() != null && devDataLog.getWorkId() != null){
 								//查询对应日志上传数据数据
-								DevDataLog log = devDataLogMapper.selectLineWorkDevIo(devDataLog.getLineId(),devDataLog.getWorkId(),devDataLog.getDevId(),devDataLog.getIoId());
+								DevDataLog log = devDataLogMapper.selectLineWorkDevIo(devDataLog.getLineId(),devDataLog.getWorkId(),devDataLog.getDevId(),devDataLog.getIoId(),WorkConstants.SING_LINE);
 								if(log != null){
 									devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
 								}

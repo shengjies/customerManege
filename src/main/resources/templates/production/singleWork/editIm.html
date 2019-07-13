@@ -5,6 +5,7 @@
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-singleWork-edit" th:object="${singleWork}">
+        <input id="parentId" name="parentId" th:field="*{parentId}" type="hidden">
         <input id="id" name="id" th:field="*{id}"  type="hidden">
         <div class="form-group">
             <label class="col-sm-3 control-label">设备责任人：</label>

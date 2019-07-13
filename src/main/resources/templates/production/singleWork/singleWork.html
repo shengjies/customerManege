@@ -17,7 +17,7 @@
 
                         <li>
                             设备编号：
-                            <select id="imId" name="imId" th:with="allIm=${@im.selectAllIm(null)}">
+                            <select id="imId" name="imId" th:with="allIm=${@im.selectAllIm(-1,-1)}">
                                 <option value="-1">所有</option>
                                 <option th:each="im:${allIm}" th:utext="${im.imCode}" th:value="${im.id}"></option>
                             </select>
@@ -178,7 +178,7 @@
      */
     function addHouse(id) {
         var url = $.common.isEmpty(id) ? $.table._option.createUrl : $.table._option.createUrl.replace("{id}", id);
-        $.modal.open("新建车间", url, 800, 300);
+        $.modal.open("新建车间", url, 800, 500);
     }
 
     /**
@@ -245,7 +245,7 @@
                 }
                 url = $.table._option.updateImUrl.replace("{id}", id);
             }
-            $.modal.open("修改设备信息", url, 800, 500);
+            $.modal.open("修改单工位责任人", url, 800, 500);
         }
     }
 

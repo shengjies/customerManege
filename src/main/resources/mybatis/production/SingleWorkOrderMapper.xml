@@ -94,5 +94,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <!--通过车间id工单id查询工单单工位记录列表-->
+    <select id="selectSingleWorkByWorkIdAndPid" resultMap="SingleWorkOrderResult">
+        SELECT * FROM tab_single_work_order where 1=1
+        <if test="singleP != null ">
+            and single_p = #{singleP}
+        </if>
+        <if test="workId != null ">
+            and work_id = #{workId}
+        </if>
+    </select>
+
+    <!--查询车间对应工单个人负责的工单生产数量-->
+    <select id="selectWorkInHouseCountNumByUid" resultType="com.ruoyi.project.page.pageInfo.domain.PageHouse">
+        select coalesce(sum(cumulative_num),0) as countNum from tab_single_work_order as a
+            left join tab_single_work as b on a.single_id = b.id
+            left join dev_work_data as c on b.id = c.io_id
+            where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} and b.dev_id >0
+            and c.work_id = #{workId} and b.liable_one = #{liableOne}
+    </select>
     
 </mapper>

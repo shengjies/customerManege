@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.devWorkDayHour.service;
 
+import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.project.device.devDeviceCounts.domain.DataLogTask;
@@ -105,7 +106,7 @@ public class DevWorkDayHourServiceImpl implements IDevWorkDayHourService {
     }
 
     /**
-     * 执行每小时定时任务，统计每小时每个IO口的数据，
+     * 流水线执行每小时定时任务，统计每小时每个IO口的数据，
      */
     @Override
     public void selectCalcDataLog() {
@@ -121,15 +122,15 @@ public class DevWorkDayHourServiceImpl implements IDevWorkDayHourService {
         // 各个IO口上传数据记录列表集合
         List<DevDataLog> dataLogs = null;
         // 所有正在生产或者已经完成的工单
-        List<DevWorkOrder> workOrders = workOrderMapper.selectWorkOrderAllBeInOrFinish();
+        List<DevWorkOrder> workOrders = workOrderMapper.selectWorkOrderAllBeInOrFinish(WorkConstants.SING_LINE);
         for (DevWorkOrder workOrder : workOrders) {
             // 上传数据各个公司各个IO口记录集合
-            dataLogs = dataLogMapper.selectDevDataLogByWorkId(workOrder.getId(),workOrder.getCompanyId());
+            dataLogs = dataLogMapper.selectDevDataLogByWorkId(workOrder.getId(),workOrder.getCompanyId(),WorkConstants.SING_LINE);
             // 上传数据列表
             for (DevDataLog dataLog : dataLogs) {
                 try {
                     // 查询出当前系统时间与前一个小时的上传数据
-                    dataLogTask = dataLogMapper.selectDataLogBeInOrFinish(dataLog.getDevId(),dataLog.getIoId(), dataLog.getWorkId(),dataLog.getLineId(), sysDateTimeOld, sysDateTime);
+                    dataLogTask = dataLogMapper.selectDataLogBeInOrFinish(WorkConstants.SING_LINE,dataLog.getDevId(),dataLog.getIoId(), dataLog.getWorkId(),dataLog.getLineId(), sysDateTimeOld, sysDateTime);
                     if (dataLogTask != null && dataLogTask.getSumData() != 0) {
                         /**
                          * 获取IO口数据的上传日期，通过上传日期判断硬件IO口24小时记录表有没有存在数据<br>

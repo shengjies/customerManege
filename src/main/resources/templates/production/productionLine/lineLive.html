@@ -522,15 +522,15 @@
      */
     function editStatus(id) {
         if($("#work-id").val() == 0 || $("#line-live-work-id").val()==""){
-            $.modal.alertWarning("请选择需要操作的工单....");
+            $.modal.alertWarning("请选择需要操作的工单...");
             return;
         }
             var msg1 ="确认开始吗";
-            var msg2 ="工单已经开始了。。。。";
+            var msg2 ="工单已经开始了...";
 
             if(id == 0){
                 var msg1 ="确认暂停吗";
-                var msg2 ="工单已经暂停了。。。。";
+                var msg2 ="工单已经暂停了...";
             }
         $("#action-btn-exce").css('display','inline-block');
             $.modal.confirm(msg1, function () {
@@ -569,7 +569,7 @@
      */
     function finishWorkerOrder() {
         if($("#work-id").val() == 0 || $("#line-live-work-id").val()==""){
-            $.modal.alertWarning("请选择需要操作的工单....");
+            $.modal.alertWarning("请选择需要操作的工单...");
             return;
         }
         $("#action-btn-exce").css('display','inline-block');
@@ -584,7 +584,7 @@
                 async: false,  //同步请求，
                 success: function (result) {
                     if (result.code == 0) {
-                        $.modal.alertWarning("工单已经结束了");
+                        $.modal.alertWarning("工单已经结束了...");
                         $("#action-btn-start").css('display','none');
                         $("#action-btn-stop").css('display','none');
                         $("#action-btn-end").css('display','none');

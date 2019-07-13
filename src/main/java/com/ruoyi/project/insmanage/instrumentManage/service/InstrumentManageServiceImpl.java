@@ -242,15 +242,15 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 	}
 
 	/**
-	 * 通过设备标记状态查询设备信息
+	 * 查询各公司所有未配置过的已启用的设备信息
 	 * @return 结果
 	 */
 	@Override
-	public List<InstrumentManage> selectAllIm(Integer imTag) {
+	public List<InstrumentManage> selectAllIm(Integer imStatus,Integer imTag) {
 		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
 		if (user == null) {
 		    return Collections.emptyList();
 		}
-		return instrumentManageMapper.selectInstrumentManageListByImTag(user.getCompanyId(),imTag);
+		return instrumentManageMapper.selectInstrumentManageListByImTag(user.getCompanyId(),imStatus,imTag);
 	}
 }

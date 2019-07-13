@@ -1,17 +1,21 @@
 package com.ruoyi.project.production.singleWork.service;
 
-import java.util.Date;
-import java.util.List;
-
+import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
+import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.support.Convert;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * 单工位与工单进行配置 服务层实现
@@ -92,8 +96,16 @@ public class SingleWorkOrderServiceImpl implements ISingleWorkOrderService
 	@Override
 	public int updateSingleWorkOrder(SingleWorkOrder singleWorkOrder)
 	{
-		return 1;
-//	    return singleWorkOrderMapper.updateSingleWorkOrder(singleWorkOrder);
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    throw new BusinessException(UserConstants.NOT_LOGIN);
+		}
+		if (singleWorkOrder.getType() == 0){
+			// 车间设备配置工单
+			DevWorkOrder workOrder = devWorkOrderMapper.selectWorkOrderInfoById(user.getCompanyId(), singleWorkOrder.getWorkId());
+			singleWorkOrder.setWorkCode(workOrder.getWorkorderNumber());
+		}
+		return singleWorkOrderMapper.updateSingleWorkOrder(singleWorkOrder);
 	}
 
 	/**

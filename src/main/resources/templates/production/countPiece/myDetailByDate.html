@@ -17,7 +17,7 @@
                             工单号：
                             <select id="workId" name="workId" th:with="allWork=${@workOrder.selectWorkListInSw(1)}">
                                 <option value="-1">请选择</option>
-                                <option th:each="item:${allWork}" th:text="item.workorderNumber" th:value="${item.id}"></option>
+                                <option th:each="item:${allWork}" th:text="${item.workorderNumber}" th:value="${item.id}"></option>
                             </select>
                         </li>
 

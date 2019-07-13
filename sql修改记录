@@ -485,12 +485,21 @@ CHANGE COLUMN `sop_sign` `sop_sign` INT(11) NULL DEFAULT 0 COMMENT '是否配置
 ALTER TABLE `octopus`.`tab_single_work`
 ADD COLUMN `im_code` VARCHAR(125) NULL COMMENT '设备编号' AFTER `im_id`;
 
+# 2019-07-10 zqm 服务器未执行sql 硬件添加配置对象类型流水线或者车间
+ALTER TABLE `octopus`.`dev_list`
+ADD COLUMN `dev_type` INT NULL COMMENT '硬件配置类型(0、流水线，1、车间)' AFTER `sign`;
 
-
+# 2019-07-10 zqm 服务器未执行sql 计数器相关数据表添加车间或者流水线标记字段
+ALTER TABLE `octopus`.`dev_data_log`
+ADD COLUMN `sc_type` INT NULL COMMENT '车间或者流水线标记(0、流水线，1、车间)' AFTER `del_data`;
+ALTER TABLE `octopus`.`dev_work_data`
+ADD COLUMN `sc_type` INT NULL COMMENT '车间或者流水线标记(0、流水线，1、车间)' AFTER `io_sign`;
 
 
 #2019-07-03 zsj 服务器未执行sql 产品编码用于区分是否产品、半成品
 ALTER TABLE `octopus`.`dev_product_list`
 ADD COLUMN `sign` INT NULL DEFAULT 0 COMMENT '标记 0、产品 1、半成品' AFTER `ecn_text`,
 ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '单位' AFTER `sign`;
+
+
 

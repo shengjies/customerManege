@@ -18,6 +18,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="configDate"    column="config_date"    />
         <result property="createDate"    column="create_date"    />
         <result property="sign"    column="sign"    />
+        <result property="devType"    column="dev_type"    />
         <association property="devModel" select="selectDevModel" column="dev_model_id">
             <result property="devModel" column="model_name"/>
         </association>
@@ -25,7 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<sql id="selectDevListVo">
         select id, device_id, device_status,config_status, device_name, dev_model_id, device_upload_time,
-         company_id, remark, def_id, config_date, create_date,sign from dev_list
+         company_id, remark, def_id, config_date, create_date,sign,dev_type from dev_list
     </sql>
 	
     <select id="selectDevListList" parameterType="DevList" resultMap="DevListResult">
@@ -75,6 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="defId != null  ">def_id,</if>
 			<if test="configDate != null  ">config_date,</if>
 			<if test="createDate != null  ">create_date,</if>
+            <if test="devType != null  ">dev_type,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="deviceId != null  and deviceId != ''  ">#{deviceId},</if>
@@ -87,6 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="defId != null  ">#{defId},</if>
 			<if test="configDate != null  ">#{configDate},</if>
 			<if test="createDate != null  ">#{createDate},</if>
+            <if test="devType != null  ">#{devType},</if>
          </trim>
     </insert>
 	 
@@ -103,7 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
     <update id="updateDevSign" parameterType="DevList">
-        update dev_list set sign = #{sign} where id = #{id}
+        update dev_list set sign = #{sign},dev_type=#{devType} where id = #{id}
     </update>
 
 	<update id="deleteDevListById" parameterType="Integer">
@@ -163,6 +166,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="defId"    column="def_id"    />
         <result property="configDate"    column="config_date"    />
         <result property="createDate"    column="create_date"    />
+        <result property="sign"    column="sign"    />
+        <result property="devType"    column="dev_type"    />
     </resultMap>
     <select id="selectDevListByCode" resultMap="DevListResult1">
         SELECT * FROM dev_list where device_id = #{code} limit 1;
@@ -181,8 +186,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <!--通过硬件id更新硬件是否被配置状态-->
-    <update id="updateDevBySign">
-        update dev_list set sign = #{sign} where id = #{id} and company_id = #{companyId}
+    <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
+    <update id="updateDevSignAndType">
+        update dev_list set sign = #{sign},dev_type = #{devType} where id = #{id} and company_id = #{companyId}
     </update>
 </mapper>

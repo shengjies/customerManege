@@ -1,8 +1,7 @@
 package com.ruoyi.project.device.devDeviceCounts.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -35,10 +34,20 @@ public class DevDataLog extends BaseEntity
 	private Date createDate;
 	/**  */
 	private Date createTime;
+	//每次上传前后数据差
+	private Integer delData;
+	/** 车间或者流水线上报日志标记 0、流水线，1、车间 **/
+	private Integer scType;
 
-	private Integer delData;//每次上传前后数据差
+	public Integer getScType() {
+		return scType;
+	}
 
-	public void setId(Integer id) 
+	public void setScType(Integer scType) {
+		this.scType = scType;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}
@@ -137,18 +146,21 @@ public class DevDataLog extends BaseEntity
 		this.delData = delData;
 	}
 
+	@Override
 	public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("companyId", getCompanyId())
-            .append("lineId", getLineId())
-            .append("workId", getWorkId())
-            .append("devId", getDevId())
-            .append("ioId", getIoId())
-            .append("ioOrder", getIoOrder())
-            .append("dataTotal", getDataTotal())
-            .append("createDate", getCreateDate())
-            .append("createTime", getCreateTime())
-            .toString();
-    }
+		return "DevDataLog{" +
+				"id=" + id +
+				", companyId=" + companyId +
+				", lineId=" + lineId +
+				", workId=" + workId +
+				", devId=" + devId +
+				", ioId=" + ioId +
+				", ioOrder=" + ioOrder +
+				", dataTotal=" + dataTotal +
+				", createDate=" + createDate +
+				", createTime=" + createTime +
+				", delData=" + delData +
+				", scType=" + scType +
+				'}';
+	}
 }

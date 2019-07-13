@@ -19,10 +19,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="cumulativeNum"    column="cumulative_num"    />
         <result property="manualNum"    column="manual_num"    />
         <result property="createTime"    column="create_time"    />
+        <result property="scType"    column="sc_type"    />
     </resultMap>
 	
 	<sql id="selectWorkDataVo">
-        select data_id, company_id, line_id, work_id, dev_id, dev_name, io_id, io_name, io_order, data_sign, initial_data, cumulative_num, manual_num, create_time from dev_work_data
+        select data_id, company_id, line_id, work_id, dev_id, dev_name, io_id, io_name, io_order, data_sign, initial_data, cumulative_num, manual_num,
+        create_time,sc_type from dev_work_data
     </sql>
 	
     <select id="selectWorkDataList" parameterType="WorkData" resultMap="WorkDataResult">
@@ -66,6 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cumulativeNum != null  ">cumulative_num,</if>
 			<if test="manualNum != null  ">manual_num,</if>
 			<if test="createTime != null  ">create_time,</if>
+            <if test="scType != null  ">sc_type,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -81,6 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cumulativeNum != null  ">#{cumulativeNum},</if>
 			<if test="manualNum != null  ">#{manualNum},</if>
 			<if test="createTime != null  ">#{createTime},</if>
+            <if test="scType != null  ">#{scType},</if>
          </trim>
     </insert>
 	 
@@ -100,6 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="cumulativeNum != null  ">cumulative_num = #{cumulativeNum},</if>
             <if test="manualNum != null  ">manual_num = #{manualNum},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="scType != null  ">sc_type = #{scType},</if>
         </trim>
         where data_id = #{dataId}
     </update>

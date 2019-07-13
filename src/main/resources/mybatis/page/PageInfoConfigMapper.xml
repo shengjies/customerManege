@@ -133,4 +133,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPageConfigByPidAndLineId" resultMap="PageInfoConfigResult">
         SELECT * FROM dev_page_config where p_id = #{pid} and line_id = #{lineId} limit 1;
     </select>
+
+    <!--车间看板通过页面id查询车间id信息-->
+    <select id="selectHousePageConfigByPageId" resultMap="PageInfoConfigResult">
+        SELECT * FROM dev_page_config where p_id = #{pId} limit 1
+    </select>
 </mapper>

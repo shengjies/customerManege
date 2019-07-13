@@ -1,11 +1,9 @@
 package com.ruoyi.project.device.devList.domain;
 
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
-import com.ruoyi.project.device.devIo.domain.DevIo;
-import com.ruoyi.project.device.devModel.domain.DevModel;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.device.devIo.domain.DevIo;
+
 import java.util.Date;
 import java.util.List;
 
@@ -55,13 +53,21 @@ public class DevList extends BaseEntity
 	@Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Excel.Type.EXPORT)
 	private Date createDate;
 
-
 	private List<DevIo> devIos;
 
 	private Integer sign;//标记硬件是否配置 0、未配置 1、已经配置
+	/** 硬件配置对象车间或者流水线 0、车间，1、流水线 */
+	private Integer devType;
 
+	public Integer getDevType() {
+		return devType;
+	}
 
-	public void setId(Integer id) 
+	public void setDevType(Integer devType) {
+		this.devType = devType;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}

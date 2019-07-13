@@ -18,7 +18,6 @@ public interface DevWorkOrderMapper {
      * @param id 工单ID
      * @return 工单信息
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     public DevWorkOrder selectDevWorkOrderById(Integer id);
 
     /**
@@ -27,7 +26,6 @@ public interface DevWorkOrderMapper {
      * @param devWorkOrder 工单信息
      * @return 工单集合
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     public List<DevWorkOrder> selectDevWorkOrderList(DevWorkOrder devWorkOrder);
 
     /**
@@ -36,7 +34,6 @@ public interface DevWorkOrderMapper {
      * @param devWorkOrder 工单信息
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     public int insertDevWorkOrder(DevWorkOrder devWorkOrder);
 
     /**
@@ -68,30 +65,29 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-    public Long checkWorkOrderNumber(@Param("workorderNumber") String workorderNumber, @Param("companyId") Integer companyId);
+    public DevWorkOrder checkWorkOrderNumber(@Param("workorderNumber") String workorderNumber, @Param("companyId") Integer companyId);
 
     /**
      * 查询对应公司对应产线正在进行中的工单
      *
      * @param compand_id 公司编号
      * @param line_id    产线编号
+     * @param wlSign 车间或者流水线标记
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
-    DevWorkOrder selectWorkByCompandAndLine(@Param("compand_id") int compand_id, @Param("line_id") int line_id);
+    DevWorkOrder selectWorkByCompandAndLine(@Param("compand_id") int compand_id, @Param("line_id") int line_id,@Param("wlSign") int wlSign);
 
-//    @DataSource(DataSourceType.SLAVE)
     DevWorkOrder selectWorkByCompandAndLine2(@Param("compand_id") int compand_id, @Param("line_id") int line_id);
 
     /**
      * 查询当天对应公司对应产线的工单计划的工单编号
      *
+     * @param wlSign 车间或者流水线标记
      * @param company_id 公司编号
      * @param line_id    查询编号
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
-    List<DevWorkOrder> selectDayWorkOrder(@Param("company_id") int company_id, @Param("line_id") int line_id);
+    List<DevWorkOrder> selectDayWorkOrder(@Param("wlSign") Integer wlSign,@Param("company_id") int company_id, @Param("line_id") int line_id);
 
 
     /**
@@ -100,14 +96,13 @@ public interface DevWorkOrderMapper {
      * @param sign 标记  0、产线 1、车间
      * @return
      */
-    Long checkWorkLineUnique(@Param("lineId") Integer lineId,@Param("sign")int sign);
+    DevWorkOrder checkWorkLineUnique(@Param("lineId") Integer lineId,@Param("sign")int sign);
 
     /**
      * 查询生产状态处于正在进行的所有工单
      *
      * @return
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllBeIn(@Param("companyId") Integer companyId);
 
     /**
@@ -115,7 +110,6 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllToday(@Param("companyId") Integer companyId);
 
     /**
@@ -126,7 +120,6 @@ public interface DevWorkOrderMapper {
      * @param endTime   结束时间
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
     List<DevWorkOrder> selectOrderByLineIsSubmit(@Param("company_id") int company_id,
                                                  @Param("productCode")String productCode,
                                                  @Param("line_id") int line_id,
@@ -139,7 +132,6 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderAllYesterday(@Param("companyId") Integer companyId);
 
     /**
@@ -147,15 +139,15 @@ public interface DevWorkOrderMapper {
      *
      * @return
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderTodayBeInOrFinish();
 
     /**
      * 还未确认数据的所有工单信息
      *
-     * @return
+     * @param wlSign 车间或者流水线标记
+     * @return 结果
      */
-    List<DevWorkOrder> selectWorkOrderAllBeInOrFinish();
+    List<DevWorkOrder> selectWorkOrderAllBeInOrFinish(@Param("wlSign") Integer wlSign);
 
     /**
      * 通过产线id或者工单id查询已经提交的工单列表
@@ -165,7 +157,6 @@ public interface DevWorkOrderMapper {
      * @param workOrderId 工单id
      * @return 结果
      */
-//    @DataSource(value = DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkOrderFinishByLineIdOrWorkOrderId(@Param("companyId") Integer companyId,
                                                                   @Param("lineId") Integer lineId,
                                                                   @Param("workOrderId") Integer workOrderId);
@@ -176,7 +167,6 @@ public interface DevWorkOrderMapper {
      * @param productCode 产品编码
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
     int editCompanyProductWorkOrderEcn(@Param("companyId")int companyId,@Param("productCode")String productCode);
 
     /**
@@ -185,24 +175,22 @@ public interface DevWorkOrderMapper {
      * @param lineId 产线id
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
     List<DevWorkOrder> selectWorkDataByCompanyIdAndLineId(@Param("companyId")int companyId,@Param("lineId")int lineId);
 
     /**
      * 查询最近完成工单信息
      * @param compand_id 公司id
      * @param line_id 产线id
+     * @param wlSign 车间或者流水线标记
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
-    DevWorkOrder selectLatelyCompleteWork(@Param("compand_id") int compand_id, @Param("line_id") int line_id);
+    DevWorkOrder selectLatelyCompleteWork(@Param("compand_id") int compand_id, @Param("line_id") int line_id,@Param("wlSign") int wlSign);
 
     /**
      * 修改已经完成的工单标记
      * @param workid
      * @return
      */
-//    @DataSource(DataSourceType.SLAVE)
     int editLatelyCompleteWorkSign(@Param("workid")int workid);
 
     /**
@@ -226,4 +214,57 @@ public interface DevWorkOrderMapper {
      * @return 结果
      */
     List<DevWorkOrder> selectWorkListInSw(@Param("companyId") Integer companyId,@Param("wlSign")Integer wlSign);
+
+    /**
+     * 通过工单进行状态查询工单列表
+     * @param companyId 公司id
+     * @param workOrderStatus 工单进行状态
+     * @return 结果
+     */
+    List<DevWorkOrder> selectWorkListInWorkStatus(@Param("companyId") Integer companyId,@Param("workOrderStatus") Integer workOrderStatus);
+
+    /**
+     * 通过工单id查询工单信息
+     * @param companyId 工单id
+     * @param workId 工单id
+     * @return 结果
+     */
+    DevWorkOrder selectWorkOrderInfoById(@Param("companyId") Integer companyId,@Param("workId") Integer workId);
+
+    /**
+     * 查询单工位未配置的下到对应车间的未确认数据的工单信息
+     * @param lineId 车间id
+     * @param workSign 工单确认数据标记
+     * @param wlSign 车间或者流水线标记
+     * @param singleId 单工位id
+     * @param companyId 公司id
+     * @return 结果
+     */
+    List<DevWorkOrder> selectAllNotConfigBySwId(@Param("lineId") Integer lineId, @Param("workSign") Integer workSign,
+                                                @Param("wlSign") Integer wlSign,@Param("singleId") Integer singleId,@Param("companyId") Integer companyId);
+
+    /**
+     * 查询正在车间对应单工位生产的工单信息
+     * @param companyId 公司id
+     * @param lineId 车间id
+     * @param wlSign 车间或者流水线标记
+     * @param singleId 单工位id
+     * @param workStatus 工单状态
+     * @return 结果
+     */
+    DevWorkOrder selectWorkInHouseBeInBySingId(@Param("companyId") Integer companyId,
+                                               @Param("lineId") Integer lineId,@Param("wlSign") Integer wlSign,
+                                               @Param("singleId") Integer singleId, @Param("workStatus") Integer workStatus);
+
+    /**
+     * 查询车间对应工单对应工位的最后一条记录
+     * @param companyId 公司id
+     * @param lineId 产线id
+     * @param wlSign 车间或者流水线标记
+     * @param singleId 单工位id
+     * @param workStatus 工单状态
+     * @return 结果
+     */
+    DevWorkOrder selectWorkInHouseLastByWorkStatus(@Param("companyId") Integer companyId, @Param("lineId") Integer lineId,
+                                                   @Param("wlSign") Integer wlSign,@Param("singleId") Integer singleId, @Param("workStatus") Integer workStatus);
 }

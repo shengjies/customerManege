@@ -1,9 +1,8 @@
 package com.ruoyi.project.production.devWorkOrder.controller;
 
-import com.alibaba.fastjson.JSON;
+import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -58,9 +57,9 @@ public class DevWorkOrderController extends BaseController {
     @RequiresPermissions("device:devWorkOrder:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(DevWorkOrder devWorkOrder,HttpServletRequest request) {
+    public TableDataInfo list(DevWorkOrder devWorkOrder) {
         startPage();
-        List<DevWorkOrder> list = devWorkOrderService.selectDevWorkOrderList(devWorkOrder,request);
+        List<DevWorkOrder> list = devWorkOrderService.selectDevWorkOrderList(devWorkOrder);
         return getDataTable(list);
     }
 
@@ -71,8 +70,8 @@ public class DevWorkOrderController extends BaseController {
     @RequiresPermissions("device:devWorkOrder:export")
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(DevWorkOrder devWorkOrder, HttpServletRequest request) {
-        List<DevWorkOrder> list = devWorkOrderService.selectDevWorkOrderList(devWorkOrder,request);
+    public AjaxResult export(DevWorkOrder devWorkOrder) {
+        List<DevWorkOrder> list = devWorkOrderService.selectDevWorkOrderList(devWorkOrder);
         ExcelUtil<DevWorkOrder> util = new ExcelUtil<DevWorkOrder>(DevWorkOrder.class);
         return util.exportExcel(list, "devWorkOrder");
     }
@@ -175,20 +174,16 @@ public class DevWorkOrderController extends BaseController {
     }
 
     /**
-     * 页面点击提交工单，工单不可修改
+     * 提交工单确认工单
      *
      * @param id
      * @return
      */
     @PostMapping("/submitWorkOrder")
     @ResponseBody
-    public AjaxResult submitWorkOrder(Integer id,HttpServletRequest request) {
-        User u = JwtUtil.getTokenUser(request);
-        if (u == null) {
-            return error();
-        }
+    public AjaxResult submitWorkOrder(Integer id) {
         try {
-            return toAjax(devWorkOrderService.submitWorkOrder(id,request));
+            return toAjax(devWorkOrderService.submitWorkOrder(id));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -247,25 +242,31 @@ public class DevWorkOrderController extends BaseController {
     @GetMapping("/showWorkOrderDetail/{id}")
     public String showWorkOrderDetail(@PathVariable("id") Integer id, ModelMap mmap) {
         DevWorkOrder devWorkOrder = devWorkOrderService.selectDevWorkOrderById(id);
-        if(devWorkOrder.getWorkorderStatus() == 1){
-            //达成率 = 累计产量/标准工时*(生产用时) *100
-            devWorkOrder.setReachRate(0.00F);
-            if(devWorkOrder.getCumulativeNumber() != 0){
-
-                float standardTotal = devWorkOrder.getProductStandardHour() * (TimeUtil.getDateDel(devWorkOrder.getSignTime())+devWorkOrder.getSignHuor());
-                devWorkOrder.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) devWorkOrder.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
+        /**
+         * 生产流水线
+         */
+        if (devWorkOrder.getWlSign().equals(WorkConstants.SING_LINE)) {
+            if(devWorkOrder.getWorkorderStatus() == 1){
+                //达成率 = 累计产量/标准工时*(生产用时) *100
+                devWorkOrder.setReachRate(0.00F);
+                if(devWorkOrder.getCumulativeNumber() != 0){
+                    float standardTotal = devWorkOrder.getProductStandardHour() * (TimeUtil.getDateDel(devWorkOrder.getSignTime())+devWorkOrder.getSignHuor());
+                    devWorkOrder.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) devWorkOrder.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
+                }
             }
-        }
-        if(devWorkOrder.getWorkorderStatus() == 2){
-            devWorkOrder.setReachRate(0.00F);
-            if(devWorkOrder.getCumulativeNumber() != 0){
-                float standardTotal = devWorkOrder.getProductStandardHour() * devWorkOrder.getSignHuor();
-                devWorkOrder.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) devWorkOrder.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
+            if(devWorkOrder.getWorkorderStatus() == 2){
+                devWorkOrder.setReachRate(0.00F);
+                if(devWorkOrder.getCumulativeNumber() != 0){
+                    float standardTotal = devWorkOrder.getProductStandardHour() * devWorkOrder.getSignHuor();
+                    devWorkOrder.setReachRate(standardTotal == 0 ? 0.0F : new BigDecimal(((float) devWorkOrder.getCumulativeNumber() / standardTotal)*100).setScale(3, BigDecimal.ROUND_HALF_UP).floatValue());
+                }
             }
-        }
-        ProductionLine productionLine = productionLineService.selectProductionLineById(devWorkOrder.getLineId());
+            ProductionLine productionLine = productionLineService.selectProductionLineById(devWorkOrder.getLineId());
+            mmap.put("line", productionLine);
+            // 生产车间
+        } else {
 
-        mmap.put("line", productionLine);
+        }
         mmap.put("devWorkOrder", devWorkOrder);
         return prefix + "/workOrderDetail";
     }
@@ -303,10 +304,9 @@ public class DevWorkOrderController extends BaseController {
     public AjaxResult changeOrder(DevWorkOrder order){
         try {
             return toAjax(devWorkOrderService.changeOrder(order));
-        }catch (Exception e){
-            e.printStackTrace();
+        }catch (BusinessException e){
+            return error(e.getMessage());
         }
-        return AjaxResult.error();
     }
 
     @RequestMapping("/workecn")

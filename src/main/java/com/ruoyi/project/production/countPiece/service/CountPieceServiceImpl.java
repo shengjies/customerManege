@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -83,12 +82,15 @@ public class CountPieceServiceImpl implements ICountPieceService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
-        CountPiece pieceById = countPieceMapper.selectCountPieceById(countPiece.getCpId());
-        if (!pieceById.getCpBadNumber().equals(countPiece.getCpBadNumber()) && !pieceById.getCpRemark().equals(countPiece.getCpRemark())) {
-            Integer cpBadNumber = countPiece.getCpBadNumber() < 0 ? 0 : countPiece.getCpBadNumber();
-            countPiece.setTotalPrice((countPiece.getCpNumber() - cpBadNumber) * countPiece.getWorkPrice());
-            countPiece.setCpLastUpdate(new Date());
-            countPiece.setCpLastId(user.getUserId().intValue());
+        // CountPiece pieceById = countPieceMapper.selectCountPieceById(countPiece.getCpId());
+        // if (!pieceById.getCpBadNumber().equals(countPiece.getCpBadNumber()) && !pieceById.getCpRemark().equals(countPiece.getCpRemark())) {
+        //     Integer cpBadNumber = countPiece.getCpBadNumber() < 0 ? 0 : countPiece.getCpBadNumber();
+        //     countPiece.setTotalPrice((countPiece.getCpNumber() - cpBadNumber) * countPiece.getWorkPrice());
+        //     countPiece.setCpLastUpdate(new Date());
+        //     countPiece.setCpLastId(user.getUserId().intValue());
+        // }
+        if (countPiece.getCpBadNumber() != null) {
+            countPiece.setTotalPrice(countPiece.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
         }
         return countPieceMapper.updateCountPiece(countPiece);
     }

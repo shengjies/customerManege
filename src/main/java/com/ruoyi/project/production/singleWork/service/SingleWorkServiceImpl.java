@@ -172,24 +172,14 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
         // 原始单工位信息
         SingleWork oldSingleWork = singleWorkMapper.selectSingleWorkById(singleWork.getId());
         Integer parentId = singleWork.getParentId();
-        // 单工位设备类型
+        // 单工位修改设备责任人
         if (StringUtils.isNotNull(parentId) && parentId != 0) {
             // 更新硬件使用状态，还原之前硬件状态
-            if (!oldSingleWork.getDevId().equals(singleWork.getDevId())) {
-                DevList oldDev = devListMapper.selectDevListById(oldSingleWork.getDevId());
-                oldDev.setSign(0);
-                devListMapper.updateDevSign(oldDev);
-                DevList newDev = devListMapper.selectDevListById(singleWork.getDevId());
-                newDev.setSign(1);
-                devListMapper.updateDevSign(newDev);
-            }
-            // 更新设备使用状态，还原之前设备状态
-            if (!oldSingleWork.getImId().equals(singleWork.getImId())) {
-                instrumentManageMapper.updateInstrumentManageImTag(oldSingleWork.getImId(), InstrumentConstants.IM_TAG_NOUSE);
-                instrumentManageMapper.updateInstrumentManageImTag(singleWork.getImId(), InstrumentConstants.IM_TAG_USED);
-            }
+            oldSingleWork.setLiableOne(singleWork.getLiableOne());
+            return singleWorkMapper.updateSingleWork(oldSingleWork);
+        } else {
+            return singleWorkMapper.updateSingleWork(singleWork);
         }
-        return singleWorkMapper.updateSingleWork(singleWork);
     }
 
     /**
@@ -220,15 +210,15 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             }
             // 更新计数器硬件配置标记
             if (singleWork.getDevId() != null && singleWork.getDevId() != 0) {
-                devListMapper.updateDevBySign(user.getCompanyId(),singleWork.getDevId(),DevConstants.DEV_SIGN_NOT_USE);
+                devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.getDevId(),DevConstants.DEV_SIGN_NOT_USE,null);
             }
             // 更新看板硬件配置标记
             if (singleWork.getWatchId() != null && singleWork.getWatchId() != 0) {
-                devListMapper.updateDevBySign(user.getCompanyId(),singleWork.getWatchId(),DevConstants.DEV_SIGN_NOT_USE);
+                devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.getWatchId(),DevConstants.DEV_SIGN_NOT_USE,null);
             }
             // 更新扫码枪硬件配置标记
             if (singleWork.geteId() != null && singleWork.geteId() != 0 ) {
-                devListMapper.updateDevBySign(user.getCompanyId(),singleWork.geteId(),DevConstants.DEV_SIGN_NOT_USE);
+                devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.geteId(),DevConstants.DEV_SIGN_NOT_USE,null);
             }
             // 删除单工位配置
             sopLineMapper.deleteSopLine(user.getCompanyId(),swId,null, FileConstants.SOP_TAG_SINGWORK);
@@ -285,7 +275,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
                 DevList devList = devListMapper.selectDevListById(singleWork.getDevId());
                 if (devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0) {
                     singleWork.setDevCode(devList.getDeviceId());
-                    devListMapper.updateDevBySign(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     throw new BusinessException("计数器硬件编码配置错误");
                 }
@@ -295,14 +285,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.getDevId() != null && singleWork.getDevId() > 0) {
                 if (!singleWork.getDevId().equals(sw.getDevId())) {
                     // 还原之前硬件
-                    devListMapper.updateDevBySign(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE,null);
                     // 修改最新硬件
                     DevList devList = devListMapper.selectDevListById(singleWork.getDevId());
                     singleWork.setDevCode(devList.getDeviceId());
-                    devListMapper.updateDevBySign(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                } else {
+                    singleWork.setDevCode(sw.getDevCode());
                 }
             } else {
-                devListMapper.updateDevBySign(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE,null);
             }
         }
 
@@ -313,7 +305,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
                 DevList devList = devListMapper.selectDevListById(singleWork.getWatchId());
                 if (devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0) {
                     singleWork.setWatchCode(devList.getDeviceId());
-                    devListMapper.updateDevBySign(user.getCompanyId(),singleWork.getWatchId(),DevConstants.DEV_SIGN_USED);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.getWatchId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     throw new BusinessException("看板硬件编码配置错误");
                 }
@@ -323,14 +315,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.getWatchId() != null && singleWork.getWatchId() > 0) {
                 if (!singleWork.getWatchId().equals(sw.getWatchId())) {
                     // 还原之前硬件
-                    devListMapper.updateDevBySign(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE,null);
                     // 修改最新硬件
                     DevList devList = devListMapper.selectDevListById(singleWork.getWatchId());
                     singleWork.setWatchCode(devList.getDeviceId());
-                    devListMapper.updateDevBySign(user.getCompanyId(), singleWork.getWatchId(), DevConstants.DEV_SIGN_USED);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getWatchId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                } else {
+                    singleWork.setWatchCode(sw.getWatchCode());
                 }
             } else {
-                devListMapper.updateDevBySign(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE,null);
             }
         }
 
@@ -341,7 +335,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
                 DevList devList = devListMapper.selectDevListById(singleWork.geteId());
                 if (devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0) {
                     singleWork.seteCode(devList.getDeviceId());
-                    devListMapper.updateDevBySign(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     throw new BusinessException("扫码枪硬件编码配置错误");
                 }
@@ -351,14 +345,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.geteId() != null && singleWork.geteId() > 0) {
                 if (!singleWork.geteId().equals(sw.geteId())) {
                     // 还原之前硬件
-                    devListMapper.updateDevBySign(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE,null);
                     // 修改最新硬件
                     DevList devList = devListMapper.selectDevListById(singleWork.geteId());
                     singleWork.seteCode(devList.getDeviceId());
-                    devListMapper.updateDevBySign(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                } else {
+                    singleWork.seteCode(sw.geteCode());
                 }
             } else {
-                devListMapper.updateDevBySign(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE,null);
             }
         }
         return singleWorkMapper.updateSingleWork(singleWork);
