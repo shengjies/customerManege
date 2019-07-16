@@ -276,7 +276,7 @@ public class ReportServiceImpl implements IReportService {
                 order.setReachRate(0F);
                 if(PdfUtil.IntegerNull(order.getCumulativeNumber()) >0 ){
                     float total =  order.getProductStandardHour()*PdfUtil.floatNull(order.getSignHuor());//实际标准产量
-                    order.setReachRate(total==0?0:getFloat3((((float)order.getCumulativeNumber())/ total))*100);
+                    order.setReachRate(total==0?0:getFloat3(((float)order.getCumulativeNumber()/ total)*100));
                 }
                 //总达成率
                 totalReachRate += order.getReachRate();
