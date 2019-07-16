@@ -581,13 +581,14 @@
                 data: {
                     id: $("#work-id").val()
                 },
-                async: false,  //同步请求，
+                async: true,  //同步请求，
                 success: function (result) {
                     if (result.code == 0) {
                         $.modal.alertWarning("工单已经结束了...");
                         $("#action-btn-start").css('display','none');
                         $("#action-btn-stop").css('display','none');
                         $("#action-btn-end").css('display','none');
+                        save();
                         search1()
                     } else {
                         $.modal.alertError(result.msg);
@@ -657,6 +658,7 @@
         }
         $.modal.confirm("提交工单不可进行修改删除，确认执行该操作吗？", function () {
             // $.modal.alertWarning("工单已经提交了。。。。");
+            save();
             $.ajax({
                 type: 'POST',
                 url: prefix + '/submitWorkOrder',
