@@ -94,6 +94,9 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         return DateFormatUtils.format(now, "yyyy/MM/dd");
     }
 
+    public static final String getDateTime(Date date){
+        return DateFormatUtils.format(date,YYYY_MM_DD_HH_MM_SS);
+    }
     /**
      * 日期路径 即年/月/日 如20180808
      */

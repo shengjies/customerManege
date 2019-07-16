@@ -528,7 +528,7 @@ public class UserServiceImpl implements IUserService {
         // 新增用户信息
         int rows = userMapper.insertUser(user);
         // 新增用户岗位关联
-        insertUserPost(user);
+//        insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
         //初始化文件

@@ -124,7 +124,8 @@ public interface DevWorkOrderMapper {
                                                  @Param("productCode")String productCode,
                                                  @Param("line_id") int line_id,
                                                  @Param("startTime") String startTime,
-                                                 @Param("endTime") String endTime);
+                                                 @Param("endTime") String endTime,
+                                                 @Param("wlSign")int wlSign);
 
 
     /**

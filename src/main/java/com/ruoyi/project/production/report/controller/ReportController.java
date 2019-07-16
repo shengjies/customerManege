@@ -52,15 +52,37 @@ public class ReportController extends BaseController {
     }
 
     /**
-     * 导出报表数据
+     * 导出产线报表数据
      * @param lineId 产线编号
+     * @param productCode 产品编码
      * @param startTime 开始时间
      * @param endTime 结束时间
      */
     @ResponseBody
-    @RequestMapping("/pdf")
+    @RequestMapping("/line/pdf")
     @RequiresPermissions("production:report:pdf")
-    public void exportReport(int lineId, String productCode,String startTime, String endTime, HttpServletResponse response, HttpServletRequest request){
-        reportService.exportReport(lineId,productCode,startTime,endTime,response,request);
+    public void exportReport(int lineId, String productCode,String startTime, String endTime){
+        try {
+            reportService.lineReport(lineId,productCode,startTime,endTime);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    /**
+     * 导出车间报表数据
+     * @param singleId 车间id
+     * @param productCode 产品编码
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     */
+    @ResponseBody
+    @RequestMapping("/single/pdf")
+    @RequiresPermissions("production:report:pdf")
+    public void exportSingleReport(int singleId, String productCode,String startTime, String endTime){
+        try {
+            reportService.singleReport(singleId,productCode,startTime,endTime);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

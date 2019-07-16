@@ -30,12 +30,14 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean isLoginAttempt(ServletRequest request, ServletResponse response) {
         HttpServletRequest req = (HttpServletRequest) request;
-        String token = null;
-        Cookie[] cookies = req.getCookies();
-        if(cookies == null)return false;
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("token")){
-                token = cookie.getValue();
+        String token = req.getHeader("token");
+        if(StringUtils.isEmpty(token)){
+            Cookie[] cookies = req.getCookies();
+            if(cookies == null)return false;
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equals("token")){
+                    token = cookie.getValue();
+                }
             }
         }
         if(StringUtils.isEmpty(token)){
@@ -51,14 +53,17 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
         HttpServletRequest req = (HttpServletRequest) request;
-        String token = null;
-        Cookie[] cookies = req.getCookies();
-        if(cookies == null)return false;
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals("token")){
-                token = cookie.getValue();
+        String token = req.getHeader("token");
+        if(StringUtils.isEmpty(token)){
+            Cookie[] cookies = req.getCookies();
+            if(cookies == null)return false;
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equals("token")){
+                    token = cookie.getValue();
+                }
             }
         }
+
         if(StringUtils.isEmpty(token)){
             return false;
         }

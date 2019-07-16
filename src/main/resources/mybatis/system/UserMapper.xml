@@ -29,6 +29,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="userPosition"    column="user_position"    />
 		<result property="phonenumber"    column="phonenumber"    />
 		<result property="loginTag"    column="login_tag"    />
+		<result property="industry"    column="industry"    />
+		<result property="devType"    column="devType"    />
+		<result property="devCode"    column="devCode"    />
+		<result property="grade"    column="grade"    />
+		<result property="sign"    column="sign"    />
 		<association property="devCompany"    column="company_id" javaType="DevCompany" resultMap="DevCompanyResult" />
 		<association property="dept"    column="dept_id" javaType="Dept" resultMap="deptResult" />
 		<collection  property="roles"   javaType="java.util.List"        resultMap="RoleResult" />
@@ -189,6 +194,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="userPosition != null  and userPosition != ''  ">user_position = #{userPosition},</if>
 			<if test="phonenumber != null  and phonenumber != ''  ">phonenumber = #{phonenumber},</if>
 			<if test="loginTag != null  and loginTag != ''  ">login_tag = #{loginTag},</if>
+			<if test="industry != null  and industry != ''  ">industry = #{industry},</if>
+			<if test="devType != null  and devType != ''  ">devType = #{devType},</if>
+			<if test="devCode != null  and devCode != ''  ">devCode = #{devCode},</if>
+			<if test="grade != null  and grade != ''  ">grade = #{grade},</if>
+			<if test="sign != null  and sign != ''  ">sign = #{sign},</if>
  			update_time = sysdate()
  		</set>
  		where user_id = #{userId}
@@ -239,6 +249,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="userPosition != null  and userPosition != ''  ">user_position,</if>
 			<if test="phonenumber != null  and phonenumber != ''  ">phonenumber,</if>
 			<if test="loginTag != null  and loginTag != ''  ">login_tag,</if>
+			<if test="industry != null  and industry != ''  ">industry,</if>
+			<if test="devType != null  and devType != ''  ">devType,</if>
+			<if test="devCode != null  and devCode != ''  ">devCode,</if>
+			<if test="grade != null  and grade != ''  ">grade,</if>
+			<if test="sign != null  and sign != ''  ">sign,</if>
  			create_time
  		)values(
  			<if test="userId != null and userId != ''">#{userId},</if>
@@ -258,6 +273,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="userPosition != null  and userPosition != ''  ">#{userPosition},</if>
 			<if test="phonenumber != null  and phonenumber != ''  ">#{phonenumber},</if>
 			<if test="loginTag != null  and loginTag != ''  ">#{loginTag},</if>
+			<if test="industry != null  and industry != ''  ">#{industry},</if>
+			<if test="devType != null  and devType != ''  ">#{devType},</if>
+			<if test="devCode != null  and devCode != ''  ">#{devCode},</if>
+			<if test="grade != null  and grade != ''  ">#{grade},</if>
+			<if test="sign != null  and sign != ''  ">#{sign},</if>
  			sysdate()
  		)
 	</insert>

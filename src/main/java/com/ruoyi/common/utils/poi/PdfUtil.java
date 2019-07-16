@@ -1,5 +1,6 @@
 package com.ruoyi.common.utils.poi;
 
+import com.itextpdf.text.BaseColor;
 import net.sf.jasperreports.engine.*;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ClassUtils;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 public class PdfUtil {
+    public static final BaseColor headerColor = new BaseColor(133, 206, 224);
     /**
      * 导出PDF 文件
      * @param temPath //模板路径
@@ -40,5 +42,51 @@ public class PdfUtil {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+    public static String pdfName(){
+        return String.valueOf(System.currentTimeMillis()+(int)((Math.random()*9+1)*10000));
+    }
+
+    /**
+     * 判断对应的数据是否为null ，为null 返回 0 ，否则返回对应的值
+     * @param val
+     * @return
+     */
+    public static String nullValue(Object val){
+        return val == null?"0":val.toString();
+    }
+
+    /**
+     * 判断float 类型数是否为null ，为null 返回 0.0 ，否则返回对应的值
+     * @param val
+     * @return
+     */
+    public static String floatNullValue(Object val){
+        return val == null?"0.0":val.toString();
+    }
+
+    public static String stringNullValue(Object val){
+        if(val == null || "".equals(val)){
+            return "0";
+        }
+        return val.toString();
+    }
+
+    /**
+     * 判断 float 类型数据是否为空
+     * @param val
+     * @return
+     */
+    public static float floatNull(Float val){
+        return val == null?0.0F:val;
+    }
+
+    /**
+     * 判断 Integer 类型数据是否为空
+     * @param val
+     * @return
+     */
+    public static int IntegerNull(Integer val){
+        return val == null?0:val;
     }
 }

@@ -314,7 +314,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
       <if test="productCode != null and productCode != ''">
           and product_code = #{productCode}
       </if>
-       and work_sign = 1 and end_time between #{startTime} and #{endTime} ;
+       and work_sign = 1 and wl_sign=#{wlSign} and end_time between #{startTime} and #{endTime} ;
     </select>
 
     <!--查询昨天所有的排单-->

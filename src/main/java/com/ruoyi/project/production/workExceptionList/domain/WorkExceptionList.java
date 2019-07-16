@@ -69,7 +69,7 @@ public class WorkExceptionList extends BaseEntity {
     /**报表所需字段*/
     private String exce;//异常处理
     private String typeName;//异常类型
-    private String workorderNumber;//工单好
+    private String workorderNumber;//工单号
 
     public static long getSerialVersionUID() {
         return serialVersionUID;

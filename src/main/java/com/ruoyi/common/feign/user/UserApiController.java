@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 /**
  * 用户交付接口
  */
@@ -24,6 +26,7 @@ public class UserApiController {
     @RequestMapping("/init")
     public AjaxResult initUserInfo(@RequestBody  User user){
         try {
+            user.setCreateTime(new Date());
             userService.register(user);
             return AjaxResult.success();
         }catch (Exception e){

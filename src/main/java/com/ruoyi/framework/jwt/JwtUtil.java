@@ -77,7 +77,11 @@ public class JwtUtil {
     }
 
     public static User getTokenUser(HttpServletRequest request) {
-        return getTokenCookie(request.getCookies());
+        String token = request.getHeader("token");
+        if(StringUtils.isEmpty(token)){
+            return getTokenCookie(request.getCookies());
+        }
+        return getUserByToken(token);
     }
 
     public static User getTokenCookie(Cookie[] cookies) {

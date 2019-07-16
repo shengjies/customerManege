@@ -116,6 +116,17 @@ public class User extends BaseEntity
     //@Excel(name = "公司名称", targetAttr = "comName", type = Type.EXPORT)
     private DevCompany devCompany;
 
+    /** 所属行业 */
+    private Integer industry;
+    /** 设备类型 */
+    private String devType;
+    /** 设备号 */
+    private String devCode;
+    /** 用户等级 */
+    private Integer grade;
+
+    private int sign;//标记注册者
+
     public String getLoginTag() {
         return loginTag;
     }
@@ -391,6 +402,46 @@ public class User extends BaseEntity
         this.userPosition = userPosition;
     }
 
+    public Integer getIndustry() {
+        return industry;
+    }
+
+    public void setIndustry(Integer industry) {
+        this.industry = industry;
+    }
+
+    public String getDevType() {
+        return devType;
+    }
+
+    public void setDevType(String devType) {
+        this.devType = devType;
+    }
+
+    public String getDevCode() {
+        return devCode;
+    }
+
+    public void setDevCode(String devCode) {
+        this.devCode = devCode;
+    }
+
+    public Integer getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
+
+    public int getSign() {
+        return sign;
+    }
+
+    public void setSign(int sign) {
+        this.sign = sign;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -419,6 +470,11 @@ public class User extends BaseEntity
                 ", loginTag='" + loginTag + '\'' +
                 ", companyId=" + companyId +
                 ", devCompany=" + devCompany +
+                ", industry=" + industry +
+                ", devType='" + devType + '\'' +
+                ", devCode='" + devCode + '\'' +
+                ", grade=" + grade +
+                ", sign=" + sign +
                 '}';
     }
 }
