@@ -176,4 +176,5 @@ public interface IUserService
      * @return
      */
     public int changeLoginTag(User user,HttpServletRequest request);
+
 }

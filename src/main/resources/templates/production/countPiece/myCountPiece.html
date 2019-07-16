@@ -31,7 +31,11 @@
                 </div>
             </form>
         </div>
-
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:countPiece:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
         <div class="col-sm-12 select-table table-striped">
             <table id="bootstrap-table" data-mobile-responsive="true"></table>
         </div>
@@ -53,10 +57,10 @@
             modalName: "我的计件",
             search: false,
             showExport: false,
-            showSearch: true,
-            showRefresh: true,
+            showSearch: false,
+            showRefresh: false,
             showColumns: false,
-            showToggle: true,
+            showToggle: false,
             columns: [
                 {
                     field: 'cpId',

@@ -37,7 +37,11 @@
                 <div class="select-list">
                     <ul>
                         <li>
-                            登录手机号：<input type="text" name="loginName"/>
+                            登录手机号
+                            <select id="loginName" name="loginName" th:with="allLoginName=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+                                <option value="">请选择</option>
+                                <option th:each="item:${allLoginName}" th:value="${item.loginName}" th:text="${item.loginName}"></option>
+                            </select>
                         </li>
                         <li>
                             用户名称：<input type="text" name="userName"/>
@@ -68,7 +72,7 @@
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
                                     class="fa fa-search"></i>&nbsp;搜索</a>
-                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
                                     class="fa fa-refresh"></i>&nbsp;重置</a>
                         </li>
                     </ul>
@@ -110,8 +114,29 @@
     var resetPwdFlag = [[${@permission.hasPermi('system:user:resetPwd')}]];
     var datas = [[${@dict.getType('sys_normal_disable')}]];
     var prefix = ctx + "system/user";
+    // $('#loginName').autocomplete({
+    //     //获取服务器数据的url
+    //     serviceUrl: prefix + '/selectAllLoginName',
+    //     //传给服务器关键词的参数名,类似于这个ajax请求$.post(url, {'filter' : keywords} ,function(){})中的filter
+    //     paramName : 'filter',
+    //     transformResult: function(response) {
+    //         //解析服务器传过来的json字符串
+    //         var obj = $.parseJSON(response);
+    //         console.log(obj);
+    //         // return {
+    //         //     suggestions: $.map(obj.list, function(dataItem) {
+    //         //         return { value: dataItem.right, data: dataItem.left };
+    //         //     })
+    //         // };
+    //     },
+    //
+    // });
 
     $(function () {
+        $("#loginName").select2({
+            width:"160px",
+            placeholder:'请选择'
+        });
         var panehHidden = false;
         if ($(this).width() < 769) {
             panehHidden = true;
@@ -120,6 +145,12 @@
         queryUserList();
         // queryDeptTree();
     });
+
+    // 重置搜索表单信息
+    function formReset(params) {
+        $('#user-form')[0].reset();//input标签重置
+        $("#loginName").val(null).trigger("change"); // select2标签重置
+    }
 
     function queryUserList() {
         var options = {
@@ -146,7 +177,7 @@
                 {
                     field: 'loginName',
                     title: '登录手机号',
-                    sortable: true
+                    sortable: true,
                 },
                 {
                     field: 'userName',

@@ -17,4 +17,10 @@ public class PageTypeConstants {
      */
     public static final int PAGE_TYPE_CJ = 3;
 
+    /**
+     * 看板名称是否唯一的返回结果
+     */
+    public final static String PAGE_NAME_UNIQUE = "0";
+    public final static String PAGE_NAME_NOT_UNIQUE = "1";
+
 }

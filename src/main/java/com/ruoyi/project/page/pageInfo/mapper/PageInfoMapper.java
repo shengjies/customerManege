@@ -1,7 +1,5 @@
 package com.ruoyi.project.page.pageInfo.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.page.pageInfo.domain.PageInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -84,5 +82,12 @@ public interface PageInfoMapper
 	 */
 //	@DataSource(DataSourceType.SLAVE)
 	List<PageInfo> selectAllPage(@Param("com_id")int com_id);
-	
+
+	/**
+	 * 校验看板名称的唯一性
+	 * @param companyId 公司id
+	 * @param pageName 看板名称
+	 * @return 结果
+	 */
+	PageInfo selectPageInfoByPageName(@Param("companyId") Integer companyId,@Param("pageName") String pageName);
 }

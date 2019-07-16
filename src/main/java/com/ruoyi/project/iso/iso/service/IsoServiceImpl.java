@@ -1,5 +1,6 @@
 package com.ruoyi.project.iso.iso.service;
 
+import com.ruoyi.common.constant.DevConstants;
 import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
@@ -10,6 +11,8 @@ import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
+import com.ruoyi.project.device.devList.domain.DevList;
+import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.mapper.IsoMapper;
 import com.ruoyi.project.iso.sopLine.domain.SopLine;
@@ -21,6 +24,9 @@ import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
@@ -63,6 +69,15 @@ public class IsoServiceImpl implements IIsoService {
 
     @Autowired
     private SopLineWorkMapper sopLineWorkMapper;
+
+    @Autowired
+    private DevListMapper devListMapper;
+
+    @Autowired
+    private SingleWorkMapper singleWorkMapper;
+
+    @Autowired
+    private SingleWorkOrderMapper singleWorkOrderMapper;
 
     @Value("${file.iso}")
     private String isoFileUrl;
@@ -325,36 +340,105 @@ public class IsoServiceImpl implements IIsoService {
      * @return
      */
     @Override
-    public Map<String,Object> selectSopByDevCode(String code) throws Exception {
+    public Map<String,Object> selectSopByDevCode(String code){
         Map<String,Object> map = new HashMap<>();
-        //根据硬件编码查询对应的工位信息
-        Workstation workstation = workstationMapper.selectByDevCode(code);
-        if (workstation == null) throw new Exception("工位不存在");
-        //查询对应产线
-        ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
-        if (line == null) throw new Exception("产线不存在");
-        //查询正在进行的工单
-        DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
-        if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode())) throw new Exception("没有正在进行的工单");
-        //查询对应SOP配置
-        SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(), line.getId(), workOrder.getProductCode());
-        if (sopLine == null) throw new Exception("没有配置SOP");
-        //查询对应的指导书页
-        SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(workstation.getCompanyId(), line.getId(), sopLine.getSopId(), workstation.getId(),FileConstants.SOP_TAG_LINE);
-        if (sopLineWork == null) throw new Exception("产线没有配置SOP");
-        //查询对应SOP
-        Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
-        if (iso == null) throw new Exception("工位没有配置SOP");
-        iso.setFileSize(line.getLineName()+" "+ workstation.getwName());
-        iso.setcId(0);
-        String hz = iso.getPath().substring(iso.getPath().lastIndexOf(".")+1,iso.getPath().length());
-        if(hz.equals("pdf")){
+        DevList devList = devListMapper.selectDevListByCode(code);
+        if (devList == null || devList.getCompanyId() == null) {
+            throw new BusinessException("硬件不存在或未归属公司");
+        }
+        if (devList.getDevType() == null || devList.getSign().equals(DevConstants.DEV_SIGN_NOT_USE)) {
+            throw new BusinessException("硬件未被配置");
+        }
+        /**
+         * 生产线
+         */
+        if (devList.getDevType().equals(DevConstants.DEV_TYPE_LINE)) {
+            //根据硬件编码查询对应的工位信息
+            Workstation workstation = workstationMapper.selectByDevCode(code);
+            if (workstation == null) throw new BusinessException("工位不存在");
+            //查询对应产线
+            ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
+            if (line == null) throw new BusinessException("产线不存在");
+            //查询正在进行的工单
+            DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
+            if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode())) throw new BusinessException("没有正在进行的工单");
+            //查询对应SOP配置
+            SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(), line.getId(), workOrder.getProductCode());
+            if (sopLine == null) throw new BusinessException("没有配置SOP");
+            //查询对应的指导书页
+            SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(workstation.getCompanyId(), line.getId(), sopLine.getSopId(), workstation.getId(),FileConstants.SOP_TAG_LINE);
+            if (sopLineWork == null) throw new BusinessException("产线没有配置SOP");
+            //查询对应SOP
+            Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
+            if (iso == null) throw new BusinessException("工位没有配置SOP");
+            iso.setFileSize(line.getLineName()+" "+ workstation.getwName());
+            iso.setcId(0);
+            // 设置作业指导书看板相关信息
+            SopApi sopApi = getSopApi(map, workOrder, iso);
+            sopApi.setlName(line.getLineName());
+            sopApi.setwName(workstation.getwName());
+            map.put("data",sopApi);
+            return map;
+
+            /**
+             * 车间
+             */
+        } else {
+            // 查询单工位
+            SingleWork singleWork = singleWorkMapper.selectSingleWorkByCode(0, devList.getId(), 0);
+            if (StringUtils.isNull(singleWork)) {
+                throw new BusinessException("单工位不存在");
+            }
+            SingleWork house = singleWorkMapper.selectSingleWorkById(singleWork.getParentId());
+            if (StringUtils.isNull(house)) {
+                throw new BusinessException("车间不存在");
+            }
+            // 查询正在进行车间单工位生产的工单信息
+            DevWorkOrder workOrder = devWorkOrderMapper.selectWorkInHouseBeInBySingId(devList.getCompanyId(), house.getId(), WorkConstants.SING_SINGLE, singleWork.getId(), WorkConstants.WORK_STATUS_STARTING);
+            if (StringUtils.isNull(workOrder)) {
+                throw new BusinessException("没有正在进行的工单");
+            }
+            // 查询对应的sop配置
+            SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(devList.getCompanyId(), singleWork.getId(), workOrder.getProductCode());
+            if (StringUtils.isNull(sopLine)) {
+                throw new BusinessException("没有配置SOP");
+            }
+            // 查询对应的指导书页
+            SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(devList.getCompanyId(), house.getId(), sopLine.getSopId(), singleWork.getId(),FileConstants.SOP_TAG_SINGWORK);
+            if (StringUtils.isNull(sopLineWork)) {
+                throw new BusinessException("单工位没有配置SOP");
+            }
+            //查询对应SOP
+            Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
+            if (StringUtils.isNull(iso)) {
+                throw new BusinessException("无对应的作业指导书");
+            }
+            iso.setFileSize(house.getWorkshopName()+" "+ singleWork.getImCode());
+            iso.setcId(0);
+            // 设置作业指导书看板相关信息
+            SopApi sopApi = getSopApi(map, workOrder, iso);
+            sopApi.setlName(house.getWorkshopName());
+            sopApi.setwName(singleWork.getImCode());
+            map.put("data",sopApi);
+            return map;
+        }
+
+    }
+
+    /**
+     * 设置作业指导书看板相关信息
+     * @param map 参数项
+     * @param workOrder 工单
+     * @param iso sop
+     * @return 结果
+     */
+    private SopApi getSopApi(Map<String, Object> map, DevWorkOrder workOrder, Iso iso) {
+        String hz = iso.getPath().substring(iso.getPath().lastIndexOf(".") + 1, iso.getPath().length());
+        if (hz.equals("pdf")) {
             iso.setcId(1);
         }
-        map.put("iso",iso);
+        map.put("iso", iso);
         SopApi sopApi = new SopApi();
-        sopApi.setlName(line.getLineName());
-        sopApi.setwName(workstation.getwName());
         sopApi.setwCode(workOrder.getWorkorderNumber());
         sopApi.setwStatus(workOrder.getOperationStatus());
         sopApi.setwNumber(workOrder.getProductNumber());
@@ -362,8 +446,7 @@ public class IsoServiceImpl implements IIsoService {
         sopApi.setpName(workOrder.getProductName());
         sopApi.setIsoId(iso.getIsoId());
         sopApi.setIsoPath(iso.getPath());
-        map.put("data",sopApi);
-        return map;
+        return sopApi;
     }
 
     @Override

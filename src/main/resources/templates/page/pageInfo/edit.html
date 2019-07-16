@@ -15,7 +15,7 @@
 					<div class="panel-body">
 						<div class="panel-group" id="accordion1">
 							<form role="form" id="form-page-add" th:object="${pageInfo}">
-								<input name="id"  type="hidden"  th:field="*{id}" />
+								<input name="id" id="id" type="hidden"  th:field="*{id}" />
 								<div class="form-group">
 									<label class="col-sm-12 control-label">页面名称</label>
 									<div class="col-sm-12">
@@ -259,11 +259,28 @@
 		rules: {
 			pageName: {
 				required: true,
+				remote: {
+					url: ctx + "page/pageInfo/checkPageName",
+					type: "post",
+					dataType: "json",
+					data: {
+						name : function() {
+							return $.common.trim($("#pageName").val());
+						},
+						id : function() {
+							return $.common.trim($("#id").val());
+						}
+					},
+					dataFilter: function(data, type) {
+						return $.validate.unique(data);
+					}
+				}
 			},
 		},
 		messages: {
 			pageName: {
 				required: "请输入看板名称",
+				remote:"看板名称已存在",
 			},
 		}
 	});

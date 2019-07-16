@@ -1,11 +1,6 @@
 package com.ruoyi.project.page.pageInfo.service;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.ruoyi.project.device.devIo.domain.DevIo;
 import com.ruoyi.project.page.pageInfo.domain.PageInfo;
-import com.ruoyi.project.page.pageInfoConfig.domain.PageInfoConfig;
-import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 
@@ -108,4 +103,11 @@ public interface IPageInfoService
 	 * @return
 	 */
 	List<SingleWork> selectSingleWork(int pid);
+
+	/**
+	 * 校验看板名称的唯一性
+	 * @param pageInfo 看板对象
+	 * @return 结果
+	 */
+	String checkPageName(PageInfo pageInfo);
 }

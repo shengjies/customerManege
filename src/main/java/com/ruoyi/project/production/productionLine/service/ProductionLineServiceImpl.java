@@ -1,8 +1,8 @@
 package com.ruoyi.project.production.productionLine.service;
 
-import java.util.*;
-
+import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
@@ -10,20 +10,19 @@ import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
+import com.ruoyi.project.production.productionLine.domain.ProductionLine;
+import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
-import com.ruoyi.project.production.productionLine.domain.ProductionLine;
-import com.ruoyi.common.support.Convert;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 /**
  * 生产线 服务层实现
@@ -309,5 +308,19 @@ public class ProductionLineServiceImpl implements IProductionLineService {
     @Override
     public List<ProductionLine> selectLineNotConfigByIsoId(Integer isoId, Integer companyId) {
         return productionLineMapper.selectLineNotConfigByIsoId(isoId,companyId);
+    }
+
+    /**
+     * 校验产线名的唯一性
+     * @param productionLine 产线对象
+     * @return 结果
+     */
+    @Override
+    public String checkLineNameUnique(ProductionLine productionLine) {
+        ProductionLine uniqueLine = productionLineMapper.selectProductionLineByName(JwtUtil.getUser().getCompanyId(),productionLine.getLineName());
+        if (StringUtils.isNotNull(uniqueLine) && !uniqueLine.getId().equals(productionLine.getId())) {
+            return WorkConstants.LINE_NAME_NOT_UNIQUE;
+        }
+        return WorkConstants.LINE_NAME_UNIQUE;
     }
 }

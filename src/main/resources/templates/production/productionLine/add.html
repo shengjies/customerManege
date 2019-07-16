@@ -80,6 +80,19 @@
 			rules:{
 				lineName:{
 					required:true,
+					remote: {
+						url: prefix + "/checkLineNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							name : function() {
+								return $.common.trim($("#lineName").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
 				},
                 deviceLiable:{
                     required:true,
@@ -89,6 +102,7 @@
             messages:{
                 lineName:{
                     required:"产线名称必填",
+					remote:"产线名称已存在",
                 },
                 deviceLiable:{
                     required:"责任人1必填",

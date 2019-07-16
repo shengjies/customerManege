@@ -387,7 +387,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过工单状态查询工单列表信息-->
     <select id="selectWorkListInWorkStatus" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
-        SELECT id as id,workorder_number as workorderNumber FROM dev_work_order where company_id = #{companyId} and workorder_status = #{workOrderStatus}
+        SELECT id as id,workorder_number as workorderNumber,work_price as workPrice FROM dev_work_order where company_id = #{companyId} and workorder_status = #{workOrderStatus}
     </select>
 
     <!--查询单工位还未配置的工单信息-->
@@ -404,7 +404,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         product_code as productCode,product_number as productNumber,product_name as productName,work_price as workPrice
         FROM dev_work_order as a left join tab_single_work_order as b on a.id = b.work_id
             where a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
-            and b.single_id = #{singleId} and a.workorder_status = #{workStatus}
+            and b.single_id = #{singleId} and a.workorder_status = #{workStatus} and b.work_id is not null
     </select>
 
     <!--查询车间对应工单对应工位的最后一条记录-->

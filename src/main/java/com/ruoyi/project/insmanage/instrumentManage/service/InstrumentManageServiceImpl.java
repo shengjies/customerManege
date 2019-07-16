@@ -1,6 +1,7 @@
 package com.ruoyi.project.insmanage.instrumentManage.service;
 
 import com.ruoyi.common.constant.InstrumentConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.ServletUtils;
@@ -116,7 +117,7 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 	{
 		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
 		if (user == null) {
-		    throw new BusinessException("未登录请登录再进行操作");
+		    throw new BusinessException(UserConstants.NOT_LOGIN);
 		}
 		// 设备名称
 		String inTypeName = instrumentManage.getInTypeName();

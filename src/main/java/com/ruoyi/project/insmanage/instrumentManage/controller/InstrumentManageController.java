@@ -1,5 +1,6 @@
 package com.ruoyi.project.insmanage.instrumentManage.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -115,11 +116,11 @@ public class InstrumentManageController extends BaseController
 	@Log(title = "仪器设备管理", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(InstrumentManage instrumentManage,HttpServletRequest request)
+	public AjaxResult addSave(InstrumentManage instrumentManage)
 	{
-		User user = JwtUtil.getTokenUser(request);
+		User user = JwtUtil.getUser();
 		if (user == null) {
-		    return error("用户未登陆或登陆超时");
+		    return error(UserConstants.NOT_LOGIN);
 		}
 		return toAjax(instrumentManageService.insertInstrumentManage(instrumentManage,user));
 	}

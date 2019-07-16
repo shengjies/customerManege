@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.countPiece.domain;
 
+import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
 import java.util.Date;
@@ -21,8 +22,10 @@ public class CountPiece extends BaseEntity
 	/** 计件记录归属人id */
 	private Integer cpUserId;
 	/** 计件记录归属人姓名 */
+	@Excel(name = "姓名",type = Excel.Type.EXPORT)
 	private String cpUserName;
 	/** 计件日期 */
+	@Excel(name = "计件日期",dateFormat = "yyyy-MM-dd",type = Excel.Type.EXPORT)
 	private Date cpDate;
 	/** 工单id */
 	private Integer workId;
@@ -32,16 +35,19 @@ public class CountPiece extends BaseEntity
 	private Float workPrice;
 	/** 计件数量 */
 	private Integer cpNumber;
-	/** 统计计件数量 */
-	private Integer sumCpNumber;
-	/** 总价((计件数量-不良品数量)*工价) */
-	private Float totalPrice;
-	/** 统计总价((计件数量-不良品数量)*工价) */
-	private Float sumTotalPrice;
 	/** 不良品 */
 	private Integer cpBadNumber;
-	/** 统计不良品 */
-	private Integer sumCpBadNumber;
+	/** 统计计件数量 */
+    @Excel(name = "计件总数",type = Excel.Type.EXPORT)
+	private Integer sumCpNumber;
+    /** 统计不良品 */
+    @Excel(name = "总不良品数",type = Excel.Type.EXPORT)
+    private Integer sumCpBadNumber;
+	/** 总价((计件数量-不良品数量)*工价) */
+	private Float totalPrice;
+    @Excel(name = "总价",type = Excel.Type.EXPORT)
+	/** 统计总价((计件数量-不良品数量)*工价) */
+	private Float sumTotalPrice;
 	/** 备注 */
 	private String cpRemark;
 	/** 最后修改时间 */

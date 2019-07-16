@@ -121,8 +121,8 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 }
             }
             if (workForm == null) {
-                //硬件为归属公司或者硬件未配置流水线或者单工位
-                map.put("code", 2);
+                // 该硬件没有进行的工单信息
+                map.put("code", 4);
                 map.put("data", null);
                 return map;
             }
@@ -303,25 +303,33 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                         /**
                          * 统计个人计件
                          */
-                        // 获取个人计件信息
-                        CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
-                        devDataLog.setWorkId(workOrder.getId());
-                        devDataLog.setIoId(singleWork.getId());
+
                         //查询对应日志上传数据数据
                         DevDataLog log = devDataLogMapper.selectLineWorkDevIo(house.getId(), workOrder.getId(), devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
                         if (log != null) {
                             devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
+                            if ((devDataLog.getDataTotal() - log.getDataTotal()) > 0) {
+                                // 个人计件统计
+                                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
+                                devDataLog.setWorkId(workOrder.getId());
+                                devDataLog.setIoId(singleWork.getId());
+                                countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
+                                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+                                countPieceMapper.updateCountPiece(countPiece);
+                            }
                             // 个人计件统计
-                            countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
-                            countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
                         } else {
                             devDataLog.setDelData(data.getD1());
-                            // 个人计件统计
-                            countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
-                            countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+                            if (data.getD1() > 0) {
+                                // 个人计件统计
+                                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
+                                devDataLog.setWorkId(workOrder.getId());
+                                devDataLog.setIoId(singleWork.getId());
+                                countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
+                                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+                                countPieceMapper.updateCountPiece(countPiece);
+                            }
                         }
-                        // 更新个人计件
-                        countPieceMapper.updateCountPiece(countPiece);
 
                         //对相关数据进行记录
                         DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(devList.getCompanyId(), house.getId(), workOrder.getId(),
@@ -360,8 +368,6 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                         workOrder = devWorkOrderMapper.selectWorkInHouseLastByWorkStatus(devList.getCompanyId(), house.getId(), WorkConstants.SING_SINGLE,
                                 singleWork.getId(), WorkConstants.WORK_STATUS_END);
                         if (workOrder != null && workOrder.getSign() == 1) {
-                            // 获取个人计件信息
-                            CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
                             devDataLog.setWorkId(workOrder.getId());
                             //设置单工位id
                             devDataLog.setIoId(singleWork.getId());
@@ -376,10 +382,13 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                             //查询对应日志上传数据数据
                             DevDataLog log = devDataLogMapper.selectLineWorkDevIo(house.getId(), workOrder.getId(), devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
                             if (log != null) {
+                                devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
+
+                                // 统计个人计件
+                                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
                                 countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
                                 countPiece.setTotalPrice(workOrder.getWorkPrice() * countPiece.getCpNumber());
                                 countPieceMapper.updateCountPiece(countPiece);
-                                devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
                             }
                         }
                     }

@@ -61,8 +61,8 @@
     // 重置搜索表单信息
     function formReset(params) {
         $('#formId')[0].reset();//input标签重置
-        $("#workId").val(null).trigger("change"); // select2标签重置
-        $("#cpLastId").val(null).trigger("change");
+        $("#workId").val('-1').trigger("change"); // select2标签重置
+        $("#cpLastId").val('-1').trigger("change");
     }
     var editFlag = [[${@permission.hasPermi('production:countPiece:edit')}]];
     var removeFlag = [[${@permission.hasPermi('production:countPiece:remove')}]];
@@ -78,10 +78,10 @@
             modalName: "全部计件",
             search: false,
             showExport: false,
-            showSearch:true,
-            showRefresh:true,
+            showSearch:false,
+            showRefresh:false,
             showColumns:false,
-            showToggle:true,
+            showToggle:false,
             columns: [
                 {
                     field : 'cpId',
@@ -131,7 +131,7 @@
                     title : '不良品',
                     sortable: true,
                     formatter:function (value, row, index) {
-                        return '<span style="font-weight: bold;color: red">'+ row.totalPrice+'</span>';
+                        return '<span style="font-weight: bold;color: red">'+ row.cpBadNumber+'</span>';
                     }
                 },
                 {

@@ -4,6 +4,7 @@ import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.production.countPiece.domain.CountPiece;
 import com.ruoyi.project.production.countPiece.mapper.CountPieceMapper;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,10 +66,19 @@ public class CountPieceServiceImpl implements ICountPieceService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
-        countPiece.setCompanyId(user.getCompanyId());
-        float totalPrice = (countPiece.getCpNumber() - countPiece.getCpBadNumber()) * countPiece.getWorkPrice();
-        countPiece.setTotalPrice(totalPrice);
-        return countPieceMapper.insertCountPiece(countPiece);
+        System.out.println(countPiece.getCpDate());
+        CountPiece piece = countPieceMapper.selectPieceByWorkIdAndUid(countPiece.getWorkId(), user.getCompanyId(), countPiece.getCpUserId(), countPiece.getCpDate());
+        if (StringUtils.isNotNull(piece)) {
+            piece.setCpNumber(piece.getCpNumber() + countPiece.getCpNumber());
+            piece.setCpBadNumber(piece.getCpBadNumber() + countPiece.getCpBadNumber());
+            piece.setTotalPrice(countPiece.getWorkPrice() * (piece.getCpNumber() - piece.getCpBadNumber()));
+            return countPieceMapper.updateCountPiece(piece);
+        } else {
+            countPiece.setCompanyId(user.getCompanyId());
+            float totalPrice = (countPiece.getCpNumber() - countPiece.getCpBadNumber()) * countPiece.getWorkPrice();
+            countPiece.setTotalPrice(totalPrice);
+            return countPieceMapper.insertCountPiece(countPiece);
+        }
     }
 
     /**
@@ -82,13 +93,13 @@ public class CountPieceServiceImpl implements ICountPieceService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
-        // CountPiece pieceById = countPieceMapper.selectCountPieceById(countPiece.getCpId());
-        // if (!pieceById.getCpBadNumber().equals(countPiece.getCpBadNumber()) && !pieceById.getCpRemark().equals(countPiece.getCpRemark())) {
-        //     Integer cpBadNumber = countPiece.getCpBadNumber() < 0 ? 0 : countPiece.getCpBadNumber();
-        //     countPiece.setTotalPrice((countPiece.getCpNumber() - cpBadNumber) * countPiece.getWorkPrice());
-        //     countPiece.setCpLastUpdate(new Date());
-        //     countPiece.setCpLastId(user.getUserId().intValue());
-        // }
+        CountPiece pieceById = countPieceMapper.selectCountPieceById(countPiece.getCpId());
+        if (!pieceById.getCpBadNumber().equals(countPiece.getCpBadNumber()) && !pieceById.getCpRemark().equals(countPiece.getCpRemark())) {
+            Integer cpBadNumber = countPiece.getCpBadNumber() < 0 ? 0 : countPiece.getCpBadNumber();
+            countPiece.setTotalPrice((countPiece.getCpNumber() - cpBadNumber) * countPiece.getWorkPrice());
+            countPiece.setCpLastUpdate(new Date());
+            countPiece.setCpLastId(user.getUserId().intValue());
+        }
         if (countPiece.getCpBadNumber() != null) {
             countPiece.setTotalPrice(countPiece.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
         }

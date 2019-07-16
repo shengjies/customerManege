@@ -17,7 +17,8 @@
                             工单号：
                             <select id="workId" name="workId" th:with="allWork=${@workOrder.selectWorkListInSw(1)}">
                                 <option value="-1">请选择</option>
-                                <option th:each="item:${allWork}" th:text="${item.workorderNumber}" th:value="${item.id}"></option>
+                                <option th:each="item:${allWork}" th:text="${item.workorderNumber}"
+                                        th:value="${item.id}"></option>
                             </select>
                         </li>
 
@@ -51,16 +52,18 @@
 <script th:inline="javascript">
     $(function () {
         $("select").select2({
-            width:"200px",
-            placeholder:'请选择'
+            width: "200px",
+            placeholder: '请选择'
         });
     })
+
     // 重置搜索表单信息
     function formReset(params) {
         $('#formId')[0].reset();//input标签重置
         $("#workId").val(null).trigger("change");
         $("#cpLastId").val(null).trigger("change");
     }
+
     var editFlag = [[${@permission.hasPermi('production:countPiece:edit')}]];
     var removeFlag = [[${@permission.hasPermi('production:countPiece:remove')}]];
     var prefix = ctx + "production/countPiece";
@@ -75,10 +78,10 @@
             modalName: "我的计件明细",
             search: false,
             showExport: false,
-            showSearch: true,
-            showRefresh: true,
+            showSearch: false,
+            showRefresh: false,
             showColumns: false,
-            showToggle: true,
+            showToggle: false,
             columns: [{
                 field: 'cpId',
                 title: '计件管理主键id',
@@ -109,17 +112,26 @@
                 {
                     field: 'cpNumber',
                     title: '计件数量',
-                    sortable: true
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return '<span style="font-weight: bold;color: green">' + row.cpNumber + '</span>';
+                    }
                 },
                 {
                     field: 'totalPrice',
                     title: '总价',
-                    sortable: true
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return '<span style="font-weight: bold;color: orangered">' + row.totalPrice + '</span>';
+                    }
                 },
                 {
                     field: 'cpBadNumber',
                     title: '不良品',
-                    sortable: true
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return '<span style="font-weight: bold;color: red">' + row.cpBadNumber + '</span>';
+                    }
                 },
                 {
                     field: 'cpRemark',

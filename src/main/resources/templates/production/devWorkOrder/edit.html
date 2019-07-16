@@ -99,16 +99,23 @@
             </div>
         </div>
         <div class="form-group" th:if="*{wlSign == 1}">
+            <label class="col-sm-3 control-label">工价：</label>
+            <div class="col-sm-8">
+                <input id="workPrice" name="workPrice" th:value="${devWorkOrder.workPrice==null?0:devWorkOrder.workPrice}"
+                       class="form-control" type="number" th:readonly="${devWorkOrder.workorderStatus != 0 ? 'true':'false'}">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 1}">
             <label class="col-sm-3 control-label">生产数量：</label>
             <div class="col-sm-8">
                 <input id="productNumber" name="productNumber" th:field="*{productNumber}"
                        class="form-control" type="number">
             </div>
         </div>
-        <div class="form-group" th:if="*{wlSign == 1}">
-            <label class="col-sm-3 control-label">工价：</label>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">投入产量：</label>
             <div class="col-sm-8">
-                <input id="workPrice" name="workPrice" th:value="${devWorkOrder.workPrice==null?0:devWorkOrder.workPrice}"
+                <input id="putIntoNumber" name="putIntoNumber" th:field="*{putIntoNumber}"
                        class="form-control" type="number">
             </div>
         </div>

@@ -519,4 +519,18 @@ public class PageInfoServiceImpl implements IPageInfoService {
         }
         return null;
     }
+
+    /**
+     * 校验看板名称的唯一性
+     * @param pageInfo 看板对象
+     * @return 结果
+     */
+    @Override
+    public String checkPageName(PageInfo pageInfo) {
+        PageInfo uniquePageInfo = pageInfoMapper.selectPageInfoByPageName(JwtUtil.getUser().getCompanyId(),pageInfo.getPageName());
+        if (com.ruoyi.common.utils.StringUtils.isNotNull(uniquePageInfo) && !pageInfo.getId().equals(uniquePageInfo.getId())) {
+            return PageTypeConstants.PAGE_NAME_NOT_UNIQUE;
+        }
+        return PageTypeConstants.PAGE_NAME_UNIQUE;
+    }
 }

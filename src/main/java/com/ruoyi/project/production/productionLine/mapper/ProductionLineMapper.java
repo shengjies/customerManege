@@ -1,10 +1,7 @@
 package com.ruoyi.project.production.productionLine.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Map;
@@ -134,4 +131,12 @@ public interface ProductionLineMapper
 	 * @return
 	 */
 	ProductionLine selectLineDetailByPageId(@Param("pid")int pid);
+
+	/**
+	 * 检验产线名称的唯一性
+	 * @param companyId 公司id
+	 * @param lineName 产线名成
+	 * @return 结果
+	 */
+    ProductionLine selectProductionLineByName(@Param("companyId") Integer companyId, @Param("lineName") String lineName);
 }

@@ -129,9 +129,9 @@
 						var actions = [];
 						actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i></i>编辑</a> ');
 						if (row.fileSourceInfo != null ) { // 已经上传过文件
-                            actions.push('<a class="btn btn-warning btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>上传文件</a> ');
+                            actions.push('<a class="btn btn-warning btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
 						} else { // 未上传文件
-                            actions.push('<a class="btn btn-default btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>上传文件</a> ');
+                            actions.push('<a class="btn btn-default btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
 						}
                         // if (row.materielSupplier != null) { //  已经关联过供应商
                         //     actions.push('<a class="btn btn-primary btn-xs" href="#" onclick="connectSupplier(\'' + row.id + '\')"><i></i>关联供应商</a> ');

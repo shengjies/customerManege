@@ -192,4 +192,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDeviceLiableName" resultType="java.lang.String">
         SELECT user_name FROM sys_user where user_id = #{device_liable};
     </select>
+
+    <!--校验产线名称的唯一性-->
+    <select id="selectProductionLineByName" resultType="com.ruoyi.project.production.productionLine.domain.ProductionLine">
+        SELECT id as id,line_name as lineName FROM dev_production_line where company_id = #{companyId} and line_name = #{lineName};
+    </select>
 </mapper>

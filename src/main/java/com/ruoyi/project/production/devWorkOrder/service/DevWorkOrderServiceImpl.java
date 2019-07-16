@@ -218,9 +218,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             /**
              * 判断修改的工单车间是否已经分配了单工位
              */
-            List<SingleWorkOrder> singleWorkOrders = singleWorkOrderMapper.selectSingleWorkByWorkIdAndPid(workOrder.getLineId(), workOrder.getId());
-            if (StringUtils.isNotEmpty(singleWorkOrders)) {
-                throw new BusinessException("该工单已分配单工位不能修改车间");
+            if (workOrder.getWorkorderStatus().equals(WorkConstants.WORK_STATUS_NOSTART)) {
+                List<SingleWorkOrder> singleWorkOrders = singleWorkOrderMapper.selectSingleWorkByWorkIdAndPid(workOrder.getLineId(), workOrder.getId());
+                if (StringUtils.isNotEmpty(singleWorkOrders)) {
+                    throw new BusinessException("该工单已分配单工位不能修改车间");
+                }
             }
             SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
             one = work.getLiableOne();
@@ -1055,6 +1057,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (user == null) {
             return Collections.emptyList();
         }
+        List<DevWorkOrder> workOrders = devWorkOrderMapper.selectWorkListInWorkStatus(user.getCompanyId(), workOrderStatus);
+
         return devWorkOrderMapper.selectWorkListInWorkStatus(user.getCompanyId(), workOrderStatus);
     }
 

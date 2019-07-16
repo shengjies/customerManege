@@ -11,8 +11,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * 首页设置控制层
  *
@@ -38,8 +36,8 @@ public class IndexSettingController {
      * @return
      */
     @GetMapping("/indexSetting")
-    public String userDetail(ModelMap mmap, HttpServletRequest request) {
-        User user = JwtUtil.getTokenUser(request);
+    public String userDetail(ModelMap mmap) {
+        User user = JwtUtil.getUser();
         DevCompany company = companyService.selectDevCompanyById(user.getCompanyId());
         if (company == null || company.getComPicture() == null) {
             mmap.put("comPictures", null);

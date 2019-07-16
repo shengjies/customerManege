@@ -73,7 +73,7 @@ public class CountPieceController extends BaseController {
     public AjaxResult export(CountPiece countPiece) {
         List<CountPiece> list = countPieceService.selectCountPieceList(countPiece);
         ExcelUtil<CountPiece> util = new ExcelUtil<CountPiece>(CountPiece.class);
-        return util.exportExcel(list, "countPiece");
+        return util.exportExcel(list, "计件数据");
     }
 
     /**

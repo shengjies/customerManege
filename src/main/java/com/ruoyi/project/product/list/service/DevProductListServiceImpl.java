@@ -1,19 +1,11 @@
 package com.ruoyi.project.product.list.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.utils.poi.ExcelUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
@@ -37,7 +29,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.support.Convert;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
@@ -139,27 +130,28 @@ public class DevProductListServiceImpl implements IDevProductListService {
         DevProductList product = devProductListMapper.selectDevProductByCode(currentUser.getCompanyId(), devProductList.getProductCode());
         if (product != null) return 0;
         if (devProductList.getPriceImport() != 0.0f) {
-            devProductList.setPrice(new BigDecimal(devProductList.getPriceImport())); // 设置导入价格
+            // 设置导入价格
+            devProductList.setPrice(new BigDecimal(devProductList.getPriceImport()));
         }
         devProductList.setCompanyId(currentUser.getCompanyId());
         devProductList.setCreate_by(currentUser.getUserName());
-        int i = devProductListMapper.insertDevProductList(devProductList);
+        return devProductListMapper.insertDevProductList(devProductList);
         /**
          * 新增产品时值增加库存记录信息
          */
-        ProductStock productStock = productStockMapper.selectProductStockByProCode(currentUser.getCompanyId(), devProductList.getProductCode());
-        if (productStock == null) {
-            productStock = new ProductStock();
-            productStock.setCompanyId(currentUser.getCompanyId());
-            productStock.setLastUpdate(new Date());
-            productStock.setCreateTime(new Date());
-            productStock.setProductCode(devProductList.getProductCode());
-            productStock.setProductModel(devProductList.getProductModel());
-            productStock.setProductName(devProductList.getProductName());
-            productStock.setProductId(devProductList.getId());
-            productStockMapper.insertProductStock(productStock);
-        }
-        return i;
+        // ProductStock productStock = productStockMapper.selectProductStockByProCode(currentUser.getCompanyId(), devProductList.getProductCode());
+        // if (productStock == null) {
+        //     productStock = new ProductStock();
+        //     productStock.setCompanyId(currentUser.getCompanyId());
+        //     productStock.setLastUpdate(new Date());
+        //     productStock.setCreateTime(new Date());
+        //     productStock.setProductCode(devProductList.getProductCode());
+        //     productStock.setProductModel(devProductList.getProductModel());
+        //     productStock.setProductName(devProductList.getProductName());
+        //     productStock.setProductId(devProductList.getId());
+        //     productStockMapper.insertProductStock(productStock);
+        // }
+        // return i;
     }
 
     /**
@@ -171,7 +163,8 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Override
     public int updateDevProductList(DevProductList devProductList) {
         if (devProductList.getPriceImport() != 0.0f) {
-            devProductList.setPrice(new BigDecimal(devProductList.getPriceImport())); // 设置导入价格
+            // 设置导入价格
+            devProductList.setPrice(new BigDecimal(devProductList.getPriceImport()));
         }
         // 更新产品库存记录的产品信息
         ProductStock productStock = productStockMapper.selectProductStockByProId(devProductList.getId());

@@ -30,10 +30,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPageInfoList" parameterType="PageInfo" resultMap="PageInfoResult">
         <include refid="selectPageInfoVo"/>
         <where>
-             <if test="pageId != null  and pageId != '' "> and page_id like concat(#{pageId}, '%') </if>
+             <if test="pageId != null  and pageId != '' "> and page_id like concat('%',#{pageId}, '%') </if>
              <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
              <if test="pageLayoutType != null and pageLayoutType > 0 "> and page_layout_type = #{pageLayoutType}</if>
-             <if test="pageName != null  and pageName != '' "> and page_name like concat(#{pageName}, '%') </if>
+             <if test="pageName != null  and pageName != '' "> and page_name like concat('%',#{pageName}, '%') </if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
             </if>
@@ -142,5 +142,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--查询页面布局类型-->
     <select id="selectPageLayout" resultType="com.ruoyi.project.page.layout.domain.Layout">
         SELECT * FROM dev_page_layout where id = #{page_layout_type};
+    </select>
+
+    <!--校验看板名称的唯一性-->
+    <select id="selectPageInfoByPageName" resultType="com.ruoyi.project.page.pageInfo.domain.PageInfo">
+        SELECT id as id,page_name as pageName FROM dev_page_list where company_id = #{companyId} and page_name = #{pageName} limit 1
     </select>
 </mapper>

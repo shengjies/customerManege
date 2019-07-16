@@ -118,4 +118,11 @@ public class WorkConstants {
     /** 用于标记是 0、产线  1、车间 */
     public final static int SING_LINE =0;
     public final static int SING_SINGLE =1;
+
+    /**
+     * 流水线名称是否唯一的返回结果
+     */
+    public final static String LINE_NAME_UNIQUE = "0";
+    public final static String LINE_NAME_NOT_UNIQUE = "1";
+
 }

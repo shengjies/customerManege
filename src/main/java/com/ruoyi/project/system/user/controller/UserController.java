@@ -1,6 +1,7 @@
 package com.ruoyi.project.system.user.controller;
 
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -218,5 +219,12 @@ public class UserController extends BaseController {
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
+    }
+
+    @GetMapping("/selectAllLoginName")
+    @ResponseBody
+    public List<User> selectAllLoginName(String filter){
+        System.out.println("===================================" + filter);
+        return userService.selectComAllUser(ServletUtils.getRequest().getCookies());
     }
 }

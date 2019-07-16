@@ -86,9 +86,9 @@
 						var uid = [[${@user.getSysUser(#httpServletRequest.getCookies())}]];
 						if(uid && uid.userId && live ==""){
 							if(row.deviceLiable && uid.userId == row.deviceLiable){
-								return '<a class="btn btn-success btn-xs " href="#" onclick="liveStatus(\'' + row.id + '\')">'+value+'</a> '
+								return '<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="liveStatus(\'' + row.id + '\')">'+value+'</a> '
 							}else if(row.deviceLiableTow && uid.userId == row.deviceLiableTow){
-								return '<a class="btn btn-success btn-xs " href="#" onclick="liveStatus(\'' + row.id + '\')">'+value+'</a> '
+								return '<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="liveStatus(\'' + row.id + '\')">'+value+'</a> '
 							}else {
 								return value;
 							}

@@ -1,17 +1,14 @@
 package com.ruoyi.project.erp.materiel.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.constant.MaterielConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
+import com.ruoyi.project.erp.materiel.domain.Materiel;
+import com.ruoyi.project.erp.materiel.mapper.MaterielMapper;
 import com.ruoyi.project.erp.materielStock.domain.MaterielStock;
 import com.ruoyi.project.erp.materielStock.mapper.MaterielStockMapper;
 import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
@@ -19,12 +16,14 @@ import com.ruoyi.project.erp.materielSupplier.mapper.MaterielSupplierMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.erp.materiel.mapper.MaterielMapper;
-import com.ruoyi.project.erp.materiel.domain.Materiel;
-import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 物料 服务层实现
@@ -103,26 +102,26 @@ public class MaterielServiceImpl implements IMaterielService {
         if (materiel.getPriceImport() != null && materiel.getPriceImport() != 0.00f) {
             materiel.setPrice(new BigDecimal(materiel.getPriceImport()));
         }
-        int i = materielMapper.insertMateriel(materiel);
+        return materielMapper.insertMateriel(materiel);
         /**
          * 新增物料更新库存记录
          */
         // 查询物料库存是否存在记录
         //MaterielStock materielStock = materielStockMapper.selectMaterielStockByMaterielId(materiel.getId());
-        MaterielStock materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(materiel.getMaterielCode(), user.getCompanyId());
-        if (materielStock == null) { // 不存在记录，新增库存记录信息
-            materielStock = new MaterielStock();
-            materielStock.setCompanyId(user.getCompanyId());
-            materielStock.setLastUpdate(new Date());
-            materielStock.setMaterielName(materiel.getMaterielName());
-            materielStock.setMaterielCode(materiel.getMaterielCode());
-            materielStock.setMaterielModel(materiel.getMaterielModel());
-            materielStock.setMaterielId(materiel.getId());
-            materielStock.setCreateTime(new Date());
-            materielStockMapper.insertMaterielStock(materielStock);
-        }
+        // MaterielStock materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(materiel.getMaterielCode(), user.getCompanyId());
+        // if (materielStock == null) { // 不存在记录，新增库存记录信息
+        //     materielStock = new MaterielStock();
+        //     materielStock.setCompanyId(user.getCompanyId());
+        //     materielStock.setLastUpdate(new Date());
+        //     materielStock.setMaterielName(materiel.getMaterielName());
+        //     materielStock.setMaterielCode(materiel.getMaterielCode());
+        //     materielStock.setMaterielModel(materiel.getMaterielModel());
+        //     materielStock.setMaterielId(materiel.getId());
+        //     materielStock.setCreateTime(new Date());
+        //     materielStockMapper.insertMaterielStock(materielStock);
+        // }
 
-        return i;
+        // return i;
     }
 
     /**
@@ -175,15 +174,15 @@ public class MaterielServiceImpl implements IMaterielService {
                 throw new BusinessException("请先删除" + materiel.getMaterielCode() + "的关联文件");
             }
             // 校验是否有相关的供应商关联信息
-            List<MaterielSupplier> materielSuppliers = materielSupplierMapper.selectMaterielSupplierListByMaterielId(materielId);
-            if (!StringUtils.isEmpty(materielSuppliers)) {
-                throw new BusinessException("请先删除" + materiel.getMaterielCode() + "的供应商关联");
-            }
-            // 查询对应物料库存记录
-            MaterielStock materielStock = materielStockMapper.selectMaterielStockByMaterielId(materielId);
-            if (!StringUtils.isNull(materielStock)) {
-                throw new BusinessException(materiel.getMaterielCode() + "存在库存记录不允许删除");
-            }
+            // List<MaterielSupplier> materielSuppliers = materielSupplierMapper.selectMaterielSupplierListByMaterielId(materielId);
+            // if (!StringUtils.isEmpty(materielSuppliers)) {
+            //     throw new BusinessException("请先删除" + materiel.getMaterielCode() + "的供应商关联");
+            // }
+            // // 查询对应物料库存记录
+            // MaterielStock materielStock = materielStockMapper.selectMaterielStockByMaterielId(materielId);
+            // if (!StringUtils.isNull(materielStock)) {
+            //     throw new BusinessException(materiel.getMaterielCode() + "存在库存记录不允许删除");
+            // }
         }
         return materielMapper.deleteMaterielByIds(Convert.toStrArray(ids));
     }

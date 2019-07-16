@@ -161,14 +161,12 @@ public class DevWorkOrder extends BaseEntity {
      * 产品型号
      */
     private String productModel;
-
     /** 投入产量 */
     private Integer putIntoNumber;
     /** 标记开始时间 */
     private Date signTime;
     /** 标记用时 */
     private Float signHuor;
-
     /**
      * 封装产品id
      */

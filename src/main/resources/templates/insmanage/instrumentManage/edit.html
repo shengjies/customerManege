@@ -2,77 +2,6 @@
 <html  lang="zh" xmlns:th="http://www.thymeleaf.org">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
-<style type="text/css">
-	.selectBox {
-		width: 400px;
-		height: 36px;
-		line-height: 36px;
-		background: #f72323;
-	}
-
-	input::-ms-clear, input::-ms-reveal {
-		/*clear去掉叉  reveal去掉眼睛;但是只能去掉ie10及以上，ie9及以下去不掉*/
-		display: none;
-	}
-
-	.inputCase {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		box-sizing: border-box;
-	}
-
-	.inputCase input.imitationSelect {
-		width: 100%;
-		height: 100%;
-		box-sizing: border-box;
-		border: 1px solid #ccc;
-		display: block;
-		text-indent: 20px;
-		cursor: default;
-	}
-
-	.inputCase i.fa {
-		position: absolute;
-		right: 10px;
-		top: 10px;
-		color: #007AFF;
-		font-size: 20px;
-		z-index: 99999;
-	}
-
-	.fa {
-		cursor: pointer;
-	}
-
-	.selectUl {
-		position: relative;
-		z-index: 500;
-		background-color: rgb(255, 255, 255);
-		display: none;
-		padding: 0;
-		margin: 0;
-		border-bottom: 1px solid #ccc;
-		border-left: 1px solid #ccc;
-		border-right: 1px solid #ccc;
-	}
-
-	.selectUl li {
-		height: 32px;
-		line-height: 36px;
-		list-style: none;
-		text-indent: 20px;
-		border-bottom: 1px solid #ccc;
-	}
-
-	.selectUl li:hover {
-		background: #ddd;
-	}
-
-	.selectUl li:last-child {
-		border-bottom: 0 none;
-	}
-</style>
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form class="form-horizontal m" id="form-instrumentManage-edit" th:object="${instrumentManage}">
@@ -98,16 +27,10 @@
 			<div class="form-group">
 				<label class="col-sm-3 control-label">仪器类型：</label>
 				<div class="col-sm-8">
-					<div class="selectBox">
-						<div class="inputCase">
-							<input class="imitationSelect" type="text" id="inTypeName" name="inTypeName" th:field ="*{inTypeName}"/>
-							<i class="fa fa-caret-down"></i>
-						</div>
-						<ul class="selectUl" th:with="allInsType=${@ins.selectAllInsType()}">
-							<li th:each="insType:${allInsType}" th:oliName="${insType.inType}" th:oliId="${insType.id}"
-								th:class="${insType.id} == 1 ?'':actived_li" th:utext="${insType.inType}"></li>
-						</ul>
-					</div>
+					<select id="inType" name="inType" class="form-control" th:with="allInsType=${@ins.selectAllInsType()}">
+						<option value="">请选择</option>
+						<option th:each="insType:${allInsType}" th:text="${insType.inType}" th:value="${insType.id}" th:field="*{inType}"></option>
+					</select>
 				</div>
 			</div>
 			<div class="form-group">	
@@ -158,56 +81,32 @@
 		</form>
     </div>
     <div th:include="include::footer"></div>
-    <script type="text/javascript">
+    <script th:inline="javascript">
 		var prefix = ctx + "insmanage/instrumentManage";
 		$("#form-instrumentManage-edit").validate({
 			rules:{
-				xxxx:{
-					required:true,
-				},
+
+			},
+			messages:{
+
 			}
 		});
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
+	        	var inType = $("#inType").find("option:selected").val();
+	        	if (inType <= 0) {
+	        	    $.modal.alertWarning("请选择设备类型");
+					return;
+	        	}
+	        	var imLiable = $("#imLiable").find("option:selected").val();
+	        	if (imLiable <= 0) {
+	        	    $.modal.alertWarning("请选择设备责任人");
+	        	    return;
+	        	}
 	            $.operate.save(prefix + "/edit", $('#form-instrumentManage-edit').serialize());
 	        }
 	    }
-
-		//点击右边箭头icon时候
-		$(".selectBox .fa").on("click", function (event) {
-			$(this).parent().next().toggle();//ul弹窗展开
-			if ($(this).hasClass("fa-caret-down")) {
-				$(this).removeClass("fa-caret-down").addClass("fa-caret-up")//点击input选择适合，小图标动态切换
-			} else {
-				$(this).addClass("fa-caret-down").removeClass("fa-caret-up")//点击input选择适合，小图标动态切换
-			}
-			if (event.stopPropagation) {
-				// 针对 Mozilla 和 Opera
-				event.stopPropagation();
-			} else if (window.event) {
-				// 针对 IE
-				window.event.cancelBubble = true;
-			}
-		});
-
-		//
-		$(".selectUl li").click(function (event) {
-			event = event || window.event;
-			$(this).addClass("actived_li").siblings().removeClass("actived_li");//点击当前的添加。actived_li这个类；其他的移除这个类名
-			var oliName = $(this).attr("oliName");//定义一个name属性，获取点击的元素属性赋值到当前，方便动态化传值
-			var oliId = $(this).attr("oliId");//定义一个id属性，获取点击的元素属性赋值到当前，方便数据交互传值
-			$(this).parent().prev().children().val(oliName); //把当前点击的name赋值到显示的input的val里面
-			$(this).parent().prev().children().attr("oliName", oliName);//把当前点击的oliName赋值到显示的input的oliName里面
-			$(this).parent().prev().children().attr("oliId", oliId);//把当前点击的oliId赋值到显示的input的oliId里面
-		});
-
-		//点击任意地方隐藏下拉
-		$(document).click(function (event) {
-			event = event || window.event;
-			$(".inputCase .fa").removeClass("fa-caret-up").addClass("fa-caret-down")//当点隐藏ul弹窗时候，把小图标恢复原状
-			$(".selectUl").hide();//当点击空白处，隐藏ul弹窗
-		});
 
 	</script>
 </body>

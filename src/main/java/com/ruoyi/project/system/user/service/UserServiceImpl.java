@@ -283,6 +283,7 @@ public class UserServiceImpl implements IUserService {
         user.setDevCompany(null);
         user.setCreateTime(null);
         user.setLoginDate(null);
+        user.setUpdateTime(null);
         UserApi userApi = Feign.builder()
                 .encoder(new GsonEncoder())
                 .decoder(new GsonDecoder())

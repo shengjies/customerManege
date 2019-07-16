@@ -90,4 +90,11 @@ public interface IProductionLineService
 	 * @return 结果
 	 */
 	List<ProductionLine> selectLineNotConfigByIsoId(Integer isoId,Integer companyId);
+
+	/**
+	 * 校验产线名称的唯一性
+	 * @param productionLine 产线对象
+	 * @return 结果
+	 */
+    String checkLineNameUnique(ProductionLine productionLine);
 }

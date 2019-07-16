@@ -93,7 +93,7 @@ public interface IIsoService
 	 * @param code 硬件编码
 	 * @return
 	 */
-	Map<String,Object> selectSopByDevCode(String code) throws Exception;
+	Map<String,Object> selectSopByDevCode(String code);
 
 	/**
 	 * 通过单工位id查询所有配置sop的iso列表
