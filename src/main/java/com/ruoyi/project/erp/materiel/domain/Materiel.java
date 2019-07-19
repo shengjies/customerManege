@@ -56,6 +56,9 @@ public class Materiel extends BaseEntity {
      */
     @Excel(name = "单价(含税)",type = Excel.Type.IMPORT)
     private Float priceImport;
+    /** 物料单位 */
+    @Excel(name = "单位",type = Excel.Type.IMPORT)
+    private String unit;
     /**
      * 物料图片(最多五张)
      */
@@ -93,6 +96,14 @@ public class Materiel extends BaseEntity {
      * 不良品数量
      */
     private Integer badNumber;
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     public Integer getBadNumber() {
         return badNumber;

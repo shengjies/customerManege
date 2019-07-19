@@ -18,11 +18,11 @@ public class ImportConfig extends BaseEntity
 	private Integer id;
 	/** 公司id */
 	private Integer companyId;
-	/** 产品编码、半产品编码 */
+	/** 产品编码、半产品编码 物料编码*/
 	private Integer con1;
-	/** 产品名称/半产品名称 */
+	/** 产品名称/半产品名称  物料名称*/
 	private Integer con2;
-	/** 产品型号/半成品信号 */
+	/** 产品型号/半成品型号  物料型号*/
 	private Integer con3;
 	/** 单价 */
 	private Integer price;

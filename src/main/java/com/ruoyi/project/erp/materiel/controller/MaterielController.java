@@ -5,6 +5,8 @@ import java.util.List;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.materielSupplier.service.IMaterielSupplierService;
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,8 +42,11 @@ public class MaterielController extends BaseController {
     @Autowired
     private IMaterielService materielService;
 
+//    @Autowired
+//    private IMaterielSupplierService materielSupplierService; // 物料供应商管理服务
+
     @Autowired
-    private IMaterielSupplierService materielSupplierService; // 物料供应商管理服务
+    private IImportConfigService configService;
 
     @RequiresPermissions("erp:materiel:view")
     @GetMapping()
@@ -86,16 +91,40 @@ public class MaterielController extends BaseController {
     @RequiresPermissions("erp:materiel:import")
     @PostMapping("/importData")
     @ResponseBody
-    public AjaxResult importData(MultipartFile file, boolean updateSupport,HttpServletRequest request) throws Exception {
-        ExcelUtil<Materiel> util = new ExcelUtil<Materiel>(Materiel.class);
-        List<Materiel> materielList = util.importExcel(file.getInputStream());
+    public AjaxResult importData(MultipartFile file, boolean updateSupport)  {
         String message = null;
         try {
-            message = materielService.importMateriel(materielList, updateSupport,request);
-        } catch (BusinessException e) {
+            message = materielService.importMateriel(file, updateSupport,2);
+        } catch (Exception e) {
+//            e.printStackTrace();
             return AjaxResult.error(e.getMessage());
         }
         return AjaxResult.success(message);
+    }
+
+    /**
+     * 物料导入配置
+     * @return
+     */
+    @Log(title = "物料导入配置", businessType = BusinessType.IMPORT)
+    @RequiresPermissions("erp:materiel:import")
+    @GetMapping("/importConfig")
+    public String mConfig(int type,ModelMap modelMap){
+        modelMap.put("config",configService.selectImportConfigByType(type));
+        return prefix+"/mconfig";
+    }
+
+    /**
+     * 添加物料导入配置
+     * @param config 配置信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/addMConfig")
+    @RequiresPermissions("erp:materiel:import")
+    public AjaxResult addImportConfig(ImportConfig config){
+        config.setcType(2);
+        return toAjax(configService.insertImportConfig(config));
     }
 
     /**

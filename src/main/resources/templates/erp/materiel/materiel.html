@@ -49,13 +49,16 @@
 			</div>
 			
 	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="importConfig()" shiro:hasPermission="erp:materiel:import">
+					<i class="fa fa-gear"></i> 导入配置
+				</a>
 				<a class="btn btn-success" onclick="add()" shiro:hasPermission="erp:materiel:add">
 					<i class="fa fa-plus"></i> 添加
 				</a>
 				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="erp:materiel:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
-				<a class="btn btn-info" onclick="$.table.importExcel()" shiro:hasPermission="erp:materiel:export">
+				<a class="btn btn-info" onclick="$.table.importExcel()" shiro:hasPermission="erp:materiel:import">
 					<i class="fa fa-upload"></i> 导入
 				</a>
 				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="erp:materiel:export">
@@ -97,6 +100,8 @@
                 importUrl: prefix + "/importData",
                 importTemplateUrl: prefix + "/importTemplate",
                 modalName: "物料",
+				sortName:'createTime',
+				sortOrder:'desc',
 				search: false,
 		        showExport: true,
                 columns: [{
@@ -147,6 +152,11 @@
 					title : '单价(含税)',
 					sortable: true
 				},
+					{
+						field : 'unit',
+						title : '单位',
+						sortable: true
+					},
 				{
 					field : 'remark',
 					title : '备注',
@@ -187,6 +197,13 @@
         function viewFile(id) {
             $.modal.open("文件查看","/erp/fileSourceInfo?save_type=6&save_id="+id,900)
         }
+
+		/**
+		 * 物料导入配置
+		 */
+		function importConfig() {
+			createMenuItem(prefix+"/importConfig?type=2","物料导入配置");
+		}
     </script>
 </body>
 <form id="importForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
@@ -194,8 +211,8 @@
 		<input type="file" id="file" name="file"/>
 		<div class="mt10 pt5">
 			<input type="checkbox" id="updateSupport" name="updateSupport" title="如果物料编码已经存在，更新这条数据。"> 是否更新已经存在的物料数据,以物料编码为标识
-			&nbsp; <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i
-				class="fa fa-file-excel-o"></i> 下载模板</a>
+			<!--&nbsp; <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i-->
+				<!--class="fa fa-file-excel-o"></i> 下载模板</a>-->
 		</div>
 		<font color="red" class="pull-left mt10">
 			提示：仅允许导入“xls”或“xlsx”格式文件！

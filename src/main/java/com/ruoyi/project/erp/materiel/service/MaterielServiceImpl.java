@@ -3,7 +3,9 @@ package com.ruoyi.project.erp.materiel.service;
 import com.ruoyi.common.constant.MaterielConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
@@ -13,9 +15,17 @@ import com.ruoyi.project.erp.materielStock.domain.MaterielStock;
 import com.ruoyi.project.erp.materielStock.mapper.MaterielStockMapper;
 import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
 import com.ruoyi.project.erp.materielSupplier.mapper.MaterielSupplierMapper;
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
+import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +54,9 @@ public class MaterielServiceImpl implements IMaterielService {
 
     @Autowired
     private FileSourceInfoMapper fileSourceInfoMapper; // 文件资源数据层
+
+    @Autowired
+    private ImportConfigMapper configMapper;
 
     /**
      * 查询物料信息
@@ -93,7 +106,7 @@ public class MaterielServiceImpl implements IMaterielService {
      * @return 结果
      */
     @Override
-    public int insertMateriel(Materiel materiel,HttpServletRequest request) {
+    public int insertMateriel(Materiel materiel, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         materiel.setCompanyId(user.getCompanyId()); // 所属公司
         materiel.setCreateId(user.getUserId().intValue()); // 创建者ID
@@ -163,13 +176,13 @@ public class MaterielServiceImpl implements IMaterielService {
      * @return 结果
      */
     @Override
-    public int deleteMaterielByIds(String ids,HttpServletRequest request) {
+    public int deleteMaterielByIds(String ids, HttpServletRequest request) {
         Integer[] materielIds = Convert.toIntArray(ids);
         Materiel materiel = null;
         for (Integer materielId : materielIds) {
             materiel = materielMapper.selectMaterielById(materielId);
             // 校验是否有相关联的物料文件未删除
-            List<FileSourceInfo> fileSourceInfos = fileSourceInfoMapper.selectFileSourceInfoBySaveIdAndComId(materielId,JwtUtil.getTokenUser(request).getCompanyId());
+            List<FileSourceInfo> fileSourceInfos = fileSourceInfoMapper.selectFileSourceInfoBySaveIdAndComId(materielId, JwtUtil.getTokenUser(request).getCompanyId());
             if (!StringUtils.isEmpty(fileSourceInfos)) {
                 throw new BusinessException("请先删除" + materiel.getMaterielCode() + "的关联文件");
             }
@@ -190,57 +203,151 @@ public class MaterielServiceImpl implements IMaterielService {
     /**
      * 导入物料列表
      *
-     * @param list            物料列表
+     * @param file            物料列表
      * @param isUpdateSupport 是否更新支持，如果已存在，则进行更新数据
      * @return
      */
     @Override
-    public String importMateriel(List<Materiel> list, boolean isUpdateSupport,HttpServletRequest request) {
-        if (StringUtils.isNull(list) || list.size() == 0) {
-            throw new BusinessException("导入物料数据不能为空！");
+    public String importMateriel(MultipartFile file, boolean isUpdateSupport, int type) throws Exception {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) {
+            throw new Exception("登录超时，请重新登录");
         }
-        int successNum = 0;
-        int failureNum = 0;
+        int failNum = 0;
+        int inserNum = 0;
+        StringBuilder failMsg = new StringBuilder();
         StringBuilder successMsg = new StringBuilder();
-        StringBuilder failureMsg = new StringBuilder();
-
-        User currentUser = JwtUtil.getTokenUser(request);
-        if (StringUtils.isNull(currentUser)) {
-            throw new BusinessException("操作异常!");
+        //查询对应配置
+        ImportConfig config = configMapper.selectImportConfigByType(type);
+        if (config == null) {
+            throw new Exception("很抱歉，导入失败，请先进行物料导入信息配置");
         }
-        for (Materiel materiel : list) {
+        //创建excel 文档对象
+        Workbook wb = null;
+        Sheet sheet = null;
+        try {
+            wb = WorkbookFactory.create(file.getInputStream());
+        } catch (Exception e) {
+            throw new Exception("很抱歉，导入失败，只支持excel文件导入");
+        }
+        if (wb == null) {
+            throw new Exception("很抱歉，导入失败，只支持excel文件导入");
+        }
+        sheet = wb.getSheetAt(0);
+        if (sheet == null) {
+            throw new Exception("很抱歉，导入失败，只支持excel文件导入");
+        }
+        //获取导入行数
+        int rows = sheet.getPhysicalNumberOfRows();
+        if (rows <= 0) {
+            throw new Exception("很抱歉，导入失败，导入excel不能为空");
+        }
+        if (rows < config.getRowIndex()) {
+            throw new Exception("很抱歉，导入失败，导入excel行数必须大配置开始解析行数,请核对配置是否正确");
+        }
+        Row row = null;
+        List<Materiel> materiels = new ArrayList<>();
+        Materiel materiel = null;
+        for (int i = config.getRowIndex() - 1; i < rows; i++) {
+            row = sheet.getRow(i);
+            if (row == null) {
+                failNum++;
+                failMsg.append("<br/>第" + (i + 1) + "行数据为空");
+                continue;
+            }
+            materiel = new Materiel();
+            //获取物料编码
+            String mCode = ExcelUtil.getCellValue1(row, config.getCon1() - 1).toString().trim();
+            if (StringUtils.isEmpty(mCode)) {
+                failNum++;
+                failMsg.append("<br/>第" + (i + 1) + "行，物料编码为空");
+                continue;
+            }
+            materiel.setCompanyId(user.getCompanyId());
+            materiel.setMaterielCode(mCode);
+            //获取物料名称
+            String mName = ExcelUtil.getCellValue1(row, config.getCon2() - 1).toString().trim();
+            if (StringUtils.isEmpty(mName)) {
+                failNum++;
+                failMsg.append("<br/>第" + (i + 1) + "行，物料名称为空");
+                continue;
+            }
+            materiel.setMaterielName(mName);
+            //获取物料型号
+            String mModel = ExcelUtil.getCellValue1(row, config.getCon3() - 1).toString().trim();
+            if (StringUtils.isEmpty(mModel)) {
+                failNum++;
+                failMsg.append("<br/>第" + (i + 1) + "行，物料型号为空");
+                continue;
+            }
+            materiel.setMaterielModel(mModel);
+            //获取单价
+            if (config.getPrice() > 0) {
+                try {
+                    float price = Float.parseFloat(ExcelUtil.getCellValue1(row, config.getPrice() - 1).toString());
+                    materiel.setPriceImport(price);
+                    materiel.setPrice(new BigDecimal(price));
+                } catch (Exception e) {
+                    failNum++;
+                    failMsg.append("<br/>第" + (i + 1) + "行,物料单价解析失败");
+                    continue;
+                }
+            }
+            //获取产品单位
+            if(config.getUnit() >0){
+                String unit = ExcelUtil.getCellValue1(row,config.getUnit() -1).toString().trim();
+                materiel.setUnit(unit);
+            }
+            //获取备注信息
+            if(config.getCon5() > 0){
+                String remark = ExcelUtil.getCellValue1(row,config.getCon5() -1).toString();
+                materiel.setRemark(remark);
+            }
+            materiel.setCreateId(user.getUserId().intValue());
+            materiel.setCreateName(user.getUserName());
+            materiel.setCreateTime(new Date());
+            materiels.add(materiel);
+        }
+        if(wb != null){
+            wb.close();
+        }
+        if(materiels.size() <=0 || failNum > 0){
+            failMsg.insert(0,"很抱歉，导入失败");
+            throw new Exception(failMsg.toString());
+        }
+        failNum = 0;
+        int a =0;
+        for (Materiel ma : materiels) {
             try {
-                // 验证物料是否为空或者未输入编码
-                if (materiel == null || StringUtils.isEmpty(materiel.getMaterielCode().trim())) {
-                    throw new Exception("导入的物料或者物料编码不能为空！");
+                a++;
+                //查询对应物料是否存在
+                Materiel m = materielMapper.selectMaterielByMaterielCode(ma.getMaterielCode(),user.getCompanyId());
+                if(StringUtils.isNull(m)){
+                    inserNum++;
+                    materielMapper.insertMateriel(ma);
+                    successMsg.append("<br/>"+a+"、物料:"+ma.getMaterielCode()+"新增成功");
+                }else if(isUpdateSupport){
+                    ma.setId(m.getId());
+                    ma.setCreateTime(m.getCreateTime());
+                    ma.setCreateId(m.getCreateId());
+                    ma.setCreateName(m.getCreateName());
+                    inserNum++;
+                    materielMapper.updateMateriel(ma);
+                    successMsg.append("<br/>、物料:"+ma.getMaterielCode()+"修改成功");
+                }else {
+                    failNum ++;
+                    failMsg.append("<br/>"+a+"、物料:"+ma.getMaterielCode()+"已存在");
                 }
-                // 验证物料是否存在
-                Materiel m = materielMapper.selectMaterielByMaterielCode(materiel.getMaterielCode().trim(), currentUser.getCompanyId());
-                if (StringUtils.isNull(m)) {
-                    this.insertMateriel(materiel,request);
-                    successNum++;
-                    successMsg.append("<br/>" + successNum + "、物料 " + materiel.getMaterielCode() + " 导入成功");
-                } else if (isUpdateSupport) {
-                    materiel.setId(m.getId());
-                    materiel.setCompanyId(currentUser.getCompanyId());
-                    this.updateMateriel(materiel); // 通过编码更新物料信息
-                    successNum++;
-                    successMsg.append("<br/>" + successNum + "、物料 " + materiel.getMaterielCode() + " 更新成功");
-                } else {
-                    failureNum++;
-                    failureMsg.append("<br/>" + failureNum + "、物料 " + materiel.getMaterielCode() + " 已存在");
-                }
-            } catch (Exception e) {
-                failureNum++;
-                String msg = "<br/>" + failureNum + "、物料 " + materiel.getMaterielCode() + " 导入失败：";
-                failureMsg.append(msg + e.getMessage());
+            }catch (Exception e){
+                failNum ++;
+                failMsg.append("<br/>"+failNum+"、物料:"+ma.getMaterielCode()+"导入失败："+e.getMessage());
             }
         }
-        if (failureNum > 0) {
-            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条数据格式不正确，错误如下：");
-            throw new BusinessException(failureMsg.toString());
+        if(failNum > 0){
+            failMsg.insert(0,"很抱歉，部分导入失败！共"+failNum+"条数据:");
+            throw new Exception(failMsg.toString());
         } else {
-            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
+            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + inserNum + " 条，数据如下：");
         }
         return successMsg.toString();
     }
@@ -252,7 +359,7 @@ public class MaterielServiceImpl implements IMaterielService {
      * @return 结果
      */
     @Override
-    public List<Materiel> materielListBySupplierId(Integer supplierId,HttpServletRequest request) {
+    public List<Materiel> materielListBySupplierId(Integer supplierId, HttpServletRequest request) {
         List<Materiel> materielList = new ArrayList<>();
         Materiel materiel = null;
         List<MaterielSupplier> materielSupplierList = materielSupplierMapper.selectMaterielSupplierListByMatIdAndSupId(null, supplierId);
@@ -295,7 +402,7 @@ public class MaterielServiceImpl implements IMaterielService {
      */
     @Override
 //    @DataSource(DataSourceType.ERP)
-    public List<Materiel> selectMaterielBySupplierId(int sid,HttpServletRequest request) {
+    public List<Materiel> selectMaterielBySupplierId(int sid, HttpServletRequest request) {
         return materielMapper.selectMaterielBySupplierId(JwtUtil.getTokenUser(request).getCompanyId(), sid);
     }
 

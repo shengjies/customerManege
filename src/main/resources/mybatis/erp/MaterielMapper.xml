@@ -17,10 +17,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createId"    column="create_id"    />
         <result property="createName"    column="create_name"    />
         <result property="createTime"    column="create_time"    />
+        <result property="unit"    column="unit"    />
     </resultMap>
 	
 	<sql id="selectMaterielVo">
-        select id, company_id, materiel_code, materiel_name, materiel_model, price, materiel_img, img_size, remark, create_id, create_name, create_time from tab_materiel
+        select id, company_id, materiel_code, materiel_name, materiel_model, price, materiel_img, img_size, remark, create_id, create_name, create_time,unit from tab_materiel
     </sql>
 	
     <select id="selectMaterielList" parameterType="Materiel" resultMap="MaterielResult">
@@ -69,6 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createId != null  ">create_id,</if>
 			<if test="createName != null  and createName != ''  ">create_name,</if>
 			<if test="createTime != null  ">create_time,</if>
+			<if test="unit != null  ">unit,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -82,6 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createId != null  ">#{createId},</if>
 			<if test="createName != null  and createName != ''  ">#{createName},</if>
 			<if test="createTime != null  ">#{createTime},</if>
+			<if test="unit != null  ">#{unit},</if>
          </trim>
     </insert>
 	 
@@ -99,6 +102,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createId != null  ">create_id = #{createId},</if>
             <if test="createName != null  and createName != ''  ">create_name = #{createName},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="unit != null  ">unit = #{unit},</if>
         </trim>
         where id = #{id}
     </update>
@@ -117,6 +121,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createId != null  ">create_id = #{createId},</if>
             <if test="createName != null  and createName != ''  ">create_name = #{createName},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="unit != null  ">unit = #{unit},</if>
         </trim>
         where materiel_code = #{materielCode}
     </update>

@@ -215,7 +215,6 @@ public class DevProductListServiceImpl implements IDevProductListService {
         User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
         int failNum =  0;
         int inserNum =0;
-        int updateNum = 0;
         String code = cType ==0?"产品":"半成品";
         StringBuilder failMsg = new StringBuilder();
         StringBuilder successMsg = new StringBuilder();
@@ -230,16 +229,16 @@ public class DevProductListServiceImpl implements IDevProductListService {
         try {
             wb = WorkbookFactory.create(file.getInputStream());
         }catch (Exception e){
-            failMsg.insert(0,"很抱歉，导入失败，系统异常");
+            failMsg.insert(0,"很抱歉，导入失败，只支持excel文件导入");
             throw  new Exception(failMsg.toString());
         }
         if(wb == null){
-            failMsg.insert(0,"很抱歉，导入失败，系统异常");
+            failMsg.insert(0,"很抱歉，导入失败，只支持excel文件导入");
             throw  new Exception(failMsg.toString());
         }
         sheet = wb.getSheetAt(0);
         if(sheet == null){
-            failMsg.insert(0,"很抱歉，导入失败，系统异常");
+            failMsg.insert(0,"很抱歉，导入失败，只支持excel文件导入");
             throw  new Exception(failMsg.toString());
         }
         //获取导入行数
@@ -249,7 +248,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
             throw  new Exception(failMsg.toString());
         }
         if(rows < config.getRowIndex()){
-            failMsg.insert(0,"很抱歉，导入失败，导入excel行数必须大配置开始解析行数");
+            failMsg.insert(0,"很抱歉，导入失败，导入excel行数必须大配置开始解析行数，请核对配置是否正确");
             throw  new Exception(failMsg.toString());
         }
         Row row = null;
@@ -277,7 +276,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
             String pName = ExcelUtil.getCellValue1(row,config.getCon2()-1).toString().trim();
             if(StringUtils.isEmpty(pName)){
                 failNum ++;
-                failMsg.append("<br/>第"+(i+1)+"行，"+code+"编码为空");
+                failMsg.append("<br/>第"+(i+1)+"行，"+code+"名称为空");
                 continue;
             }
             product.setProductName(pName);
@@ -331,6 +330,9 @@ public class DevProductListServiceImpl implements IDevProductListService {
             product.setDef_id(0);
             productList.add(product);
          }
+        if(wb != null){
+            wb.close();
+        }
         if(productList.size() <=0 || failNum > 0){
             failMsg.insert(0,"很抱歉，导入失败");
             throw new Exception(failMsg.toString());
@@ -365,7 +367,7 @@ public class DevProductListServiceImpl implements IDevProductListService {
             }
         }
         if(failNum > 0){
-                failMsg.insert(0,"很抱歉，导入失败！共"+failNum+"条数据:");
+                failMsg.insert(0,"很抱歉，部分导入失败！共"+failNum+"条数据:");
                 throw new Exception(failMsg.toString());
         } else {
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + inserNum + " 条，数据如下：");

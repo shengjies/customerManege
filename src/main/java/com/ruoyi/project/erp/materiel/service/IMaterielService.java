@@ -1,6 +1,7 @@
 package com.ruoyi.project.erp.materiel.service;
 
 import com.ruoyi.project.erp.materiel.domain.Materiel;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -55,11 +56,11 @@ public interface IMaterielService {
 
     /**
      * 导入物料列表
-     * @param materielList 物料列表
+     * @param file 物料列表
      * @param updateSupport  是否更新支持，如果已存在，则进行更新数据
      * @return 结果
      */
-    public String importMateriel(List<Materiel> materielList, boolean updateSupport,HttpServletRequest request);
+    public String importMateriel(MultipartFile file, boolean updateSupport, int type) throws Exception;
 
     /**
      * 通过供应商id查询和供应商关联的物料列表
