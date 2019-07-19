@@ -37,10 +37,10 @@
                 <div class="select-list">
                     <ul>
                         <li>
-                            登录手机号
-                            <select id="loginName" name="loginName" th:with="allLoginName=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+                            登录手机号:
+                            <select id="loginName" name="loginName" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
                                 <option value="">请选择</option>
-                                <option th:each="item:${allLoginName}" th:value="${item.loginName}" th:text="${item.loginName}"></option>
+                                <option th:each="u : ${user}" th:text="${u.loginName}" th:value="${u.loginName}"></option>
                             </select>
                         </li>
                         <li>
@@ -54,11 +54,12 @@
                         </select>
                         </li>
                         <li>
-                            用户状态：<select name="status" th:with="type=${@dict.getType('sys_normal_disable')}" style="width: 100px">
-                            <option value="">所有</option>
-                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
-                                    th:value="${dict.dictValue}"></option>
-                        </select>
+                            用户状态：
+                            <select name="status" th:with="type=${@dict.getType('sys_normal_disable')}" style="width: 100px">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
                         </li>
 
                         <li class="select-time">
@@ -114,28 +115,11 @@
     var resetPwdFlag = [[${@permission.hasPermi('system:user:resetPwd')}]];
     var datas = [[${@dict.getType('sys_normal_disable')}]];
     var prefix = ctx + "system/user";
-    // $('#loginName').autocomplete({
-    //     //获取服务器数据的url
-    //     serviceUrl: prefix + '/selectAllLoginName',
-    //     //传给服务器关键词的参数名,类似于这个ajax请求$.post(url, {'filter' : keywords} ,function(){})中的filter
-    //     paramName : 'filter',
-    //     transformResult: function(response) {
-    //         //解析服务器传过来的json字符串
-    //         var obj = $.parseJSON(response);
-    //         console.log(obj);
-    //         // return {
-    //         //     suggestions: $.map(obj.list, function(dataItem) {
-    //         //         return { value: dataItem.right, data: dataItem.left };
-    //         //     })
-    //         // };
-    //     },
-    //
-    // });
 
     $(function () {
         $("#loginName").select2({
             width:"160px",
-            placeholder:'请选择'
+            // placeholder:'请选择'
         });
         var panehHidden = false;
         if ($(this).width() < 769) {

@@ -1,7 +1,5 @@
 package com.ruoyi.common.utils;
 
-import com.ruoyi.common.utils.security.ShiroUtils;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -14,8 +12,8 @@ public class CodeUtils {
      * 获取工单号 GD+公司id属性
      * @return
      */
-    public static String getWorkOrderCode(int companyId){
-        return "GD"+ companyId +getCode();
+    public static String getWorkOrderCode(){
+        return "GD" +getCode();
     }
 
     /**

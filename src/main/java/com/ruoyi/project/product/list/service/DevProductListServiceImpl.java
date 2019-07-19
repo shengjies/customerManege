@@ -347,15 +347,17 @@ public class DevProductListServiceImpl implements IDevProductListService {
                     devProductList.setDef_id(0);
                     inserNum++;
                     devProductListMapper.insertDevProductList(devProductList);
+                    successMsg.append("<br/>"+a+"、"+code+devProductList.getProductCode()+"新增成功");
                 }else if(isUpdateSupport){
                     devProductList.setId(productList1.getId());
                     devProductList.setCompanyId(u.getCompanyId());
                     devProductList.setCreateTime(productList1.getCreateTime());
                     devProductListMapper.updateDevProductList(devProductList);
-                    updateNum++;
+                    inserNum++;
                     successMsg.append("<br/>"+code+devProductList.getProductCode()+"修改成功");
                 }else {
-                    successMsg.append("<br/>"+a+"、"+code+devProductList.getProductCode()+"已存在");
+                    failNum ++;
+                    failMsg.append("<br/>"+a+"、"+code+devProductList.getProductCode()+"已存在");
                 }
             }catch (Exception e){
                 failNum ++;
@@ -365,6 +367,8 @@ public class DevProductListServiceImpl implements IDevProductListService {
         if(failNum > 0){
                 failMsg.insert(0,"很抱歉，导入失败！共"+failNum+"条数据:");
                 throw new Exception(failMsg.toString());
+        } else {
+            successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + inserNum + " 条，数据如下：");
         }
         return successMsg.toString();
     }
@@ -541,5 +545,18 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Override
     public List<DevProductList> selectNotConfigByIsoId(Integer isoId, Integer companyId) {
         return devProductListMapper.selectNotConfigByIsoId(isoId,companyId);
+    }
+
+    /**
+     * 查询公司所有的产品信息
+     * @return 结果
+     */
+    @Override
+    public List<DevProductList> selectProductAll() {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return devProductListMapper.selectProductAll(user.getCompanyId());
     }
 }

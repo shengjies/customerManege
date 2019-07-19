@@ -17,7 +17,35 @@ public class ApiWorkForm {
     private Integer workorderStatus; // 工单生产状态
     private String productCode;//产品编码
     private String productName;//产品名称
+    private Integer tag; // 车间或者流水线标记
+    /** 车间责任人信息id和名称 **/
+    private Integer userId;
+    private String userName;
     private int op =0;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Integer getTag() {
+        return tag;
+    }
+
+    public void setTag(Integer tag) {
+        this.tag = tag;
+    }
 
     public Integer getPerNum() {
         return perNum;

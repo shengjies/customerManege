@@ -3,7 +3,6 @@ package com.ruoyi.project.product.list.service;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -141,4 +140,10 @@ public interface IDevProductListService
 	 * @return 结果
 	 */
 	List<DevProductList> selectNotConfigByIsoId(Integer isoId, Integer companyId);
+
+	/**
+	 * 查询公司所有的产品信息
+	 * @return 结果
+	 */
+	List<DevProductList> selectProductAll();
 }

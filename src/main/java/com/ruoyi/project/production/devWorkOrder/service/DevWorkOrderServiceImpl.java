@@ -15,7 +15,6 @@ import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
-import com.ruoyi.project.production.countPiece.mapper.CountPieceMapper;
 import com.ruoyi.project.production.devWorkData.domain.DevWorkData;
 import com.ruoyi.project.production.devWorkData.mapper.DevWorkDataMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
@@ -101,12 +100,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private DevListMapper devListMapper;
 
-    @Autowired
-    private CountPieceMapper countPieceMapper;
-
-
     public String getWorkOrderCode() {
-        return CodeUtils.getWorkOrderCode(JwtUtil.getTokenUser(ServletUtils.getRequest()).getCompanyId());
+        return CodeUtils.getWorkOrderCode();
     }
 
     /**
@@ -299,8 +294,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     devWorkDataMapper.updateWorkSigInit(devWorkOrder.getId());
                     //计数时间
                     devWorkOrder.setSignHuor(devWorkOrder.getSignHuor() + TimeUtil.getDateDel(devWorkOrder.getSignTime(), new Date()));
-                } else if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_PAUSE)) {
+
                     //页面点击开始按钮继续工单生产
+                } else if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_PAUSE)) {
+                    // 计数状态标志重新标志位计数0
+                    devWorkOrder.setPbSign(WorkConstants.PB_SIGN_YES);
                     devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);
                     devWorkOrder.setUpdateBy(user.getUserName());
                     devWorkOrder.setSignTime(new Date());
@@ -357,6 +355,23 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
              * 车间
              */
         } else if (devWorkOrder.getWlSign().equals(WorkConstants.SING_SINGLE)) {
+            // 判断该工单配置的单工位是否存在正在进行的工单信息
+            List<SingleWorkOrder> singleWorkOrderList = singleWorkOrderMapper.selectSingleWorkByWorkIdAndPid(devWorkOrder.getLineId(), id);
+            DevWorkOrder order;
+            int failNum = 0;
+            StringBuilder failMsg = new StringBuilder();
+            failMsg.append("工单开始失败,原因如下:");
+            for (SingleWorkOrder singleWorkOrder : singleWorkOrderList) {
+                order = devWorkOrderMapper.selectWorkInHouseBeInBySingId(devWorkOrder.getCompanyId(), devWorkOrder.getLineId(), devWorkOrder.getWlSign(),
+                        singleWorkOrder.getSingleId(), WorkConstants.WORK_STATUS_STARTING);
+                if (StringUtils.isNotNull(order) && !order.getId().equals(id)) {
+                    failNum++;
+                    failMsg.append("<br/>"+ failNum+"、单工位"+singleWorkOrder.getImCode()+"存在未完成的工单，请先完成单工位工单或删除关联配置。");
+                }
+            }
+            if (failNum > 0) {
+                throw new BusinessException(failMsg.toString());
+            }
             // 车间工单正在进行中操作
             if (devWorkOrder.getWorkorderStatus().equals(WorkConstants.WORK_STATUS_STARTING)) {
                 if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_STARTING)) {
@@ -364,8 +379,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_PAUSE);
                     devWorkOrder.setUpdateTime(new Date());
                     devWorkOrder.setUpdateBy(user.getUserName());
-                } else {
+
                     // 点击开始，开始工单
+                } else {
+                    // 计数状态标志重新标志位计数0
+                    devWorkOrder.setPbSign(WorkConstants.PB_SIGN_YES);
                     devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);
                     devWorkOrder.setUpdateTime(new Date());
                     devWorkOrder.setUpdateBy(user.getUserName());
@@ -823,7 +841,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         }
         //查询产品
         DevProductList productList = productListMapper.selectDevProductByCode(u.getCompanyId(), order.getProductCode());
-        map.put("code", CodeUtils.getWorkOrderCode(u.getCompanyId()));
+        map.put("code", CodeUtils.getWorkOrderCode());
         map.put("num", num);
         map.put("product", productList);
         return map;
@@ -946,7 +964,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         DevProductList devProductList = null;
         WorkOrderChange change = null;
         for (DevWorkOrder order : orders) {
-            order.setWorkorderNumber(CodeUtils.getWorkOrderCode(u.getCompanyId()));
+            order.setWorkorderNumber(CodeUtils.getWorkOrderCode());
             try {
                 Thread.sleep(1100);
             } catch (Exception e) {
@@ -1066,14 +1084,14 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * 查询工单未配置的未确认数据的工单信息
      *
      * @param lineId    车间id
-     * @param workSign  工单确认数据标记
+     * @param workStatus  工单状态
      * @param wlSign    工单下到车间标记
      * @param singleId  单工位id
      * @param companyId 公司id
      * @return 结果过
      */
     @Override
-    public List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId, Integer workSign, Integer wlSign, Integer singleId, Integer companyId) {
-        return devWorkOrderMapper.selectAllNotConfigBySwId(lineId, workSign, wlSign, singleId, companyId);
+    public List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId, Integer workStatus, Integer wlSign, Integer singleId, Integer companyId) {
+        return devWorkOrderMapper.selectAllNotConfigBySwId(lineId, workStatus, wlSign, singleId, companyId);
     }
 }

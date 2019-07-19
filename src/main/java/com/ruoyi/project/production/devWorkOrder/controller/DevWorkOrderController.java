@@ -81,7 +81,7 @@ public class DevWorkOrderController extends BaseController {
      */
     @GetMapping("/add")
     public String add(ModelMap mmap,HttpServletRequest request) {
-        mmap.put("workorderNumber",CodeUtils.getWorkOrderCode(JwtUtil.getTokenUser(request).getCompanyId()));
+        mmap.put("workorderNumber",CodeUtils.getWorkOrderCode());
         return prefix + "/add";
     }
 
@@ -91,8 +91,8 @@ public class DevWorkOrderController extends BaseController {
      */
     @ResponseBody
     @PostMapping("/getWorkOrderCode")
-    public String getWorkOrderCode(HttpServletRequest request){
-        return CodeUtils.getWorkOrderCode(JwtUtil.getTokenUser(request).getCompanyId());
+    public String getWorkOrderCode(){
+        return CodeUtils.getWorkOrderCode();
     }
 
     /**

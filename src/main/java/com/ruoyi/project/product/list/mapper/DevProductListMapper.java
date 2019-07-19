@@ -164,4 +164,11 @@ public interface DevProductListMapper {
      * @return 结果
      */
     List<DevProductList> selectNotConfigByIsoId(@Param("isoId") Integer isoId,@Param("companyId") Integer companyId);
+
+    /**
+     * 查询公司的所有产品信息包括半成品
+     * @param companyId 公司id
+     * @return 结果
+     */
+    List<DevProductList> selectProductAll(@Param("companyId") Integer companyId);
 }

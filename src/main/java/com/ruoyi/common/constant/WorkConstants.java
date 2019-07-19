@@ -125,4 +125,8 @@ public class WorkConstants {
     public final static String LINE_NAME_UNIQUE = "0";
     public final static String LINE_NAME_NOT_UNIQUE = "1";
 
+    /** 开始暂停计数标记  0、需要计数，1、不需要计数 */
+    public final static Integer PB_SIGN_YES =0;
+    public final static Integer PB_SIGN_NO =1;
+
 }

@@ -268,7 +268,14 @@
      * 删除单工位配置
      */
     function remove(id) {
-        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息以及所有相关SOP配置吗？", function () {
+        var parentId = $("#parentId").val();
+        var msg = '';
+        if (parentId != 0) {
+            msg = '单工位信息以及所有相关配置吗?'
+        } else {
+            msg = '车间信息吗?';
+        }
+        $.modal.confirm("确定删除该条" + msg, function () {
             var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
             var data = {"ids": id};
             $.operate.submit(url, "post", "json", data);

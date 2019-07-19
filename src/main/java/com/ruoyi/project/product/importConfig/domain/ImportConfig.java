@@ -1,8 +1,7 @@
 package com.ruoyi.project.product.importConfig.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -31,7 +30,7 @@ public class ImportConfig extends BaseEntity
 	private Integer con4;
 	/** 备注信息 */
 	private Integer con5;
-	/** 配置类型 0、产品配置 1、半成品配置 */
+	/** 配置类型 0、产品配置 1、半成品配置 2、物料 */
 	private Integer cType;
 	/** 操作时间 */
 	private Date cTime;

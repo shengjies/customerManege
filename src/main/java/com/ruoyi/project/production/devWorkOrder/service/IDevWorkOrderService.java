@@ -179,11 +179,11 @@ public interface IDevWorkOrderService {
     /**
      * 查询工位未配置的工单信息
      * @param lineId 车间id
-     * @param workSign 工单确认标记
+     * @param workStatus 工单状态
      * @param wlSign 工单下到车间标记
      * @param singleId 单工位id
      * @param companyId 公司id
      * @return 结果
      */
-    List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId,Integer workSign, Integer wlSign, Integer singleId, Integer companyId);
+    List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId,Integer workStatus, Integer wlSign, Integer singleId, Integer companyId);
 }

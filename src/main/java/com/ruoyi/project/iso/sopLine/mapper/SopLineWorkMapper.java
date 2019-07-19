@@ -40,7 +40,7 @@ public interface SopLineWorkMapper {
      * @return
      */
     public int deleteSopLineWork(@Param("companyId") int companyId, @Param("lineId") int lineId,
-                                 @Param("sopId") int sopId);
+                                 @Param("sopId") int sopId,@Param("sopTag") int sopTag);
 
     /**
      * 根据公司id 产线id SOP id查询所以的工位配置信息

@@ -20,7 +20,7 @@
 				<label class="col-sm-3 control-label">产品编码：</label>
 				<div class="col-sm-8">
 					<select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
-						<option th:each="item : ${proList}"  th:text="${item.productCode}" th:value="${item.Id}"></option>
+						<!--<option th:each="item : ${proList}"  th:text="${item.productCode}" th:value="${item.Id}"></option>-->
 					</select>
 				</div>
 			</div>
@@ -117,35 +117,40 @@
         }
     }
 
+    var pages = [[${pages}]];
     /**
      * 产线选择改变
      * @param val
      */
     function lineChange(val) {
+    	var selectItem=[];
+    	var pnsItem = [];
         $("#add-sop-w-table-body").find("tr").remove();
+        $("#pnId").find("option").remove();
         var id = $(val).find("option:selected").val();
         if(id > 0){
             // 获取产线的所有的工位信息
             $.post("/production/workstation/findByLineId",{lineId:id,isoId:[[${isoId}]]},function (res) {
                 if(res.code == 0){
+					var proItem = res.data.proList;
+                	pnsItem.push('<option value="0">请选择</option>');
+					for(var z = 0;z<proItem.length;z++){
+						pnsItem.push('<option value='+ proItem[z].id+'>'+ proItem[z].productCode+'</option>');
+					}
+					$("#pnId").append(pnsItem);
+
+                	selectItem.push('<option value="0">请选择</option>')
+                	for(var j = 0;j<pages.length;j++){
+						selectItem.push('<option value='+ pages[j].isoId+'>'+ pages[j].cName+'</option>');
+					}
+
                     var workItem = res.data.work;
-                    var isoItem = res.data.isoList;
-                    var rows=[{id:0,text:'请选择'}];
                     for(var i =0;i<workItem.length;i++){
                         var workDetail = '<tr>' +
                             '<td data-w-id="'+ workItem[i].id+'">'+ workItem[i].wName+'</td>' +
-                            '<td><select style="width: 100%" class="form-control" name="wId">' +
-                            '</select></td>' +
+                            '<td><select style="width: 100%" class="form-control" name="wId">'+ selectItem +'</select></td>' +
                             '</tr>';
-                        var row ={
-                            id:isoItem[i].isoId,
-                            text:isoItem[i].cName
-                        }
-                        rows.push(row);
                         $("#add-sop-w-table-body").append(workDetail);
-                        $("#add-sop-w-table-body select").select2({
-                            data:rows
-                        });
                     }
                 }else{
                     $.modal.alertWarning("操作异常...")

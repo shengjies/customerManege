@@ -51,13 +51,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="wlSign"    column="wl_sign"    />
         <result property="makeType"    column="make_type"    />
         <result property="workPrice"    column="work_price"    />
+        <result property="pbSign"    column="pb_sign"    />
     </resultMap>
     <sql id="selectDevWorkOrderVo">
         select id, workorder_name, workorder_number, company_id, line_id, product_name, product_code, product_number, production_start,
          production_end, start_time, end_time, product_standard_hour, create_time, create_by, update_time, device_liable, update_by, people_number,
           working_hour, overtime_hour,overtime_race, manual_time, workorder_status, operation_status, init_date, work_sign, scrap_num,
           actual_warehouse_num,cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign,
-         put_into_number,sign_time,sign_huor,abolish,wl_sign,make_type,work_price from dev_work_order
+         put_into_number,sign_time,sign_huor,abolish,wl_sign,make_type,work_price,pb_sign from dev_work_order
     </sql>
 
     <select id="selectDevWorkOrderList" parameterType="DevWorkOrder" resultMap="DevWorkOrderResult">
@@ -156,6 +157,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="wlSign != null  ">wl_sign,</if>
             <if test="makeType != null  ">make_type,</if>
             <if test="workPrice != null  ">work_price,</if>
+            <if test="pbSign != null  ">pb_sign,</if>
             create_time
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -198,6 +200,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="wlSign != null  ">#{wlSign},</if>
             <if test="makeType != null  ">#{makeType},</if>
             <if test="workPrice != null  ">#{workPrice},</if>
+            <if test="pbSign != null  ">#{pbSign},</if>
             now()
          </trim>
     </insert>
@@ -247,6 +250,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="wlSign != null  ">wl_sign =#{wlSign},</if>
             <if test="makeType != null  ">make_type =#{makeType},</if>
             <if test="workPrice != null  ">work_price =#{workPrice},</if>
+            <if test="pbSign != null  ">pb_sign =#{pbSign},</if>
             update_time = sysdate()
         </trim>
         where id = #{id}
@@ -394,25 +398,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectAllNotConfigBySwId" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
         select a.id as id,a.workorder_number as workorderNumber from dev_work_order as a
         left join tab_single_work_order as b on a.id = b.work_id
-        and b.single_id = #{singleId} where a.company_id = #{companyId} and a.line_id = #{lineId} and a.work_sign = #{workSign}
+        and b.single_id = #{singleId} where a.company_id = #{companyId} and a.line_id = #{lineId} and a.workorder_status = #{workorderStatus}
         and a.wl_sign = #{wlSign} and b.work_id is null
     </select>
 
     <!--查询正在车间对应单工位生产的工单信息-->
-    <select id="selectWorkInHouseBeInBySingId" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
-        SELECT a.id as id,a.workorder_number as workorderNumber,operation_status as operationStatus,workorder_status as workorderStatus,
-        product_code as productCode,product_number as productNumber,product_name as productName,work_price as workPrice
-        FROM dev_work_order as a left join tab_single_work_order as b on a.id = b.work_id
-            where a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
-            and b.single_id = #{singleId} and a.workorder_status = #{workStatus} and b.work_id is not null
+    <select id="selectWorkInHouseBeInBySingId"  resultMap="DevWorkOrderResult">
+        SELECT w.* FROM dev_work_order as w,tab_single_work_order as wo where w.id = wo.work_id and w.line_id = #{lineId}
+        and w.wl_sign = #{wlSign} and w.company_id = #{companyId} and wo.single_id = #{singleId} and w.workorder_status = #{workStatus} limit 1
     </select>
 
     <!--查询车间对应工单对应工位的最后一条记录-->
-    <select id="selectWorkInHouseLastByWorkStatus" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
-        SELECT a.id as id,a.workorder_number as workorderNumber,operation_status as operationStatus,workorder_status as workorderStatus,
-        product_code as productCode,product_number as productNumber,product_name as productName
-        FROM dev_work_order as a left join tab_single_work_order as b on a.id = b.work_id
-            where a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
-            and b.single_id = #{singleId} and a.workorder_status = #{workStatus} order by end_time desc limit 1
+    <select id="selectWorkInHouseLastByWorkStatus"  resultMap="DevWorkOrderResult">
+        SELECT a.*  FROM dev_work_order as a,tab_single_work_order as b where a.id = b.work_id
+            and a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
+            and b.single_id = #{singleId} and a.workorder_status = #{workStatus} order by a.end_time desc limit 1
     </select>
 </mapper>

@@ -95,7 +95,9 @@ public class SopLineController extends BaseController {
         // 查询未配置该作业指导书的所有产线信息
         modelMap.put("lineList", lineService.selectLineNotConfigByIsoId(isoId, user.getCompanyId()));
         // 查询该公司的所有产品信息
-        modelMap.put("proList", productListService.selectProductAllByCompanyId(0));
+        // modelMap.put("proList", productListService.selectProductAllByCompanyId(0));
+        // 查询作业指导书的所有页信息
+        modelMap.put("pages",iIsoService.selectIsoByParentId(isoId));
         modelMap.put("isoId", isoId);
         return prefix + "/add";
     }
@@ -314,7 +316,7 @@ public class SopLineController extends BaseController {
         SingleWork singleWork = new SingleWork();
         singleWork.setSign(FileConstants.SIGN_HOUSE);
         modelMap.put("house",singleWorkService.selectSingleWorkList(singleWork));
-        modelMap.put("pns",productListService.selectProductAllByCompanyId(0));
+        modelMap.put("pns",productListService.selectProductAll());
         modelMap.put("pages", iIsoService.selectIsoByParentId(isoId));
         return prefix + "/addSingWork";
     }

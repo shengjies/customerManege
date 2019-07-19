@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.workstation.controller;
 
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -7,6 +8,7 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -37,6 +39,9 @@ public class WorkstationController extends BaseController
 
 	@Autowired
 	private IIsoService isoService;
+
+	@Autowired
+	private IDevProductListService productListService;
 
 
 	@GetMapping("/{id}")
@@ -137,8 +142,8 @@ public class WorkstationController extends BaseController
 	@ResponseBody
 	public AjaxResult findByLineId(Integer lineId,Integer isoId){
 		Map map = new HashMap<String,Object>();
+		map.put("proList", productListService.selectNotConfigByLineId(lineId, JwtUtil.getUser().getCompanyId(), FileConstants.SOP_TAG_LINE));
 		map.put("work",workstationService.selectAllByLineId(lineId));
-		map.put("isoList",isoService.selectIsoByParentId(isoId));
 		return AjaxResult.success(map);
 	}
 	

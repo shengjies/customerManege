@@ -109,7 +109,7 @@ public class SopLineServiceImpl implements ISopLineService {
                 //删除对应公司 对应产线 对应 SOP 配置信息
                 sopLineMapper.deleteSopLine(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId(),FileConstants.SOP_TAG_LINE);
                 //删除 工位配置
-                sopLineWorkMapper.deleteSopLineWork(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId());
+                sopLineWorkMapper.deleteSopLineWork(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId(),FileConstants.SOP_TAG_LINE);
                 //操作产线 SOP 工位配置
                 handleSop(sopLine);
             } else {
@@ -179,7 +179,7 @@ public class SopLineServiceImpl implements ISopLineService {
             sopLineMapper.deleteSopLine(companyId, lineId, sopId,FileConstants.SOP_TAG_LINE);
             //删除 工位配置
             if (sopTag == FileConstants.SOP_TAG_LINE) {
-                sopLineWorkMapper.deleteSopLineWork(companyId, lineId, sopId);
+                sopLineWorkMapper.deleteSopLineWork(companyId, lineId, sopId,sopTag);
             } else {
                 sopLineWorkMapper.deleteSopLineWorkByWId(companyId,lineId,sopId,sopTag);
             }

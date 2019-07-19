@@ -235,13 +235,13 @@ public interface DevWorkOrderMapper {
     /**
      * 查询单工位未配置的下到对应车间的未确认数据的工单信息
      * @param lineId 车间id
-     * @param workSign 工单确认数据标记
+     * @param workStatus 工单状态
      * @param wlSign 车间或者流水线标记
      * @param singleId 单工位id
      * @param companyId 公司id
      * @return 结果
      */
-    List<DevWorkOrder> selectAllNotConfigBySwId(@Param("lineId") Integer lineId, @Param("workSign") Integer workSign,
+    List<DevWorkOrder> selectAllNotConfigBySwId(@Param("lineId") Integer lineId, @Param("workorderStatus") Integer workStatus,
                                                 @Param("wlSign") Integer wlSign,@Param("singleId") Integer singleId,@Param("companyId") Integer companyId);
 
     /**

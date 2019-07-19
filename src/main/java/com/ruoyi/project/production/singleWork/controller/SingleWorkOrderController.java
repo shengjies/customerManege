@@ -1,6 +1,7 @@
 package com.ruoyi.project.production.singleWork.controller;
 
 import com.ruoyi.common.constant.WorkConstants;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -54,6 +55,15 @@ public class SingleWorkOrderController extends BaseController {
         modelMap.put("type", type);
         modelMap.put("orderId", orderId);
         modelMap.put("singleId", singleId);
+        DevWorkOrder workOrder = null;
+        if (orderId != 0) {
+            workOrder = workOrderService.selectDevWorkOrderById(orderId);
+        }
+        if (StringUtils.isNotNull(workOrder)) {
+            modelMap.put("workStatus", workOrder.getWorkorderStatus());
+        } else {
+            modelMap.put("workStatus", 0);
+        }
         return prefix + "/singleWorkOrder";
     }
 
@@ -85,8 +95,8 @@ public class SingleWorkOrderController extends BaseController {
             SingleWork singleWork = singleWorkService.selectSingleWorkById(singleId);
             List<DevWorkOrder> workOrders = null;
             if (singleWork != null) {
-                // 查询对应车间对应工位未配置的未提交数据的工单信息
-                workOrders = workOrderService.selectAllNotConfigBySwId(singleWork.getParentId(), WorkConstants.WORK_SIGN_NO,
+                // 查询对应车间还未开始的公安单信息
+                workOrders = workOrderService.selectAllNotConfigBySwId(singleWork.getParentId(), WorkConstants.WORK_STATUS_NOSTART,
                         WorkConstants.SING_SINGLE, singleId, JwtUtil.getUser().getCompanyId());
             }
             modelMap.put("works", workOrders);
@@ -132,7 +142,7 @@ public class SingleWorkOrderController extends BaseController {
             modelMap.put("singleId", singleId);
             // 车间id
             SingleWork singleWork = singleWorkService.selectSingleWorkById(singleId);
-            modelMap.put("works",  workOrderService.selectAllNotConfigBySwId(singleWork.getParentId(), WorkConstants.WORK_SIGN_NO,
+            modelMap.put("works",  workOrderService.selectAllNotConfigBySwId(singleWork.getParentId(), WorkConstants.WORK_STATUS_NOSTART,
                     WorkConstants.SING_SINGLE, singleId, JwtUtil.getUser().getCompanyId()));
             modelMap.put("singleP", singleWork.getParentId());
         }

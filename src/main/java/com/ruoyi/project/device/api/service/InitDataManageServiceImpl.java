@@ -23,13 +23,14 @@ import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
-import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
 import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
 import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
+import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,10 +72,11 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
     private SingleWorkMapper singleWorkMapper;
 
     @Autowired
-    private SingleWorkOrderMapper singleWorkOrderMapper;
+    private CountPieceMapper countPieceMapper;
 
     @Autowired
-    private CountPieceMapper countPieceMapper;
+    private UserMapper userMapper;
+
 
     /**
      * 拉取工单信息
@@ -91,12 +93,14 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             if (devList == null || devList.getCompanyId() == null) {
                 //硬件编码不存在
                 map.put("code", 3);
+                map.put("msg","硬件编码不存在");
                 map.put("data", null);
                 return map;
             }
             if (devList.getDevType() == null) {
-                // 硬件未配置车间或者产线
+                // 硬件未配置流水线工位或者车间单工位
                 map.put("code", 2);
+                map.put("msg","硬件未被配置");
                 map.put("data", null);
                 return map;
             }
@@ -121,16 +125,19 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 }
             }
             if (workForm == null) {
-                // 该硬件没有进行的工单信息
+                // 未找到流水线或者车间信息
                 map.put("code", 4);
+                map.put("msg","未找到流水线或者车间");
                 map.put("data", null);
                 return map;
             }
             map.put("code", 1);
+            map.put("msg","请求成功");
             map.put("data", workForm);
         } catch (Exception e) {
             e.printStackTrace();
             map.put("code", 0);
+            map.put("msg","系统异常");
             map.put("data", null);
         }
         return map;
@@ -149,16 +156,20 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             DevList devList = devListMapper.selectDevListByCode(data.getCode());
             if (devList == null || devList.getCompanyId() == null) {
                 map.put("code", 3);//硬件编码不存在
+                map.put("msg","硬件编码不存在");
                 map.put("status", 0);//没有正在进行的工单
                 map.put("num", 0);//没有正在进行的工单
+                map.put("tag", 0);//流水线标记
                 map.put("workCode", null);//工单编号为空
                 return map;
             }
             // 硬件未配置车间或者生产线
             if (devList.getDevType() == null) {
                 map.put("code", 4);
+                map.put("msg","硬件未被配置");
                 map.put("status", 0);
                 map.put("num", 0);
+                map.put("tag", 0);//流水线标记
                 map.put("workCode", null);
                 return map;
             }
@@ -171,8 +182,10 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 Workstation workstation = workstationMapper.selectInfoByDevice(devList.getId(), 0, 0);
                 if (workstation == null || workstation.getLineId() == null) {
                     map.put("code", 4);//硬件未配置产线
+                    map.put("msg","硬件未配置产线");
                     map.put("status", 0);//没有正在进行的工单
                     map.put("num", 0);//没有正在进行的工单
+                    map.put("tag", 0);//流水线标记
                     map.put("workCode", null);//工单编号为空
                     return map;
                 }
@@ -189,42 +202,18 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     devDataLog.setLineId(workstation.getLineId());
                     //查询正在进行工单
                     DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(devList.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
-                    if (workOrder != null && workOrder.getOperationStatus() == WorkConstants.OPERATION_STATUS_STARTING) {
-                        devDataLog.setWorkId(workOrder.getId());
-                        devDataLog.setIoId(workstation.getId());//设置工位id
-                        //查询对应日志上传数据数据
-                        DevDataLog log = devDataLogMapper.selectLineWorkDevIo(workstation.getLineId(), workOrder.getId(), devList.getId(), workstation.getId(), WorkConstants.SING_LINE);
-                        if (log != null) {
-                            devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
+                    // 存在工单并且需要计数
+                    if (workOrder != null && workOrder.getPbSign().equals(WorkConstants.PB_SIGN_YES)) {
+                        // 工单进行中
+                        if (workOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_STARTING)) {
+                            countNumData(data, devList, workstation, devDataLog, workOrder);
+
+                        // 工单已暂停
                         } else {
-                            devDataLog.setDelData(data.getD1());
+                            workOrder.setPbSign(WorkConstants.PB_SIGN_NO);
+                            countNumData(data, devList, workstation, devDataLog, workOrder);
                         }
-                        //对相关数据进行记录
-                        DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(devList.getCompanyId(), workstation.getLineId(), workOrder.getId(),
-                                devList.getId(), workstation.getId(), WorkConstants.SING_LINE);
-                        if (workData != null) {
-                            // 生产标记为流水线生产
-                            workData.setScType(WorkConstants.SING_LINE);
-                            workData.setIoSign(workstation.getSign());//标记数据 为报表数据
-                            //记录累计产量
-                            devWorkDataMapper.saveTotalWorkData(workData.getDataId(), data.getD1(), workData.getIoSign());
-                            workOrder.setCumulativeNumber(data.getD1());
-                            devWorkOrderMapper.updateDevWorkOrder(workOrder);
-                        } else {
-                            workData = new DevWorkData();
-                            // 生产标记为流水线生产
-                            workData.setScType(WorkConstants.SING_LINE);
-                            workData.setIoSign(workstation.getSign());
-                            workData.setDevName(devListMapper.selectDevListById(devList.getId()).getDeviceName());
-                            workData.setCompanyId(workstation.getCompanyId());
-                            workData.setLineId(workstation.getLineId());
-                            workData.setWorkId(workOrder.getId());
-                            workData.setDevId(devList.getId());
-                            workData.setIoId(workstation.getId());
-                            workData.setCumulativeNum(data.getD1());
-                            workData.setCreateTime(new Date());
-                            devWorkDataMapper.insertDevWorkData(workData);
-                        }
+
                     } else if (workOrder == null) {
                         //查询最近完成工单信息
                         workOrder = devWorkOrderMapper.selectLatelyCompleteWork(devList.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
@@ -238,6 +227,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                                 //记录累计产量
                                 devWorkDataMapper.saveTotalWorkData(workData.getDataId(), data.getD1(), workData.getIoSign());
                                 workOrder.setCumulativeNumber(data.getD1());
+                                workOrder.setSign(0);
                                 devWorkOrderMapper.updateDevWorkOrder(workOrder);
                             }
                             //查询对应日志上传数据数据
@@ -252,8 +242,10 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     devDataLogMapper.insertDevDataLog(devDataLog);
                 }
                 map.put("code", 1);//成功
+                map.put("msg","没有正在进行的工单");
                 map.put("status", 0);//没有正在进行的工单
                 map.put("num", 0);//没有正在进行的工单
+                map.put("tag", 0);//流水线标记
                 map.put("workCode", null);//工单编号为空
                 DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(devList.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
                 if (workOrder != null) {
@@ -261,6 +253,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(workstation.getCompanyId(), workstation.getLineId(),
                             workOrder.getId(), devList.getId(), workstation.getId(), WorkConstants.SING_LINE);
                     if (workData != null && workData.getCumulativeNum() != null) {
+                        map.put("msg","工单生产状态进行中");
                         map.put("num", workData.getCumulativeNum());//没有正在进行的工单
                         map.put("status", workOrder.getOperationStatus());//工单正在进行
                         map.put("workCode", workOrder.getWorkorderNumber());//工单编号为空
@@ -276,10 +269,13 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 if (StringUtils.isNull(singleWork) || singleWork.getParentId() == null) {
                     //硬件未被单工位配置
                     map.put("code", 4);
+                    map.put("msg","硬件未被单工位配置");
                     //没有正在进行的工单
                     map.put("status", 0);
-                    //没有正在进行的工单
+                    //工单累计
                     map.put("num", 0);
+                    map.put("perNum", 0);//个人计件
+                    map.put("tag", 1);//车间标记
                     //工单编号为空
                     map.put("workCode", null);
                     return map;
@@ -298,70 +294,20 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     // 查询正在车间生产对应单工位的工单信息
                     DevWorkOrder workOrder = devWorkOrderMapper.selectWorkInHouseBeInBySingId(devList.getCompanyId(), house.getId(), WorkConstants.SING_SINGLE,
                             singleWork.getId(), WorkConstants.WORK_STATUS_STARTING);
-                    // 存在进行中的工单信息
-                    if (workOrder != null && workOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_STARTING)) {
-                        /**
-                         * 统计个人计件
-                         */
+                    // 存在进行中的需要计数的工单信息
+                    if (workOrder != null && workOrder.getPbSign() != null && workOrder.getPbSign().equals(WorkConstants.PB_SIGN_YES)) {
 
-                        //查询对应日志上传数据数据
-                        DevDataLog log = devDataLogMapper.selectLineWorkDevIo(house.getId(), workOrder.getId(), devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
-                        if (log != null) {
-                            devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
-                            if ((devDataLog.getDataTotal() - log.getDataTotal()) > 0) {
-                                // 个人计件统计
-                                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
-                                devDataLog.setWorkId(workOrder.getId());
-                                devDataLog.setIoId(singleWork.getId());
-                                countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
-                                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
-                                countPieceMapper.updateCountPiece(countPiece);
-                            }
-                            // 个人计件统计
+                        // 工单进行中
+                        if (workOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_STARTING)) {
+                            countSingWorkNum(data, devList, singleWork, house, devDataLog, workOrder);
+
+                            // 工单暂停
                         } else {
-                            devDataLog.setDelData(data.getD1());
-                            if (data.getD1() > 0) {
-                                // 个人计件统计
-                                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
-                                devDataLog.setWorkId(workOrder.getId());
-                                devDataLog.setIoId(singleWork.getId());
-                                countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
-                                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
-                                countPieceMapper.updateCountPiece(countPiece);
-                            }
+                            workOrder.setPbSign(WorkConstants.PB_SIGN_NO);
+                            //查询对应日志上传数据数据
+                            countSingWorkNum(data, devList, singleWork, house, devDataLog, workOrder);
                         }
 
-                        //对相关数据进行记录
-                        DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(devList.getCompanyId(), house.getId(), workOrder.getId(),
-                                devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
-
-                        if (workData != null) {
-                            // 生产标记为车间生产
-                            workData.setScType(WorkConstants.SING_SINGLE);
-                            //记录累计产量
-                            devWorkDataMapper.saveTotalWorkData(workData.getDataId(), data.getD1(), workData.getIoSign());
-
-                            //查询对应车间已生成的总数
-                            DevWorkOrder workActNum = devWorkDataMapper.selectHouseWorkDataActualNum(devList.getCompanyId(), house.getId(), workOrder.getId(), WorkConstants.SING_SINGLE);
-                            if (workActNum != null && workActNum.getCumulativeNumber() != null) {
-                                // 设置工单累计产量
-                                workOrder.setCumulativeNumber(workActNum.getCumulativeNumber());
-                                devWorkOrderMapper.updateDevWorkOrder(workOrder);
-                            }
-                        } else {
-                            workData = new DevWorkData();
-                            // 生产标记未车间
-                            workData.setScType(WorkConstants.SING_SINGLE);
-                            workData.setCompanyId(devList.getCompanyId());
-                            workData.setLineId(house.getId());
-                            workData.setWorkId(workOrder.getId());
-                            workData.setDevId(devList.getId());
-                            workData.setDevName(devListMapper.selectDevListById(devList.getId()).getDeviceName());
-                            workData.setIoId(singleWork.getId());
-                            workData.setCumulativeNum(data.getD1());
-                            workData.setCreateTime(new Date());
-                            devWorkDataMapper.insertDevWorkData(workData);
-                        }
                         // 工单为空
                     } else if (workOrder == null) {
                         //查询车间对应最近完成工单信息
@@ -377,6 +323,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                                 //记录累计产量
                                 devWorkDataMapper.saveTotalWorkData(workData.getDataId(), data.getD1(), workData.getIoSign());
                                 workOrder.setCumulativeNumber(data.getD1());
+                                workOrder.setSign(0);
                                 devWorkOrderMapper.updateDevWorkOrder(workOrder);
                             }
                             //查询对应日志上传数据数据
@@ -397,12 +344,16 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     devDataLogMapper.insertDevDataLog(devDataLog);
                 }
                 map.put("code", 1);//成功
+                map.put("msg","没有正在进行的工单");
                 map.put("status", 0);//没有正在进行的工单
+                map.put("tag", 1);//车间标记
+                map.put("perNum", 0);//个人计件
                 map.put("num", 0);//没有正在进行的工单
                 map.put("workCode", null);//工单编号为空
                 DevWorkOrder workOrder = devWorkOrderMapper.selectWorkInHouseBeInBySingId(devList.getCompanyId(), singleWork.getParentId(), WorkConstants.SING_SINGLE,
                         singleWork.getId(), WorkConstants.WORK_STATUS_STARTING);
                 if (workOrder != null) {
+                    map.put("msg","工单生产状态进行中");
                     //查询对应工位的个人累计数量
                     CountPiece countPiece = countPieceMapper.selectPieceByWorkIdAndUid(workOrder.getId(), devList.getCompanyId(), singleWork.getLiableOne(), TimeUtil.getNYR());
                     if (countPiece != null) {
@@ -422,11 +373,117 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
         } catch (Exception e) {
             e.printStackTrace();
             map.put("code", 0);//异常错误
+            map.put("msg","系统异常");
             map.put("status", 0);//没有正在进行的工单
-            map.put("num", 0);//没有正在进行的工单
+            map.put("perNum", 0);//个人计件
+            map.put("num", 0);//工单累计
+            map.put("tag", 1);//车间标记
             map.put("workCode", null);//工单编号为空
         }
         return map;
+    }
+
+    /**
+     * 单工位统计计数
+     */
+    private void countSingWorkNum(WorkDataForm data, DevList devList, SingleWork singleWork, SingleWork house, DevDataLog devDataLog, DevWorkOrder workOrder) {
+        //查询对应日志上传数据数据
+        DevDataLog log = devDataLogMapper.selectLineWorkDevIo(house.getId(), workOrder.getId(), devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
+        if (log != null) {
+            devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
+            if ((devDataLog.getDataTotal() - log.getDataTotal()) > 0) {
+                // 个人计件统计
+                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
+                devDataLog.setWorkId(workOrder.getId());
+                devDataLog.setIoId(singleWork.getId());
+                countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
+                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+                countPieceMapper.updateCountPiece(countPiece);
+            }
+            // 个人计件统计
+        } else {
+            devDataLog.setDelData(data.getD1());
+            if (data.getD1() > 0) {
+                // 个人计件统计
+                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
+                devDataLog.setWorkId(workOrder.getId());
+                devDataLog.setIoId(singleWork.getId());
+                countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
+                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+                countPieceMapper.updateCountPiece(countPiece);
+            }
+        }
+        //对相关数据进行记录
+        DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(devList.getCompanyId(), house.getId(), workOrder.getId(),
+                devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
+        if (workData != null) {
+            // 生产标记为车间生产
+            workData.setScType(WorkConstants.SING_SINGLE);
+            //记录累计产量
+            devWorkDataMapper.saveTotalWorkData(workData.getDataId(), data.getD1(), workData.getIoSign());
+
+            //查询对应车间已生产的总数
+            DevWorkOrder workActNum = devWorkDataMapper.selectHouseWorkDataActualNum(devList.getCompanyId(), house.getId(), workOrder.getId(), WorkConstants.SING_SINGLE);
+            if (workActNum != null && workActNum.getCumulativeNumber() != null) {
+                // 设置工单累计产量
+                workOrder.setCumulativeNumber(workActNum.getCumulativeNumber());
+                devWorkOrderMapper.updateDevWorkOrder(workOrder);
+            }
+        } else {
+            workData = new DevWorkData();
+            // 生产标记未车间
+            workData.setScType(WorkConstants.SING_SINGLE);
+            workData.setCompanyId(devList.getCompanyId());
+            workData.setLineId(house.getId());
+            workData.setWorkId(workOrder.getId());
+            workData.setDevId(devList.getId());
+            workData.setDevName(devListMapper.selectDevListById(devList.getId()).getDeviceName());
+            workData.setIoId(singleWork.getId());
+            workData.setCumulativeNum(data.getD1());
+            workData.setCreateTime(new Date());
+            devWorkDataMapper.insertDevWorkData(workData);
+        }
+    }
+
+    /**
+     * 流水线工单计数
+     */
+    private void countNumData(WorkDataForm data, DevList devList, Workstation workstation, DevDataLog devDataLog, DevWorkOrder workOrder) {
+        devDataLog.setWorkId(workOrder.getId());
+        devDataLog.setIoId(workstation.getId());//设置工位id
+        //查询对应日志上传数据数据
+        DevDataLog log = devDataLogMapper.selectLineWorkDevIo(workstation.getLineId(), workOrder.getId(), devList.getId(), workstation.getId(), WorkConstants.SING_LINE);
+        if (log != null) {
+            devDataLog.setDelData(devDataLog.getDataTotal() - log.getDataTotal());
+        } else {
+            devDataLog.setDelData(data.getD1());
+        }
+        //对相关数据进行记录
+        DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(devList.getCompanyId(), workstation.getLineId(), workOrder.getId(),
+                devList.getId(), workstation.getId(), WorkConstants.SING_LINE);
+        if (workData != null) {
+            // 生产标记为流水线生产
+            workData.setScType(WorkConstants.SING_LINE);
+            workData.setIoSign(workstation.getSign());//标记数据 为报表数据
+            //记录累计产量
+            devWorkDataMapper.saveTotalWorkData(workData.getDataId(), data.getD1(), workData.getIoSign());
+            workOrder.setCumulativeNumber(data.getD1());
+            devWorkOrderMapper.updateDevWorkOrder(workOrder);
+        } else {
+            workData = new DevWorkData();
+            // 生产标记为流水线生产
+            workData.setScType(WorkConstants.SING_LINE);
+            workData.setIoSign(workstation.getSign());
+            workData.setDevName(devListMapper.selectDevListById(devList.getId()).getDeviceName());
+            workData.setCompanyId(workstation.getCompanyId());
+            workData.setLineId(workstation.getLineId());
+            workData.setWorkId(workOrder.getId());
+            workData.setDevId(devList.getId());
+            workData.setIoId(workstation.getId());
+            workData.setCumulativeNum(data.getD1());
+            workData.setCreateTime(new Date());
+            devWorkDataMapper.insertDevWorkData(workData);
+        }
     }
 
 
@@ -444,11 +501,13 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             DevList devList = devListMapper.selectDevListByCode(code);
             if (devList == null || devList.getCompanyId() == null) {
                 map.put("code", 3);//硬件编码不存在
+                map.put("msg","硬件编码不存在");
                 map.put("status", 0);//上报失败
                 return map;
             }
             if (devList.getDevType() == null) {
                 map.put("code", 4);//硬件未配置流水线或者车间
+                map.put("msg","硬件未被配置");
                 map.put("status", 0);//上报失败
                 return map;
             }
@@ -460,12 +519,14 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 Workstation workstation = workstationMapper.selectInfoByDevice(devList.getId(), 0, 0);
                 if (workstation == null || workstation.getLineId() == null) {
                     map.put("code", 4);//硬件未配置产线
+                    map.put("msg","硬件未被配置");
                     map.put("status", 0);//上报失败
                     return map;
                 }
                 ApiWorkForm workForm = findLineAndWork(devList, workstation, null);
                 if (workForm == null || workForm.getWorkId() == null) {
                     map.put("code", 2);//不存在对应工单信息
+                    map.put("msg","不存在对应工单信息");
                     map.put("status", 0);//上报失败
                     return map;
                 }
@@ -489,6 +550,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 exceptionList.setCreateTime(new Date());
                 workExceptionListMapper.insertWorkExceptionList(exceptionList);
                 map.put("code", 1);//创建成功
+                map.put("msg","上报成功");
                 map.put("status", 1);//上报成功
 
 
@@ -499,13 +561,15 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 // 查询对应硬件车间单工位信息
                 SingleWork singleWork = singleWorkMapper.selectSingleWorkByCode(devList.getId(), 0, 0);
                 if (singleWork == null) {
-                    map.put("code", 4);//硬件未配置产线
+                    map.put("code", 4);//硬件未配置车间
+                    map.put("msg","硬件未被配置");
                     map.put("status", 0);//上报失败
                     return map;
                 }
                 ApiWorkForm workForm = findLineAndWork(devList, null, singleWork);
                 if (workForm == null || workForm.getWorkId() == null) {
                     map.put("code", 2);//不存在对应工单信息
+                    map.put("msg","不存在对应工单信息");
                     map.put("status", 0);//上报失败
                     return map;
                 }
@@ -529,6 +593,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 exceptionList.setCreateTime(new Date());
                 workExceptionListMapper.insertWorkExceptionList(exceptionList);
                 map.put("code", 1);//创建成功
+                map.put("msg","上报成功");
                 map.put("status", 1);//上报成功
 
             }
@@ -536,6 +601,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
         } catch (Exception e) {
             // e.printStackTrace();
             map.put("code", 0);//异常错误
+            map.put("msg","异常错误");
             map.put("status", 0);//上报失败
         }
         return map;
@@ -563,15 +629,17 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
         workForm.setCompanyName(devCompany.getComName());
         //查询对应产线正在进行的工单信息
         DevWorkOrder workOrder = null;
-        //查询对应的产线信息
-        ProductionLine line = null;
         if (workstation != null) {
+            //查询对应的产线信息
+            ProductionLine line = null;
             line = productionLineMapper.selectProductionLineById(workstation.getLineId());
             if (line == null) return null;
+            workForm.setTag(WorkConstants.SING_LINE); // 流水线
             workForm.setLineName(line.getLineName() + "-" + workstation.getwName());
             workForm.setLineId(line.getId());
             workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(devCompany.getCompanyId(), line.getId(), WorkConstants.SING_LINE);
             //设置工单默认状态
+            workForm.setPerNum(0);
             workForm.setWorkorderStatus(0);
             workForm.setActualNum(0);
             if (workOrder != null) {
@@ -581,13 +649,21 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 if (workData != null) {
                     workForm.setActualNum(workData.getCumulativeNum());
                 }
-
             }
 
+            /**
+             * 车间
+             */
         } else if (singleWork != null) {
             //查询对应的车间信息
             SingleWork work = singleWorkMapper.selectSingleWorkById(singleWork.getParentId());
             if (work == null) return null;
+            User user = userMapper.selectUserInfoById(singleWork.getLiableOne());
+            if (user != null) {
+                workForm.setUserId(user.getUserId().intValue());
+                workForm.setUserName(user.getUserName());
+            }
+            workForm.setTag(WorkConstants.SING_SINGLE); // 车间
             workForm.setLineName(work.getWorkshopName() + "-" + singleWork.getImCode());
             workForm.setLineId(work.getId());
             workOrder = devWorkOrderMapper.selectWorkInHouseBeInBySingId(devList.getCompanyId(), singleWork.getParentId(), WorkConstants.SING_SINGLE,

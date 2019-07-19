@@ -142,10 +142,13 @@ public class PageStandard {
         if(startHour > date){
             return 0;
         }
+
         if(startHour == date){
+            int nowDay = TimeUtil.getHour(new Date());
             //实时计算
-            float val = TimeUtil.getDateDel(this.getDevWorkOrder().getStartTime(),TimeUtil.getEndHour(this.getDevWorkOrder().getStartTime()));
-            return (int) (this.getDevWorkOrder().getProductStandardHour() *val);
+            float val = TimeUtil.getDateDel(this.getDevWorkOrder().getStartTime(),nowDay == startHour?new Date():TimeUtil.getEndHour(this.getDevWorkOrder().getStartTime()));
+            int a = (int) (this.getDevWorkOrder().getProductStandardHour() *val);
+            return a;
         }
         //获取当前系统小时数
         int hour = TimeUtil.getHour(new Date());

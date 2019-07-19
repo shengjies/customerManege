@@ -501,6 +501,9 @@ ALTER TABLE `octopus`.`dev_product_list`
 ADD COLUMN `sign` INT NULL DEFAULT 0 COMMENT '标记 0、产品 1、半成品' AFTER `ecn_text`,
 ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '单位' AFTER `sign`;
 
+# 2019-07-17 zqm 服务器未执行sql 工单添加暂停开始计数标志
+ALTER TABLE `octopus`.`dev_work_order`
+ADD COLUMN `pb_sign` INT NULL DEFAULT 0 COMMENT '暂停开始最后一次计数标志(默认值0、需要计数，1、不需要计数)' AFTER `work_price`;
 
 
  ###############################平台修改sql#####################################2019-07-13
@@ -511,6 +514,8 @@ ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '单位' AFTER `sign`;
  ADD COLUMN `devCode` VARCHAR(45) NULL COMMENT '设备号' AFTER `devType`,
  ADD COLUMN `grade` INT NULL DEFAULT 1 COMMENT '用户等级' AFTER `devCode`,
  ADD COLUMN `sign` INT NULL DEFAULT 0 AFTER `grade`;
+
+
 
 
 

@@ -8,7 +8,7 @@
         <input id="parentId" name="parentId" th:field="*{parentId}" type="hidden">
         <input id="id" name="id" th:field="*{id}"  type="hidden">
         <div class="form-group">
-            <label class="col-sm-3 control-label">设备责任人：</label>
+            <label class="col-sm-3 control-label">单工位责任人：</label>
             <div class="col-sm-8">
                 <select style="width: 100%"  id="liableOne" name="liableOne" class="form-control"
                         th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
@@ -53,6 +53,11 @@
 
     function submitHandler() {
         if ($.validate.form()) {
+            var liableOne = $("#liableOne").find('option:selected').val();
+            if (liableOne <= 0) {
+                $.modal.alertWarning("请选择单工位责任人");
+                return;
+            }
             $.operate.save(prefix + "/edit", $('#form-singleWork-edit').serialize());
         }
     }

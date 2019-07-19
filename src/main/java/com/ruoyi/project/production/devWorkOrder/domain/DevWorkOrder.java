@@ -194,6 +194,16 @@ public class DevWorkOrder extends BaseEntity {
     private Float workPrice;
 
     private Integer single;//用于查询车间
+    /** 暂停开始计数标志(0、默认值需要计数，1、不需要计数) */
+    private Integer pbSign;
+
+    public Integer getPbSign() {
+        return pbSign;
+    }
+
+    public void setPbSign(Integer pbSign) {
+        this.pbSign = pbSign;
+    }
 
     public Integer getSingle() {
         return single;

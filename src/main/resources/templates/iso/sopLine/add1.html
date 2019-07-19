@@ -90,6 +90,7 @@
                 var work ={
                     lineId:[[${line}]],
                     sopId:id,
+                    sopTag:0,
                     wId:$(this).find("td").attr("data-w-id"),
                     pageId:$(this).find("td").find("select[name='wId'] option:selected").val()
                 }
@@ -99,6 +100,7 @@
                 lineId:[[${line}]],
                 sopId:id,
                 pns:pns,
+                sopTag:0,
                 sopLineWorks:sopLineWorks
             }
             var config = {
