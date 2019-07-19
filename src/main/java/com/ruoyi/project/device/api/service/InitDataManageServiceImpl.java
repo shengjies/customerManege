@@ -399,6 +399,13 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
                 countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
                 countPieceMapper.updateCountPiece(countPiece);
+            } else if (data.getD1() > 0){
+                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
+                devDataLog.setWorkId(workOrder.getId());
+                devDataLog.setIoId(singleWork.getId());
+                countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
+                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+                countPieceMapper.updateCountPiece(countPiece);
             }
             // 个人计件统计
         } else {
@@ -431,7 +438,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             }
         } else {
             workData = new DevWorkData();
-            // 生产标记未车间
+            // 生产标记为车间
             workData.setScType(WorkConstants.SING_SINGLE);
             workData.setCompanyId(devList.getCompanyId());
             workData.setLineId(house.getId());
