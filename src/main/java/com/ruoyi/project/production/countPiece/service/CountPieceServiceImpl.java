@@ -94,7 +94,7 @@ public class CountPieceServiceImpl implements ICountPieceService {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
         CountPiece pieceById = countPieceMapper.selectCountPieceById(countPiece.getCpId());
-        if (!pieceById.getCpBadNumber().equals(countPiece.getCpBadNumber()) && !pieceById.getCpRemark().equals(countPiece.getCpRemark())) {
+        if (!pieceById.getCpBadNumber().equals(countPiece.getCpBadNumber())) {
             Integer cpBadNumber = countPiece.getCpBadNumber() < 0 ? 0 : countPiece.getCpBadNumber();
             countPiece.setTotalPrice((countPiece.getCpNumber() - cpBadNumber) * countPiece.getWorkPrice());
             countPiece.setCpLastUpdate(new Date());

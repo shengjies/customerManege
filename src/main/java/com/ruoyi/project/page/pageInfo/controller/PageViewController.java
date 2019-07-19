@@ -66,11 +66,11 @@ public class PageViewController {
     public Map<String,Object> apiGetSop(@PathVariable("code")String code){
         Map<String,Object> map =new HashMap<>();
         try {
-            map.put("status",1);
+            map.put("code",1);
             map.put("data",iIsoService.selectSopByDevCode(code).get("data"));
-            map.put("msg","");
+            map.put("msg","请求成功");
         }catch (Exception e){
-            map.put("status",0);
+            map.put("code",0);
             map.put("data",null);
             map.put("msg",e.getMessage());
         }

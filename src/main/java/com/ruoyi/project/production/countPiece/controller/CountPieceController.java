@@ -43,7 +43,7 @@ public class CountPieceController extends BaseController {
     /**
      * 我的计件
      */
-    @RequiresPermissions("production:countPiece:myList")
+    @RequiresPermissions("production:countPiece:list")
     @GetMapping("/myCountPiece")
     public String myCountPiece(ModelMap mmap) {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
