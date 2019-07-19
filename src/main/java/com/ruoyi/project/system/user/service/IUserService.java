@@ -1,6 +1,7 @@
 package com.ruoyi.project.system.user.service;
 
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.domain.UserQrCode;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -176,5 +177,12 @@ public interface IUserService
      * @return
      */
     public int changeLoginTag(User user,HttpServletRequest request);
+
+    /**
+     * 查询用户二维码
+     * @param user 用户信息
+     * @return
+     */
+    List<UserQrCode> selectUserQrCode(User user);
 
 }

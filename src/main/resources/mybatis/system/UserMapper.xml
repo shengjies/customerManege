@@ -285,7 +285,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!--查询对应公司所以的员工信息-->
 	<select id="selectComAllUser" resultType="com.ruoyi.project.system.user.domain.User">
-		SELECT user_id as userId,user_name as userName,login_name as loginName FROM
+		SELECT user_id as userId,user_name as userName,login_name as  loginName FROM
 		sys_user where del_flag = 0 and tag =0 and company_id = #{comid};
 	</select>
 
@@ -298,4 +298,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<update id="updateUserDelFlag">
 		update sys_user set del_flag =0,company_id =#{companyId} where user_id = #{id}
 	</update>
-</mapper> 
+
+	<!--查询用户二维码信息-->
+	<select id="selectUserQrCode" resultType="com.ruoyi.project.system.user.domain.UserQrCode">
+			SELECT user_id as id,user_name as userName FROM sys_user
+		where del_flag = '0' AND tag = '0' and company_id = #{companyId}
+		<if test="loginName != null and loginName != ''">
+			AND login_name like concat('%', #{loginName}, '%')
+		</if>
+		<if test="userName != null and userName != ''">
+			AND user_name like concat('%', #{userName}, '%')
+		</if>
+
+		<if test="status != null and status != ''">
+			AND status = #{status}
+		</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+</mapper>

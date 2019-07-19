@@ -150,6 +150,7 @@ public class PageStandard {
             int a = (int) (this.getDevWorkOrder().getProductStandardHour() *val);
             return a;
         }
+        //标记时间是否与当前系统
         //获取当前系统小时数
         int hour = TimeUtil.getHour(new Date());
         if(hour == date){

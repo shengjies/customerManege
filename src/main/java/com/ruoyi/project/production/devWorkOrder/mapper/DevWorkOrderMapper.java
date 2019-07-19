@@ -127,6 +127,25 @@ public interface DevWorkOrderMapper {
                                                  @Param("endTime") String endTime,
                                                  @Param("wlSign")int wlSign);
 
+    /**
+     * 根据用户查询对应的工单信息
+     * @param company_id 公司id
+     * @param productCode 产品/半成品
+     * @param line_id //车间id
+     * @param startTime //开始时间
+     * @param endTime //结束时间
+     * @param wlSign//工单标记  1
+     * @param userId //员工id
+     * @return
+     */
+    List<DevWorkOrder> selectOrderBySingleIsSubmit(@Param("company_id") int company_id,
+                                                   @Param("productCode")String productCode,
+                                                   @Param("line_id") int line_id,
+                                                   @Param("startTime") String startTime,
+                                                   @Param("endTime") String endTime,
+                                                   @Param("wlSign")int wlSign,
+                                                   @Param("userId")int userId);
+
 
     /**
      * 查询昨天生产的工单

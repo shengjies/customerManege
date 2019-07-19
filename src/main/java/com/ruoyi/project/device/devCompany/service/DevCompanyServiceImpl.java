@@ -78,16 +78,16 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
      */
     @Override
     public int updateDevCompany(DevCompany devCompany, HttpServletRequest request) {
-        devCompany.setCreateTime(null);
-        CompanyApi companyApi = Feign.builder()
-                .encoder(new GsonEncoder())
-                .decoder(new GsonDecoder())
-                .target(CompanyApi.class, FeignUtils.MAIN_PATH);
-        HashMap<String, Object> result = companyApi.editCompanyInfo(devCompany, JwtUtil.getToken(request));
-        if (Double.valueOf(result.get("code").toString()) == 0) {
+//        devCompany.setCreateTime(null);
+//        CompanyApi companyApi = Feign.builder()
+//                .encoder(new GsonEncoder())
+//                .decoder(new GsonDecoder())
+//                .target(CompanyApi.class, FeignUtils.MAIN_PATH);
+//        HashMap<String, Object> result = companyApi.editCompanyInfo(devCompany, JwtUtil.getToken(request));
+//        if (Double.valueOf(result.get("code").toString()) == 0) {
             return devCompanyMapper.updateDevCompany(devCompany);
-        }
-        return 0;
+//        }
+//        return 0;
     }
 
     /**

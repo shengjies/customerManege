@@ -25,6 +25,7 @@ import com.ruoyi.project.system.role.domain.Role;
 import com.ruoyi.project.system.role.mapper.RoleMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.domain.UserPost;
+import com.ruoyi.project.system.user.domain.UserQrCode;
 import com.ruoyi.project.system.user.domain.UserRole;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import com.ruoyi.project.system.user.mapper.UserPostMapper;
@@ -639,5 +640,15 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User getSysUser(Cookie[] cookies) {
         return JwtUtil.getTokenCookie(cookies);
+    }
+
+    /**
+     * 查询用户二维码
+     * @param user 用户信息
+     * @return
+     */
+    @Override
+    public List<UserQrCode> selectUserQrCode(User user) {
+        return userMapper.selectUserQrCode(user);
     }
 }

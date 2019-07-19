@@ -14,13 +14,18 @@ import com.ruoyi.common.utils.poi.PdfUtil;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
+import com.ruoyi.project.production.countPiece.domain.CountPiece;
+import com.ruoyi.project.production.countPiece.mapper.CountPieceMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
+import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.mapper.UserMapper;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +48,6 @@ public class ReportServiceImpl implements IReportService {
     private boolean isColor = false;
 
     @Autowired
-    private ResourceLoader resourceLoader;
-
-    @Autowired
     private ProductionLineMapper productionLineMapper;
 
     @Autowired
@@ -57,130 +59,15 @@ public class ReportServiceImpl implements IReportService {
     @Autowired
     private WorkExceptionListMapper workExceptionListMapper;
 
-    @Override
-    public int exportReport(int lineId, String productCode,String startTime, String endTime,
-                            HttpServletResponse response, HttpServletRequest request) {
-        User user = JwtUtil.getTokenUser(request);
-        String path = "/test_A4.jrxml";
-        String pdfName = "全局";
-        Map<String,Object> param = new HashMap<>();
-        param.put("company_name","xxx");
-        param.put("line","xxx");
-        param.put("startTime",startTime);
-        param.put("endTime", startTime);
-        int totalActualNum =0;//总入库数量
-        int totalScrapNum =0;//总报废数量
-        float totalStandardHour =0F;//标准总工时
-        float totalHour =0F;//实际总工时
-        float totalProduct=0F;//生产总工时
-        float totalReachRate = 0F;//总平均达成率
-        float reachRateNum = 0F;//总达成率
-        float ztRate = 0F;//总直通率
-        float pjztRate = 0F;//平均直通率
-        int totalInput =0;//总投入数量
-        float totalZcHour = 0F;//正常总工时
-        float totalWork1 = 0F;//1.5
-        float totalWork2 = 0F;//2
-        float totalWork3 = 0F;//3
-        int totalCumulativeNumber = 0;//总累计产量
-        StringBuffer sb = new StringBuffer();
-        if(user != null){
-            //查询对应的公司名称
-            DevCompany company = devCompanyMapper.selectDevCompanyById(user.getCompanyId());
-            if(company != null){
-                param.put("company_name",company.getComName());
-            }
-            //查询对应产线
-                if(lineId > 0){
-                    ProductionLine line = productionLineMapper.selectProductionLineById(lineId);
-                    pdfName = line.getLineName();
-                }
-                if(!StringUtils.isEmpty(productCode)){
-                    pdfName = "产品："+productCode;
-                }
-                if(lineId >0 && !StringUtils.isEmpty(productCode)){
-                    ProductionLine line = productionLineMapper.selectProductionLineById(lineId);
-                    pdfName = line.getLineName()+",产品："+productCode;
-                }
-                param.put("line",pdfName);
-                //查询产线在该时间段内已经提交的所以工单数据
-               List<DevWorkOrder> orders = devWorkOrderMapper.selectOrderByLineIsSubmit(user.getCompanyId(),productCode,
-                       lineId,startTime+" 00:00:00",endTime+" 23:59:59",0);
-                for (DevWorkOrder order : orders) {
-                    float wh = order.getWorkingHour() == null?0:order.getWorkingHour();//正常工时
-//                    float mh = order.getManualTime()==null?0:order.getManualTime();//手动调整工时
-                    float sh = order.getSignHuor() == null?0:order.getSignHuor();//生产工时
-                    sb.append(order.getId());
-                    sb.append(",");
-                    totalActualNum += order.getActualWarehouseNum()==null?0:order.getActualWarehouseNum();//总入库数量
-                    totalScrapNum += order.getScrapNum()==null?0:order.getScrapNum();
-                    totalHour += wh;//正常中工时
-                    totalProduct += sh;//生产总工时
-                    totalInput += order.getPutIntoNumber()==null?0:order.getPutIntoNumber();//中投入数
-                    totalCumulativeNumber += order.getCumulativeNumber() ==null?0:order.getCumulativeNumber();//总累计数量
-                    //加班倍率
-                    if(order.getOvertimeHour() != null && order.getOvertimeHour() > 0 && order.getOvertimeRace() != null && order.getOvertimeRace() >0){
-                        if(order.getOvertimeRace() == 1.5){
-                            order.setWork1(order.getOvertimeRace()+"");
-                            totalWork1 += order.getOvertimeRace();
-                        }else if(order.getOvertimeRace() == 2){
-                            order.setWork2(order.getOvertimeRace()+"");
-                            totalWork2 += order.getOvertimeRace();
-                        }else if(order.getOvertimeRace() == 3){
-                            order.setWork3(order.getOvertimeHour()+"");
-                            totalWork3 += order.getOvertimeHour();
-                        }
-                    }
-                    order.setPutIntoNumber(order.getPutIntoNumber() == null?0:order.getPutIntoNumber());
-                    //直通率 = 入库数量 / 累计产量
-                    ztRate +=  order.getDirectPassRate()==null?0:order.getDirectPassRate();
+    @Autowired
+    private UserMapper userMapper;
 
-                    //达成率
-                    order.setReachRate(0F);
-                    if(order.getCumulativeNumber() != null && order.getProductStandardHour() != null){
-                        float total =  order.getProductStandardHour()*(sh);//实际标准产量
-                        order.setReachRate(total==0?0:getFloat3((((float)order.getCumulativeNumber())/ total))*100);
-                    }
-                    reachRateNum+=order.getReachRate();//总达成率
-                    //标准工时
-                    float standardHour = 0F;
-                    if(order.getProductStandardHour() != null && order.getProductStandardHour() >0){
-                        int num = order.getActualWarehouseNum() ==null?order.getProductNumber():order.getActualWarehouseNum();
-                        standardHour = (float)num/order.getProductStandardHour();
-                    }
-                    totalStandardHour +=standardHour;//总标准工时
-                }
-                if(orders.size() >0){
-                    totalReachRate = getFloat3(reachRateNum/orders.size());//平均达成率
-                    pjztRate = getFloat3(ztRate/orders.size());//平均直通率
-                }
-                JRDataSource dataSource = new JRBeanCollectionDataSource(orders);
-                param.put("orderDataTable",dataSource);
+    @Autowired
+    private SingleWorkMapper  singleWorkMapper;
 
-        }
-        //查询所以的异常事件
-        if(sb.toString().length()>0){
-            List<WorkExceptionList> exceptionLists = workExceptionListMapper.selectWorkExceByWorkId(sb.toString().substring(0,sb.length()-1));
-            JRDataSource dataSource = new JRBeanCollectionDataSource(exceptionLists);
-            param.put("exceptionData",dataSource);
-        }
-        param.put("totalActualNum",totalActualNum);
-        param.put("totalScrapNum",totalScrapNum);
-        param.put("totalStandardHour",new BigDecimal(totalStandardHour).setScale(1,BigDecimal.ROUND_HALF_UP).floatValue());
-        param.put("totalHour",totalHour);
-        param.put("totalReachRate",totalReachRate);
-        param.put("totalZcHour",totalZcHour);
-        param.put("totalInput",totalInput);
-        param.put("totalWork1",totalWork1);
-        param.put("totalWork2",totalWork2);
-        param.put("totalWork3",totalWork3);
-        param.put("totalProduct",totalProduct);//生产总工时
-        //直通率
-        param.put("totalDirectPassRate",pjztRate);
-        PdfUtil util = new PdfUtil();
-        util.exportPdf(path,pdfName,resourceLoader,response,request,param);
-        return 1;
-    }
+    @Autowired
+    private CountPieceMapper countPieceMapper;
+
 
     private float getFloat3(float val){
         return  new BigDecimal(val).setScale(2,BigDecimal.ROUND_HALF_UP).floatValue();
@@ -198,7 +85,7 @@ public class ReportServiceImpl implements IReportService {
         //表头参数定义
         String titleHeader[]={"总入库数量","总报废数量","总投入数量","标准总工时","出勤总工时","生产总工时","平均达成率(%)",
                 "平均直通率(%)","加班X1.5","加班X2.0","加班X3.0"};
-        String workHeader[]={"工单号","产品编码","工单数量","入库数量","报废数量","投入数量","达成率%","直通率%","出勤工时","生产工时","加班X1.5","加班X2.0","加班X3.0"};
+        String workHeader[]={"工单号","产品/半成品","工单数量","入库数量","报废数量","投入数量","达成率%","直通率%","出勤工时","生产工时","加班X1.5","加班X2.0","加班X3.0"};
         String eHeader[]={"工单号","异常分类","发生时间","异常描述","处理状态","处理者","解决方案","处理时间"};
         //汇总参数
         float totalWork1 = 0.0F;//加班倍率 1.5
@@ -233,13 +120,13 @@ public class ReportServiceImpl implements IReportService {
         StringBuilder dataSource = new StringBuilder();
         if(lineId > 0 && !StringUtils.isEmpty(productCode)){
             ProductionLine line = productionLineMapper.selectProductionLineById(lineId);
-            dataSource.append(line.getLineName()+",产品："+productCode);
+            dataSource.append(line.getLineName()+",产品/半成品："+productCode);
         }else{
             if(lineId > 0){
                 ProductionLine line = productionLineMapper.selectProductionLineById(lineId);
                 dataSource.append(line.getLineName());
             }else if(!StringUtils.isEmpty(productCode)){
-                dataSource.append("产品："+productCode);
+                dataSource.append("产品/半成品："+productCode);
             }else{
                 dataSource.append("全局");
             }
@@ -434,12 +321,23 @@ public class ReportServiceImpl implements IReportService {
     /**
      * 车间报表导出
      * @param singleId 车间id
+     * @param userId 员工id
      * @param productCode 产品编码
      * @param startTime 开始时间
      * @param endTime 结束时间
      */
     @Override
-    public void singleReport(int singleId, String productCode, String startTime, String endTime) throws IOException, DocumentException {
+    public void singleReport(int singleId,int userId, String productCode, String startTime, String endTime) throws IOException, DocumentException {
+        int totalNum =0 ;//总计件数量
+        int totalBadNumber = 0;//总不良品数量
+        int totalInputNum =0; //总投入数量
+        float totalPrice =0;//总工价
+        float totalStandardHour =0.0F;//标准总工时
+        float totalProductHour = 0.0F;//生产总工时
+        //表格头部参数定义
+        String titleHeader[]={"总计件数量","总不良品数量","总投入数量","总工价","标准总工时","生产总工时","标准总工时/生产总工时"};
+        String workHeader[]={"工单号","产品/半成品","工单数量","计件数量","不良品数量","投入数量","标准工时","生产工时","工价","总工价"};
+        String eHeader[]={"工单号","异常分类","发生时间","异常描述","处理状态","处理者","解决方案","处理时间"};
         HttpServletResponse response = ServletUtils.getResponse();
         response.setHeader("content-Type", "application/pdf");
         response.setHeader("Content-Disposition", "attachment;filename=" + PdfUtil.pdfName() + ".pdf");
@@ -448,5 +346,170 @@ public class ReportServiceImpl implements IReportService {
         titleFont.setSize(14);
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
         User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        document.open();
+        writer.open();
+        if(u == null){
+            document.add(new Paragraph("登录超时，请重新登录",titleFont));
+            writer.close();
+            document.close();
+            return;
+        }
+        StringBuilder dataSource = new StringBuilder();
+        if(singleId > 0 ){
+            SingleWork work = singleWorkMapper.selectSingleWorkById(singleId);
+            dataSource.append(work.getWorkshopName()+",");
+        }
+        if(!StringUtils.isEmpty(productCode)){
+            dataSource.append("产品/半成品:"+productCode);
+        }
+        if(userId > 0){
+           User user = userMapper.selectUserInfoById(userId);
+           dataSource.append("员工:"+user.getUserName());
+        }
+        if(dataSource.toString().length()<=0){
+            dataSource.append("全局");
+        }
+        DevCompany company = devCompanyMapper.selectDevCompanyById(u.getCompanyId());
+        if(company != null){
+            Paragraph companyTile = new Paragraph(company.getComName(), titleFont);
+            companyTile.setAlignment(1);
+            document.add(companyTile);
+        }
+        //查询产线在该时间段内已经提交的所以工单数据
+        StringBuffer sb = new StringBuffer();
+        List<DevWorkOrder> orders = null;
+        if(userId <= 0){
+            orders = devWorkOrderMapper.selectOrderByLineIsSubmit(u.getCompanyId(),productCode,
+                    singleId,startTime+" 00:00:00",endTime+" 23:59:59",1);
+        }else{
+            orders = devWorkOrderMapper.selectOrderBySingleIsSubmit(u.getCompanyId(),productCode,singleId,
+                    startTime+" 00:00:00",endTime+" 23:59:59",1,userId);
+        }
+
+        if(orders != null && orders.size() > 0){
+            for (DevWorkOrder order : orders) {
+                sb.append(order.getId());
+                sb.append(",");
+                //查询对应的计件数
+                order.setActualWarehouseNum(0);//计件数
+                order.setBadNumber(0);//不良品数
+                order.setWorkingHour(0F);
+                CountPiece piece = countPieceMapper.selectPieceByWorkId(order.getId());
+                if(piece != null){
+                    order.setActualWarehouseNum(piece.getCpNumber());//计件数
+                    order.setBadNumber(piece.getCpBadNumber());//不良品数
+                    totalNum += piece.getCpNumber();//总计件数
+                    totalBadNumber += piece.getCpBadNumber();//总不良品数
+                    float price = (piece.getCpNumber()-piece.getCpBadNumber())*order.getWorkPrice();
+                    //设置总工价
+                    order.setWorkingHour(price);
+                    totalPrice += price;//总工价
+                }
+                totalInputNum += PdfUtil.IntegerNull(order.getPutIntoNumber());//总投入数量
+                //标准工时
+                order.setOvertimeRace(0F);
+                if(PdfUtil.IntegerNull(order.getProductStandardHour())>0){
+                    float standardHour = ((float) PdfUtil.IntegerNull(order.getProductNumber())/(float)order.getProductStandardHour());
+                    order.setOvertimeRace(standardHour);
+                    totalStandardHour += standardHour;
+                }
+                //总生产工时
+                totalProductHour += PdfUtil.floatNull(order.getSignHuor());
+            }
+        }
+        //查询所以的异常事件
+        List<WorkExceptionList> exceptionLists = null;
+        if(sb.toString().length()>0){
+            exceptionLists = workExceptionListMapper.selectWorkExceByWorkId(sb.toString().substring(0,sb.length()-1));
+        }
+        titleFont.setSize(12);
+        Paragraph text = new Paragraph("生产报表", titleFont);
+        text.setAlignment(1);
+        document.add(text);
+        //数据来源
+        titleFont.setSize(10);
+        Phrase phrase  = new Phrase ("数据来源："+dataSource.toString()+";  报表时间:"+startTime+"至"+endTime,titleFont);
+        document.add(phrase);
+        //数据汇总表
+        Font bodyFont =  new Font(BaseFont.createFont("/fonts/STSONG.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED));
+        bodyFont.setSize(8);
+        PdfPTable table = new PdfPTable(titleHeader.length);
+        table.setTotalWidth(580);
+        table.setLockedWidth(true);
+        for (String h : titleHeader) {
+            table.addCell(createCell(h,bodyFont,1,isColor));
+        }
+        table.addCell(createCell(PdfUtil.stringNullValue(totalNum),bodyFont,1,isColor));//总计件数量
+        table.addCell(createCell(PdfUtil.stringNullValue(totalBadNumber),bodyFont,1,isColor));//总不良品数量
+        table.addCell(createCell(PdfUtil.stringNullValue(totalInputNum),bodyFont,1,isColor));//总入投入数量
+        table.addCell(createCell(PdfUtil.stringNullValue(totalPrice),bodyFont,1,isColor));//总工价
+        table.addCell(createCell(PdfUtil.stringNullValue(totalStandardHour),bodyFont,1,isColor));//标准总工时
+        table.addCell(createCell(PdfUtil.stringNullValue(totalProductHour),bodyFont,1,isColor));//生产总工时
+        if(totalProductHour > 0){
+            table.addCell(createCell(PdfUtil.stringNullValue(getFloat3((totalStandardHour/totalProductHour)*100)+"%"),bodyFont,1,isColor));//生产总工时
+        }else {
+            table.addCell(createCell("0%",bodyFont,1,isColor));//生产总工时
+        }
+        document.add(table);
+        document.add(new Chunk("\n"));
+        //工单详情
+        PdfPTable detailsTable = createTable(workHeader.length+2);
+        PdfPCell titleCell = createCell("工单详情",titleFont,workHeader.length+2,isColor);
+        titleCell.setVerticalAlignment(1);
+        detailsTable.addCell(titleCell);
+        int i=0;
+        for (; i <workHeader.length ; i++) {
+            if(i == 0 || i == 1){
+                detailsTable.addCell(createCell(workHeader[i],bodyFont,2,!isColor));
+            }else{
+                detailsTable.addCell(createCell(workHeader[i],bodyFont,1,!isColor));
+            }
+        }
+        if(orders != null && orders.size() > 0){
+            for (DevWorkOrder order : orders) {
+                detailsTable.addCell(createCell(order.getWorkorderNumber(),bodyFont,2,isColor));//工单号
+                detailsTable.addCell(createCell(order.getProductCode(),bodyFont,2,isColor));//产品编码
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getProductNumber()),bodyFont,1,isColor));//工单数量
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getActualWarehouseNum()),bodyFont,1,isColor));//计件数量
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getBadNumber()),bodyFont,1,isColor));//不良品数量
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getPutIntoNumber()),bodyFont,1,isColor));//投入数量
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getOvertimeRace()),bodyFont,1,isColor));//标准工时
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getSignHuor()),bodyFont,1,isColor));//生产用时
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getWorkPrice()),bodyFont,1,isColor));//工价
+                detailsTable.addCell(createCell(PdfUtil.nullValue(order.getWorkingHour()),bodyFont,1,isColor));//总工价
+            }
+        }
+        document.add(detailsTable);
+        document.add(new Chunk("\n"));
+        //工单异常
+        PdfPTable eTable = createTable(eHeader.length+7);
+        PdfPCell eCell = createCell("异常事件",titleFont,eHeader.length+7,false);
+        eCell.setVerticalAlignment(1);
+        eTable.addCell(eCell);
+        i=0;
+        for (; i<eHeader.length ; i++) {
+            if(i == 0 || i== 2 || i==eHeader.length-1){
+                eTable.addCell(createCell(eHeader[i],bodyFont,2,!isColor));
+            }else if(i == 3 || i == 6){
+                eTable.addCell(createCell(eHeader[i],bodyFont,3,!isColor));
+            }else{
+                eTable.addCell(createCell(eHeader[i],bodyFont,1,!isColor));
+            }
+        }
+        if(exceptionLists != null && exceptionLists.size() >0){
+            for (WorkExceptionList exe : exceptionLists) {
+                eTable.addCell(createCell(exe.getWorkorderNumber(),bodyFont,2,isColor));//工单号
+                eTable.addCell(createCell(exe.getTypeName(),bodyFont,1,isColor));//异常分类
+                eTable.addCell(createCell(DateUtils.getDateTime(exe.getCreateTime()),bodyFont,2,isColor));//发生时间
+                eTable.addCell(createCell(exe.getRemark(),bodyFont,3,isColor));//异常描述
+                eTable.addCell(createCell(exe.getExce(),bodyFont,1,isColor));//处理状态
+                eTable.addCell(createCell(exe.getHandleUser(),bodyFont,1,isColor));//处理者
+                eTable.addCell(createCell(exe.getHandleContent(),bodyFont,3,isColor));//解决方法
+                eTable.addCell(createCell(DateUtils.getDateTime(exe.getHandleTime()),bodyFont,2,isColor));//解决时间
+            }
+        }
+        document.add(eTable);
+        writer.close();
+        document.close();
     }
 }

@@ -44,22 +44,14 @@
                             </select>
                         </li>
                         <li>
-                            用户名称：<input type="text" name="userName"/>
-                        </li>
-                        <li th:if="${@product.isSys(#httpServletRequest.getCookies())}">
-                            所属公司：<select name="companyId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
-                            <option value="-1">所有</option>
-                            <option th:each="com : ${Company}" th:text="${com.comName}"
-                                    th:value="${com.companyId}"></option>
-                        </select>
+                            用户名称：<input id="userName" type="text" name="userName"/>
                         </li>
                         <li>
-                            用户状态：
-                            <select name="status" th:with="type=${@dict.getType('sys_normal_disable')}" style="width: 100px">
-                                <option value="">所有</option>
-                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
-                                        th:value="${dict.dictValue}"></option>
-                            </select>
+                            用户状态：<select id="status" name="status" th:with="type=${@dict.getType('sys_normal_disable')}" style="width: 100px">
+                            <option value="">所有</option>
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                    th:value="${dict.dictValue}"></option>
+                        </select>
                         </li>
 
                         <li class="select-time">
@@ -97,6 +89,9 @@
             </a>
             <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:user:export">
                 <i class="fa fa-download"></i> 导出
+            </a>
+            <a class="btn btn-primary" onclick="qrcode()" shiro:hasPermission="system:user:view">
+                <i class="fa fa-qrcode"></i> 二维码
             </a>
         </div>
 
@@ -230,23 +225,6 @@
         $.table.init(options);
     }
 
-    // function queryDeptTree()
-    // {
-    // 	var url = ctx + "system/dept/treeData";
-    // 	var options = {
-    //         url: url,
-    //         expandLevel: 2,
-    //         onClick : zOnClick
-    //     };
-    // 	$.tree.init(options);
-    //
-    // 	function zOnClick(event, treeId, treeNode) {
-    // 		$("#deptId").val(treeNode.id);
-    // 		$("#parentId").val(treeNode.pId);
-    // 		$.table.search();
-    // 	}
-    // }
-
     $('#btnExpand').click(function () {
         $._tree.expandAll(true);
         $(this).hide();
@@ -263,11 +241,6 @@
         queryDeptTree();
     });
 
-    /* 用户管理-部门 */
-    // function dept() {
-    // 	var url = ctx + "system/dept";
-    // 	createMenuItem(url, "部门管理");
-    // }
 
     /* 用户管理-重置密码 */
     function resetPwd(userId) {
@@ -296,6 +269,13 @@
         $.modal.confirm("确认要启用用户吗？", function () {
             $.operate.post(prefix + "/changeStatus", {"userId": userId, "status": 0});
         })
+    }
+
+    /**
+     * 生产二维码
+     */
+    function qrcode() {
+        createMenuItem(prefix+"/qrcode","用户二维码");
     }
 </script>
 </body>

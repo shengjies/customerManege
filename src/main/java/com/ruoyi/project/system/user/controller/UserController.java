@@ -13,6 +13,7 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.system.post.service.IPostService;
 import com.ruoyi.project.system.role.service.IRoleService;
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.domain.UserQrCode;
 import com.ruoyi.project.system.user.service.IUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,7 +225,26 @@ public class UserController extends BaseController {
     @GetMapping("/selectAllLoginName")
     @ResponseBody
     public List<User> selectAllLoginName(String filter){
-        System.out.println("===================================" + filter);
         return userService.selectComAllUser(ServletUtils.getRequest().getCookies());
+    }
+
+    /**
+     * 用户二维码
+     * @return
+     */
+    @RequestMapping("/qrcode")
+    public String qrcode(){
+        return prefix+"/qrcode";
+    }
+
+    @RequiresPermissions("system:user:list")
+    @PostMapping("/qrcode/list")
+    @ResponseBody
+    public TableDataInfo listQrCode(User user) {
+        startPage();
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        user.setCompanyId(u.getCompanyId());
+        List<UserQrCode> list = userService.selectUserQrCode(user);
+        return getDataTable(list);
     }
 }

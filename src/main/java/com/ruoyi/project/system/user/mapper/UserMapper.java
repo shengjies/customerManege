@@ -1,6 +1,7 @@
 package com.ruoyi.project.system.user.mapper;
 
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.domain.UserQrCode;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -137,4 +138,11 @@ public interface UserMapper
      * @return
      */
     User selectUserInfoById(@Param("user_id")int user_id);
+
+    /**
+     * 查询用户二维码信息
+     * @param user 用户信息
+     * @return
+     */
+    List<UserQrCode> selectUserQrCode(User user);
 }

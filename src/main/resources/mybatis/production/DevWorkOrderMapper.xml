@@ -321,6 +321,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
        and work_sign = 1 and wl_sign=#{wlSign} and end_time between #{startTime} and #{endTime} ;
     </select>
 
+    <!--查询对应时间段内车间已经提交的所以工单数据-->
+    <select id="selectOrderBySingleIsSubmit" resultMap="DevWorkOrderResult">
+        SELECT w.* FROM dev_work_order as w,tab_count_piece as p where w.id = p.work_id and cp_user_id = #{userId}
+        and w.company_id = #{company_id}
+        <if test="line_id > 0">
+            and w.line_id = #{line_id}
+        </if>
+        <if test="productCode != null and productCode != ''">
+            and w.product_code = #{productCode}
+        </if>
+        and w.work_sign = 1 and w.wl_sign=#{wlSign} and w.end_time between #{startTime} and #{endTime} ;
+    </select>
+
     <!--查询昨天所有的排单-->
     <select id="selectWorkOrderAllYesterday" parameterType="Integer" resultMap="DevWorkOrderResult">
         <include refid="selectDevWorkOrderVo"/>

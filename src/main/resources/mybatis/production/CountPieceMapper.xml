@@ -162,4 +162,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPieceByWorkIdAndUid" resultMap="CountPieceResult">
         SELECT * FROM tab_count_piece where company_id = #{companyId} and cp_user_id = #{cpUserId} and work_id = #{workId} and cp_date = #{cpDate}
     </select>
+
+    <!--根据工单id查询对应的计件数量-->
+    <select id="selectPieceByWorkId" resultType="com.ruoyi.project.production.countPiece.domain.CountPiece">
+       SELECT coalesce(sum(cp_number),0) as cpNumber,coalesce(sum(cp_bad_number),0) as cpBadNumber,work_price as workPrice
+        FROM tab_count_piece where work_id = #{workid};
+    </select>
 </mapper>

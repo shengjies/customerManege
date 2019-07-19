@@ -86,4 +86,11 @@ public interface CountPieceMapper
 	 */
     CountPiece selectPieceByWorkIdAndUid(@Param("workId") Integer workId, @Param("companyId") Integer companyId,
 										 @Param("cpUserId") Integer cpUserId, @Param("cpDate") Date cpDate);
+
+	/**
+	 * 根据工单id查询对应的计件数量
+	 * @param workid 工单id
+	 * @return
+	 */
+	CountPiece selectPieceByWorkId(@Param("workid")int workid);
 }

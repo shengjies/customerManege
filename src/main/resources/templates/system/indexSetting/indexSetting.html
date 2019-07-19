@@ -43,7 +43,7 @@
                             </ol>
                             <div class="carousel-inner" role="listbox">
                                 <div th:class="${start.index ==0?'item active':'item'}" th:each="item,start:${comPictures}">
-                                    <img alt="image" class="img-responsive" style="height: 500px;"
+                                    <img alt="image" class="img-responsive" style="width:100%;height: 500px;"
                                          th:src="${item}">
                                 </div>
                             </div>

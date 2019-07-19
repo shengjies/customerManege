@@ -71,6 +71,7 @@ public class ReportController extends BaseController {
     /**
      * 导出车间报表数据
      * @param singleId 车间id
+     * @param userId 员工id
      * @param productCode 产品编码
      * @param startTime 开始时间
      * @param endTime 结束时间
@@ -78,9 +79,9 @@ public class ReportController extends BaseController {
     @ResponseBody
     @RequestMapping("/single/pdf")
     @RequiresPermissions("production:report:pdf")
-    public void exportSingleReport(int singleId, String productCode,String startTime, String endTime){
+    public void exportSingleReport(int singleId,int userId, String productCode,String startTime, String endTime){
         try {
-            reportService.singleReport(singleId,productCode,startTime,endTime);
+            reportService.singleReport(singleId,userId,productCode,startTime,endTime);
         }catch (Exception e){
             e.printStackTrace();
         }
