@@ -3,6 +3,7 @@ package com.ruoyi.project.production.devWorkOrder.controller;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -11,6 +12,8 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -21,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -44,6 +48,9 @@ public class DevWorkOrderController extends BaseController {
 
     @Autowired
     private IProductionLineService productionLineService;
+
+    @Autowired
+    private IImportConfigService configService;
 
     @RequiresPermissions("device:devWorkOrder:view")
     @GetMapping()
@@ -80,7 +87,7 @@ public class DevWorkOrderController extends BaseController {
      * 新增工单
      */
     @GetMapping("/add")
-    public String add(ModelMap mmap,HttpServletRequest request) {
+    public String add(ModelMap mmap) {
         mmap.put("workorderNumber",CodeUtils.getWorkOrderCode());
         return prefix + "/add";
     }
@@ -386,5 +393,77 @@ public class DevWorkOrderController extends BaseController {
             e.printStackTrace();
         }
         return AjaxResult.error();
+    }
+
+    /****************************工单OCR操作*****************************/
+    /**
+     * 工单OCR 操作
+     * @return
+     */
+    @GetMapping("/ocr")
+    @RequiresPermissions("device:devWorkOrder:ocr")
+    public String ocr(ModelMap modelMap)
+    {
+        modelMap.put("config",configService.selectImportConfigByType(3));
+        return prefix+"/workOcr";
+    }
+
+    /**
+     * ocr 图片解析
+     * @param file 图片文件
+     * @return
+     */
+    @PostMapping("/ocr")
+    @ResponseBody
+    @RequiresPermissions("device:devWorkOrder:ocr")
+    public AjaxResult ocrFile(@RequestParam("file")MultipartFile file){
+        if(file.isEmpty()){
+            return AjaxResult.error();
+        }
+        try {
+            return AjaxResult.success(devWorkOrderService.ocrFile(file));
+        }catch (Exception e){
+            return AjaxResult.error("解析异常:"+e.getMessage());
+        }
+
+    }
+
+    /**
+     * 初始化 OCR 配置
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/initOcr")
+    @RequiresPermissions("device:devWorkOrder:ocrInit")
+    public AjaxResult initOcr(){
+        return toAjax(devWorkOrderService.initOcrConfig());
+    }
+
+    /**
+     * 保存匹配配置
+     * @param config
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/initOcrSave")
+    @RequiresPermissions("device:devWorkOrder:ocrInit")
+    public AjaxResult saveInitOcrConfig(ImportConfig config){
+        return toAjax(devWorkOrderService.saveInitOcrConfig(config));
+    }
+
+    /**
+     * 保存解析的工单信息
+     * @param order 工单信息
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/ocrSaveWork")
+    @RequiresPermissions("device:devWorkOrder:ocrInit")
+    public AjaxResult saveOcrWork(DevWorkOrder order){
+        try {
+            return toAjax(devWorkOrderService.saveOcrWork(order));
+        }catch (Exception e){
+            return AjaxResult.error(e.getMessage());
+        }
     }
 }

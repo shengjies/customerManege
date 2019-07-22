@@ -18,19 +18,19 @@ public class ImportConfig extends BaseEntity
 	private Integer id;
 	/** 公司id */
 	private Integer companyId;
-	/** 产品编码、半产品编码 物料编码*/
+	/** 产品编码、半产品编码 物料编码  工单号*/
 	private Integer con1;
-	/** 产品名称/半产品名称  物料名称*/
+	/** 产品名称/半产品名称  物料名称  订单号*/
 	private Integer con2;
-	/** 产品型号/半成品型号  物料型号*/
+	/** 产品型号/半成品型号  物料型号  产线*/
 	private Integer con3;
-	/** 单价 */
+	/** 单价  生产数量*/
 	private Integer price;
-	/** 标准工时 */
+	/** 标准工时  编码*/
 	private Integer con4;
-	/** 备注信息 */
+	/** 备注信息  工价*/
 	private Integer con5;
-	/** 配置类型 0、产品配置 1、半成品配置 2、物料 */
+	/** 配置类型 0、产品配置 1、半成品配置 2、物料  3、工单OCR 图片解析*/
 	private Integer cType;
 	/** 操作时间 */
 	private Date cTime;
@@ -38,6 +38,14 @@ public class ImportConfig extends BaseEntity
 	private Integer unit;
 	/**  */
 	private Integer rowIndex;
+
+	private int cSign;
+
+	private String appId;
+
+	private String apiKey;
+
+	private String secretKey;
 
 	public Integer getId() {
 		return id;
@@ -133,6 +141,38 @@ public class ImportConfig extends BaseEntity
 
 	public void setRowIndex(Integer rowIndex) {
 		this.rowIndex = rowIndex;
+	}
+
+	public int getcSign() {
+		return cSign;
+	}
+
+	public void setcSign(int cSign) {
+		this.cSign = cSign;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public String getSecretKey() {
+		return secretKey;
+	}
+
+	public void setSecretKey(String secretKey) {
+		this.secretKey = secretKey;
 	}
 
 	@Override

@@ -1,0 +1,62 @@
+package com.ruoyi.project.mes.mesBatch.mapper;
+
+import com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail;
+import java.util.List;	
+
+/**
+ * MES批准追踪详情 数据层
+ * 
+ * @author sj
+ * @date 2019-07-22
+ */
+public interface MesBatchDetailMapper 
+{
+	/**
+     * 查询MES批准追踪详情信息
+     * 
+     * @param id MES批准追踪详情ID
+     * @return MES批准追踪详情信息
+     */
+	public MesBatchDetail selectMesBatchDetailById(Integer id);
+	
+	/**
+     * 查询MES批准追踪详情列表
+     * 
+     * @param mesBatchDetail MES批准追踪详情信息
+     * @return MES批准追踪详情集合
+     */
+	public List<MesBatchDetail> selectMesBatchDetailList(MesBatchDetail mesBatchDetail);
+	
+	/**
+     * 新增MES批准追踪详情
+     * 
+     * @param mesBatchDetail MES批准追踪详情信息
+     * @return 结果
+     */
+	public int insertMesBatchDetail(MesBatchDetail mesBatchDetail);
+	
+	/**
+     * 修改MES批准追踪详情
+     * 
+     * @param mesBatchDetail MES批准追踪详情信息
+     * @return 结果
+     */
+	public int updateMesBatchDetail(MesBatchDetail mesBatchDetail);
+	
+	/**
+     * 删除MES批准追踪详情
+     * 
+     * @param id MES批准追踪详情ID
+     * @return 结果
+     */
+	public int deleteMesBatchDetailById(Integer id);
+	
+	/**
+     * 批量删除MES批准追踪详情
+     * 
+     * @param ids 需要删除的数据ID
+     * @return 结果
+     */
+	public int deleteMesBatchDetailByIds(String[] ids);
+	
+}

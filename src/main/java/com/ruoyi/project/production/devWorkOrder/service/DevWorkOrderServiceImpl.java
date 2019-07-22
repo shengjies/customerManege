@@ -1,5 +1,7 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
+import com.alibaba.fastjson.JSON;
+import com.baidu.aip.ocr.AipOcr;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
@@ -9,15 +11,21 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.security.ShiroUtils;
+import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.device.devCompany.domain.DevCompany;
+import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.devWorkData.domain.DevWorkData;
 import com.ruoyi.project.production.devWorkData.mapper.DevWorkDataMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.domain.Ocr;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
@@ -37,12 +45,17 @@ import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
+import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -99,6 +112,15 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     @Autowired
     private DevListMapper devListMapper;
+
+    @Autowired
+    private DevCompanyMapper companyMapper;
+
+    @Autowired
+    private ImportConfigMapper configMapper;
+
+    @Value("${file.iso}")
+    private String fileUrl;
 
     public String getWorkOrderCode() {
         return CodeUtils.getWorkOrderCode();
@@ -1093,5 +1115,203 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Override
     public List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId, Integer workStatus, Integer wlSign, Integer singleId, Integer companyId) {
         return devWorkOrderMapper.selectAllNotConfigBySwId(lineId, workStatus, wlSign, singleId, companyId);
+    }
+
+    /**
+     * OCR 图片解析
+     * @param file 图片
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public  Map<String,Object> ocrFile(MultipartFile file) throws Exception {
+        ImportConfig config = configMapper.selectImportConfigByType(3);
+        if(config == null || StringUtils.isEmpty(config.getSecretKey()) ||
+                StringUtils.isEmpty(config.getAppId()) || StringUtils.isEmpty(config.getApiKey())){
+            throw new Exception("无APPKEY配置，请先初始化APPKEY配置");
+        }
+        Map<String,Object> map = new HashMap<>();
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
+        if(company == null)throw new Exception("系统异常");
+        File f = new File(RuoYiConfig.getProfile() +"/"+company.getTotalIso());
+        if((f.exists() && !f.isDirectory())|| !f.exists()){
+            f.mkdir();
+        }
+        String path = RuoYiConfig.getProfile()+"/"+company.getTotalIso()+"/ocr/";
+        f = new File(path);
+        if((f.exists() && !f.isDirectory())|| !f.exists()){
+            f.mkdir();
+        }
+        String fileName = UUID.randomUUID().toString().replaceAll("-","")+".jpg";
+        String filePath = path+fileName;
+        f = new File(filePath);
+        if(f.exists()){
+            f.delete();
+        }
+        f.createNewFile();
+        file.transferTo(f);
+        List<Ocr> ocrs = null;
+        try {
+            //进行图片解析
+            AipOcr client = new AipOcr(config.getAppId(),config.getApiKey(),config.getSecretKey());
+            client.setConnectionTimeoutInMillis(2000);
+            client.setSocketTimeoutInMillis(60000);
+            JSONObject res = client.basicGeneral(filePath,new HashMap<String, String>());
+            ocrs = JSON.parseArray(res.get("words_result").toString(),Ocr.class);
+        }catch (Exception e){
+            throw new Exception("解析异常,请确认APP_ID,API_KEY,SECRET_KEY是否正确");
+        }
+        if(ocrs == null && ocrs.size()>0){
+            throw new Exception("解决异常，请确认图片所包含内容是否是需要解决的工单信息");
+        }
+        //匹配解决结果
+        if(config.getcSign() ==1){
+            DevWorkOrder order = new DevWorkOrder();
+            //工单号
+            if(config.getCon1() != null && config.getCon1()>0){
+                order.setWorkorderNumber(ocrs.get(config.getCon1()-1).getWords());
+                String name = order.getWorkorderNumber()+".jpg";
+                File code = new File(path+name);
+                FileUtils.copyFile(f,code);
+                f.delete();
+                map.put("path",fileUrl+company.getTotalIso()+"/ocr/"+name);
+            }
+            //订单号
+            if(config.getCon2() != null && config.getCon2() > 0){
+                order.setOrderCode(ocrs.get(config.getCon2()-1).getWords());
+            }
+            //产线/车间
+            if(config.getCon3() != null && config.getCon3() > 0){
+                order.setParam1(ocrs.get(config.getCon3()-1).getWords());
+            }
+            //编码
+            if(config.getCon4() != null && config.getCon4() > 0){
+                order.setProductCode(ocrs.get(config.getCon4() -1).getWords());
+            }
+            //生产数量
+            if(config.getPrice() != null && config.getPrice() > 0){
+                order.setParam2(ocrs.get(config.getPrice()-1).getWords());
+            }
+            //工价
+//            if(config.getCon5() != null && config.getCon5() >0){
+//                order.setParam3(ocrs.get(config.getCon5() -1).getWords());
+//            }
+            map.put("order",order);
+        }
+        map.put("ocr",ocrs);
+        return map;
+    }
+
+    @Value("${baidu.appId}")
+    private String appId;
+
+    @Value("${baidu.appKey}")
+    private String appKey;
+
+    @Value("${baidu.secretKey}")
+    private String secretKey;
+
+    /**
+     * 初始化OCR
+     * @return
+     */
+    @Override
+    @Transactional
+    public int initOcrConfig() {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        ImportConfig config = configMapper.selectImportConfigByType(3);
+        if(config != null){
+            configMapper.deleteImportConfigByType(3);
+        }
+        config = new ImportConfig();
+        config.setcSign(0);
+        config.setcType(3);
+        config.setAppId(appId);
+        config.setApiKey(appKey);
+        config.setSecretKey(secretKey);
+        config.setcTime(new Date());
+        config.setCompanyId(user.getCompanyId());
+        return configMapper.insertImportConfig(config);
+    }
+
+    /**
+     * 保存匹配配置
+     * @param config 匹配配置
+     * @return
+     */
+    @Override
+    public int saveInitOcrConfig(ImportConfig config) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        ImportConfig config1 = configMapper.selectImportConfigByType(3);
+        config.setAppId(appId);
+        config.setApiKey(appKey);
+        config.setSecretKey(secretKey);
+        if(config1 != null){
+            config.setAppId(config1.getAppId());
+            config.setApiKey(config1.getApiKey());
+            config.setSecretKey(config1.getSecretKey());
+            configMapper.deleteImportConfigByType(3);
+        }
+        config.setcSign(1);
+        config.setcType(3);
+        config.setcTime(new Date());
+        config.setCompanyId(user.getCompanyId());
+        return configMapper.insertImportConfig(config);
+    }
+
+    /**
+     * 保存OCR 解析的工单信息
+     * @param order 工单信息
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int saveOcrWork(DevWorkOrder order) throws Exception {
+        User u = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if(order == null || u == null)return 0;
+        order.setCompanyId(u.getCompanyId().intValue());
+        //判断对应产线是否存在
+        if(order.getWlSign() == 0){
+          ProductionLine line =  productionLineMapper.selectProductionLineByName(u.getCompanyId(),order.getParam1());
+          if(line == null)
+              throw new Exception("对应产线不存在");
+          order.setLineId(line.getId());
+          order.setDeviceLiable(line.getDeviceLiable());
+        }
+        //判断车间是否存在
+        if(order.getWlSign() == 1){
+           SingleWork work = singleWorkMapper.selectSingleWorkByWorkshopName(u.getCompanyId(),order.getParam1());
+           if(work == null) throw new Exception("对应车间不存在");
+           order.setLineId(work.getId());
+        }
+        //查询对应产品是否存在
+        DevProductList productList = productListMapper.selectDevProductByCode(u.getCompanyId(),order.getProductCode());
+        if(productList == null) throw new Exception("对应产品/半成品不存在");
+        order.setProductCode(productList.getProductCode());
+        order.setProductModel(productList.getProductModel());
+        order.setProductName(productList.getProductName());
+        order.setProductionStart(new Date());
+        order.setProductionEnd(new Date());
+        order.setProductStandardHour(productList.getStandardHourYield());
+        order.setCreateTime(new Date());
+        order.setMakeType(productList.getSign());
+        //生产数量
+        try {
+            order.setProductNumber(Integer.parseInt(order.getParam2()));
+        }catch (Exception e){
+            throw new Exception("生产数量错误，确保生产数量为数字");
+        }
+        //工价
+//        try {
+//            order.setWorkPrice(Float.parseFloat(order.getParam3()));
+//        }catch (Exception e){
+//            throw new Exception("工价错误，确保工价为数字");
+//        }
+        order.setCreateBy(u.getUserName());
+        //查询对应工单是否存在
+        DevWorkOrder workOrder = devWorkOrderMapper.checkWorkOrderNumber(order.getWorkorderNumber(),u.getCompanyId());
+        if(workOrder != null) throw new  Exception("工单已存在");
+        return devWorkOrderMapper.insertDevWorkOrder(order);
     }
 }

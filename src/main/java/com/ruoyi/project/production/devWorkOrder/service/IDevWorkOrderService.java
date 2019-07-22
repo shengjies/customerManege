@@ -1,6 +1,9 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
+import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.domain.Ocr;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -186,4 +189,33 @@ public interface IDevWorkOrderService {
      * @return 结果
      */
     List<DevWorkOrder> selectAllNotConfigBySwId(Integer lineId,Integer workStatus, Integer wlSign, Integer singleId, Integer companyId);
+
+    /**
+     * OCR 图片解析
+     * @param file 图片
+     * @return
+     * @throws Exception
+     */
+    Map<String,Object> ocrFile(MultipartFile file) throws Exception;
+
+    /**
+     * 初始化OCR 配置
+     * @return
+     */
+    int initOcrConfig();
+
+    /**
+     * 保存匹配配置
+     * @param config 匹配配置
+     * @return
+     */
+    int saveInitOcrConfig(ImportConfig config);
+
+    /**
+     * 保存OCR 解析的工单信息
+     * @param order 工单信息
+     * @return
+     * @throws Exception
+     */
+    int saveOcrWork(DevWorkOrder order) throws Exception;
 }

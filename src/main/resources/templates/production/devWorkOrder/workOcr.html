@@ -1,0 +1,389 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div>
+        <div class="panel-body">
+            <div class="panel-group" id="accordion1">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                OCR配置&nbsp;&nbsp;&nbsp;<a shiro:hasPermission="device:devWorkOrder:ocrInit"
+                                          onclick="initOcrConfig()" class="btn btn-success btn-sm" th:utext="${config ==null?'初始化APPKEY配置':'匹配配置初始化'}">配置初始化</a>
+                                &nbsp;&nbsp;&nbsp;<a shiro:hasPermission="device:devWorkOrder:ocrInit" th:if="${config != null }" class="btn btn-success btn-sm">编辑APPKEY</a>
+                            </div>
+                            <div class="panel-body" style="max-height: 350px;overflow-y: scroll">
+                                <h5 th:if="${config == null}"style="color: red">当前无配置，请先初始化配置</h5>
+                                <h5 th:if="${config != null and config.cSign == 0}"style="color: red">当前无匹配配置，请在第一次操作时保存匹配配置</h5>
+                                <div th:if="${config != null and config.cSign == 1}">
+                                    <div class="col-md-12" style="color: red">以下是各个参数的匹配配置，如(1、工单号,则是拿取解决结果中第一位作为工单号):</div>
+                                    <div class="col-md-2" th:utext="${config.con1+'、工单号'}"></div>
+                                    <div class="col-md-2" th:utext="${config.con2+'、订单号'}"></div>
+                                    <div class="col-md-2" th:utext="${config.con3+'、产线/车间'}"></div>
+                                    <div class="col-md-2" th:utext="${config.con4+'、产品/半成品'}"></div>
+                                    <div class="col-md-2" th:utext="${config.price+'、生产数量'}"></div>
+                                    <!--<div class="col-md-2" th:utext="${config.con5+'、工价'}"></div>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12" style="margin-top: 5px;">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                相关操作
+                                <div style="text-align: center;color: #0a0a0a" id="div-fs">
+                                    解析结果保存方式：<label style="margin-bottom: -1px"><input type="radio" name="fs" value="0" checked>手动</label>&nbsp;&nbsp;&nbsp;
+                                    <label style="margin-bottom: -1px"> <input type="radio" name="fs" value="1">自动</label>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="col-md-6">
+                                    <div class="ibox float-e-margins">
+                                        <div class="ibox-title" style="text-align: center">
+                                            <h5>图片操作&nbsp;&nbsp;&nbsp;<span style="color: red">请将截图粘贴到以下框中</span></h5>
+                                        </div>
+                                        <div class="ibox-content" style="padding: 15px 0px 0px 0px">
+                                            <div contenteditable id="ocrContent" style="width: 100%;min-height: 500px; border:1px solid">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="ibox float-e-margins">
+                                        <div class="ibox-title" style="text-align: center">
+                                            <span>解析结果</span>
+                                        </div>
+                                        <div class="ibox-content" style="padding: 15px 0px 0px 0px;">
+                                            <ul class="todo-list ui-sortable" id="ocr-result">
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="ibox float-e-margins">
+                                        <div id="div-wlSign" class="ibox-title" style="text-align: center">
+                                            <span>匹配结果</span> &nbsp;&nbsp;&nbsp;
+                                            <label style="margin-bottom: -1px"><input type="radio" name="wlSign" value="0" checked>产线</label>&nbsp;&nbsp;&nbsp;
+                                            <label style="margin-bottom: -1px"> <input type="radio" name="wlSign" value="1">车间</label>
+                                        </div>
+                                        <div class="ibox-content" style="padding: 15px 0px 0px 0px;">
+                                            <div id="init-ocr-config" style="text-align: center" th:if="${config == null }">
+                                                <h3 style="color: red">请先初始化APPKEY配置</h3>
+                                            </div>
+                                            <div id="init-ocr-config" th:if="${config != null and config.cSign == 0}">
+                                                <form id="save-init-config" >
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label" style="color: red;text-align: center">请保存匹配配置，0则不匹配</label>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">工单号：</label>
+                                                        <div class="col-sm-12">
+                                                            <select class="form-control" name="con1"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">订单号：</label>
+                                                        <div class="col-sm-12">
+                                                            <select class="form-control" name="con2"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">产线/车间：</label>
+                                                        <div class="col-sm-12">
+                                                            <select class="form-control" name="con3"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">产品/半成品编码：</label>
+                                                        <div class="col-sm-12">
+                                                            <select class="form-control" name="con4"></select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">生产数量：</label>
+                                                        <div class="col-sm-12">
+                                                            <select class="form-control" name="price"></select>
+                                                        </div>
+                                                    </div>
+                                                    <!--<div class="form-group">-->
+                                                        <!--<label class="col-sm-12 control-label">工价：</label>-->
+                                                        <!--<div class="col-sm-12">-->
+                                                            <!--<select class="form-control" name="con5"></select>-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+                                                    <div class="form-group">
+                                                        <div class="col-sm-12" style="text-align: center">
+                                                            <a onclick="saveInitOcr()" class="btn btn-primary btn-sm" style="margin-top: 10px">保存配置</a>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div id="save-ocr-result" th:if="${config != null and config.cSign == 1}">
+                                                <form id="save-ocr-result-form" >
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">工单号：</label>
+                                                        <div class="col-sm-12">
+                                                            <input class="form-control" name="workorderNumber" id="workorderNumber">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">订单号：</label>
+                                                        <div class="col-sm-12">
+                                                            <input class="form-control" name="orderCode" id="orderCode">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">产线/车间：</label>
+                                                        <div class="col-sm-12">
+                                                            <input class="form-control" name="param1" id="param1">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">产品/半成品编码：</label>
+                                                        <div class="col-sm-12">
+                                                            <input class="form-control" name="productCode" id="productCode">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-12 control-label">生产数量：</label>
+                                                        <div class="col-sm-12">
+                                                            <input class="form-control" name="param2" id="param2">
+                                                        </div>
+                                                    </div>
+                                                    <!--<div class="form-group">-->
+                                                        <!--<label class="col-sm-12 control-label">工价：</label>-->
+                                                        <!--<div class="col-sm-12">-->
+                                                            <!--<input class="form-control" name="param3" id="param3">-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+                                                    <div class="form-group">
+                                                        <div class="col-sm-12" style="text-align: center">
+                                                            <a onclick="saveWork()" class="btn btn-primary btn-sm" style="margin-top: 10px">保存</a>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" th:inline="javascript">
+    document.addEventListener('paste', function (event) {
+        var isChrome = false;
+        if ( event.clipboardData || event.originalEvent ) {
+            $("#ocrContent").children().remove();
+            var clipboardData = (event.clipboardData || event.originalEvent.clipboardData);
+            if ( clipboardData.items ) {
+                var  items = clipboardData.items,
+                    len = items.length,
+                    blob = null;
+                isChrome = true;
+                event.preventDefault();
+                for (var i = 0; i < len; i++) {
+                    if (items[i].type.indexOf("image") !== -1) {
+                        blob = items[i].getAsFile();
+                    }
+                }
+                if ( blob !== null ) {
+                    var blobUrl=URL.createObjectURL(blob);
+                    if(blobUrl !== null){
+                        $("#ocrContent").append("<img style='width: 90%' src='"+blobUrl+"'/>");
+                    }
+                    var reader = new FileReader();
+                    reader.onload = function (event) {
+                        var base64_str = event.target.result
+                        var b64 = base64_str.replace('data:image/png;base64,','');
+                        var binary = atob(b64);
+                        var array = [];
+                        for (var i = 0; i < binary.length; i++) {
+                            array.push(binary.charCodeAt(i));
+                        }
+                        var file = new Blob([new Uint8Array(array)], {type: 'image/png'});
+                        uploadImgFromPaste(file);
+                    }
+                    reader.readAsDataURL(blob);
+                }
+            } else {
+            }
+        } else {
+        }
+    });
+    var sign = [[${config == null?0:config.cSign}]]
+    /**  图片上传 */
+    function uploadImgFromPaste (file) {
+        var formData = new FormData();
+        formData.append('file', file);
+        $.ajax({
+            url:"/device/devWorkOrder/ocr",
+            data: formData,
+            type: "post",
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                $.modal.loading("正在解析中，请稍后...");
+            },
+            success: function(result) {
+                if (result.code == web_status.SUCCESS) {
+                    var ocr = result.data.ocr;
+                    if(ocr){
+                        $("#ocr-result").children().remove();
+                        var op=new Array();
+                        op.push('<option value="0">0</option>')
+                        for(var i =0;i<ocr.length;i++){
+                            var re ='<li>\n' +
+                                ' <span class="m-l-xs">'+(i+1)+'、</span>\n' +
+                                ' <span class="m-l-xs">'+ocr[i].words+'</span>\n' +
+                                ' </li>';
+                            $("#ocr-result").append(re);
+                            op.push('<option value="'+(i+1)+'">'+(i+1)+'</option>')
+                        }
+                        if(sign ==0){
+                            $("#init-ocr-config").find("select").each(function () {
+                                $(this).append(op);
+                            })
+                        }else if(sign ==1){
+                            if(result.data.order){
+                                $("#workorderNumber").val(result.data.order.workorderNumber);
+                                $("#orderCode").val(result.data.order.orderCode);
+                                $("#param1").val(result.data.order.param1);
+                                $("#productCode").val(result.data.order.productCode);
+                                $("#param2").val(result.data.order.param2);
+                                $("#param3").val(result.data.order.param3);
+                                var fs = $("#div-fs").find("input[type='radio']:checked").val();
+                                if(fs == 1){
+                                    saveToWork();
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $.modal.alertError(result.msg);
+                };
+                $.modal.closeLoading();
+                $.modal.enable();
+            }
+        })
+    }
+    /** 初始化OCR 配置 */
+    function initOcrConfig() {
+        $.modal.confirm("确定初始化配置吗?",function (e) {
+            if(e){
+                $.ajax({
+                    url:"/device/devWorkOrder/initOcr",
+                    data: {},
+                    type: "post",
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function () {
+                        $.modal.loading("正在初始化中，请稍后...");
+                    },
+                    success: function(result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.alertSuccess("初始化成功");
+                            refreshTab();
+                        } else {
+                            $.modal.alertError(result.msg);
+                        };
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                })
+            }
+        })
+    }
+    /**
+     * 刷新页面
+     */
+    function refreshTab() {
+        var currentId = window.parent.$('.page-tabs-content').find('.active').attr('data-id');
+        var target = window.parent.$('.RuoYi_iframe[data-id="' + currentId + '"]');
+        var url = target.attr('src');
+        target.attr('src', url).ready();
+    }
+    /**
+     * 保存匹配配置
+     */
+    function saveInitOcr() {
+        $.modal.confirm("是否保存匹配配置?",function (e) {
+            if(e){
+                var config = {
+                    url: '/device/devWorkOrder/initOcrSave',
+                    type: "post",
+                    dataType: "json",
+                    data: $('#save-init-config').serialize(),
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.alertSuccess("操作成功");
+                            refreshTab();
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+    /** 保存工单信息 */
+    function saveWork() {
+        if(sign ==1){
+            $.modal.confirm("确认保存相关工单信息吗",function (e) {
+                if(e){
+                    saveToWork();
+                }
+            })
+        }else{
+            $.modal.alertWarning("请先进行相关配置")
+        }
+    }
+    function saveToWork() {
+        var data={
+            wlSign:$("#div-wlSign").find("input[type='radio']:checked").val(),
+            workorderNumber:$("#workorderNumber").val(),
+            orderCode:$("#orderCode").val(),
+            param1:$("#param1").val(),
+            productCode:$("#productCode").val(),
+            param2:$("#param2").val(),
+            param3:$("#param3").val()
+        }
+        var config = {
+            url: '/device/devWorkOrder/ocrSaveWork',
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $.modal.alertSuccess("操作成功");
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+                $.modal.enable();
+            }
+        };
+        $.ajax(config)
+    }
+</script>
+</body>
+</html>
