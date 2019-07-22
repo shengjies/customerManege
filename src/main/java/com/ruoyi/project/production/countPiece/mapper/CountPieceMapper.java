@@ -92,5 +92,5 @@ public interface CountPieceMapper
 	 * @param workid 工单id
 	 * @return
 	 */
-	CountPiece selectPieceByWorkId(@Param("workid")int workid);
+	CountPiece selectPieceByWorkId(@Param("workid")int workid,@Param("cpUserId") Integer cpUserId);
 }

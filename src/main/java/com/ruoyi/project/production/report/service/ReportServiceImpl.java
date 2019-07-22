@@ -1,8 +1,5 @@
 package com.ruoyi.project.production.report.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -26,20 +23,14 @@ import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ReportServiceImpl implements IReportService {
@@ -386,6 +377,7 @@ public class ReportServiceImpl implements IReportService {
                     startTime+" 00:00:00",endTime+" 23:59:59",1,userId);
         }
 
+        CountPiece piece = null;
         if(orders != null && orders.size() > 0){
             for (DevWorkOrder order : orders) {
                 sb.append(order.getId());
@@ -394,7 +386,11 @@ public class ReportServiceImpl implements IReportService {
                 order.setActualWarehouseNum(0);//计件数
                 order.setBadNumber(0);//不良品数
                 order.setWorkingHour(0F);
-                CountPiece piece = countPieceMapper.selectPieceByWorkId(order.getId());
+                if (userId <= 0) {
+                    piece = countPieceMapper.selectPieceByWorkId(order.getId(),0);
+                } else {
+                    piece = countPieceMapper.selectPieceByWorkId(order.getId(),userId);
+                }
                 if(piece != null){
                     order.setActualWarehouseNum(piece.getCpNumber());//计件数
                     order.setBadNumber(piece.getCpBadNumber());//不良品数

@@ -2,6 +2,7 @@ package com.ruoyi.project.iso.iso.service;
 
 import com.ruoyi.common.constant.DevConstants;
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
@@ -39,6 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -194,24 +197,30 @@ public class IsoServiceImpl implements IIsoService {
                 // 判断文件名是否重复
                 isoUnique = isoMapper.selectIsoByEName(isoData.getDiskPath(),iso.geteName());
                 if (StringUtils.isNotNull(isoUnique)) {
-                    throw new BusinessException("文件名称重复，请重新输入");
-                }
-                // 获取旧文件信息
-                File file = new File(isoData.getDisk() + "/" + isoData.getcName());
-                if (file.exists()) { // 文件存在
-                    String suffixName = file.getName();
-                    suffixName = suffixName.substring(suffixName.lastIndexOf("."),suffixName.length()); // 文件名后缀
-                    // 创建新的文件
-                    File newFile = new File(isoData.getDisk() + "/" + iso.geteName() + suffixName);
-                    FileUtils.copyFile(file,newFile);
-                    file.delete();
-                    iso.setcName(iso.geteName() + suffixName);
-                    iso.setPath(isoFileUrl + isoData.getDiskPath() + "/" + iso.geteName() + suffixName);
-                    iso.seteName(iso.geteName());
+                    if (!isoUnique.getIsoId().equals(iso.getIsoId())) {
+                        throw new BusinessException("文件名称重复，请重新输入");
+                    }
+                    if (iso.geteName().equals(isoUnique.geteName())) {
+                        return isoMapper.updateIso(iso);
+                    }
+                } else {
+                    // 获取旧文件信息
+                    File file = new File(isoData.getDisk() + "/" + isoData.getcName());
+                    if (file.exists()) { // 文件存在
+                        String suffixName = file.getName();
+                        suffixName = suffixName.substring(suffixName.lastIndexOf("."),suffixName.length()); // 文件名后缀
+                        // 创建新的文件
+                        File newFile = new File(isoData.getDisk() + "/" + iso.geteName() + suffixName);
+                        FileUtils.copyFile(file,newFile);
+                        file.delete();
+                        iso.setcName(iso.geteName() + suffixName);
+                        iso.setPath(isoFileUrl + isoData.getDiskPath() + "/" + iso.geteName() + suffixName);
+                        iso.seteName(iso.geteName());
+                    }
                 }
             } else { // 文件夹类型
                 isoUnique = isoMapper.selectIsoByFolderNameUnique(FileConstants.ITYPE_FOLDER,isoData.getParentId(),iso.getcName());
-                if (StringUtils.isNotNull(isoUnique)) {
+                if (StringUtils.isNotNull(isoUnique) && !isoUnique.getIsoId().equals(iso.getIsoId())) {
                     throw new BusinessException("文件名称重复，请重新输入");
                 }
             }
@@ -291,7 +300,7 @@ public class IsoServiceImpl implements IIsoService {
     public int uploadSop(MultipartFile file, int parentId, HttpServletRequest request) throws IOException {
         User user = JwtUtil.getTokenUser(request);
         if (user == null) {
-            return 0;
+            throw new BusinessException(UserConstants.NOT_LOGIN);
         }
 
         // 子文件
@@ -374,7 +383,13 @@ public class IsoServiceImpl implements IIsoService {
             iso.setFileSize(line.getLineName()+" "+ workstation.getwName());
             iso.setcId(0);
             // 设置作业指导书看板相关信息
-            SopApi sopApi = getSopApi(map, workOrder, iso);
+            SopApi sopApi = null;
+            try {
+                sopApi = getSopApi(map, workOrder, iso);
+            } catch (Exception e) {
+                // e.printStackTrace();
+               throw new BusinessException("文件获取失败");
+            }
             sopApi.setlName(line.getLineName());
             sopApi.setwName(workstation.getwName());
             map.put("data",sopApi);
@@ -416,7 +431,13 @@ public class IsoServiceImpl implements IIsoService {
             iso.setFileSize(house.getWorkshopName()+" "+ singleWork.getImCode());
             iso.setcId(0);
             // 设置作业指导书看板相关信息
-            SopApi sopApi = getSopApi(map, workOrder, iso);
+            SopApi sopApi = null;
+            try {
+                sopApi = getSopApi(map, workOrder, iso);
+            } catch (Exception e) {
+                // e.printStackTrace();
+                throw new BusinessException("文件获取失败");
+            }
             sopApi.setlName(house.getWorkshopName());
             sopApi.setwName(singleWork.getImCode());
             map.put("data",sopApi);
@@ -432,11 +453,10 @@ public class IsoServiceImpl implements IIsoService {
      * @param iso sop
      * @return 结果
      */
-    private SopApi getSopApi(Map<String, Object> map, DevWorkOrder workOrder, Iso iso) {
-        String hz = iso.getPath().substring(iso.getPath().lastIndexOf(".") + 1, iso.getPath().length());
-        if (hz.equals("pdf")) {
-            iso.setcId(1);
-        }
+    private SopApi getSopApi(Map<String, Object> map, DevWorkOrder workOrder, Iso iso) throws UnsupportedEncodingException {
+        int index = iso.getPath().lastIndexOf("/");
+        String path = iso.getPath().substring(0,index);
+        String fileName = iso.getPath().substring(index + 1);
         map.put("iso", iso);
         SopApi sopApi = new SopApi();
         sopApi.setwCode(workOrder.getWorkorderNumber());
@@ -446,6 +466,7 @@ public class IsoServiceImpl implements IIsoService {
         sopApi.setpName(workOrder.getProductName());
         sopApi.setIsoId(iso.getIsoId());
         sopApi.setIsoPath(iso.getPath());
+        sopApi.setPath(path+"/"+ URLEncoder.encode(fileName,"UTF-8"));
         return sopApi;
     }
 
