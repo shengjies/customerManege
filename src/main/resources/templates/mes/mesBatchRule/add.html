@@ -6,39 +6,28 @@
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form class="form-horizontal m" id="form-mesBatchRule-add">
 			<div class="form-group">	
-				<label class="col-sm-3 control-label">公司id：</label>
-				<div class="col-sm-8">
-					<input id="companyId" name="companyId" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
 				<label class="col-sm-3 control-label">规则名称：</label>
 				<div class="col-sm-8">
 					<input id="ruleName" name="ruleName" class="form-control" type="text">
 				</div>
 			</div>
 			<div class="form-group">	
-				<label class="col-sm-3 control-label">类型区分：</label>
+				<label class="col-sm-3 control-label">规格类型：</label>
 				<div class="col-sm-8">
-					<input id="pType" name="pType" class="form-control" type="text">
+					<select id="pType" name="pType" class="form-control">
+						<option value="-1">请选择</option>
+						<option value="0">产品</option>
+						<option value="1">半成品</option>
+					</select>
 				</div>
 			</div>
 			<div class="form-group">	
 				<label class="col-sm-3 control-label">物料编码：</label>
 				<div class="col-sm-8">
-					<input id="materiels" name="materiels" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">创建时间：</label>
-				<div class="col-sm-8">
-					<input id="cTime" name="cTime" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">修改时间：</label>
-				<div class="col-sm-8">
-					<input id="uTime" name="uTime" class="form-control" type="text">
+					<select style="width: 100%" id="materiels" name="materiels" multiple="multiple" class="form-control" th:with="allMat=${@materiel.selectAllMatByComId(#httpServletRequest.getCookies())}">
+						<option value="-1">请选择</option>
+						<option th:each="item : ${allMat}"  th:text="${item.materielCode}" th:value="${item.materielCode}"></option>
+					</select>
 				</div>
 			</div>
 		</form>
@@ -48,15 +37,69 @@
 		var prefix = ctx + "mes/mesBatchRule"
 		$("#form-mesBatchRule-add").validate({
 			rules:{
-				xxxx:{
+				ruleName:{
 					required:true,
+					remote: {
+						url: prefix + "/checkMesRuleNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							name : function() {
+								return $.common.trim($("#ruleName").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
 				},
+			},
+			messages:{
+				ruleName:{
+					required:"规格名称必填",
+					remote:"规格名称已存在",
+				}
 			}
 		});
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
-	            $.operate.save(prefix + "/add", $('#form-mesBatchRule-add').serialize());
+	        	var pType = $("#pType").find("option:selected").val();
+	        	if (pType <= -1) {
+	        	    $.modal.alertWarning("请选择规格类型");
+	        	    return;
+	        	}
+	        	console.log(pType);
+				//验证产品编码
+				var matSelect = $("#materiels").find("option:selected");
+				if($(matSelect).size() <= 0){
+					$.modal.alertWarning("请选择物料编码");
+					return;
+				}
+				var materielList = '';
+				for(var i =0;i<$(matSelect).size();i++){
+					materielList += $(matSelect[i]).val() + ",";
+				}
+				var data={
+					ruleName:$.common.trim($("#ruleName").val()),
+					pType:pType,
+					materiels:materielList,
+				}
+				var config = {
+					url: prefix + "/add",
+					type: "post",
+					dataType: "json",
+					contentType: 'application/json',
+					data: JSON.stringify(data),
+					beforeSend: function () {
+						$.modal.loading("正在处理中，请稍后...");
+						$.modal.disable();
+					},
+					success: function (result) {
+						$.operate.successCallback(result);
+					}
+				};
+				$.ajax(config)
 	        }
 	    }
 	</script>

@@ -1,6 +1,8 @@
 package com.ruoyi.project.mes.mesBatchRule.mapper;
 
 import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;	
 
 /**
@@ -58,5 +60,12 @@ public interface MesBatchRuleMapper
      * @return 结果
      */
 	public int deleteMesBatchRuleByIds(String[] ids);
-	
+
+	/**
+	 * 通过规格名称查询MES追踪规格信息
+	 * @param companyId 公司id
+	 * @param ruleName 规格名称
+	 * @return 结果
+	 */
+	MesBatchRule selectMesBatchRuleByName(@Param("companyId") Integer companyId, @Param("ruleName") String ruleName);
 }

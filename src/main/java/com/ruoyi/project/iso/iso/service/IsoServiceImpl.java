@@ -27,7 +27,6 @@ import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
-import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.mapper.WorkstationMapper;
 import com.ruoyi.project.system.user.domain.User;
@@ -78,9 +77,6 @@ public class IsoServiceImpl implements IIsoService {
 
     @Autowired
     private SingleWorkMapper singleWorkMapper;
-
-    @Autowired
-    private SingleWorkOrderMapper singleWorkOrderMapper;
 
     @Value("${file.iso}")
     private String isoFileUrl;
@@ -350,13 +346,18 @@ public class IsoServiceImpl implements IIsoService {
      */
     @Override
     public Map<String,Object> selectSopByDevCode(String code){
-        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>(16);
         DevList devList = devListMapper.selectDevListByCode(code);
         if (devList == null || devList.getCompanyId() == null) {
             throw new BusinessException("硬件不存在或未归属公司");
         }
         if (devList.getDevType() == null || devList.getSign().equals(DevConstants.DEV_SIGN_NOT_USE)) {
             throw new BusinessException("硬件未被配置");
+        }
+        //查询对应公司信息
+        DevCompany company = companyMapper.selectDevCompanyById(devList.getCompanyId());
+        if(company == null){
+            throw new BusinessException("公司信息不存在");
         }
         /**
          * 生产线
@@ -392,6 +393,7 @@ public class IsoServiceImpl implements IIsoService {
             }
             sopApi.setlName(line.getLineName());
             sopApi.setwName(workstation.getwName());
+            sopApi.setCompany(company.getComName());
             map.put("data",sopApi);
             return map;
 
@@ -440,6 +442,7 @@ public class IsoServiceImpl implements IIsoService {
             }
             sopApi.setlName(house.getWorkshopName());
             sopApi.setwName(singleWork.getImCode());
+            sopApi.setCompany(company.getComName());
             map.put("data",sopApi);
             return map;
         }

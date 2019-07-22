@@ -11,6 +11,7 @@ public class SopApi {
     private int isoId;//文件id
     private String isoPath;//文件地址
     private String path;//文件地址
+    private String company;//公司名称
 
     public String getlName() {
         return lName;
@@ -90,5 +91,13 @@ public class SopApi {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 }

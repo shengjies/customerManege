@@ -1,23 +1,21 @@
 package com.ruoyi.project.mes.mesBatchRule.controller;
 
-import java.util.List;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
-import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * MES批准追踪规则 信息操作处理
@@ -84,9 +82,13 @@ public class MesBatchRuleController extends BaseController
 	@Log(title = "MES批准追踪规则", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(MesBatchRule mesBatchRule)
-	{		
-		return toAjax(mesBatchRuleService.insertMesBatchRule(mesBatchRule));
+	public AjaxResult addSave(@RequestBody MesBatchRule mesBatchRule)
+	{
+		try {
+			return toAjax(mesBatchRuleService.insertMesBatchRule(mesBatchRule));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 	/**
@@ -122,6 +124,15 @@ public class MesBatchRuleController extends BaseController
 	public AjaxResult remove(String ids)
 	{		
 		return toAjax(mesBatchRuleService.deleteMesBatchRuleByIds(ids));
+	}
+
+	/**
+	 * 校验追踪规格名称的唯一性
+	 */
+	@PostMapping("/checkMesRuleNameUnique")
+	@ResponseBody
+	public String checkMesRuleNameUnique(MesBatchRule mesBatchRule){
+		return mesBatchRuleService.checkMesRuleNameUnique(mesBatchRule);
 	}
 	
 }

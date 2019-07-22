@@ -1,7 +1,6 @@
 package com.ruoyi.project.device.devList.service;
 
 import com.ruoyi.common.constant.DevConstants;
-import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.feign.FeignUtils;
 import com.ruoyi.common.feign.devList.DevListApi;
 import com.ruoyi.common.support.Convert;
@@ -165,6 +164,9 @@ public class DevListServiceImpl implements IDevListService {
         HashMap<String, Object> result = devListApi.addSaveDevList(devListResult, JwtUtil.getToken(request));
         devList.setCreateDate(new Date());
         if (Double.valueOf(result.get("code").toString()) == 0) {
+            String data = result.get("data").toString();
+            int id = Integer.parseInt(data.substring(0, data.lastIndexOf(".")));
+            devList.setId(id);
             return devListMapper.insertDevList(devList);
         }
         return 0;

@@ -50,5 +50,11 @@ public interface IMesBatchRuleService
      * @return 结果
      */
 	public int deleteMesBatchRuleByIds(String ids);
-	
+
+	/**
+	 * 校验规格名称的唯一性
+	 * @param mesBatchRule 追踪规格
+	 * @return 结果
+	 */
+    String checkMesRuleNameUnique(MesBatchRule mesBatchRule);
 }

@@ -1,8 +1,7 @@
 package com.ruoyi.project.mes.mesBatchRule.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -30,79 +29,72 @@ public class MesBatchRule extends BaseEntity
 	/** 修改时间 */
 	private Date uTime;
 
-	public void setId(Integer id) 
-	{
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getId() 
-	{
-		return id;
+	public Integer getCompanyId() {
+		return companyId;
 	}
-	public void setCompanyId(Integer companyId) 
-	{
+
+	public void setCompanyId(Integer companyId) {
 		this.companyId = companyId;
 	}
 
-	public Integer getCompanyId() 
-	{
-		return companyId;
+	public String getRuleName() {
+		return ruleName;
 	}
-	public void setRuleName(String ruleName) 
-	{
+
+	public void setRuleName(String ruleName) {
 		this.ruleName = ruleName;
 	}
 
-	public String getRuleName() 
-	{
-		return ruleName;
+	public Integer getpType() {
+		return pType;
 	}
-	public void setPType(Integer pType) 
-	{
+
+	public void setpType(Integer pType) {
 		this.pType = pType;
 	}
 
-	public Integer getPType() 
-	{
-		return pType;
+	public String getMateriels() {
+		return materiels;
 	}
-	public void setMateriels(String materiels) 
-	{
+
+	public void setMateriels(String materiels) {
 		this.materiels = materiels;
 	}
 
-	public String getMateriels() 
-	{
-		return materiels;
+	public Date getcTime() {
+		return cTime;
 	}
-	public void setCTime(Date cTime) 
-	{
+
+	public void setcTime(Date cTime) {
 		this.cTime = cTime;
 	}
 
-	public Date getCTime() 
-	{
-		return cTime;
-	}
-	public void setUTime(Date uTime) 
-	{
-		this.uTime = uTime;
-	}
-
-	public Date getUTime() 
-	{
+	public Date getuTime() {
 		return uTime;
 	}
 
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("companyId", getCompanyId())
-            .append("ruleName", getRuleName())
-            .append("pType", getPType())
-            .append("materiels", getMateriels())
-            .append("cTime", getCTime())
-            .append("uTime", getUTime())
-            .toString();
-    }
+	public void setuTime(Date uTime) {
+		this.uTime = uTime;
+	}
+
+	@Override
+	public String toString() {
+		return "MesBatchRule{" +
+				"id=" + id +
+				", companyId=" + companyId +
+				", ruleName='" + ruleName + '\'' +
+				", pType=" + pType +
+				", materiels='" + materiels + '\'' +
+				", cTime=" + cTime +
+				", uTime=" + uTime +
+				'}';
+	}
 }

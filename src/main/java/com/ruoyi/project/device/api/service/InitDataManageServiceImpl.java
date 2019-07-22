@@ -507,15 +507,15 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             //判断对应的硬件编码是否存在
             DevList devList = devListMapper.selectDevListByCode(code);
             if (devList == null || devList.getCompanyId() == null) {
-                map.put("code", 3);//硬件编码不存在
+                map.put("status", 3);//硬件编码不存在
                 map.put("msg","硬件编码不存在");
-                map.put("status", 0);//上报失败
+                map.put("code", 0);//上报失败
                 return map;
             }
             if (devList.getDevType() == null) {
-                map.put("code", 4);//硬件未配置流水线或者车间
+                map.put("status", 4);//硬件未配置流水线或者车间
                 map.put("msg","硬件未被配置");
-                map.put("status", 0);//上报失败
+                map.put("code", 0);//上报失败
                 return map;
             }
             /**
@@ -525,16 +525,16 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 //查询对应硬件是否配置产线
                 Workstation workstation = workstationMapper.selectInfoByDevice(devList.getId(), 0, 0);
                 if (workstation == null || workstation.getLineId() == null) {
-                    map.put("code", 4);//硬件未配置产线
+                    map.put("status", 4);//硬件未配置产线
                     map.put("msg","硬件未被配置");
-                    map.put("status", 0);//上报失败
+                    map.put("code", 0);//上报失败
                     return map;
                 }
                 ApiWorkForm workForm = findLineAndWork(devList, workstation, null);
                 if (workForm == null || workForm.getWorkId() == null) {
-                    map.put("code", 2);//不存在对应工单信息
+                    map.put("status", 2);//不存在对应工单信息
                     map.put("msg","不存在对应工单信息");
-                    map.put("status", 0);//上报失败
+                    map.put("code", 0);//上报失败
                     return map;
                 }
                 //查询对应异常类型是否存在
@@ -556,9 +556,9 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 exceptionList.setRemark("工位:" + workstation.getwName() + ",设备ID：" + code + ",上报异常");
                 exceptionList.setCreateTime(new Date());
                 workExceptionListMapper.insertWorkExceptionList(exceptionList);
-                map.put("code", 1);//创建成功
+                map.put("status", 1);//创建成功
                 map.put("msg","上报成功");
-                map.put("status", 1);//上报成功
+                map.put("code", 1);//上报成功
 
 
                 /**
@@ -599,17 +599,17 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 exceptionList.setRemark("单工位设备编号:" + singleWork.getImCode() + ",设备ID：" + code + ",上报异常");
                 exceptionList.setCreateTime(new Date());
                 workExceptionListMapper.insertWorkExceptionList(exceptionList);
-                map.put("code", 1);//创建成功
+                map.put("status", 1);//创建成功
                 map.put("msg","上报成功");
-                map.put("status", 1);//上报成功
+                map.put("code", 1);//上报成功
 
             }
 
         } catch (Exception e) {
             // e.printStackTrace();
-            map.put("code", 0);//异常错误
-            map.put("msg","异常错误");
-            map.put("status", 0);//上报失败
+            map.put("status", 0);//异常错误
+            map.put("msg","系统异常");
+            map.put("code", 0);//上报失败
         }
         return map;
     }

@@ -1,12 +1,20 @@
 package com.ruoyi.project.mes.mesBatchRule.service;
 
-import java.util.List;
+import com.ruoyi.common.constant.MesConstants;
+import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleMapper;
+import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleMapper;
-import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
-import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleService;
-import com.ruoyi.common.support.Convert;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * MES批准追踪规则 服务层实现
@@ -41,7 +49,12 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	@Override
 	public List<MesBatchRule> selectMesBatchRuleList(MesBatchRule mesBatchRule)
 	{
-	    return mesBatchRuleMapper.selectMesBatchRuleList(mesBatchRule);
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return Collections.emptyList();
+		}
+		mesBatchRule.setCompanyId(user.getCompanyId());
+		return mesBatchRuleMapper.selectMesBatchRuleList(mesBatchRule);
 	}
 	
     /**
@@ -53,7 +66,18 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	@Override
 	public int insertMesBatchRule(MesBatchRule mesBatchRule)
 	{
-	    return mesBatchRuleMapper.insertMesBatchRule(mesBatchRule);
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    throw new BusinessException(UserConstants.NOT_LOGIN);
+		}
+		String materiels = mesBatchRule.getMateriels();
+		if (StringUtils.isNotNull(materiels)) {
+			String materielSub = materiels.substring(0, materiels.lastIndexOf(','));
+			mesBatchRule.setMateriels(materielSub);
+		}
+		mesBatchRule.setCompanyId(user.getCompanyId());
+		mesBatchRule.setcTime(new Date());
+		return mesBatchRuleMapper.insertMesBatchRule(mesBatchRule);
 	}
 	
 	/**
@@ -65,6 +89,7 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	@Override
 	public int updateMesBatchRule(MesBatchRule mesBatchRule)
 	{
+		mesBatchRule.setuTime(new Date());
 	    return mesBatchRuleMapper.updateMesBatchRule(mesBatchRule);
 	}
 
@@ -79,5 +104,22 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	{
 		return mesBatchRuleMapper.deleteMesBatchRuleByIds(Convert.toStrArray(ids));
 	}
-	
+
+	/**
+	 * 校验追踪规格的唯一性
+	 * @param mesBatchRule 追踪规格
+	 * @return 结果
+	 */
+	@Override
+	public String checkMesRuleNameUnique(MesBatchRule mesBatchRule) {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return MesConstants.MES_RULENAME_NOT_UNIQUE;
+		}
+		MesBatchRule mesBatchRuleUnique = mesBatchRuleMapper.selectMesBatchRuleByName(user.getCompanyId(),mesBatchRule.getRuleName());
+		if (StringUtils.isNotNull(mesBatchRuleUnique) && !mesBatchRule.getId().equals(mesBatchRuleUnique.getId())) {
+		    return MesConstants.MES_RULENAME_NOT_UNIQUE;
+		}
+		return MesConstants.MES_RULENAME_UNIQUE;
+	}
 }
