@@ -1,5 +1,6 @@
 package com.ruoyi.project.mes.mesBatch.domain;
 
+import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
@@ -20,20 +21,30 @@ public class MesBatch extends BaseEntity
 	/** 公司id */
 	private Integer companyId;
 	/** 主码 */
+	@Excel(name = "主码")
 	private String mesCode;
 	/** 工单号 */
+	@Excel(name = "工单号")
 	private String workCode;
 	/** 订单号 */
+	@Excel(name = "订单号")
 	private String orderCode;
+	/** 产品/半成品编码 */
+	@Excel(name = "产品/半成品")
+	private String pbCode;
 	/** 规则id */
 	private Integer ruleId;
 	/** 规则名称 */
+	@Excel(name = "MES规则")
 	private String ruleName;
 	/** 规则物料 */
+	@Excel(name = "物料")
 	private String ruleMateriel;
 	/** 创建时间 */
+	@Excel(name = "创建时间",dateFormat = "yyyy-MM-dd HH:mm:ss")
 	private Date cTime;
-	/**  */
+	/** 修改时间 */
+	@Excel(name = "修改时间",dateFormat = "yyyy-MM-dd HH:mm:ss")
 	private Date uTime;
 
 	public void setId(Integer id) 
@@ -80,6 +91,15 @@ public class MesBatch extends BaseEntity
 	public String getOrderCode() 
 	{
 		return orderCode;
+	}
+	public void setPbCode(String pbCode) 
+	{
+		this.pbCode = pbCode;
+	}
+
+	public String getPbCode() 
+	{
+		return pbCode;
 	}
 	public void setRuleId(Integer ruleId) 
 	{
@@ -134,6 +154,7 @@ public class MesBatch extends BaseEntity
             .append("mesCode", getMesCode())
             .append("workCode", getWorkCode())
             .append("orderCode", getOrderCode())
+            .append("pbCode", getPbCode())
             .append("ruleId", getRuleId())
             .append("ruleName", getRuleName())
             .append("ruleMateriel", getRuleMateriel())

@@ -11,20 +11,20 @@
 						<ul>
 							<li>
 								物料编码：
-								<select id="materielCode" name="materielCode" th:with="allMat=${@materiel.selectAllMatByComId(#httpServletRequest.getCookies())}">
+								<select id="materielCode" name="materielCode" th:with="allMat=${@materiel.selectAllMatByComId()}">
 									<option value="">请选择</option>
 									<option th:each="mat:${allMat}" th:text="${mat.materielCode}" th:value="${mat.materielCode}"></option>
 								</select>
 							</li>
 							<li>
-								物料型号：
-								<select id="materielModel" name="materielModel" th:with="allMat=${@materiel.selectAllMatByComId(#httpServletRequest.getCookies())}">
+								物料名称：
+								<select id="materielModel" name="materielModel" th:with="allMat=${@materiel.selectAllMatByComId()}">
 									<option value="">请选择</option>
 									<option th:each="mat:${allMat}" th:text="${mat.materielModel}" th:value="${mat.materielModel}"></option>
 								</select>
 							</li>
 							<li>
-								物料名称：
+								物料型号：
 								<select id="materielName" name="materielName" th:with="allMatName=${@materiel.selectAllMatNameByComId(#httpServletRequest.getCookies())}">
 									<option value="">请选择</option>
 									<option th:each="mat:${allMatName}" th:text="${mat.materielName}" th:value="${mat.materielName}"></option>
@@ -74,8 +74,8 @@
     <script th:inline="javascript">
         $(function () {
             $("select").select2({
-                width:"100px",
-                placeholder:'请选择'
+                width:"180px",
+                // placeholder:'请选择'
             });
         })
         // 重置搜索表单信息

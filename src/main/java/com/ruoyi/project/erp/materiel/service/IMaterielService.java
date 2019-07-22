@@ -96,7 +96,7 @@ public interface IMaterielService {
      * 查询各公司的物料信息
      * @return 结果
      */
-    List<Materiel> selectAllMatByComId(Cookie[] cookies);
+    List<Materiel> selectAllMatByComId();
 
     /**
      * 查询公司的物料名称信息

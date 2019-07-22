@@ -24,7 +24,7 @@
 			<div class="form-group">	
 				<label class="col-sm-3 control-label">物料编码：</label>
 				<div class="col-sm-8">
-					<select style="width: 100%" id="materiels" name="materiels" multiple="multiple" class="form-control" th:with="allMat=${@materiel.selectAllMatByComId(#httpServletRequest.getCookies())}">
+					<select style="width: 100%" id="materiels" name="materiels" multiple="multiple" class="form-control" th:with="allMat=${@materiel.selectAllMatByComId()}">
 						<option value="-1">请选择</option>
 						<option th:each="item : ${allMat}"  th:text="${item.materielCode}" th:value="${item.materielCode}"></option>
 					</select>

@@ -268,12 +268,14 @@
                 {
                     field: 'productionStart',
                     title: '计划开始',
-                    sortable: true
+                    sortable: true,
+                    width:100
                 },
                 {
                     field: 'productionEnd',
                     title: '计划结束',
                     sortable: true,
+                    width:100
                 },
                 {
                     field: 'productStandardHour',
@@ -317,9 +319,11 @@
                             if (row.workSign == 0) {  // 工单还未提交可进行修改
                                 actions.push('<a class="btn btn-default btn-xs '+ editFlag +'" href="javascript:void(0)" onclick="edit(' + row.id + ','+row.wlSign+')"><i></i>编辑</a> ');
                                 actions.push('<a class="btn btn-primary btn-xs '+ editFlag +'" href="javascript:void(0)" onclick="submitWorkOrder(\'' + row.id + '\')"><i></i>提交</a> ');
+                                actions.push('<a class="btn btn-primary btn-xs '+ editFlag +'" href="javascript:void(0)" onclick="submitWorkOrder(\'' + row.id + '\')"><i></i>MES</a> ');
                             } else if (row.workSign == 1) { // 工单已经提交，不能修改
                                 actions.push('<a class="btn btn-default btn-xs '+ editFlag +'" href="javascript:void(0)" disabled="true"><i></i>编辑</a> ');
                                 actions.push('<a class="btn btn-success btn-xs '+ editFlag +'" href="javascript:void(0)" disabled="true"><i></i>已提</a> ');
+                                actions.push('<a class="btn btn-primary btn-xs '+ editFlag +'" href="javascript:void(0)" disabled="true"><i></i>MES</a> ');
                             }
                         }
 

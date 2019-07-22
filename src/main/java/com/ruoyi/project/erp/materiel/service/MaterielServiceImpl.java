@@ -86,10 +86,10 @@ public class MaterielServiceImpl implements IMaterielService {
 
         for (Materiel mat : materielList) {
             // 查询物料是否关联了供应商信息
-            List<MaterielSupplier> materielSuppliers = materielSupplierMapper.selectMaterielSupplierListByMatIdAndSupId(mat.getId(), null);
-            if (!StringUtils.isEmpty(materielSuppliers)) { // 物料关联了供应商信息
-                mat.setMaterielSupplier(materielSuppliers.get(0));
-            }
+//            List<MaterielSupplier> materielSuppliers = materielSupplierMapper.selectMaterielSupplierListByMatIdAndSupId(mat.getId(), null);
+//            if (!StringUtils.isEmpty(materielSuppliers)) { // 物料关联了供应商信息
+//                mat.setMaterielSupplier(materielSuppliers.get(0));
+//            }
             // 查询物料是否上传了文件
             List<FileSourceInfo> fileSourceInfoList = fileSourceInfoMapper.selectFileSourceInfoBySaveIdAndComId(mat.getId(), sysUser.getCompanyId());
             if (!StringUtils.isEmpty(fileSourceInfoList)) {
@@ -427,8 +427,8 @@ public class MaterielServiceImpl implements IMaterielService {
      * @return
      */
     @Override
-    public List<Materiel> selectAllMatByComId(Cookie[] cookies) {
-        User user = JwtUtil.getTokenCookie(cookies);
+    public List<Materiel> selectAllMatByComId() {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         if (user == null) {
             return Collections.emptyList();
         }

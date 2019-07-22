@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mesCode"    column="mes_code"    />
         <result property="workCode"    column="work_code"    />
         <result property="orderCode"    column="order_code"    />
+        <result property="pbCode"    column="pb_code"    />
         <result property="ruleId"    column="rule_id"    />
         <result property="ruleName"    column="rule_name"    />
         <result property="ruleMateriel"    column="rule_materiel"    />
@@ -18,7 +19,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectMesBatchVo">
-        select id, company_id, mes_code, work_code, order_code, rule_id, rule_name, rule_materiel, c_time, u_time from tab_mes_batch
+        select id, company_id, mes_code, work_code, order_code, pb_code, rule_id, rule_name, rule_materiel, c_time, u_time from tab_mes_batch
     </sql>
 	
     <select id="selectMesBatchList" parameterType="MesBatch" resultMap="MesBatchResult">
@@ -29,6 +30,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="mesCode != null  and mesCode != '' "> and mes_code = #{mesCode}</if>
              <if test="workCode != null  and workCode != '' "> and work_code = #{workCode}</if>
              <if test="orderCode != null  and orderCode != '' "> and order_code = #{orderCode}</if>
+             <if test="pbCode != null  and pbCode != '' "> and pb_code = #{pbCode}</if>
              <if test="ruleId != null "> and rule_id = #{ruleId}</if>
              <if test="ruleName != null  and ruleName != '' "> and rule_name = #{ruleName}</if>
              <if test="ruleMateriel != null  and ruleMateriel != '' "> and rule_materiel = #{ruleMateriel}</if>
@@ -49,6 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="mesCode != null  and mesCode != ''  ">mes_code,</if>
 			<if test="workCode != null  and workCode != ''  ">work_code,</if>
 			<if test="orderCode != null  and orderCode != ''  ">order_code,</if>
+			<if test="pbCode != null  and pbCode != ''  ">pb_code,</if>
 			<if test="ruleId != null  ">rule_id,</if>
 			<if test="ruleName != null  and ruleName != ''  ">rule_name,</if>
 			<if test="ruleMateriel != null  and ruleMateriel != ''  ">rule_materiel,</if>
@@ -60,6 +63,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="mesCode != null  and mesCode != ''  ">#{mesCode},</if>
 			<if test="workCode != null  and workCode != ''  ">#{workCode},</if>
 			<if test="orderCode != null  and orderCode != ''  ">#{orderCode},</if>
+			<if test="pbCode != null  and pbCode != ''  ">#{pbCode},</if>
 			<if test="ruleId != null  ">#{ruleId},</if>
 			<if test="ruleName != null  and ruleName != ''  ">#{ruleName},</if>
 			<if test="ruleMateriel != null  and ruleMateriel != ''  ">#{ruleMateriel},</if>
@@ -75,6 +79,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mesCode != null  and mesCode != ''  ">mes_code = #{mesCode},</if>
             <if test="workCode != null  and workCode != ''  ">work_code = #{workCode},</if>
             <if test="orderCode != null  and orderCode != ''  ">order_code = #{orderCode},</if>
+            <if test="pbCode != null  and pbCode != ''  ">pb_code = #{pbCode},</if>
             <if test="ruleId != null  ">rule_id = #{ruleId},</if>
             <if test="ruleName != null  and ruleName != ''  ">rule_name = #{ruleName},</if>
             <if test="ruleMateriel != null  and ruleMateriel != ''  ">rule_materiel = #{ruleMateriel},</if>

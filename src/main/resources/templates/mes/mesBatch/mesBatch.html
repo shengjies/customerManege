@@ -11,41 +11,39 @@
 					<div class="select-list">
 						<ul>
 							<li>
-								公司id：<input type="text" name="companyId"/>
+								主码：<input type="text" name="mesCode" style="max-width: 200px"/>
 							</li>
 
 							<li>
-								主码：<input type="text" name="mesCode"/>
+								工单号：<input type="text" name="workCode" style="max-width: 200px"/>
 							</li>
 
 							<li>
-								工单号：<input type="text" name="workCode"/>
+								订单号：<input type="text" name="orderCode" style="max-width: 200px"/>
 							</li>
 
 							<li>
-								订单号：<input type="text" name="orderCode"/>
+								产品/半成品：<input type="text" name="pbCode"/>
+							</li>
+							<li>
+								MES规则：<input type="text" name="ruleName"/>
 							</li>
 
 							<li>
-								规则id：<input type="text" name="ruleId"/>
+								物料：
+								<select id="ruleMateriel" name="ruleMateriel" th:with="allMat=${@materiel.selectAllMatByComId()}">
+									<option value="">请选择</option>
+									<option th:each="mat:${allMat}" th:text="${mat.materielCode}" th:value="${mat.materielCode}"></option>
+								</select>
 							</li>
-
-							<li>
-								规则名称：<input type="text" name="ruleName"/>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间"
+									   name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间"
+									   name="params[endTime]"/>
 							</li>
-
-							<li>
-								规则物料：<input type="text" name="ruleMateriel"/>
-							</li>
-
-							<li>
-								创建时间：<input type="text" name="cTime"/>
-							</li>
-
-							<li>
-								：<input type="text" name="uTime"/>
-							</li>
-
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
 								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -61,9 +59,6 @@
 				</a>
 				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="mes:mesBatch:edit">
 					<i class="fa fa-edit"></i> 修改
-				</a>
-				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="mes:mesBatch:remove">
-					<i class="fa fa-remove"></i> 删除
 				</a>
 				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="mes:mesBatch:export">
 						<i class="fa fa-download"></i> 导出
@@ -99,11 +94,6 @@
 					visible: false
 				},
 				{
-					field : 'companyId', 
-					title : '公司id',
-					sortable: true
-				},
-				{
 					field : 'mesCode', 
 					title : '主码',
 					sortable: true
@@ -119,18 +109,18 @@
 					sortable: true
 				},
 				{
-					field : 'ruleId', 
-					title : '规则id',
+					field : 'pbCode', 
+					title : '产品/半成品',
 					sortable: true
 				},
 				{
 					field : 'ruleName', 
-					title : '规则名称',
+					title : 'MES规则',
 					sortable: true
 				},
 				{
-					field : 'ruleMateriel', 
-					title : '规则物料',
+					field : 'ruleMateriel',
+					title : '物料',
 					sortable: true
 				},
 				{
@@ -140,7 +130,7 @@
 				},
 				{
 					field : 'uTime', 
-					title : '',
+					title : '修改时间',
 					sortable: true
 				},
 		        {
@@ -156,6 +146,13 @@
             };
             $.table.init(options);
         });
+
+		$(function () {
+			$("select").select2({
+				width:"180px",
+				// placeholder:'请选择'
+			});
+		})
     </script>
 </body>
 </html>

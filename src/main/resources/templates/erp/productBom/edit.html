@@ -93,7 +93,7 @@
                                         <tr th:if="${ not #lists.isEmpty(detail)}" th:each="de:${detail}" th:data-bom-index="${de.bIndex}">
                                             <td>
                                                 <select name="detailId"
-                                                        th:with="materiel = ${@materiel.selectAllMatByComId(#httpServletRequest.getCookies())}"
+                                                        th:with="materiel = ${@materiel.selectAllMatByComId()}"
                                                         style="min-width: 180px;">
                                                     <option th:each="item:${materiel}" th:value="${item.id}"
                                                             th:utext="${item.materielCode}"
