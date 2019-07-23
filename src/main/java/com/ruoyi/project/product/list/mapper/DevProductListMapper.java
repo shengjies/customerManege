@@ -171,4 +171,13 @@ public interface DevProductListMapper {
      * @return 结果
      */
     List<DevProductList> selectProductAll(@Param("companyId") Integer companyId);
+
+    /**
+     * 修改对应的产品MES规则
+     * @param id 产品/半成品id
+     * @param ruleId 规则id
+     * @return
+     */
+    int saveMesRuleConfig(@Param("id")int id,@Param("ruleId")int ruleId);
+
 }

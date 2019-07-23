@@ -112,6 +112,8 @@ public class DevProductList extends BaseEntity {
     /** 单位 */
     @Excel(name = "单位")
     private String unit;
+    /** 规格id */
+    private Integer ruleId;
 
 
     public Integer getEcnType() {
@@ -303,6 +305,14 @@ public class DevProductList extends BaseEntity {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public Integer getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Integer ruleId) {
+        this.ruleId = ruleId;
     }
 
     @Override

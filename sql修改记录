@@ -520,4 +520,6 @@ ADD COLUMN `pb_sign` INT NULL DEFAULT 0 COMMENT '暂停开始最后一次计数�
 ALTER TABLE `octopus`.`tab_materiel`
 ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '物料添加单位' AFTER `create_time`;
 
-
+#产品/半成品   规格配置
+ALTER TABLE `bzytest`.`dev_product_list`
+ADD COLUMN `rule_id` INT NULL DEFAULT 0 COMMENT '规格配置' AFTER `unit`;

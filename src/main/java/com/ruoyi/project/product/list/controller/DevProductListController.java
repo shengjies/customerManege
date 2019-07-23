@@ -390,4 +390,52 @@ public class DevProductListController extends BaseController {
         ExcelUtil<DevProductList> util = new ExcelUtil<DevProductList>(DevProductList.class);
         return util.exportExcel(list, "半成品编码");
     }
+
+
+    /********************MES规则配置***********************/
+
+    @GetMapping("/mesConfig")
+    public String mesConfig(int id,ModelMap modelMap){
+        modelMap.put("id",id);
+        modelMap.put("rule",devProductListService.selectMesBatchRuleByPbId(id));
+        return prefix+"/mesConfig";
+    }
+
+    @GetMapping("/mesParConfig")
+    public String mesParConfig(int id,ModelMap modelMap){
+        modelMap.put("id",id);
+        modelMap.put("rule",devProductListService.selectMesBatchRuleByPbId(id));
+        return prefixPart+"/mesParConfig";
+    }
+
+    /**
+     * 保存 MES 规则
+     * @param id 产品/半成品
+     * @param ruleId 对应规则id
+     * @return
+     */
+    @ResponseBody
+    @PostMapping("/saveMesRule")
+    public AjaxResult saveMesRuleConfig(int id,int ruleId){
+        try {
+            return toAjax(devProductListService.saveMesRuleConfig(id,ruleId));
+        }catch (Exception e){
+            return error(e.getMessage());
+        }
+    }
+
+    /**
+     * 取消MES 规则配置
+     * @param id 对应产品/半成品id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/cancelMes")
+    public AjaxResult cancel(int id){
+        try {
+            return toAjax(devProductListService.cancel(id));
+        }catch (Exception e){
+            return error();
+        }
+    }
 }

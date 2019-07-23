@@ -1,5 +1,6 @@
 package com.ruoyi.project.product.list.service;
 
+import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -146,4 +147,27 @@ public interface IDevProductListService
 	 * @return 结果
 	 */
 	List<DevProductList> selectProductAll();
+
+	/********************MES规则配置*********************/
+	/**
+	 * 保存MES规则配置
+	 * @param id 对应产品/半成品 id
+	 * @param ruleId 规则id
+	 * @return
+	 */
+	int saveMesRuleConfig(int id,int ruleId) throws Exception;
+
+	/**
+	 * 取消产品/半成品 mes 规则
+	 * @param id 产品/半成品id
+	 * @return
+	 */
+	int cancel(int id);
+
+	/**
+	 * 根据产品/半成品id查询对应配置的规则信息
+	 * @param id 产品/半成品
+	 * @return
+	 */
+	MesBatchRule selectMesBatchRuleByPbId(int id);
 }

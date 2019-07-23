@@ -22,7 +22,7 @@ import java.util.List;
  * @author sj
  * @date 2019-07-22
  */
-@Service
+@Service("mesRule")
 public class MesBatchRuleServiceImpl implements IMesBatchRuleService 
 {
 	@Autowired
@@ -121,5 +121,15 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 		    return MesConstants.MES_RULENAME_NOT_UNIQUE;
 		}
 		return MesConstants.MES_RULENAME_UNIQUE;
+	}
+
+	/**
+	 * 根据规则类型查询对应的规则列表
+	 * @param type 规则类型 0、产品 1、半成品
+	 * @return
+	 */
+	@Override
+	public List<MesBatchRule> selectMesRuleByType(int type) {
+		return mesBatchRuleMapper.selectMesRuleByType(type);
 	}
 }

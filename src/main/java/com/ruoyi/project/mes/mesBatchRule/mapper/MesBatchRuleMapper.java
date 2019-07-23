@@ -68,4 +68,11 @@ public interface MesBatchRuleMapper
 	 * @return 结果
 	 */
 	MesBatchRule selectMesBatchRuleByName(@Param("companyId") Integer companyId, @Param("ruleName") String ruleName);
+
+	/**
+	 * 根据规则类型查询对应的规则列表
+	 * @param type  规则类型 0、产品 1、半成品
+	 * @return
+	 */
+	List<MesBatchRule> selectMesRuleByType(@Param("type")int type);
 }

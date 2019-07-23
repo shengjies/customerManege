@@ -94,5 +94,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectMesBatchRuleByName" resultMap="MesBatchRuleResult">
         SELECT * FROM tab_mes_batch_rule where company_id = #{companyId} and rule_name = #{ruleName} limit 1
     </select>
+
+    <!--根据规则类型查询对应的规则列表-->
+    <select id="selectMesRuleByType" resultMap="MesBatchRuleResult">
+      SELECT * FROM tab_mes_batch_rule where p_type =#{type};
+    </select>
     
 </mapper>

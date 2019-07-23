@@ -15,6 +15,8 @@ import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
 import com.ruoyi.project.erp.productCustomer.mapper.ProductCustomerMapper;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
+import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleMapper;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
@@ -59,8 +61,8 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Autowired
     private EcnLogMapper ecnLogMapper;
 
-    @Autowired
-    private DevWorkOrderMapper workOrderMapper;
+   @Autowired
+   private MesBatchRuleMapper mesBatchRuleMapper;
 
     @Autowired
     private ProductStockMapper productStockMapper;
@@ -560,5 +562,46 @@ public class DevProductListServiceImpl implements IDevProductListService {
             return Collections.emptyList();
         }
         return devProductListMapper.selectProductAll(user.getCompanyId());
+    }
+
+    /**
+     * 保存MES规则配置
+     * @param id 对应产品/半成品 id
+     * @param ruleId 规则id
+     * @return
+     */
+    @Override
+    public int saveMesRuleConfig(int id, int ruleId) throws Exception {
+        //查询对应的规则是否存在
+        MesBatchRule batchRule = mesBatchRuleMapper.selectMesBatchRuleById(ruleId);
+        if(batchRule == null){
+            throw new Exception("对应MES规则不存在");
+        }
+        return devProductListMapper.saveMesRuleConfig(id,ruleId);
+    }
+
+    /**
+     * 取消产品/半成品 mes 规则
+     * @param id 产品/半成品id
+     * @return
+     */
+    @Override
+    public int cancel(int id) {
+        return devProductListMapper.saveMesRuleConfig(id,0);
+    }
+
+    /**
+     * 根据产品/半成品id查询对应配置的规则信息
+     * @param id 产品/半成品
+     * @return
+     */
+    @Override
+    public MesBatchRule selectMesBatchRuleByPbId(int id) {
+        //查询对应的产品/半成品是否存在
+        DevProductList devProductList = devProductListMapper.selectDevProductListById(id);
+        if(devProductList != null && devProductList.getRuleId() > 0){
+            return mesBatchRuleMapper.selectMesBatchRuleById(devProductList.getRuleId());
+        }
+        return null;
     }
 }

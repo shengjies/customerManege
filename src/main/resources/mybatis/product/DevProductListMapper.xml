@@ -23,11 +23,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ecnText"    column="ecn_text"    />
         <result property="sign"    column="sign"    />
         <result property="unit"    column="unit"    />
+        <result property="ruleId"    column="rule_id"    />
     </resultMap>
 	
 	<sql id="selectDevProductListVo">
         select id, company_id, product_code, product_name, remark, create_time, standard_hour_yield,create_by,product_model,price,
-        product_img,img_size,ecnstatus,ecn_text,sign,unit from dev_product_list
+        product_img,img_size,ecnstatus,ecn_text,sign,unit,rule_id from dev_product_list
     </sql>
 	
     <select id="selectDevProductListList" parameterType="DevProductList" resultMap="DevProductListResult">
@@ -49,6 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="price != null  and price != '' "> and price = #{price}</if>
             <if test="productImg != null  and productImg != '' "> and product_img = #{productImg}</if>
             <if test="imgSize != null  and imgSize != '' "> and img_size = #{imgSize}</if>
+            <if test="ruleId != null  and ruleId != '' "> and rule_id = #{ruleId}</if>
          </where>
     </select>
     
@@ -73,6 +75,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="imgSize != null  ">img_size,</if>
             <if test="sign != null  ">sign,</if>
             <if test="unit != null  ">unit,</if>
+            <if test="ruleId != null and ruleId != '' ">rule_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -88,6 +91,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="imgSize != null  ">#{imgSize},</if>
             <if test="sign != null  ">#{sign},</if>
             <if test="unit != null  ">#{unit},</if>
+            <if test="ruleId != null and ruleId != '' ">#{ruleId},</if>
          </trim>
     </insert>
 	 
@@ -105,6 +109,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="ecnStatus != null  ">ecnstatus = #{ecnStatus},</if>
             <if test="ecnText != null  ">ecn_text = #{ecnText},</if>
             <if test="unit != null  ">unit = #{unit},</if>
+            <if test="ruleId != null and ruleId != '' ">rule_id = #{ruleId},</if>
         </trim>
         where id = #{id}
     </update>
@@ -199,4 +204,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectProductAll" resultMap="DevProductListResult">
         SELECT * FROM dev_product_list where company_id = #{companyId}
     </select>
+
+    <!--修改对应的产品MES规则-->
+    <update id="saveMesRuleConfig">
+        update dev_product_list set rule_id =#{ruleId} where id =#{id}
+    </update>
 </mapper>

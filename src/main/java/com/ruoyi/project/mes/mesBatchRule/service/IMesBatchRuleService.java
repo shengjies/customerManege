@@ -57,4 +57,11 @@ public interface IMesBatchRuleService
 	 * @return 结果
 	 */
     String checkMesRuleNameUnique(MesBatchRule mesBatchRule);
+
+	/**
+	 * 根据规则类型查询对应的规则列表
+	 * @param type 规则类型 0、产品 1、半成品
+	 * @return
+	 */
+	List<MesBatchRule> selectMesRuleByType(int type);
 }
