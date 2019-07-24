@@ -20,7 +20,7 @@ public interface IUserService
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    public List<User> selectUserList(User user, HttpServletRequest request);
+    public List<User> selectUserList(User user);
 
     /**
      * 通过用户名查询用户

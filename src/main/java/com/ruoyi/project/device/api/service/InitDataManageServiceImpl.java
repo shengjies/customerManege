@@ -242,7 +242,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     devDataLogMapper.insertDevDataLog(devDataLog);
                 }
                 map.put("code", 1);//成功
-                map.put("msg","没有正在进行的工单");
+                map.put("msg","无工单");
                 map.put("status", 0);//没有正在进行的工单
                 map.put("num", 0);//没有正在进行的工单
                 map.put("tag", 0);//流水线标记
@@ -253,7 +253,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(workstation.getCompanyId(), workstation.getLineId(),
                             workOrder.getId(), devList.getId(), workstation.getId(), WorkConstants.SING_LINE);
                     if (workData != null && workData.getCumulativeNum() != null) {
-                        map.put("msg","工单生产状态进行中");
+                        map.put("msg","进行中");
                         map.put("num", workData.getCumulativeNum());//没有正在进行的工单
                         map.put("status", workOrder.getOperationStatus());//工单正在进行
                         map.put("workCode", workOrder.getWorkorderNumber());//工单编号为空
@@ -269,7 +269,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 if (StringUtils.isNull(singleWork) || singleWork.getParentId() == null) {
                     //硬件未被单工位配置
                     map.put("code", 4);
-                    map.put("msg","硬件未被单工位配置");
+                    map.put("msg","硬件未被工位配置");
                     //没有正在进行的工单
                     map.put("status", 0);
                     //工单累计
@@ -344,7 +344,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                     devDataLogMapper.insertDevDataLog(devDataLog);
                 }
                 map.put("code", 1);//成功
-                map.put("msg","没有正在进行的工单");
+                map.put("msg","无工单");
                 map.put("status", 0);//没有正在进行的工单
                 map.put("tag", 1);//车间标记
                 map.put("perNum", 0);//个人计件
@@ -353,7 +353,7 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 DevWorkOrder workOrder = devWorkOrderMapper.selectWorkInHouseBeInBySingId(devList.getCompanyId(), singleWork.getParentId(), WorkConstants.SING_SINGLE,
                         singleWork.getId(), WorkConstants.WORK_STATUS_STARTING);
                 if (workOrder != null) {
-                    map.put("msg","工单生产状态进行中");
+                    map.put("msg","进行中");
                     //查询对应工位的个人累计数量
                     CountPiece countPiece = countPieceMapper.selectPieceByWorkIdAndUid(workOrder.getId(), devList.getCompanyId(), singleWork.getLiableOne(), TimeUtil.getNYR());
                     if (countPiece != null) {
@@ -363,6 +363,9 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                             workOrder.getId(), devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
                     if (workData != null && workData.getCumulativeNum() != null) {
                         map.put("status", workOrder.getOperationStatus());
+                        if(workOrder.getOperationStatus() == WorkConstants.OPERATION_STATUS_PAUSE){
+                            map.put("msg","暂停中");
+                        }
                         // 该单工位累计产量
                         map.put("num", workData.getCumulativeNum());
                         map.put("workCode", workOrder.getWorkorderNumber());
@@ -399,14 +402,15 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
                 countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
                 countPieceMapper.updateCountPiece(countPiece);
-            } else if (data.getD1() > 0){
-                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
-                devDataLog.setWorkId(workOrder.getId());
-                devDataLog.setIoId(singleWork.getId());
-                countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
-                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
-                countPieceMapper.updateCountPiece(countPiece);
             }
+//            else if (data.getD1() > 0){
+//                CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
+//                devDataLog.setWorkId(workOrder.getId());
+//                devDataLog.setIoId(singleWork.getId());
+//                countPiece.setCpNumber(countPiece.getCpNumber() + data.getD1());
+//                countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
+//                countPieceMapper.updateCountPiece(countPiece);
+//            }
             // 个人计件统计
         } else {
             devDataLog.setDelData(data.getD1());

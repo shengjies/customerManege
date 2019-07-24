@@ -417,8 +417,8 @@
     function hzCheck(val) {
         //获取父元素
         var size = $(val).parent("label").parent("div[data-checke-info]").find("input[type='checkbox']:checked").size();
-        if (size > 10) {
-            $.modal.alertWarning("最多只能选择10条产线");
+        if (size > 8) {
+            $.modal.alertWarning("最多只能选择8条产线");
             $(val).attr("checked", false)
         }
     }

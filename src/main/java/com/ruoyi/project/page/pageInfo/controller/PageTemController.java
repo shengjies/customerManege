@@ -39,9 +39,6 @@ public class PageTemController extends BaseController {
     private IPageInfoService pageInfoService;
 
     @Autowired
-    private IPageInfoConfigService pageInfoConfigService;
-
-    @Autowired
     private IFileSourceInfoService fileSourceInfoService;
 
     @Autowired
@@ -50,6 +47,33 @@ public class PageTemController extends BaseController {
     @Autowired
     private IDevProductListService productListService;
 
+
+    @ResponseBody
+    @RequestMapping("/v/{code}")
+    public Map<String,Object> temVerification(@PathVariable("code")String code,String pwd){
+        Map<String,Object> map = new HashMap<>();
+        try {
+            PageInfo info = pageInfoService.selectPageByCode(code);
+            if(info == null){
+                map.put("code",1);
+                map.put("msg","页面不存在");
+                return map;
+            }
+            if(!info.getPagePwd().equals(pwd)){
+                map.put("code",2);
+                map.put("msg","密码错误");
+                return map;
+            }
+            map.put("code",0);
+            map.put("msg","验证通过");
+            return map;
+        }catch (Exception e){
+            e.printStackTrace();
+            map.put("code",3);
+            map.put("msg","系统异常");
+        }
+        return map;
+    }
 
     /**
      * 动态页面跳转
@@ -73,6 +97,7 @@ public class PageTemController extends BaseController {
         if(info.getDevCompany() == null) return "error/404";
         mmap.put("info",info);
         mmap.put("company",info.getDevCompany());
+        mmap.put("pwd",pwd);
         String to = "error/404";
         switch (info.getPageType()){
             case PageTypeConstants.PAGE_TYPE_HZ:

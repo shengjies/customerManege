@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author ruoyi
  */
-@Component
+
 public class UserRealm extends AuthorizingRealm
 {
     private static final Logger log = LoggerFactory.getLogger(UserRealm.class);
@@ -95,10 +95,10 @@ public class UserRealm extends AuthorizingRealm
 
         try
         {
-            User u = userService.selectUserByLoginName(user.getLoginName());
-            if(u ==null){
-                throw new Exception("用户验证失败");
-            }
+//            User u = userService.selectUserByLoginName(user.getLoginName());
+//            if(u ==null){
+//                throw new Exception("用户验证失败");
+//            }
         }
         catch (Exception e)
         {

@@ -54,9 +54,9 @@ public class UserController extends BaseController {
     @RequiresPermissions("system:user:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(User user, HttpServletRequest request) {
+    public TableDataInfo list(User user) {
         startPage();
-        List<User> list = userService.selectUserList(user,request);
+        List<User> list = userService.selectUserList(user);
         return getDataTable(list);
     }
 
@@ -64,8 +64,8 @@ public class UserController extends BaseController {
     @RequiresPermissions("system:user:export")
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(User user,HttpServletRequest request) {
-        List<User> list = userService.selectUserList(user,request);
+    public AjaxResult export(User user) {
+        List<User> list = userService.selectUserList(user);
         ExcelUtil<User> util = new ExcelUtil<User>(User.class);
         return util.exportExcel(list, "用户数据");
     }

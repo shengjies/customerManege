@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="include :: header"></head>
+<body>
+
+<style>
+    * {margin: 0;padding: 0;box-sizing: border-box;}
+    h3 {text-align: center;font-size: 16px;margin: 10px;}
+    .box {text-align: center;}
+    #barcode {width: 200px;}
+</style>
+<div class="box">
+    <div id="container" >
+        <canvas  width="260" height="260"></canvas>
+    </div>
+    <img id="barcode" />
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/jqueryqr.js}"></script>
+<script th:src="@{/js/qrcode.js}"></script>
+</body>
+<script th:inline="javascript" >
+    initCode();
+   function initCode() {
+       var page ={name:[[${info.pageName}]],path:[[${info.pageUrl}]]};
+       $('#container').erweima({
+           fill:"#000",
+           size:230,
+           text:JSON.stringify(page),
+           label:'扫码保存'
+       });
+   }
+    function submitHandler(){
+        $.modal.close();
+    }
+</script>
+
+</html>

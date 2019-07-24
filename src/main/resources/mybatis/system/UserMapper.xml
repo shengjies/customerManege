@@ -76,8 +76,42 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			 left join dev_company c on u.company_id = c.company_id
     </sql>
 
-	<select id="selectUserList" parameterType="User" resultMap="UserResult">
-		select com_name, user_id, login_name, user_name, email, password, sex,avatar, salt, status, del_flag, login_ip, login_date, create_by, create_time, remark,company_id,user_department,user_position,phonenumber,login_tag from sys_user
+
+	<!--用户列表查询-->
+	<resultMap type="User" id="UserResult1">
+		<id     property="userId"       column="user_id"      />
+		<result property="deptId"       column="dept_id"      />
+		<result property="loginName"    column="login_name"   />
+		<result property="userName"     column="user_name"    />
+		<result property="email"        column="email"        />
+		<result property="sex"          column="sex"          />
+		<result property="avatar"       column="avatar"       />
+		<result property="password"     column="password"     />
+		<result property="salt"         column="salt"         />
+		<result property="status"       column="status"       />
+		<result property="delFlag"      column="del_flag"     />
+		<result property="loginIp"      column="login_ip"     />
+		<result property="loginDate"    column="login_date"   />
+		<result property="createBy"     column="create_by"    />
+		<result property="createTime"   column="create_time"  />
+		<result property="updateBy"     column="update_by"    />
+		<result property="updateTime"   column="update_time"  />
+		<result property="remark"       column="remark"       />
+		<result property="companyId"    column="company_id"    />
+		<result property="tag"    column="tag"    />
+		<result property="userDepartment"    column="user_department"    />
+		<result property="userPosition"    column="user_position"    />
+		<result property="phonenumber"    column="phonenumber"    />
+		<result property="loginTag"    column="login_tag"    />
+		<result property="industry"    column="industry"    />
+		<result property="devType"    column="devType"    />
+		<result property="devCode"    column="devCode"    />
+		<result property="grade"    column="grade"    />
+		<result property="sign"    column="sign"    />
+	</resultMap>
+
+	<select id="selectUserList" parameterType="User" resultMap="UserResult1">
+		select  user_id, login_name, user_name, email, password, sex,avatar, salt, status, del_flag, login_ip, login_date, create_by, create_time, remark,company_id,user_department,user_position,phonenumber,login_tag from sys_user
 		where del_flag = '0' AND tag = '0'
 		<if test="loginName != null and loginName != ''">
 			AND login_name like concat('%', #{loginName}, '%')

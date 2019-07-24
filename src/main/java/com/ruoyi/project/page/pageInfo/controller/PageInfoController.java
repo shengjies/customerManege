@@ -192,4 +192,17 @@ public class PageInfoController extends BaseController
 	public String checkPageName(PageInfo pageInfo){
 		return pageInfoService.checkPageName(pageInfo);
 	}
+
+	/**
+	 * 生产对应页面条码
+	 * @param id
+	 * @param modelMap
+	 * @return
+	 */
+	@RequestMapping("/code")
+	public String pageCode(int id,ModelMap modelMap){
+		PageInfo info = pageInfoService.selectPageInfoById(id);
+		modelMap.put("info",info);
+		return  prefix+"/code";
+	}
 }

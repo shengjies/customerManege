@@ -201,7 +201,7 @@ public class ReportServiceImpl implements IReportService {
         table.addCell(createCell(PdfUtil.stringNullValue(totalActualWarehouseNum),bodyFont,1,isColor));//总入库数量
         table.addCell(createCell(PdfUtil.stringNullValue(totalScrapNum),bodyFont,1,isColor));//总入报废数量
         table.addCell(createCell(PdfUtil.stringNullValue(totalInputNum),bodyFont,1,isColor));//总入投入数量
-        table.addCell(createCell(PdfUtil.stringNullValue(totalStandardHour),bodyFont,1,isColor));//标准总工时
+        table.addCell(createCell(PdfUtil.stringNullValue(getFloat3(totalStandardHour)),bodyFont,1,isColor));//标准总工时
         table.addCell(createCell(PdfUtil.stringNullValue(totalWorkHour),bodyFont,1,isColor));//出勤总工时
         table.addCell(createCell(PdfUtil.stringNullValue(totalProductHour),bodyFont,1,isColor));//生产总工时
         if(workNum > 0){
@@ -406,7 +406,7 @@ public class ReportServiceImpl implements IReportService {
                 order.setOvertimeRace(0F);
                 if(PdfUtil.IntegerNull(order.getProductStandardHour())>0){
                     float standardHour = ((float) PdfUtil.IntegerNull(order.getProductNumber())/(float)order.getProductStandardHour());
-                    order.setOvertimeRace(standardHour);
+                    order.setOvertimeRace(getFloat3(standardHour));
                     totalStandardHour += standardHour;
                 }
                 //总生产工时
@@ -439,7 +439,7 @@ public class ReportServiceImpl implements IReportService {
         table.addCell(createCell(PdfUtil.stringNullValue(totalBadNumber),bodyFont,1,isColor));//总不良品数量
         table.addCell(createCell(PdfUtil.stringNullValue(totalInputNum),bodyFont,1,isColor));//总入投入数量
         table.addCell(createCell(PdfUtil.stringNullValue(totalPrice),bodyFont,1,isColor));//总工价
-        table.addCell(createCell(PdfUtil.stringNullValue(totalStandardHour),bodyFont,1,isColor));//标准总工时
+        table.addCell(createCell(PdfUtil.stringNullValue(getFloat3(totalStandardHour)),bodyFont,1,isColor));//标准总工时
         table.addCell(createCell(PdfUtil.stringNullValue(totalProductHour),bodyFont,1,isColor));//生产总工时
         if(totalProductHour > 0){
             table.addCell(createCell(PdfUtil.stringNullValue(getFloat3((totalStandardHour/totalProductHour)*100)+"%"),bodyFont,1,isColor));//生产总工时

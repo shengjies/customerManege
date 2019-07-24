@@ -2,8 +2,13 @@ package com.ruoyi.framework.shiro;
 
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.filter.JwtFilter;
 import com.ruoyi.framework.shiro.realm.UserRealm;
+import org.apache.commons.io.IOUtils;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.config.ConfigurationException;
+import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -17,6 +22,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import javax.servlet.Filter;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,6 +40,61 @@ public class ShiroConfig {
     @Value("${shiro.user.unauthorizedUrl}")
     private String unauthorizedUrl;
 
+
+    /**
+     * 缓存管理器 使用Ehcache实现
+     */
+    @Bean
+    public EhCacheManager getEhCacheManager()
+    {
+        net.sf.ehcache.CacheManager cacheManager = net.sf.ehcache.CacheManager.getCacheManager("ruoyi");
+        EhCacheManager em = new EhCacheManager();
+        if (StringUtils.isNull(cacheManager))
+        {
+            em.setCacheManager(new net.sf.ehcache.CacheManager(getCacheManagerConfigFileInputStream()));
+            return em;
+        }
+        else
+        {
+            em.setCacheManager(cacheManager);
+            return em;
+        }
+    }
+
+    /**
+     * 返回配置文件流 避免ehcache配置文件一直被占用，无法完全销毁项目重新部署
+     */
+    protected InputStream getCacheManagerConfigFileInputStream()
+    {
+        String configFile = "classpath:ehcache/ehcache-shiro.xml";
+        InputStream inputStream = null;
+        try
+        {
+            inputStream = ResourceUtils.getInputStreamForPath(configFile);
+            byte[] b = IOUtils.toByteArray(inputStream);
+            InputStream in = new ByteArrayInputStream(b);
+            return in;
+        }
+        catch (IOException e)
+        {
+            throw new ConfigurationException(
+                    "Unable to obtain input stream for cacheManagerConfigFile [" + configFile + "]", e);
+        }
+        finally
+        {
+            IOUtils.closeQuietly(inputStream);
+        }
+    }
+    /**
+     * 自定义Realm
+     */
+    @Bean("userRealm")
+    public UserRealm userRealm(EhCacheManager cacheManager)
+    {
+        UserRealm userRealm = new UserRealm();
+        userRealm.setCacheManager(cacheManager);
+        return userRealm;
+    }
 
     @Bean("securityManager")
     public DefaultWebSecurityManager getManager(UserRealm realm) {
@@ -68,6 +131,7 @@ public class ShiroConfig {
         filterRuleMap.put("/captcha/captchaImage**", "anon");
         // 不需要拦截的访问
         filterRuleMap.put("/login", "anon");
+        filterRuleMap.put("/init/data", "anon");
         filterRuleMap.put("/system/user/checkLoginNameUnique", "anon");
         filterRuleMap.put("/t/**", "anon");
         filterRuleMap.put("/c/**", "anon");

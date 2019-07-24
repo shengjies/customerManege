@@ -58,6 +58,7 @@
 		</div>
 	</div>
     <div th:include="include :: footer"></div>
+	 <script th:src="@{/js/JsBarcode.all.min.js}"></script>
     <script th:inline="javascript">
         var pwdFlag = [[${@permission.hasPermi('page:pageInfo:pwd')}]];
         var editFlag = [[${@permission.hasPermi('page:pageInfo:edit')}]];
@@ -86,7 +87,10 @@
 				{
 					field : 'pageId', 
 					title : '看板编号',
-					sortable: true
+					sortable: true,
+					formatter:function (value, row, index) {
+						return '<a class="btn btn-primary btn-xs" onclick="pageCode('+row.id+')">'+value+'</a>'
+					}
 				},
 				{
 					field : 'pageName',
@@ -193,6 +197,11 @@
 		function pwd(id) {
 			var url = prefix+'/pwd/'+id;
 			$.modal.open("看板密码",url,400,340)
+		}
+
+		function pageCode(id) {
+			var url = prefix+'/code?id='+id;
+			$.modal.open("看板条码",url,460,400)
 		}
     </script>
 </body>
