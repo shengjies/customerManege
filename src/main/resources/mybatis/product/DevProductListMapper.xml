@@ -153,7 +153,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--通过产品编码查询产品信息-->
     <select id="selectProductByCode" parameterType="String" resultMap="DevProductListResult">
         <include refid="selectDevProductListVo"/>
-        where product_code = #{productCode} and def_id = 0;
+        where product_code = #{productCode} and def_id = 0 limit 1
     </select>
 
     <!--校验产品编码的唯一性-->
@@ -209,4 +209,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="saveMesRuleConfig">
         update dev_product_list set rule_id =#{ruleId} where id =#{id}
     </update>
+
+    <!--查看mes规格配置明细-->
+    <select id="selectMesCfList" resultMap="DevProductListResult">
+        SELECT * FROM dev_product_list where company_id = #{companyId}
+        <if test="productCode != null  and productCode != ''  ">
+            and product_code = #{productCode}
+        </if>
+        <if test="id != null  and id > 0  ">
+            and id = #{id}
+        </if>
+        <if test="sign != null and sign != -1 ">
+            and sign = #{sign}
+        </if>
+        <if test="ruleId != null and ruleId > 0">
+            and rule_id = #{ruleId}
+        </if>
+    </select>
+
+    <!--通过追踪规则id查询配置的产品信息-->
+    <select id="selectDevProductByRuleId" resultMap="DevProductListResult">
+        SELECT * FROM dev_product_list where company_id = #{companyId} and rule_id = #{ruleId}
+    </select>
 </mapper>

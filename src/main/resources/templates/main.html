@@ -103,6 +103,27 @@
             <div class="col-sm-5">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
+                        <h5>消息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="feed-activity-list" th:with="allNotice=${@notice.selectAllNotice(#httpServletRequest.getCookies())}">
+                            <div class="feed-element" th:each="notice : ${allNotice}">
+                                <a href="profile.html" class="pull-left">
+                                    <img alt="image" class="img-circle" th:src="(${notice.createUser.avatar} == '') ? @{/img/profile.jpg} :  ${notice.createUser.avatar}">
+                                </a>
+                                <div class="media-body">
+                                    <strong><span style="color: #00C1B3">[[${notice.createUser.userName}]]</span></strong>
+                                    <div>[[${notice.noticeContent}]]</div>
+                                    <small class="text-muted" style="color: #00a65a">[[${#dates.format(notice.createTime, 'yyyy-MM-dd HH:ss')}]]</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
                         <h5 style="color: red">异常情况</h5>
                     </div>
                     <div class="ibox-content ">
@@ -134,27 +155,6 @@
                             </tr>
                             </tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-7">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5>消息</h5>
-                    </div>
-                    <div class="ibox-content">
-                        <div class="feed-activity-list" th:with="allNotice=${@notice.selectAllNotice(#httpServletRequest.getCookies())}">
-                            <div class="feed-element" th:each="notice : ${allNotice}">
-                                <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" th:src="(${notice.createUser.avatar} == '') ? @{/img/profile.jpg} :  ${notice.createUser.avatar}">
-                                </a>
-                                <div class="media-body">
-                                    <strong><span style="color: #00C1B3">[[${notice.createUser.userName}]]</span></strong>
-                                    <div>[[${notice.noticeContent}]]</div>
-                                    <small class="text-muted" style="color: #00a65a">[[${#dates.format(notice.createTime, 'yyyy-MM-dd HH:ss')}]]</small>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

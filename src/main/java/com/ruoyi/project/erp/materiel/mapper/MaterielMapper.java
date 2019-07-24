@@ -1,7 +1,5 @@
 package com.ruoyi.project.erp.materiel.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.erp.materiel.domain.Materiel;
 import org.apache.ibatis.annotations.Param;
 
@@ -111,4 +109,11 @@ public interface MaterielMapper {
      */
 //    @DataSource(value = DataSourceType.ERP)
     List<Materiel> selectAllMatNameByComId(@Param("companyId") Integer companyId);
+
+    /**
+     * 查询未配置的物料信息
+     * @param ids 物料编码
+     * @return 结果
+     */
+    List<Materiel> selectMaterielByMatCodes(String[] ids);
 }

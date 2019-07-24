@@ -1,6 +1,7 @@
 package com.ruoyi.project.mes.mesBatchRule.controller;
 
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
@@ -9,13 +10,16 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
 import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleService;
+import com.ruoyi.project.product.list.service.IDevProductListService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * MES批准追踪规则 信息操作处理
@@ -31,7 +35,10 @@ public class MesBatchRuleController extends BaseController
 	
 	@Autowired
 	private IMesBatchRuleService mesBatchRuleService;
-	
+
+	@Autowired
+	private IDevProductListService productListService;
+
 	@RequiresPermissions("mes:mesBatchRule:view")
 	@GetMapping()
 	public String mesBatchRule()
@@ -82,7 +89,7 @@ public class MesBatchRuleController extends BaseController
 	@Log(title = "MES批准追踪规则", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(@RequestBody MesBatchRule mesBatchRule)
+	public AjaxResult addSave(MesBatchRule mesBatchRule)
 	{
 		try {
 			return toAjax(mesBatchRuleService.insertMesBatchRule(mesBatchRule));
@@ -122,8 +129,12 @@ public class MesBatchRuleController extends BaseController
 	@PostMapping( "/remove")
 	@ResponseBody
 	public AjaxResult remove(String ids)
-	{		
-		return toAjax(mesBatchRuleService.deleteMesBatchRuleByIds(ids));
+	{
+		try {
+			return toAjax(mesBatchRuleService.deleteMesBatchRuleByIds(ids));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 	/**
@@ -134,5 +145,27 @@ public class MesBatchRuleController extends BaseController
 	public String checkMesRuleNameUnique(MesBatchRule mesBatchRule){
 		return mesBatchRuleService.checkMesRuleNameUnique(mesBatchRule);
 	}
-	
+
+	/**
+	 * 查看规则配置明细
+	 */
+	@GetMapping("/showCfDetail")
+	public String showCfDetail(int id,int pType,ModelMap map){
+		map.put("ruleId",id);
+		map.put("pType",pType);
+		map.put("proList",productListService.selectProductAllByCompanyId(pType));
+		return prefix + "/cfDetail";
+	}
+
+	/**
+	 * 查询规则明细
+	 */
+	@PostMapping("/selectMesBatchRuleById")
+	@ResponseBody
+	public AjaxResult selectMesBatchRuleById(int id){
+		Map<String,Object> map = new HashMap<>(16);
+		map.put("mesList",mesBatchRuleService.selectMesBatchRuleById(id));
+		map.put("mesCode", CodeUtils.getMesCode());
+		return AjaxResult.success(map);
+	}
 }

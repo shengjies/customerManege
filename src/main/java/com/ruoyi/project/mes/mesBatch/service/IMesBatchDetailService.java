@@ -51,5 +51,11 @@ public interface IMesBatchDetailService
      * @return 结果
      */
 	public int deleteMesBatchDetailByIds(String ids);
-	
+
+	/**
+	 * 通过主表id查询明细信息
+	 * @param bId MES主表id
+	 * @return 结果
+	 */
+	public List<MesBatchDetail> selectMesBatchDetailListByBId(int bId);
 }

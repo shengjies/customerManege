@@ -153,6 +153,7 @@
     var removeFlag = [[${@permission.hasPermi('device:devWorkOrder:remove')}]];
     var workChange = [[${@permission.hasPermi('production:workOrderChange:list')}]];
     var workSingle = [[${@permission.hasPermi('production:singleWorkOrder:list')}]];
+    var woMesFlag = [[${@permission.hasPermi('mes:mesBatch:add')}]];
     var prefix = ctx + "device/devWorkOrder";
 
     $(function () {
@@ -319,11 +320,11 @@
                             if (row.workSign == 0) {  // 工单还未提交可进行修改
                                 actions.push('<a class="btn btn-default btn-xs '+ editFlag +'" href="javascript:void(0)" onclick="edit(' + row.id + ','+row.wlSign+')"><i></i>编辑</a> ');
                                 actions.push('<a class="btn btn-primary btn-xs '+ editFlag +'" href="javascript:void(0)" onclick="submitWorkOrder(\'' + row.id + '\')"><i></i>提交</a> ');
-                                actions.push('<a class="btn btn-primary btn-xs '+ editFlag +'" href="javascript:void(0)" onclick="submitWorkOrder(\'' + row.id + '\')"><i></i>MES</a> ');
+                                actions.push('<a class="btn btn-primary btn-xs '+ woMesFlag +'" href="javascript:void(0)" onclick="woConfigMes(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>MES</a> ');
                             } else if (row.workSign == 1) { // 工单已经提交，不能修改
                                 actions.push('<a class="btn btn-default btn-xs '+ editFlag +'" href="javascript:void(0)" disabled="true"><i></i>编辑</a> ');
                                 actions.push('<a class="btn btn-success btn-xs '+ editFlag +'" href="javascript:void(0)" disabled="true"><i></i>已提</a> ');
-                                actions.push('<a class="btn btn-primary btn-xs '+ editFlag +'" href="javascript:void(0)" disabled="true"><i></i>MES</a> ');
+                                actions.push('<a class="btn btn-primary btn-xs '+ woMesFlag +'" href="javascript:void(0)" disabled="true"><i></i>MES</a> ');
                             }
                         }
 
@@ -560,7 +561,11 @@
     function configSingle(id,singleId,name) {
         $.modal.open(name+" 单工位配置","/production/singleWorkOrder?type=1&singleId="+singleId+"&orderId="+id,800,700);
     }
-
+    
+    function woConfigMes(id,code) {
+        var url = prefix + "/woConfigMes?id=" + id;
+        createMenuItem(url,code + "配置MES批次追踪");
+    }
 
 </script>
 </body>

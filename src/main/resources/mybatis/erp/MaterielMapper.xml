@@ -159,4 +159,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectAllMatNameByComId" resultType="com.ruoyi.project.erp.materiel.domain.Materiel">
         select distinct materiel_name as materielName from tab_materiel where company_id = #{companyId};
     </select>
+
+    <!--查询未配置对应规则的物料信息-->
+    <select id="selectMaterielByMatCodes" parameterType="String"  resultMap="MaterielResult">
+        select * from tab_materiel where materiel_code not in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

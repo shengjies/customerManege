@@ -25,7 +25,11 @@
 							</li>
 
 							<li>
-								物料编码：<input type="text" name="materiels"/>
+								物料编码：
+								<select id="materiels" name="materiels" class="form-control" th:with="allMat=${@materiel.selectAllMatByComId()}">
+									<option value="-1">请选择</option>
+									<option th:each="item : ${allMat}"  th:text="${item.materielCode}" th:value="${item.materielCode}"></option>
+								</select>
 							</li>
 
 							<li class="select-time">
@@ -47,7 +51,7 @@
 
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
 							</li>
 						</ul>
 					</div>
@@ -57,9 +61,6 @@
 	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
 				<a class="btn btn-success" onclick="addMES()" shiro:hasPermission="mes:mesBatchRule:add">
 					<i class="fa fa-plus"></i> 添加
-				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="mes:mesBatchRule:edit">
-					<i class="fa fa-edit"></i> 修改
 				</a>
 				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="mes:mesBatchRule:remove">
 					<i class="fa fa-remove"></i> 删除
@@ -76,6 +77,17 @@
     <div th:include="include :: footer"></div>
 	 <script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
     <script th:inline="javascript">
+		$(function () {
+			$("#materiels").select2({
+				width:"200px",
+				placeholder:'请选择'
+			});
+		})
+		// 重置搜索表单信息
+		function formReset() {
+			$('#formId')[0].reset();//input标签重置
+			$("#materiels").val("-1").trigger("change");
+		}
         var editFlag = [[${@permission.hasPermi('mes:mesBatchRule:edit')}]];
         var removeFlag = [[${@permission.hasPermi('mes:mesBatchRule:remove')}]];
         var prefix = ctx + "mes/mesBatchRule";
@@ -105,7 +117,10 @@
 				{
 					field : 'ruleName', 
 					title : '规则名称',
-					sortable: true
+					sortable: true,
+					formatter:function (value, row, index) {
+						return '<a href="javascript:void(0)" onclick="showCfDetail(\'' + row.id + '\',\'' + row.pType + '\',\'' + row.ruleName + '\')"><span style="font-weight: bold;color: red">'+ value +'</span></a>'
+					}
 				},
 				{
 					field : 'pType', 
@@ -113,16 +128,20 @@
 					sortable: true,
 					formatter:function (value, row, index) {
 						if (row.pType == 0) {
-						    return '<span style="font-weight: bold;color: green">产品</span>';
+						    return '<span style="color: green">成品</span>';
 						} else {
-							return '<span style="font-weight: bold;color: blue">半成品</span>';
+							return '<span style="color: blue">半成品</span>';
 						}
 					}
 				},
 				{
 					field : 'materiels', 
 					title : '物料编码',
-					sortable: true
+					width:300,
+					sortable: true,
+					formatter: function(value, row, index) {
+						return $.table.tooltip(value);
+					}
 				},
 				{
 					field : 'cTime', 
@@ -139,8 +158,8 @@
 		            align: 'center',
 		            formatter: function(value, row, index) {
 		            	var actions = [];
-		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="editMES(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 						return actions.join('');
 		            }
 		        }]
@@ -159,7 +178,26 @@
 		 * 修改MES追踪规格
 		 */
 		function editMES(id) {
+			var url = "/404.html";
+			if ($.common.isNotEmpty(id)) {
+				url = $.table._option.updateUrl.replace("{id}", id);
+			} else {
+				var id = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+				if (id.length == 0) {
+					$.modal.alertWarning("请至少选择一条记录");
+					return;
+				}
+				url = $.table._option.updateUrl.replace("{id}", id);
+			}
+			$.modal.open("修改MES追踪规格", url,'800','500');
+		}
 
+		/**
+		 * 查看规格配置明细
+		 */
+		function showCfDetail(id,pType,value) {
+			var url = prefix + "/showCfDetail?id="+ id +"&pType=" + pType;
+			$.modal.open("查看" + value + "的追踪规则配置明细", url,'800','680');
 		}
 	</script>
 </body>

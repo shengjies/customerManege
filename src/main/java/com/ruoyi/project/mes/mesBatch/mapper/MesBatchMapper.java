@@ -1,7 +1,9 @@
 package com.ruoyi.project.mes.mesBatch.mapper;
 
 import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
-import java.util.List;	
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * MES批准追踪 数据层
@@ -58,5 +60,26 @@ public interface MesBatchMapper
      * @return 结果
      */
 	public int deleteMesBatchByIds(String[] ids);
-	
+
+	/**
+	 * 通过工单号查询批次追踪列表
+	 * @param workCode 工单号
+	 * @return 结果
+	 */
+    List<MesBatch> selectMesBatchListByWorkCode(@Param("workCode") String workCode);
+
+	/**
+	 * 通过mes查询mes批次追踪信息
+	 * @param companyId 公司id
+	 * @param mesCode mescode
+	 * @return 结果
+	 */
+    MesBatch selectMesBatchByMesCode(@Param("companyId") Integer companyId, @Param("mesCode") String mesCode);
+
+	/**
+	 * 查询MES物料批次信息
+	 * @param mesBatch MES批次
+	 * @return 结果
+	 */
+	List<MesBatch> selectMesBatchList2(MesBatch mesBatch);
 }

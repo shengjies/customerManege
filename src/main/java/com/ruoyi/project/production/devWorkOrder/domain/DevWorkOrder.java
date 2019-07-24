@@ -2,13 +2,15 @@ package com.ruoyi.project.production.devWorkOrder.domain;
 
 import com.alibaba.fastjson.JSONArray;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
+import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.system.user.domain.User;
-import com.ruoyi.framework.web.domain.BaseEntity;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 工单表 dev_work_order
@@ -196,6 +198,38 @@ public class DevWorkOrder extends BaseEntity {
     private Integer single;//用于查询车间
     /** 暂停开始计数标志(0、默认值需要计数，1、不需要计数) */
     private Integer pbSign;
+
+    /*******************  工单MES相关 *******************/
+    /** mes批次追踪列表 */
+    private List<MesBatch> mesBatchList;
+    /** 对应产品追踪规格 */
+    private String[] mesMatList;
+    /** 配置规则id */
+    private Integer ruleId;
+
+    public Integer getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Integer ruleId) {
+        this.ruleId = ruleId;
+    }
+
+    public String[] getMesMatList() {
+        return mesMatList;
+    }
+
+    public void setMesMatList(String[] mesMatList) {
+        this.mesMatList = mesMatList;
+    }
+
+    public List<MesBatch> getMesBatchList() {
+        return mesBatchList;
+    }
+
+    public void setMesBatchList(List<MesBatch> mesBatchList) {
+        this.mesBatchList = mesBatchList;
+    }
 
     public Integer getPbSign() {
         return pbSign;

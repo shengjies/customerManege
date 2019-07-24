@@ -64,4 +64,11 @@ public interface IMesBatchRuleService
 	 * @return
 	 */
 	List<MesBatchRule> selectMesRuleByType(int type);
+
+	/**
+	 * 查询mes所有的规则信息
+	 * @return 结果
+	 */
+	List<MesBatchRule> selectAllMesRule();
+
 }

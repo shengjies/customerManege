@@ -69,5 +69,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <!--通过主表id查询mes批次明细列表-->
+    <select id="selectMesBatchDetailByBId" resultMap="MesBatchDetailResult">
+        SELECT * FROM tab_mes_batch_detail where b_id = #{bId}
+    </select>
+
+    <!--通过mes追踪主表id删除明细信息-->
+    <delete id="deleteMesBatchDetailByBId" parameterType="Integer">
+        delete from tab_mes_batch_detail where b_id = #{bId}
+    </delete>
     
 </mapper>

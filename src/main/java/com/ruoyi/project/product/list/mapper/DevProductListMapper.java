@@ -180,4 +180,18 @@ public interface DevProductListMapper {
      */
     int saveMesRuleConfig(@Param("id")int id,@Param("ruleId")int ruleId);
 
+    /**
+     * 查看mes规格配置明细
+     * @param productList 产品
+     * @return 结果
+     */
+    List<DevProductList> selectMesCfList(DevProductList productList);
+
+    /**
+     * 通过配置规则id查询配置的产品信息
+     * @param companyId 公司id
+     * @param ruleId 追踪规格id
+     * @return 结果
+     */
+    List<DevProductList> selectDevProductByRuleId(@Param("companyId") Integer companyId,@Param("ruleId") Integer ruleId);
 }

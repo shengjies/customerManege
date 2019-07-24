@@ -1,10 +1,10 @@
 package com.ruoyi.project.mes.mesBatch.domain;
 
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
+import java.util.List;
 
 /**
  * MES批准追踪表 tab_mes_batch
@@ -43,123 +43,133 @@ public class MesBatch extends BaseEntity
 	/** 创建时间 */
 	@Excel(name = "创建时间",dateFormat = "yyyy-MM-dd HH:mm:ss")
 	private Date cTime;
-	/** 修改时间 */
-	@Excel(name = "修改时间",dateFormat = "yyyy-MM-dd HH:mm:ss")
 	private Date uTime;
+	/** MES批次追踪明细 */
+	private List<MesBatchDetail> mesBatchDetailList;
 
-	public void setId(Integer id) 
-	{
-		this.id = id;
-	}
+	/** 物料批次追踪条件 */
+    private String batchCode;
 
-	public Integer getId() 
-	{
-		return id;
-	}
-	public void setCompanyId(Integer companyId) 
-	{
-		this.companyId = companyId;
-	}
+    public String getBatchCode() {
+        return batchCode;
+    }
 
-	public Integer getCompanyId() 
-	{
-		return companyId;
-	}
-	public void setMesCode(String mesCode) 
-	{
-		this.mesCode = mesCode;
-	}
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
 
-	public String getMesCode() 
-	{
-		return mesCode;
-	}
-	public void setWorkCode(String workCode) 
-	{
-		this.workCode = workCode;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public String getWorkCode() 
-	{
-		return workCode;
-	}
-	public void setOrderCode(String orderCode) 
-	{
-		this.orderCode = orderCode;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getOrderCode() 
-	{
-		return orderCode;
-	}
-	public void setPbCode(String pbCode) 
-	{
-		this.pbCode = pbCode;
-	}
+    public Integer getCompanyId() {
+        return companyId;
+    }
 
-	public String getPbCode() 
-	{
-		return pbCode;
-	}
-	public void setRuleId(Integer ruleId) 
-	{
-		this.ruleId = ruleId;
-	}
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
 
-	public Integer getRuleId() 
-	{
-		return ruleId;
-	}
-	public void setRuleName(String ruleName) 
-	{
-		this.ruleName = ruleName;
-	}
+    public String getMesCode() {
+        return mesCode;
+    }
 
-	public String getRuleName() 
-	{
-		return ruleName;
-	}
-	public void setRuleMateriel(String ruleMateriel) 
-	{
-		this.ruleMateriel = ruleMateriel;
-	}
+    public void setMesCode(String mesCode) {
+        this.mesCode = mesCode;
+    }
 
-	public String getRuleMateriel() 
-	{
-		return ruleMateriel;
-	}
-	public void setCTime(Date cTime) 
-	{
-		this.cTime = cTime;
-	}
+    public String getWorkCode() {
+        return workCode;
+    }
 
-	public Date getCTime() 
-	{
-		return cTime;
-	}
-	public void setUTime(Date uTime) 
-	{
-		this.uTime = uTime;
-	}
+    public void setWorkCode(String workCode) {
+        this.workCode = workCode;
+    }
 
-	public Date getUTime() 
-	{
-		return uTime;
-	}
+    public String getOrderCode() {
+        return orderCode;
+    }
 
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode;
+    }
+
+    public String getPbCode() {
+        return pbCode;
+    }
+
+    public void setPbCode(String pbCode) {
+        this.pbCode = pbCode;
+    }
+
+    public Integer getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Integer ruleId) {
+        this.ruleId = ruleId;
+    }
+
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+
+    public String getRuleMateriel() {
+        return ruleMateriel;
+    }
+
+    public void setRuleMateriel(String ruleMateriel) {
+        this.ruleMateriel = ruleMateriel;
+    }
+
+    public Date getcTime() {
+        return cTime;
+    }
+
+    public void setcTime(Date cTime) {
+        this.cTime = cTime;
+    }
+
+    public Date getuTime() {
+        return uTime;
+    }
+
+    public void setuTime(Date uTime) {
+        this.uTime = uTime;
+    }
+
+    public List<MesBatchDetail> getMesBatchDetailList() {
+        return mesBatchDetailList;
+    }
+
+    public void setMesBatchDetailList(List<MesBatchDetail> mesBatchDetailList) {
+        this.mesBatchDetailList = mesBatchDetailList;
+    }
+
+    @Override
     public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("companyId", getCompanyId())
-            .append("mesCode", getMesCode())
-            .append("workCode", getWorkCode())
-            .append("orderCode", getOrderCode())
-            .append("pbCode", getPbCode())
-            .append("ruleId", getRuleId())
-            .append("ruleName", getRuleName())
-            .append("ruleMateriel", getRuleMateriel())
-            .append("cTime", getCTime())
-            .append("uTime", getUTime())
-            .toString();
+        return "MesBatch{" +
+                "id=" + id +
+                ", companyId=" + companyId +
+                ", mesCode='" + mesCode + '\'' +
+                ", workCode='" + workCode + '\'' +
+                ", orderCode='" + orderCode + '\'' +
+                ", pbCode='" + pbCode + '\'' +
+                ", ruleId=" + ruleId +
+                ", ruleName='" + ruleName + '\'' +
+                ", ruleMateriel='" + ruleMateriel + '\'' +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", mesBatchDetailList=" + mesBatchDetailList +
+                ", batchCode='" + batchCode + '\'' +
+                '}';
     }
 }

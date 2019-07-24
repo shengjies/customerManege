@@ -1,23 +1,22 @@
 package com.ruoyi.project.mes.mesBatch.controller;
 
-import java.util.List;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
+import com.ruoyi.project.mes.mesBatch.service.IMesBatchDetailService;
+import com.ruoyi.project.mes.mesBatch.service.IMesBatchService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
-import com.ruoyi.project.mes.mesBatch.service.IMesBatchService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * MES批准追踪 信息操作处理
@@ -33,6 +32,9 @@ public class MesBatchController extends BaseController
 	
 	@Autowired
 	private IMesBatchService mesBatchService;
+
+	@Autowired
+	private IMesBatchDetailService mesBatchDetailService;
 	
 	@RequiresPermissions("mes:mesBatch:view")
 	@GetMapping()
@@ -84,9 +86,13 @@ public class MesBatchController extends BaseController
 	@Log(title = "MES批准追踪", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(MesBatch mesBatch)
-	{		
-		return toAjax(mesBatchService.insertMesBatch(mesBatch));
+	public AjaxResult addSave(@RequestBody MesBatch mesBatch)
+	{
+		try {
+			return toAjax(mesBatchService.insertMesBatch(mesBatch));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 	/**
@@ -122,6 +128,18 @@ public class MesBatchController extends BaseController
 	public AjaxResult remove(String ids)
 	{		
 		return toAjax(mesBatchService.deleteMesBatchByIds(ids));
+	}
+
+	/**
+	 * 查看MES主码批次明细
+	 * @return
+	 */
+	@GetMapping("/showMesDetailByMesCode")
+	public String showMesDetailByMesCode(int id,String mesCode,String workCode,ModelMap map){
+		map.put("mesDetails",mesBatchDetailService.selectMesBatchDetailListByBId(id));
+		map.put("mesCode",mesCode);
+		map.put("workCode",workCode);
+		return prefix + "/mesDetail";
 	}
 	
 }

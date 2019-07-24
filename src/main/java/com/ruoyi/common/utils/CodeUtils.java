@@ -125,4 +125,12 @@ public class CodeUtils {
     public static String getMrpCode(){
         return "MRP"+getCode()+getRandom();
     }
+
+    /**
+     * 生产MES主码
+     * @return 结果
+     */
+    public static String getMesCode(){
+        return "MES" + getCode();
+    }
 }

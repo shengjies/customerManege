@@ -1,8 +1,7 @@
 package com.ruoyi.project.mes.mesBatch.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -26,59 +25,54 @@ public class MesBatchDetail extends BaseEntity
 	/** 创建时间 */
 	private Date cTime;
 
-	public void setId(Integer id) 
-	{
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getId() 
-	{
-		return id;
+	public Integer getbId() {
+		return bId;
 	}
-	public void setBId(Integer bId) 
-	{
+
+	public void setbId(Integer bId) {
 		this.bId = bId;
 	}
 
-	public Integer getBId() 
-	{
-		return bId;
+	public String getMaterielCode() {
+		return materielCode;
 	}
-	public void setMaterielCode(String materielCode) 
-	{
+
+	public void setMaterielCode(String materielCode) {
 		this.materielCode = materielCode;
 	}
 
-	public String getMaterielCode() 
-	{
-		return materielCode;
+	public String getBatchCode() {
+		return batchCode;
 	}
-	public void setBatchCode(String batchCode) 
-	{
+
+	public void setBatchCode(String batchCode) {
 		this.batchCode = batchCode;
 	}
 
-	public String getBatchCode() 
-	{
-		return batchCode;
-	}
-	public void setCTime(Date cTime) 
-	{
-		this.cTime = cTime;
-	}
-
-	public Date getCTime() 
-	{
+	public Date getcTime() {
 		return cTime;
 	}
 
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("bId", getBId())
-            .append("materielCode", getMaterielCode())
-            .append("batchCode", getBatchCode())
-            .append("cTime", getCTime())
-            .toString();
-    }
+	public void setcTime(Date cTime) {
+		this.cTime = cTime;
+	}
+
+	@Override
+	public String toString() {
+		return "MesBatchDetail{" +
+				"id=" + id +
+				", bId=" + bId +
+				", materielCode='" + materielCode + '\'' +
+				", batchCode='" + batchCode + '\'' +
+				", cTime=" + cTime +
+				'}';
+	}
 }

@@ -1,33 +1,26 @@
 package com.ruoyi.project.product.list.controller;
 
-import java.util.List;
-import java.util.jar.JarEntry;
-
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
-import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 产品管理 信息操作处理
@@ -409,6 +402,18 @@ public class DevProductListController extends BaseController {
     }
 
     /**
+     * 查看mes配置规格明细
+     */
+    @RequiresPermissions("mes:mesBatchRule:list")
+    @PostMapping("/mesCfList")
+    @ResponseBody
+    public TableDataInfo mesCfList(DevProductList productList) {
+        startPage();
+        List<DevProductList> list = devProductListService.selectMesCfList(productList);
+        return getDataTable(list);
+    }
+
+    /**
      * 保存 MES 规则
      * @param id 产品/半成品
      * @param ruleId 对应规则id
@@ -419,7 +424,7 @@ public class DevProductListController extends BaseController {
     public AjaxResult saveMesRuleConfig(int id,int ruleId){
         try {
             return toAjax(devProductListService.saveMesRuleConfig(id,ruleId));
-        }catch (Exception e){
+        }catch (BusinessException e){
             return error(e.getMessage());
         }
     }
@@ -429,6 +434,7 @@ public class DevProductListController extends BaseController {
      * @param id 对应产品/半成品id
      * @return
      */
+    @RequiresPermissions("mes:mesBatchRule:remove")
     @ResponseBody
     @RequestMapping("/cancelMes")
     public AjaxResult cancel(int id){

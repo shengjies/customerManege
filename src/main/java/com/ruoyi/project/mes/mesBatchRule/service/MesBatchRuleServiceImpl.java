@@ -6,8 +6,12 @@ import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.erp.materiel.domain.Materiel;
+import com.ruoyi.project.erp.materiel.mapper.MaterielMapper;
 import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
 import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleMapper;
+import com.ruoyi.project.product.list.domain.DevProductList;
+import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,12 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	@Autowired
 	private MesBatchRuleMapper mesBatchRuleMapper;
 
+	@Autowired
+	private MaterielMapper materielMapper;
+
+	@Autowired
+	private DevProductListMapper productListMapper;
+
 	/**
      * 查询MES批准追踪规则信息
      * 
@@ -37,7 +47,17 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
     @Override
 	public MesBatchRule selectMesBatchRuleById(Integer id)
 	{
-	    return mesBatchRuleMapper.selectMesBatchRuleById(id);
+		MesBatchRule mesBatchRule = mesBatchRuleMapper.selectMesBatchRuleById(id);
+		// 查询未配置的物料编码信息
+		String materiels = mesBatchRule.getMateriels();
+		if (StringUtils.isNotNull(materiels)) {
+			String[] matCodeList = materiels.split(",");
+			mesBatchRule.setMaterielList(matCodeList);
+			// 查询未配置的物料信息
+			List<Materiel> notMaterielList = materielMapper.selectMaterielByMatCodes(Convert.toStrArray(materiels));
+			mesBatchRule.setNotMaterielList(notMaterielList);
+		}
+		return mesBatchRule;
 	}
 	
 	/**
@@ -70,11 +90,6 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 		if (user == null) {
 		    throw new BusinessException(UserConstants.NOT_LOGIN);
 		}
-		String materiels = mesBatchRule.getMateriels();
-		if (StringUtils.isNotNull(materiels)) {
-			String materielSub = materiels.substring(0, materiels.lastIndexOf(','));
-			mesBatchRule.setMateriels(materielSub);
-		}
 		mesBatchRule.setCompanyId(user.getCompanyId());
 		mesBatchRule.setcTime(new Date());
 		return mesBatchRuleMapper.insertMesBatchRule(mesBatchRule);
@@ -102,6 +117,17 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	@Override
 	public int deleteMesBatchRuleByIds(String ids)
 	{
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    throw new BusinessException(UserConstants.NOT_LOGIN);
+		}
+		Integer[] ruleIds = Convert.toIntArray(ids);
+		for (Integer ruleId : ruleIds) {
+			List<DevProductList> productList = productListMapper.selectDevProductByRuleId(user.getCompanyId(), ruleId);
+			if (StringUtils.isNotEmpty(productList) && productList.size() > 0) {
+			    throw new BusinessException("该追踪规则配置了产品，请先删除其关联信息");
+			}
+		}
 		return mesBatchRuleMapper.deleteMesBatchRuleByIds(Convert.toStrArray(ids));
 	}
 
@@ -132,4 +158,14 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService
 	public List<MesBatchRule> selectMesRuleByType(int type) {
 		return mesBatchRuleMapper.selectMesRuleByType(type);
 	}
+
+	/**
+	 * 查询所有的MES规则信息
+	 * @return 结果
+	 */
+	@Override
+	public List<MesBatchRule> selectAllMesRule() {
+		return mesBatchRuleMapper.selectAllMesRule();
+	}
+
 }

@@ -1,8 +1,10 @@
 package com.ruoyi.project.mes.mesBatchRule.domain;
 
 import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.erp.materiel.domain.Materiel;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * MES批准追踪规则表 tab_mes_batch_rule
@@ -24,10 +26,30 @@ public class MesBatchRule extends BaseEntity
 	private Integer pType;
 	/** 物料编码 */
 	private String materiels;
+	/** 已配置的物料信息 */
+	private String[] materielList;
+	/** 未配置的物料信息 */
+	private List<Materiel> notMaterielList;
 	/** 创建时间 */
 	private Date cTime;
 	/** 修改时间 */
 	private Date uTime;
+
+	public String[] getMaterielList() {
+		return materielList;
+	}
+
+	public void setMaterielList(String[] materielList) {
+		this.materielList = materielList;
+	}
+
+	public List<Materiel> getNotMaterielList() {
+		return notMaterielList;
+	}
+
+	public void setNotMaterielList(List<Materiel> notMaterielList) {
+		this.notMaterielList = notMaterielList;
+	}
 
 	public Integer getId() {
 		return id;

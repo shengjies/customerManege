@@ -2,7 +2,6 @@ package com.ruoyi.project.production.devWorkOrder.service;
 
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
-import com.ruoyi.project.production.devWorkOrder.domain.Ocr;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -218,4 +217,11 @@ public interface IDevWorkOrderService {
      * @throws Exception
      */
     int saveOcrWork(DevWorkOrder order) throws Exception;
+
+    /**
+     * 查询mes工单相关信息
+     * @param id 工单id
+     * @return 结果
+     */
+    DevWorkOrder selectWorkOrderMesByWId(int id);
 }

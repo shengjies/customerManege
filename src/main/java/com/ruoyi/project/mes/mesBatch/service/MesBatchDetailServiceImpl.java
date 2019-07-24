@@ -1,12 +1,12 @@
 package com.ruoyi.project.mes.mesBatch.service;
 
-import java.util.List;
-
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail;
 import com.ruoyi.project.mes.mesBatch.mapper.MesBatchDetailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.support.Convert;
+
+import java.util.List;
 
 /**
  * MES批准追踪详情 服务层实现
@@ -79,5 +79,14 @@ public class MesBatchDetailServiceImpl implements IMesBatchDetailService
 	{
 		return mesBatchDetailMapper.deleteMesBatchDetailByIds(Convert.toStrArray(ids));
 	}
-	
+
+	/**
+	 * 查询MES明细
+	 * @param bId MES主表id
+	 * @return 结果
+	 */
+	@Override
+	public List<MesBatchDetail> selectMesBatchDetailListByBId(int bId) {
+		return mesBatchDetailMapper.selectMesBatchDetailByBId(bId);
+	}
 }

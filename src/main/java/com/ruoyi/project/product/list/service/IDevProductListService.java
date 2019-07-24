@@ -155,7 +155,7 @@ public interface IDevProductListService
 	 * @param ruleId 规则id
 	 * @return
 	 */
-	int saveMesRuleConfig(int id,int ruleId) throws Exception;
+	int saveMesRuleConfig(int id,int ruleId);
 
 	/**
 	 * 取消产品/半成品 mes 规则
@@ -170,4 +170,11 @@ public interface IDevProductListService
 	 * @return
 	 */
 	MesBatchRule selectMesBatchRuleByPbId(int id);
+
+	/**
+	 * 查看mes配置明细
+	 * @param productList 产品信息
+	 * @return 结果
+	 */
+    List<DevProductList> selectMesCfList(DevProductList productList);
 }

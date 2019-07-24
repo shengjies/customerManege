@@ -21,7 +21,6 @@ import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
-import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper;
 import com.ruoyi.project.system.user.domain.User;
@@ -138,22 +137,6 @@ public class DevProductListServiceImpl implements IDevProductListService {
         devProductList.setCompanyId(currentUser.getCompanyId());
         devProductList.setCreate_by(currentUser.getUserName());
         return devProductListMapper.insertDevProductList(devProductList);
-        /**
-         * 新增产品时值增加库存记录信息
-         */
-        // ProductStock productStock = productStockMapper.selectProductStockByProCode(currentUser.getCompanyId(), devProductList.getProductCode());
-        // if (productStock == null) {
-        //     productStock = new ProductStock();
-        //     productStock.setCompanyId(currentUser.getCompanyId());
-        //     productStock.setLastUpdate(new Date());
-        //     productStock.setCreateTime(new Date());
-        //     productStock.setProductCode(devProductList.getProductCode());
-        //     productStock.setProductModel(devProductList.getProductModel());
-        //     productStock.setProductName(devProductList.getProductName());
-        //     productStock.setProductId(devProductList.getId());
-        //     productStockMapper.insertProductStock(productStock);
-        // }
-        // return i;
     }
 
     /**
@@ -571,11 +554,16 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return
      */
     @Override
-    public int saveMesRuleConfig(int id, int ruleId) throws Exception {
+    public int saveMesRuleConfig(int id, int ruleId){
         //查询对应的规则是否存在
         MesBatchRule batchRule = mesBatchRuleMapper.selectMesBatchRuleById(ruleId);
         if(batchRule == null){
-            throw new Exception("对应MES规则不存在");
+            throw new BusinessException("对应MES规则不存在");
+        }
+        // 查询该产品是否已经配置过规则
+        DevProductList product = devProductListMapper.selectDevProductListById(id);
+        if (StringUtils.isNotNull(product) && product.getRuleId() > 0) {
+            throw new BusinessException(product.getProductCode() + "已经配置了追踪规则");
         }
         return devProductListMapper.saveMesRuleConfig(id,ruleId);
     }
@@ -603,5 +591,20 @@ public class DevProductListServiceImpl implements IDevProductListService {
             return mesBatchRuleMapper.selectMesBatchRuleById(devProductList.getRuleId());
         }
         return null;
+    }
+
+    /**
+     * 查看mes配置规则明细
+     * @param productList 产品信息
+     * @return 结果
+     */
+    @Override
+    public List<DevProductList> selectMesCfList(DevProductList productList) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        productList.setCompanyId(user.getCompanyId());
+        return devProductListMapper.selectMesCfList(productList);
     }
 }

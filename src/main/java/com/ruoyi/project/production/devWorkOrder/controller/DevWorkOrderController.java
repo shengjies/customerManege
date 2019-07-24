@@ -3,7 +3,6 @@ package com.ruoyi.project.production.devWorkOrder.controller;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
-import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.TimeUtil;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -12,6 +11,7 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.mes.mesBatch.service.IMesBatchService;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
@@ -51,6 +51,9 @@ public class DevWorkOrderController extends BaseController {
 
     @Autowired
     private IImportConfigService configService;
+
+    @Autowired
+    private IMesBatchService mesBatchService;
 
     @RequiresPermissions("device:devWorkOrder:view")
     @GetMapping()
@@ -465,5 +468,13 @@ public class DevWorkOrderController extends BaseController {
         }catch (Exception e){
             return AjaxResult.error(e.getMessage());
         }
+    }
+
+    /************************** 工单MES操作 ********************************/
+    @GetMapping("/woConfigMes")
+    public String woConfigMes(int id,ModelMap map){
+        map.put("mesCode",CodeUtils.getMesCode());
+        map.put("workOrder",devWorkOrderService.selectWorkOrderMesByWId(id));
+        return prefix + "/mesConfig";
     }
 }

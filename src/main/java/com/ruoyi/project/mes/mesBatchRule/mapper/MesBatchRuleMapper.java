@@ -75,4 +75,10 @@ public interface MesBatchRuleMapper
 	 * @return
 	 */
 	List<MesBatchRule> selectMesRuleByType(@Param("type")int type);
+
+	/**
+	 * 查询所有的MES规则
+	 * @return 结果
+	 */
+    List<MesBatchRule> selectAllMesRule();
 }

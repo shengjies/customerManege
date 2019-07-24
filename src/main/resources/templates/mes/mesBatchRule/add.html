@@ -25,7 +25,6 @@
 				<label class="col-sm-3 control-label">物料编码：</label>
 				<div class="col-sm-8">
 					<select style="width: 100%" id="materiels" name="materiels" multiple="multiple" class="form-control" th:with="allMat=${@materiel.selectAllMatByComId()}">
-						<option value="-1">请选择</option>
 						<option th:each="item : ${allMat}"  th:text="${item.materielCode}" th:value="${item.materielCode}"></option>
 					</select>
 				</div>
@@ -76,30 +75,7 @@
 					$.modal.alertWarning("请选择物料编码");
 					return;
 				}
-				var materielList = '';
-				for(var i =0;i<$(matSelect).size();i++){
-					materielList += $(matSelect[i]).val() + ",";
-				}
-				var data={
-					ruleName:$.common.trim($("#ruleName").val()),
-					pType:pType,
-					materiels:materielList,
-				}
-				var config = {
-					url: prefix + "/add",
-					type: "post",
-					dataType: "json",
-					contentType: 'application/json',
-					data: JSON.stringify(data),
-					beforeSend: function () {
-						$.modal.loading("正在处理中，请稍后...");
-						$.modal.disable();
-					},
-					success: function (result) {
-						$.operate.successCallback(result);
-					}
-				};
-				$.ajax(config)
+				$.operate.save(prefix + "/add", $('#form-mesBatchRule-add').serialize());
 	        }
 	    }
 	</script>

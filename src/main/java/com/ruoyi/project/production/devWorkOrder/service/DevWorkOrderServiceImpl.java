@@ -18,6 +18,12 @@ import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.erp.orderDetails.domain.OrderDetails;
 import com.ruoyi.project.erp.orderDetails.mapper.OrderDetailsMapper;
+import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
+import com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail;
+import com.ruoyi.project.mes.mesBatch.mapper.MesBatchDetailMapper;
+import com.ruoyi.project.mes.mesBatch.mapper.MesBatchMapper;
+import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleMapper;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
@@ -118,6 +124,15 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     @Autowired
     private ImportConfigMapper configMapper;
+
+    @Autowired
+    private MesBatchMapper mesBatchMapper;
+
+    @Autowired
+    private MesBatchDetailMapper mesBatchDetailMapper;
+
+    @Autowired
+    private MesBatchRuleMapper mesBatchRuleMapper;
 
     @Value("${file.iso}")
     private String fileUrl;
@@ -1314,4 +1329,44 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if(workOrder != null) throw new  Exception("工单已存在");
         return devWorkOrderMapper.insertDevWorkOrder(order);
     }
+
+
+    /******************************************************************************************************
+     *********************************** 工单MES操作逻辑 ***************************************************
+     ******************************************************************************************************/
+    /**
+     * 查询MES工单相关信息
+     * @param id 工单id
+     * @return 结果
+     */
+    @Override
+    public DevWorkOrder selectWorkOrderMesByWId(int id) {
+        DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
+        if (StringUtils.isNotNull(workOrder)) {
+            // 查询工单产品信息
+            DevProductList product = productListMapper.selectProductByCode(workOrder.getProductCode());
+            MesBatchRule batchRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
+            if (StringUtils.isNotNull(batchRule)) {
+                workOrder.setRuleId(batchRule.getId());
+            }
+            // 查询已经配置的工单批次追踪信息
+            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getWorkorderNumber());
+            if (StringUtils.isNotEmpty(mesBatchList)) {
+                List<MesBatchDetail> mesBatchDetailList = null;
+                for (MesBatch mesBatch : mesBatchList) {
+                    mesBatchDetailList = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+                    mesBatch.setMesBatchDetailList(mesBatchDetailList);
+                }
+                workOrder.setMesBatchList(mesBatchList);
+            } else {
+                // 产品配置规则
+                if (StringUtils.isNotNull(batchRule)) {
+                    workOrder.setMesMatList(Convert.toStrArray(batchRule.getMateriels()));
+                }
+            }
+            return workOrder;
+        }
+        return null;
+    }
+
 }
