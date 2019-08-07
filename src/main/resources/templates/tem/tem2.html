@@ -215,6 +215,9 @@
                                                 <span th:if="${item.operationStatus == 3}" style="background-color:blue;color: #fff" th:utext="${item.workorderNumber}"></span>
                                                 </li>
                                             </ul>
+                                            <ul id="data-work-list"
+                                                th:if="${#lists.isEmpty(info.workOrder)}" >
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -228,10 +231,12 @@
                                         <div class="demo_paidan">
                                             <ul class="demo_paidan" id="data-work-exc" th:if="${not #lists.isEmpty(info.exs)}">
                                                 <li  th:each="item:${info.exs}">
-                                                    <span th:if="${item.exceStatut == 0}" style="background-color: red" th:utext="${item.typeName}"></span>
-                                                    <span th:if="${item.exceStatut == 1}" style="background-color: blue;color: #fff" th:utext="${item.typeName}"></span>
-                                                    <span th:if="${item.exceStatut == 2}"  th:utext="${item.typeName}"></span>
+                                                    <span th:if="${item.exceStatut == 0}" style="background-color: red" th:utext="${item.remark!= null?item.remark:item.typeName}"></span>
+                                                    <span th:if="${item.exceStatut == 1}" style="background-color: blue;color: #fff" th:utext="${item.remark!= null?item.remark:item.typeName}"></span>
+                                                    <span th:if="${item.exceStatut == 2}"  th:utext="${item.remark!= null?item.remark:item.typeName}"></span>
                                                 </li>
+                                            </ul>
+                                            <ul class="demo_paidan" id="data-work-exc" th:if="${#lists.isEmpty(info.exs)}">
                                             </ul>
                                         </div>
                                     </div>

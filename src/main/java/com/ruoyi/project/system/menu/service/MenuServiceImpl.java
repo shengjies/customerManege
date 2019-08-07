@@ -56,7 +56,6 @@ public class MenuServiceImpl implements IMenuService {
         } else {
             menus = menuMapper.selectMenusByUserId(user.getUserId());
             //menus = menuMapper.selectMenusByCompanyId(user.getCompanyId().longValue());
-
         }
         return TreeUtils.getChildPerms(menus, 0);
     }

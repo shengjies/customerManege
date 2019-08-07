@@ -10,26 +10,21 @@
     #barcode {width: 200px;}
 </style>
 <div class="box">
-    <div id="container" >
-        <canvas  width="260" height="260"></canvas>
-    </div>
     <img id="barcode" />
 </div>
 <div th:include="include::footer"></div>
-<script th:src="@{/js/jqueryqr.js}"></script>
-<script th:src="@{/js/qrcode.js}"></script>
+<script th:src="@{/js/JsBarcode.all.min.js}"></script>
 </body>
 <script th:inline="javascript" >
-    initCode();
-   function initCode() {
-       var page ={name:[[${info.pageName}]],path:[[${info.pageUrl}]]};
-       $('#container').erweima({
-           fill:"#000",
-           size:230,
-           text:JSON.stringify(page),
-           label:'扫码保存'
-       });
-   }
+    var barcode = document.getElementById('barcode'),
+        str = [[${info==null?'':info.pageId}]],
+        options = {
+            format: "CODE128",
+            displayValue: true,
+            fontSize: 18,
+            height: 100
+        };
+    JsBarcode(barcode, str, options); //原生
     function submitHandler(){
         $.modal.close();
     }
