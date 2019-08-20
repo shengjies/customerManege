@@ -1,7 +1,5 @@
 package com.ruoyi.project.production.workExceptionList.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
 import org.apache.ibatis.annotations.Param;
 
@@ -97,4 +95,11 @@ public interface WorkExceptionListMapper
 	 * @return
 	 */
 	List<WorkExceptionList> selectWorkExceAllByWorkId(@Param("wid")int wid);
+
+	/**
+	 * app端查看工单异常信息
+	 * @param workExceptionList 异常对象
+	 * @return 结果
+	 */
+    List<WorkExceptionList> appSelectWorkExcList(WorkExceptionList workExceptionList);
 }

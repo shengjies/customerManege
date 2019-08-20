@@ -51,6 +51,44 @@ public class SingleWork extends BaseEntity
 	 */
 	private Integer sopSign;
 
+	/*******************  app交互参数 *******************/
+	private Integer uid; // app在线用户id
+	private Integer mParentId; // 菜单父id
+	private String deviceCode; //设备编号
+	private String devType; //设备类型
+
+	public Integer getUid() {
+		return uid;
+	}
+
+	public void setUid(Integer uid) {
+		this.uid = uid;
+	}
+
+	public Integer getmParentId() {
+		return mParentId;
+	}
+
+	public void setmParentId(Integer mParentId) {
+		this.mParentId = mParentId;
+	}
+
+	public String getDeviceCode() {
+		return deviceCode;
+	}
+
+	public void setDeviceCode(String deviceCode) {
+		this.deviceCode = deviceCode;
+	}
+
+	public String getDevType() {
+		return devType;
+	}
+
+	public void setDevType(String devType) {
+		this.devType = devType;
+	}
+
 	public Integer getSopSign() {
 		return sopSign;
 	}
@@ -225,6 +263,10 @@ public class SingleWork extends BaseEntity
 				", cTime=" + cTime +
 				", parentId=" + parentId +
 				", sopSign=" + sopSign +
+				", uid=" + uid +
+				", mParentId=" + mParentId +
+				", deviceCode='" + deviceCode + '\'' +
+				", devType='" + devType + '\'' +
 				'}';
 	}
 }

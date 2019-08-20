@@ -64,4 +64,12 @@ public interface ICountPieceService
 	 * @return 结果
 	 */
 	List<CountPiece> selectCountPieceListByDate(CountPiece countPiece);
+
+
+	/**
+	 * app端查看计件明细
+	 * @param countPiece 计件对象
+	 * @return 结果
+	 */
+	List<CountPiece> appSelectDetailList(CountPiece countPiece);
 }

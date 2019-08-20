@@ -89,4 +89,14 @@ public class MesBatchDetailServiceImpl implements IMesBatchDetailService
 	public List<MesBatchDetail> selectMesBatchDetailListByBId(int bId) {
 		return mesBatchDetailMapper.selectMesBatchDetailByBId(bId);
 	}
+
+	/**
+	 * 查询批次总的记录数
+	 * @param batchCode 批次号
+	 * @return 结果
+	 */
+	@Override
+	public int selectMesBatchTotal(String batchCode) {
+		return mesBatchDetailMapper.selectMesBatchTotal(batchCode);
+	}
 }

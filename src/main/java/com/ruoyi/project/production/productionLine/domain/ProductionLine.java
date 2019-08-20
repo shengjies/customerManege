@@ -1,19 +1,12 @@
 package com.ruoyi.project.production.productionLine.domain;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
-import com.ruoyi.project.system.user.domain.User;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.system.user.domain.User;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 生产线表 production_line
@@ -82,7 +75,47 @@ public class ProductionLine extends BaseEntity
 	private Integer teUser; // 测试员工
 	private User teUserInfo; // 测试员工
 
-	public Integer getEdUser() {
+	/**
+	 * app端交互参数
+	 */
+	private Integer uid; // app端在线用户的id
+	private Integer mParentId; // app端菜单父id
+	private String devCode; //app设备编号
+	private String devType; //app设备类型
+
+	public String getDevCode() {
+		return devCode;
+	}
+
+	public void setDevCode(String devCode) {
+		this.devCode = devCode;
+	}
+
+	public String getDevType() {
+		return devType;
+	}
+
+	public void setDevType(String devType) {
+		this.devType = devType;
+	}
+
+	public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getmParentId() {
+        return mParentId;
+    }
+
+    public void setmParentId(Integer mParentId) {
+        this.mParentId = mParentId;
+    }
+
+    public Integer getEdUser() {
 		return edUser;
 	}
 

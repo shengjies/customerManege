@@ -13,6 +13,7 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.system.post.service.IPostService;
 import com.ruoyi.project.system.role.service.IRoleService;
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.domain.UserApp;
 import com.ruoyi.project.system.user.domain.UserQrCode;
 import com.ruoyi.project.system.user.service.IUserService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -246,5 +247,26 @@ public class UserController extends BaseController {
         user.setCompanyId(u.getCompanyId());
         List<UserQrCode> list = userService.selectUserQrCode(user);
         return getDataTable(list);
+    }
+
+
+    /******************************************************************************************************
+     *********************************** app用户交互逻辑 ***************************************************
+     ******************************************************************************************************/
+    /**
+     * app端查询用户信息
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectUserList(@RequestBody UserApp userApp){
+        try {
+            if (userApp != null) {
+                userApp.appStartPage();
+                return AjaxResult.success("请求成功",userService.appSelectUserList(userApp));
+            }
+            return error();
+        } catch (Exception e) {
+            return error();
+        }
     }
 }

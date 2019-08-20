@@ -1,6 +1,7 @@
 package com.ruoyi.project.device.devNotice.service;
 
 import com.ruoyi.project.device.devNotice.domain.DevNotice;
+import com.ruoyi.project.system.notice.domain.NoticeApp;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -66,4 +67,12 @@ public interface IDevNoticeService
 	 * @return
 	 */
 	public int publishEnd(Integer id);
+
+	/**
+	 * app查询消息
+	 * @return 结果
+	 */
+	List<NoticeApp> appSelectNoticeList();
+
+    NoticeApp appSelectNoticeByOne(Integer uid);
 }

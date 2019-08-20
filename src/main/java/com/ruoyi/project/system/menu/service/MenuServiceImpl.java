@@ -1,30 +1,22 @@
 package com.ruoyi.project.system.menu.service;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.ruoyi.framework.jwt.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.TreeUtils;
 import com.ruoyi.common.utils.security.ShiroUtils;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.system.menu.domain.Menu;
+import com.ruoyi.project.system.menu.domain.MenuApi;
 import com.ruoyi.project.system.menu.mapper.MenuMapper;
 import com.ruoyi.project.system.role.domain.Role;
 import com.ruoyi.project.system.role.mapper.RoleMenuMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
  * 菜单 业务层处理
@@ -286,5 +278,16 @@ public class MenuServiceImpl implements IMenuService {
             return UserConstants.MENU_NAME_NOT_UNIQUE;
         }
         return UserConstants.MENU_NAME_UNIQUE;
+    }
+
+    /**
+     * api接口查询菜单
+     * @param uid 用户id
+     * @param parentId 父id
+     * @return 结果
+     */
+    @Override
+    public List<MenuApi> selectMenuListByParentId(Integer uid, Integer parentId) {
+        return menuMapper.selectMenuListByParentId(uid,parentId);
     }
 }

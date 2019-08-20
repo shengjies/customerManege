@@ -70,6 +70,14 @@ public class SopLine extends BaseEntity
 		return id;
 	}
 
+	public Integer getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
+	}
+
 	public void setId(Integer id) {
 		this.id = id;
 	}

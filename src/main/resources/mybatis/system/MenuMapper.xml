@@ -21,12 +21,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="updateBy"       column="update_by"      />
 		<result property="remark"         column="remark"         />
 	</resultMap>
-	
+
 	<sql id="selectMenuVo">
         select menu_id, menu_name, parent_id, order_num, url, menu_type, visible, perms, icon, create_by, create_time 
 		from sys_menu
     </sql>
-    
+
     <select id="selectMenusByUserId" parameterType="Long" resultMap="MenuResult">
 		select distinct m.menu_id, m.parent_id, m.menu_name, m.url, m.perms , m.menu_type, m.icon, m.order_num, m.create_time
 		from sys_menu m
@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where m.menu_type in ('M', 'C') and m.visible = 0
 		order by m.order_num
 	</select>
-	
+
 	<select id="selectMenuAll" resultMap="MenuResult">
 		<include refid="selectMenuVo"/>
 		order by order_num
@@ -59,7 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where ur.user_id = #{userId}
 		order by m.order_num
 	</select>
-	
+
 	<select id="selectPermsByUserId" parameterType="Long" resultType="String">
 		select distinct m.perms
 		from sys_menu m
@@ -67,7 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			 left join sys_user_role ur on rm.role_id = ur.role_id
 		where ur.user_id = #{userId}
 	</select>
-	
+
 	<select id="selectMenuTree" parameterType="Long" resultType="String">
 		select concat(m.menu_id, m.perms) as perms
 		from sys_menu m
@@ -75,7 +75,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where rm.role_id = #{roleId}
 		order by m.parent_id, m.order_num
 	</select>
-	
+
 	<select id="selectMenuList" parameterType="Menu" resultMap="MenuResult">
         <include refid="selectMenuVo"/>
         <where>
@@ -105,27 +105,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</if>
 		order by m.order_num
 	</select>
-	
+
 	<delete id="deleteMenuById" parameterType="Long">
 	    delete from sys_menu where menu_id = #{menuId} or parent_id = #{menuId}
 	</delete>
-	
+
 	<select id="selectMenuById" parameterType="Long" resultMap="MenuResult">
 		SELECT t.menu_id, t.parent_id, t.menu_name, t.order_num, t.url, t.menu_type, t.visible, t.perms, t.icon, t.remark,
 			(SELECT menu_name FROM sys_menu WHERE menu_id = t.parent_id) parent_name
 		FROM sys_menu t
 		where t.menu_id = #{menuId}
 	</select>
-	
+
 	<select id="selectCountMenuByParentId" resultType="Integer">
 	    select count(1) from sys_menu where parent_id=#{menuId}  
 	</select>
-	
+
 	<select id="checkMenuNameUnique" parameterType="Menu" resultMap="MenuResult">
 		<include refid="selectMenuVo"/>
 		where menu_name=#{menuName} and parent_id = #{parentId}
 	</select>
-	
+
 	<update id="updateMenu" parameterType="Menu">
  		update sys_menu
  		<set>
@@ -143,7 +143,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  		</set>
  		where menu_id = #{menuId}
 	</update>
- 	
+
  	<insert id="insertMenu" parameterType="Menu">
  		insert into sys_menu(
  			<if test="menuId != null and menuId != 0">menu_id,</if>
@@ -183,6 +183,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		order by m.order_num
 	</select>
 
+	<!--app端根据角色id和菜单父id查询菜单列表-->
+	<select id="selectMenuListByParentId" resultType="com.ruoyi.project.system.menu.domain.MenuApi">
+		select distinct m.menu_id as menuId, m.parent_id as parentId, m.menu_name as menuName, m.url as url, m.menu_type as menuType,ur.user_id as uid
+		from sys_menu m
+			 left join sys_role_menu rm on m.menu_id = rm.menu_id
+			 left join sys_user_role ur on rm.role_id = ur.role_id
+			 LEFT JOIN sys_role ro on ur.role_id = ro.role_id
+		where ur.user_id = #{userId} and m.menu_type in ('M', 'C', 'F') and m.visible = 0  AND ro.status = 0 and parent_id = #{parentId} and m.app_sign = 1
+		order by m.order_num
+	</select>
 
-	
 </mapper> 

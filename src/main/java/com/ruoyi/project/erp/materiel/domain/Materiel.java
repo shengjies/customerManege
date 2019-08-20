@@ -1,11 +1,8 @@
 package com.ruoyi.project.erp.materiel.domain;
 
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
-import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
-import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -89,13 +86,52 @@ public class Materiel extends BaseEntity {
      */
     private MaterielSupplier materielSupplier;
     /**
-     * 封装物料文件信息
+     * 物料是否上传过文件标记
+     * 0、未上传，1、上传过
      */
-    private FileSourceInfo fileSourceInfo;
+    private Integer fileFlag;
     /**
      * 不良品数量
      */
     private Integer badNumber;
+
+    /*******************  app交互参数 *******************/
+    private Integer uid; // app在线用户id
+    private Integer mParentId; // 菜单父id
+    private String devCode; //设备编号
+    private String devType; //设备类型
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getmParentId() {
+        return mParentId;
+    }
+
+    public void setmParentId(Integer mParentId) {
+        this.mParentId = mParentId;
+    }
+
+    public String getDevCode() {
+        return devCode;
+    }
+
+    public void setDevCode(String devCode) {
+        this.devCode = devCode;
+    }
+
+    public String getDevType() {
+        return devType;
+    }
+
+    public void setDevType(String devType) {
+        this.devType = devType;
+    }
 
     public String getUnit() {
         return unit;
@@ -113,12 +149,12 @@ public class Materiel extends BaseEntity {
         this.badNumber = badNumber;
     }
 
-    public FileSourceInfo getFileSourceInfo() {
-        return fileSourceInfo;
+    public Integer getFileFlag() {
+        return fileFlag;
     }
 
-    public void setFileSourceInfo(FileSourceInfo fileSourceInfo) {
-        this.fileSourceInfo = fileSourceInfo;
+    public void setFileFlag(Integer fileFlag) {
+        this.fileFlag = fileFlag;
     }
 
     public MaterielSupplier getMaterielSupplier() {
@@ -241,20 +277,27 @@ public class Materiel extends BaseEntity {
         return createTime;
     }
 
+    @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
-                .append("id", getId())
-                .append("companyId", getCompanyId())
-                .append("materielCode", getMaterielCode())
-                .append("materielName", getMaterielName())
-                .append("materielModel", getMaterielModel())
-                .append("price", getPrice())
-                .append("materielImg", getMaterielImg())
-                .append("imgSize", getImgSize())
-                .append("remark", getRemark())
-                .append("createId", getCreateId())
-                .append("createName", getCreateName())
-                .append("createTime", getCreateTime())
-                .toString();
+        return "Materiel{" +
+                "id=" + id +
+                ", companyId=" + companyId +
+                ", materielCode='" + materielCode + '\'' +
+                ", materielName='" + materielName + '\'' +
+                ", supplierCode='" + supplierCode + '\'' +
+                ", materielModel='" + materielModel + '\'' +
+                ", price=" + price +
+                ", priceImport=" + priceImport +
+                ", unit='" + unit + '\'' +
+                ", materielImg='" + materielImg + '\'' +
+                ", imgSize=" + imgSize +
+                ", remark='" + remark + '\'' +
+                ", createId=" + createId +
+                ", createName='" + createName + '\'' +
+                ", createTime=" + createTime +
+                ", materielSupplier=" + materielSupplier +
+                ", fileFlag=" + fileFlag +
+                ", badNumber=" + badNumber +
+                '}';
     }
 }

@@ -188,4 +188,62 @@ public class CountPieceController extends BaseController {
     }
 
 
+    /******************************************************************************************************
+     *********************************** app端计件统计交互 *************************************************
+     ******************************************************************************************************/
+    /**
+     * app端查询个人计件列表信息
+     */
+    @PostMapping("/myCountPiece/applist")
+    @ResponseBody
+    public AjaxResult appSelectList(@RequestBody CountPiece countPiece){
+        try {
+            return AjaxResult.success("请求成功",countPieceService.selectCountPieceList(countPiece));
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+    /**
+     * app端查询所有人的计件信息
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectList1(@RequestBody CountPiece countPiece){
+        try {
+            return AjaxResult.success("请求成功",countPieceService.selectCountPieceList(countPiece));
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+
+    /**
+     * app端计件明细列表
+     */
+    @PostMapping("/appDetail")
+    @ResponseBody
+    public AjaxResult appSelectDetailList(@RequestBody CountPiece countPiece){
+        try {
+            if (countPiece != null) {
+                countPiece.appStartPage();
+                return AjaxResult.success("请求成功",countPieceService.appSelectDetailList(countPiece));
+            }
+            return error();
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+    @PostMapping("/myCountPiece/appDetail")
+    @ResponseBody
+    public AjaxResult appSelectDetailList1(@RequestBody CountPiece countPiece){
+        try {
+            if (countPiece != null) {
+                countPiece.appStartPage();
+                return AjaxResult.success("请求成功",countPieceService.appSelectDetailList(countPiece));
+            }
+            return error();
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+
 }

@@ -81,5 +81,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{noticeId}
         </foreach>
     </delete>
-    
+
+    <!--app端查询发布过的消息-->
+    <select id="appSelectNoticeList" resultType="com.ruoyi.project.system.notice.domain.NoticeApp">
+        SELECT notice_content as text,notice_status as status FROM dev_notice where notice_status = 2;
+    </select>
 </mapper>

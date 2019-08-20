@@ -97,4 +97,11 @@ public interface IProductionLineService
 	 * @return 结果
 	 */
     String checkLineNameUnique(ProductionLine productionLine);
+
+	/**
+	 * app端查询流水线列表
+	 * @param productionLine 流水线对象
+	 * @return 结果
+	 */
+	List<ProductionLine> appSelectLineList(ProductionLine productionLine);
 }

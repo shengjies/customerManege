@@ -23,10 +23,7 @@ import com.ruoyi.project.system.post.domain.Post;
 import com.ruoyi.project.system.post.mapper.PostMapper;
 import com.ruoyi.project.system.role.domain.Role;
 import com.ruoyi.project.system.role.mapper.RoleMapper;
-import com.ruoyi.project.system.user.domain.User;
-import com.ruoyi.project.system.user.domain.UserPost;
-import com.ruoyi.project.system.user.domain.UserQrCode;
-import com.ruoyi.project.system.user.domain.UserRole;
+import com.ruoyi.project.system.user.domain.*;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import com.ruoyi.project.system.user.mapper.UserPostMapper;
 import com.ruoyi.project.system.user.mapper.UserRoleMapper;
@@ -294,6 +291,30 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
+     * 修改用户个人详细信息
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public int updateUserInfo1(User user, String token) throws Exception {
+        user.setDevCompany(null);
+        user.setCreateTime(null);
+        user.setLoginDate(null);
+        user.setUpdateTime(null);
+        UserApi userApi = Feign.builder()
+                .encoder(new GsonEncoder())
+                .decoder(new GsonDecoder())
+                .target(UserApi.class, FeignUtils.MAIN_PATH);
+        HashMap<String, Object> result = userApi.editUserInfo(user, token);
+        if (Double.valueOf(result.get("code").toString()) == 0) {
+            return userMapper.updateUser(user);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
      * 修改用户密码
      *
      * @param user 用户信息
@@ -303,6 +324,9 @@ public class UserServiceImpl implements IUserService {
     public int resetUserPwd(User user, HttpServletRequest request) {
         user.setDevCompany(null);
         user.setCreateTime(null);
+        user.setUpdateTime(null);
+        user.setLoginDate(null);
+        user.setAvatar(null);
         user.randomSalt(); // 生成盐
         user.setLoginTag(UserConstants.LOGIN_TAG_ADD);
         user.setPassword(PasswordUtil.encryptPassword(user.getLoginName(), user.getPassword(), user.getSalt()));
@@ -646,5 +670,51 @@ public class UserServiceImpl implements IUserService {
     @Override
     public List<UserQrCode> selectUserQrCode(User user) {
         return userMapper.selectUserQrCode(user);
+    }
+
+    @Override
+    public User selectUserInfo(Long userId) {
+        return userMapper.selectUserInfoById(userId.intValue());
+    }
+
+    /**
+     * 用户app交互查询用户列表
+     * @return 结果
+     */
+    @Override
+    public List<UserApp> appSelectUserList(UserApp userApp) {
+        Integer userId = userApp.getUid();
+        if (userId != null) {
+            User user = userMapper.selectUserInfoById(userId);
+            if (StringUtils.isNotNull(user)) {
+                return userMapper.appSelectUserList(user.getCompanyId());
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public List<UserApp> appSelectUserInfoList(Integer uid) {
+        if (uid != null) {
+            User user = userMapper.selectUserInfoById(uid);
+            if (user != null) {
+                return userMapper.appSelectUserList(user.getCompanyId());
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * 查询用户信息
+     * @param uid
+     * @return
+     */
+    @Override
+    public String selectUserInfo(Integer uid) {
+        User user = userMapper.selectUserInfoById(uid);
+        if (user != null && StringUtils.isNotEmpty(user.getAvatar())) {
+            return user.getAvatar();
+        }
+        return null;
     }
 }

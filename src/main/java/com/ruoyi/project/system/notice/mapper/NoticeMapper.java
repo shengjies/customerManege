@@ -1,6 +1,8 @@
 package com.ruoyi.project.system.notice.mapper;
 
 import com.ruoyi.project.system.notice.domain.Notice;
+import com.ruoyi.project.system.notice.domain.NoticeApp;
+
 import java.util.List;
 
 /**
@@ -49,4 +51,10 @@ public interface NoticeMapper
      * @return 结果
      */
     public int deleteNoticeByIds(String[] noticeIds);
+
+    /**
+     * 查询消息列表
+     * @return
+     */
+    List<NoticeApp> appSelectNoticeList();
 }

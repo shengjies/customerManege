@@ -73,7 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--查询对应公司的所有异常信息-->
     <select id="findExceTypeAll" resultType="com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType">
-        SELECT id as Id,type_name as typeName FROM dev_work_exception_type where company_id = #{companyId};
+        SELECT id as Id,type_name as typeName FROM dev_work_exception_type where company_id = #{companyId} and def_id = 0
     </select>
 
     <!--查询对应公司对应工单的异常信息-->
@@ -83,7 +83,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--根据公司id和异常类型名称查询对应的异常类型信息-->
     <select id="selectByCompanyAndTypeName" resultMap="WorkExceptionTypeResult">
-        SELECT * FROM dev_work_exception_type where company_id = #{company_id} and type_name = #{type_name} limit 1;
+        SELECT * FROM dev_work_exception_type where company_id = #{company_id} and type_name = #{type_name} and def_id = 0 limit 1;
     </select>
     
 </mapper>

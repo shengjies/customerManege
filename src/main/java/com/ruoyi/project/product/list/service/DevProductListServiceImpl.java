@@ -1,5 +1,6 @@
 package com.ruoyi.project.product.list.service;
 
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
@@ -16,6 +17,7 @@ import com.ruoyi.project.erp.productCustomer.mapper.ProductCustomerMapper;
 import com.ruoyi.project.erp.productStock.domain.ProductStock;
 import com.ruoyi.project.erp.productStock.mapper.ProductStockMapper;
 import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleDetailMapper;
 import com.ruoyi.project.mes.mesBatchRule.mapper.MesBatchRuleMapper;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
@@ -30,6 +32,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
@@ -72,6 +75,9 @@ public class DevProductListServiceImpl implements IDevProductListService {
     @Autowired
     private ImportConfigMapper configMapper;
 
+    @Autowired
+    private MesBatchRuleDetailMapper mesBatchRuleDetailMapper;
+
     public boolean isSys(Cookie[] cookies) {
         User user = JwtUtil.getTokenCookie(cookies);
         if (user == null) {
@@ -104,12 +110,10 @@ public class DevProductListServiceImpl implements IDevProductListService {
             if (productList.getCompanyId() == null) continue;
             DevCompany devCompany = devCompanyMapper.selectDevCompanyById(productList.getCompanyId());
             if (devCompany != null) productList.setComName(devCompany.getComName());
-            // 查询产品是否关联过客户
-            productList.setProductCustomer(productCustomerMapper.selectProductCustomerByProIdOrCusIdLimit1(productList.getId()));
             // 查询产品是否上传过文件
-            List<FileSourceInfo> fileSourceInfos = fileSourceInfoMapper.selectFileSourceInfoBySaveIdAndComId(productList.getId(), devProductList.getCompanyId());
-            if (!StringUtils.isEmpty(fileSourceInfos)) {
-                productList.setFileSourceInfo(fileSourceInfos.get(0));
+            List<FileSourceInfo> sourceInfos = fileSourceInfoMapper.selectFileSourceInfoBySaveId(productList.getCompanyId(), FileConstants.FILE_SAVETYPE_PRO, productList.getId());
+            if (StringUtils.isNotEmpty(sourceInfos)) {
+                productList.setFileFlag(FileConstants.FILE_SAVE_YES);
             }
         }
         return list;
@@ -554,16 +558,25 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int saveMesRuleConfig(int id, int ruleId){
         //查询对应的规则是否存在
-        MesBatchRule batchRule = mesBatchRuleMapper.selectMesBatchRuleById(ruleId);
-        if(batchRule == null){
-            throw new BusinessException("对应MES规则不存在");
+        if (ruleId > 0) {
+            MesBatchRule batchRule = mesBatchRuleMapper.selectMesBatchRuleById(ruleId);
+            if(batchRule == null){
+                throw new BusinessException("对应MES规则不存在");
+            }
         }
-        // 查询该产品是否已经配置过规则
+        // 半成品添加规则MES明细字段更新
         DevProductList product = devProductListMapper.selectDevProductListById(id);
-        if (StringUtils.isNotNull(product) && product.getRuleId() > 0) {
-            throw new BusinessException(product.getProductCode() + "已经配置了追踪规则");
+        if (StringUtils.isNotNull(product) && product.getSign().equals(ProductConstants.TYPE_PARTS)) {
+            if (ruleId == 0) {
+                // 取消配置
+                mesBatchRuleDetailMapper.updateMesBatchRuleDetailTag(product.getProductCode(),0);
+            } else {
+                // 更新半成品标记为已经配置
+                mesBatchRuleDetailMapper.updateMesBatchRuleDetailTag(product.getProductCode(),1);
+            }
         }
         return devProductListMapper.saveMesRuleConfig(id,ruleId);
     }
@@ -574,7 +587,14 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int cancel(int id) {
+        // 半成品添加规则MES明细字段更新
+        DevProductList product = devProductListMapper.selectDevProductListById(id);
+        if (StringUtils.isNotNull(product) && product.getSign().equals(ProductConstants.TYPE_PARTS)) {
+            // 更新半成品标记为未配置
+            mesBatchRuleDetailMapper.updateMesBatchRuleDetailTag(product.getProductCode(),0);
+        }
         return devProductListMapper.saveMesRuleConfig(id,0);
     }
 
@@ -606,5 +626,15 @@ public class DevProductListServiceImpl implements IDevProductListService {
         }
         productList.setCompanyId(user.getCompanyId());
         return devProductListMapper.selectMesCfList(productList);
+    }
+
+    /**
+     * 通过标记查询所有的成品或者半成品
+     * @param sign 成品0，半成品1
+     * @return 结果
+     */
+    @Override
+    public List<DevProductList> selectProAllBySign(Integer sign) {
+        return devProductListMapper.selectProAllBySign(sign);
     }
 }

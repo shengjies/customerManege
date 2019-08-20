@@ -1,23 +1,21 @@
 package com.ruoyi.project.erp.fileSourceInfo.service;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
+import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
+import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
-import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
-import com.ruoyi.common.support.Convert;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 文件素材管理 服务层实现
@@ -45,10 +43,10 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
      */
 	@Override
 //	@DataSource(DataSourceType.ERP)
-	public List<FileSourceInfo> selectFileSourceInfoList(FileSourceInfo fileSourceInfo, HttpServletRequest request)
+	public List<FileSourceInfo> selectFileSourceInfoList(FileSourceInfo fileSourceInfo)
 	{
 		if(fileSourceInfo.getCompanyId() == null) {
-			User user = JwtUtil.getTokenUser(request);
+			User user = JwtUtil.getUser();
 			if (user == null) return Collections.emptyList();
 			fileSourceInfo.setCompanyId(user.getCompanyId());
 		}

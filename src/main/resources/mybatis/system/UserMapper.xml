@@ -325,7 +325,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<!--根据用户编号查询用户基本信息-->
 	<select id="selectUserInfoById" resultType="com.ruoyi.project.system.user.domain.User">
-		SELECT user_id as userId,login_name as loginName,create_by as createBy,email as Email,user_name as userName FROM sys_user where user_id =#{user_id}
+		SELECT user_id as userId,company_id as companyId,login_name as loginName,create_by as createBy,email as Email,
+		avatar as avatar,user_name as userName FROM sys_user where user_id =#{user_id}
 	</select>
 
 	<!--修改用户删除状态-->
@@ -353,5 +354,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
 			AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
 		</if>
+	</select>
+
+	<!--app交互查询用户列表-->
+	<select id="appSelectUserList" resultType="com.ruoyi.project.system.user.domain.UserApp">
+        SELECT user_id as uid,login_name as phone,user_name as userName FROM sys_user where company_id = #{companyId}
 	</select>
 </mapper>

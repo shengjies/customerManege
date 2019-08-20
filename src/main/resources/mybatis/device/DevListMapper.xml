@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
              <if test="deviceName != null  and deviceName != '' "> and device_name like concat(#{deviceName}, '%')</if>
              <if test="devModelId > 0 "> and dev_model_id = #{devModelId}</if>
-             <if test="sign > 0 "> and sign = #{sign}</if>
+             <if test="sign != null and sign > -1 "> and sign = #{sign}</if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(create_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
             </if>
@@ -66,6 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <insert id="insertDevList" parameterType="DevList" useGeneratedKeys="true" keyProperty="id">
         insert into dev_list
 		<trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''  ">id,</if>
 			<if test="deviceId != null  and deviceId != ''  ">device_id,</if>
 			<if test="deviceStatus != null  ">device_status,</if>
 			<if test="deviceName != null  and deviceName != ''  ">device_name,</if>
@@ -79,6 +80,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="devType != null  ">dev_type,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''  ">#{id},</if>
 			<if test="deviceId != null  and deviceId != ''  ">#{deviceId},</if>
 			<if test="deviceStatus != null  ">#{deviceStatus},</if>
 			<if test="deviceName != null  and deviceName != ''  ">#{deviceName},</if>

@@ -177,19 +177,20 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 
 	/**
 	 * 校验设备编码唯一性
-	 * @param imCode 设备编号
+	 * @param instrumentManage 设备
 	 * @return 结果
 	 */
 	@Override
-	public String checkImCodeUnique(String imCode) {
+	public String checkImCodeUnique(InstrumentManage instrumentManage) {
 		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-		if (StringUtils.isNotNull(user)) {
-			InstrumentManage ins = instrumentManageMapper.selectInstrumentManageByImCode(imCode,user.getCompanyId());
-			if (StringUtils.isNull(ins)) {
-			    return InstrumentConstants.IM_CODE_UNIQUE;
-			}
+		if (user == null) {
+		    return InstrumentConstants.IM_CODE_NOT_UNIQUE;
 		}
-		return InstrumentConstants.IM_CODE_NOT_UNIQUE;
+		InstrumentManage ins = instrumentManageMapper.selectInstrumentManageByImCode(instrumentManage.getImCode(),user.getCompanyId());
+		if (StringUtils.isNotNull(ins) && !ins.getId().equals(instrumentManage.getId())) {
+			return InstrumentConstants.IM_CODE_NOT_UNIQUE;
+		}
+		return InstrumentConstants.IM_CODE_UNIQUE;
 	}
 
 	/**
@@ -253,5 +254,15 @@ public class InstrumentManageServiceImpl implements IInstrumentManageService
 		    return Collections.emptyList();
 		}
 		return instrumentManageMapper.selectInstrumentManageListByImTag(user.getCompanyId(),imStatus,imTag);
+	}
+
+	/**
+	 * app端查询设备列表
+	 * @param instrumentManage 设备对象
+	 * @return 结果
+	 */
+	@Override
+	public List<InstrumentManage> appSelectList(InstrumentManage instrumentManage) {
+		return instrumentManageMapper.selectInstrumentManageList(instrumentManage);
 	}
 }

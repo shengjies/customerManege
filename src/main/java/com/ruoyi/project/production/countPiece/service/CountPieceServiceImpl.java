@@ -66,7 +66,6 @@ public class CountPieceServiceImpl implements ICountPieceService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
-        System.out.println(countPiece.getCpDate());
         CountPiece piece = countPieceMapper.selectPieceByWorkIdAndUid(countPiece.getWorkId(), user.getCompanyId(), countPiece.getCpUserId(), countPiece.getCpDate());
         if (StringUtils.isNotNull(piece)) {
             piece.setCpNumber(piece.getCpNumber() + countPiece.getCpNumber());
@@ -147,5 +146,15 @@ public class CountPieceServiceImpl implements ICountPieceService {
         }
         countPiece.setCompanyId(user.getCompanyId());
         return countPieceMapper.selectCountPieceListByDate(countPiece);
+    }
+
+    /**
+     * app端查询计件明细信息
+     * @param countPiece 计件对象
+     * @return 结果
+     */
+    @Override
+    public List<CountPiece> appSelectDetailList(CountPiece countPiece) {
+        return countPieceMapper.selectCountPieceListDetail(countPiece);
     }
 }

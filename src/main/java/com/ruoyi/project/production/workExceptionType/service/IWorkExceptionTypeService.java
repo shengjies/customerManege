@@ -52,5 +52,11 @@ public interface IWorkExceptionTypeService
      * @return 结果
      */
 	public int deleteWorkExceptionTypeByIds(String ids);
-	
+
+	/**
+	 * 校验异常名称的唯一性
+	 * @param workExceptionType 异常类型对象
+	 * @return 结果
+	 */
+    String checkExcTypeNameUnique(WorkExceptionType workExceptionType);
 }

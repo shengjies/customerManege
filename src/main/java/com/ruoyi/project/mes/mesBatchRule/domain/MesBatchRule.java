@@ -2,7 +2,9 @@ package com.ruoyi.project.mes.mesBatchRule.domain;
 
 import com.ruoyi.framework.web.domain.BaseEntity;
 import com.ruoyi.project.erp.materiel.domain.Materiel;
+import com.ruoyi.project.product.list.domain.DevProductList;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -30,10 +32,42 @@ public class MesBatchRule extends BaseEntity
 	private String[] materielList;
 	/** 未配置的物料信息 */
 	private List<Materiel> notMaterielList;
+	/** 未配置的半成品信息 */
+	private List<DevProductList> notPartlList;
 	/** 创建时间 */
 	private Date cTime;
 	/** 修改时间 */
 	private Date uTime;
+	/**
+	 * mes配置明细
+	 */
+	private List<MesBatchRuleDetail> mesBatchRuleDetails;
+	/** 已配置的总数 */
+	private Integer totalNum;
+
+	public Integer getTotalNum() {
+		return totalNum;
+	}
+
+	public void setTotalNum(Integer totalNum) {
+		this.totalNum = totalNum;
+	}
+
+	public List<DevProductList> getNotPartlList() {
+		return notPartlList;
+	}
+
+	public void setNotPartlList(List<DevProductList> notPartlList) {
+		this.notPartlList = notPartlList;
+	}
+
+	public List<MesBatchRuleDetail> getMesBatchRuleDetails() {
+		return mesBatchRuleDetails;
+	}
+
+	public void setMesBatchRuleDetails(List<MesBatchRuleDetail> mesBatchRuleDetails) {
+		this.mesBatchRuleDetails = mesBatchRuleDetails;
+	}
 
 	public String[] getMaterielList() {
 		return materielList;
@@ -107,16 +141,19 @@ public class MesBatchRule extends BaseEntity
 		this.uTime = uTime;
 	}
 
-	@Override
-	public String toString() {
-		return "MesBatchRule{" +
-				"id=" + id +
-				", companyId=" + companyId +
-				", ruleName='" + ruleName + '\'' +
-				", pType=" + pType +
-				", materiels='" + materiels + '\'' +
-				", cTime=" + cTime +
-				", uTime=" + uTime +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "MesBatchRule{" +
+                "id=" + id +
+                ", companyId=" + companyId +
+                ", ruleName='" + ruleName + '\'' +
+                ", pType=" + pType +
+                ", materiels='" + materiels + '\'' +
+                ", materielList=" + Arrays.toString(materielList) +
+                ", notMaterielList=" + notMaterielList +
+                ", cTime=" + cTime +
+                ", uTime=" + uTime +
+                ", mesBatchRuleDetails=" + mesBatchRuleDetails +
+                '}';
+    }
 }

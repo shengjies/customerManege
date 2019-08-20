@@ -3,32 +3,27 @@ package com.ruoyi.project.system.user.controller;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.PasswordUtil;
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.service.DictService;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileUploadUtils;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.framework.config.RuoYiConfig;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.framework.web.service.DictService;
-import com.ruoyi.project.system.user.domain.User;
-import com.ruoyi.project.system.user.service.IUserService;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -78,7 +73,7 @@ public class ProfileController extends BaseController {
     @GetMapping("/checkPassword")
     @ResponseBody
     public boolean checkPassword(String password, HttpServletRequest request) {
-        User user = JwtUtil.getTokenUser(request);
+        User user = JwtUtil.getUser();
         if (PasswordUtil.matches(user, password)) {
             return true;
         }

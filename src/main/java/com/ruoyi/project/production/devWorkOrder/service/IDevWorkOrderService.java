@@ -64,9 +64,10 @@ public interface IDevWorkOrderService {
     /**
      * 工单开始暂停状态修改，第一次点击开始初始化数据
      * @param id
+     * @param uid 用户id
      * @return
      */
-    int editWorkerOrderById(Integer id);
+    int editWorkerOrderById(Integer id,Integer uid);
 
     /**
      * 校验流水线是否只有一个处于生产状态的工单
@@ -80,14 +81,14 @@ public interface IDevWorkOrderService {
      * @param id
      * @return
      */
-    int finishWorkerOrder(Integer id,HttpServletRequest request);
+    int finishWorkerOrder(Integer id);
 
     /**
      * 提交工单确认工单
      * @param id
      * @return
      */
-    int submitWorkOrder(Integer id);
+    int submitWorkOrder(Integer id,Integer uid);
 
     /**
      * 根据工单编号查询对应的工单信息
@@ -101,7 +102,7 @@ public interface IDevWorkOrderService {
      * @param lineId
      * @return
      */
-    DevWorkOrder selectWorkOrderBeInByLineId(Integer lineId,HttpServletRequest request);
+    DevWorkOrder selectWorkOrderBeInByLineId(Integer lineId);
 
     /**
      * 通过产线id查询已经提交的工单列表
@@ -224,4 +225,41 @@ public interface IDevWorkOrderService {
      * @return 结果
      */
     DevWorkOrder selectWorkOrderMesByWId(int id);
+
+    /**
+     * app查询工单列表
+     * @param workOrder 工单信息
+     * @return 结果
+     */
+    List<DevWorkOrder> appSelectDevWorkOrderList(DevWorkOrder workOrder);
+
+    /**
+     * app端修改工单信息
+     * @param workOrder 工单信息
+     * @return 结果
+     */
+    int appEditWorkInfo(DevWorkOrder workOrder);
+
+    /**
+     * app端结束工单
+     * @param id 工单id
+     * @param uid 用户id
+     * @param workStatus 工单状态
+     * @return 结果
+     */
+    int appFinishWorkOrder(Integer id, Integer uid, Integer workStatus);
+
+    /**
+     * 删除工单信息
+     */
+    int deleteDevWorkOrderById(Integer id, Integer uid);
+
+    List<DevWorkOrder> appSelectWorkListTwo();
+
+    /**
+     * 查询MES数据通过排序优先级别
+     * @param workId 工单id
+     * @return 结果
+     */
+    DevWorkOrder selectWorkMesOrderByWorkId(int workId);
 }

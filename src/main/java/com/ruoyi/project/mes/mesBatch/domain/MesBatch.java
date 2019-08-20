@@ -35,20 +35,28 @@ public class MesBatch extends BaseEntity
 	/** 规则id */
 	private Integer ruleId;
 	/** 规则名称 */
-	@Excel(name = "MES规则")
 	private String ruleName;
 	/** 规则物料 */
-	@Excel(name = "物料")
 	private String ruleMateriel;
 	/** 创建时间 */
 	@Excel(name = "创建时间",dateFormat = "yyyy-MM-dd HH:mm:ss")
 	private Date cTime;
 	private Date uTime;
+	/** MES标记扫描字段(1-12优先级别递增)、0代表生产未扫描，1，代表生产已扫描,默认值12位0 */
+	private String mesSign;
 	/** MES批次追踪明细 */
 	private List<MesBatchDetail> mesBatchDetailList;
 
 	/** 物料批次追踪条件 */
     private String batchCode;
+
+    public String getMesSign() {
+        return mesSign;
+    }
+
+    public void setMesSign(String mesSign) {
+        this.mesSign = mesSign;
+    }
 
     public String getBatchCode() {
         return batchCode;
@@ -168,6 +176,7 @@ public class MesBatch extends BaseEntity
                 ", ruleMateriel='" + ruleMateriel + '\'' +
                 ", cTime=" + cTime +
                 ", uTime=" + uTime +
+                ", mesSign='" + mesSign + '\'' +
                 ", mesBatchDetailList=" + mesBatchDetailList +
                 ", batchCode='" + batchCode + '\'' +
                 '}';

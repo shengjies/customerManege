@@ -1,8 +1,7 @@
 package com.ruoyi.project.device.devNotice.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.device.devNotice.domain.DevNotice;
+import com.ruoyi.project.system.notice.domain.NoticeApp;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -76,4 +75,11 @@ public interface DevNoticeMapper
 	 */
 //	@DataSource(value = DataSourceType.SLAVE)
     List<DevNotice> selectAllNotice(@Param("companyId") Integer companyId);
+
+	/**
+	 * app端查询用户消息
+	 */
+	List<NoticeApp> appSelectNoticeList();
+
+    NoticeApp appSelectNoticeByOne();
 }

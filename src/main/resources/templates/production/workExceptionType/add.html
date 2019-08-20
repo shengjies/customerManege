@@ -14,12 +14,31 @@
 		</form>
 	</div>
     <div th:include="include::footer"></div>
-    <script type="text/javascript">
+    <script th:inline="javascript">
 		var prefix = ctx + "production/workExceptionType"
 		$("#form-workExceptionType-add").validate({
 			rules:{
-				xxxx:{
+				typeName:{
 					required:true,
+					remote: {
+						url: prefix + "/checkExcTypeNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							typeName : function() {
+								return $.common.trim($("#typeName").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
+				},
+			},
+			messages: {
+				typeName: {
+					required:"异常类型名称必填",
+					remote: "异常类型名称已存在"
 				},
 			}
 		});

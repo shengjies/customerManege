@@ -1,20 +1,20 @@
 package com.ruoyi.project.device.devNotice.service;
 
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.constant.NoticeConstants;
+import com.ruoyi.common.support.Convert;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.device.devNotice.domain.DevNotice;
+import com.ruoyi.project.device.devNotice.mapper.DevNoticeMapper;
+import com.ruoyi.project.system.notice.domain.NoticeApp;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.device.devNotice.mapper.DevNoticeMapper;
-import com.ruoyi.project.device.devNotice.domain.DevNotice;
-import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 公司消息通知 服务层实现
@@ -133,5 +133,19 @@ public class DevNoticeServiceImpl implements IDevNoticeService {
             notice.setCreateUser(userMapper.selectUserById(notice.getCreateId().longValue())); // 创建者对象
         }
         return devNotices;
+    }
+
+    /**
+     * app查询消息
+     * @return
+     */
+    @Override
+    public List<NoticeApp> appSelectNoticeList() {
+        return devNoticeMapper.appSelectNoticeList();
+    }
+
+    @Override
+    public NoticeApp appSelectNoticeByOne(Integer uid) {
+        return devNoticeMapper.appSelectNoticeByOne();
     }
 }

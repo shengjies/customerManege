@@ -11,11 +11,11 @@
             <input type="hidden" id="ecnType" name="ecnType" th:value="${ecn_type}">
         </form>
         <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
-            <a id="ecn-status" th:data-status="${ecn_status}" th:class="${ecn_status == 1?'btn btn-primary':'btn btn-default'}" onclick="changeEcn()">
-                <span th:utext="${ecn_status == 1?'关闭变更':'暂无变更'}"></span>
-            </a>
-            &nbsp;&nbsp;&nbsp;
-            <a class="btn btn-success" onclick="addEcn()">
+            <!--<a id="ecn-status" th:data-status="${ecn_status}" th:class="${ecn_status == 1?'btn btn-primary':'btn btn-default'}" onclick="changeEcn()">-->
+            <!--<span th:utext="${ecn_status == 1?'关闭变更':'暂无变更'}"></span>-->
+            <!--</a>-->
+            <!--&nbsp;&nbsp;&nbsp;-->
+            <a class="btn btn-success" id="addEcn" onclick="addEcn()" th:style="${ecnLog==null?'':'display: none'}">
                 <i class="fa fa-plus"></i> 新增变更
             </a>
             <a class="btn btn-primary " onclick="$.table.search()"><i
@@ -30,6 +30,8 @@
 
 <script th:inline="javascript">
     var prefix = ctx + "production/ecnLog";
+    var cancelEcnFlag = [[${@permission.hasPermi('production:ecnLog:add')}]];
+    var examEcnFlag = [[${@permission.hasPermi('production:ecnLog:examEcn')}]];
     $(function () {
         var options = {
             url: prefix + "/list",
@@ -73,13 +75,42 @@
                     field: 'createPeople',
                     title: '操作者',
                     sortable: true,
-                    width: 80
                 },
                 {
                     field: 'createTime',
                     title: '操作时间',
                     sortable: true,
-                    width: 180
+                },
+                {
+                    field: 'ecnStatus',
+                    title: '状态',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return '<span style="font-weight: bold;color: #e08e0b">待提交</span>';
+                        } else if (value == 1) {
+                            return '<span style="font-weight: bold;color: red">待审核</span>';
+                        } else if (value == 2) {
+                            return '<span style="font-weight: bold;color: #1E0FBE">待执行</span>';
+                        } else if (value == 3) {
+                            return '<span style="font-weight: bold;color: green">执行中</span>';
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.ecnStatus == 0) {
+                            actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="submitEcn(\'' + row.id + '\')"><i></i>提交</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + cancelEcnFlag + '" href="javascript:void(0)" onclick="cancelEcn(\'' + row.id + '\')"><i></i>取消变更</a> ');
+                        } else if (row.ecnStatus == 1) {
+                            actions.push('<a class="btn btn-success btn-xs ' + examEcnFlag + '" href="javascript:void(0)" onclick="examEcn(\'' + row.id + '\')"><i></i>审核</a> ');
+                            actions.push('<a class="btn btn-danger  btn-xs ' + examEcnFlag + '" href="javascript:void(0)" onclick="cancelEcn(\'' + row.id + '\')"><i></i>取消变更</a> ');
+                        }
+                        return actions.join('');
+                    }
                 }]
         };
         $.table.init(options);
@@ -104,10 +135,10 @@
      */
     function changeEcn() {
         var dataStatus = $("#ecn-status").attr("data-status");
-        if(dataStatus == 0){
+        if (dataStatus == 0) {
             $.modal.msgSuccess("暂无变更，无需改变状态");
-        }else{
-            $.modal.confirm("确认关闭变更状态",function (e) {
+        } else {
+            $.modal.confirm("确认关闭变更状态", function (e) {
                 if (e) {
                     var config = {
                         url: prefix + "/edit",
@@ -138,7 +169,109 @@
                 }
             })
         }
+    }
 
+    /**
+     * 取消ECN
+     */
+    function cancelEcn(id) {
+        $.modal.confirm("确认取消ECN变更吗？", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + "/cancelEcn",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        ecnType: [[${ecn_type}]],
+                        saveId: [[${save_id}]]
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                            $("#addEcn").show();
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    /**
+     * 提交ECN
+     */
+    function submitEcn(id) {
+        $.modal.confirm("确认提交ECN变更吗？", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + "/submitEcn",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        ecnStatus: 1,
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    /**
+     * 审核ECN
+     */
+    function examEcn(id) {
+        $.modal.confirm("确认审核ECN变更吗？", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + "/examEcn",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        ecnStatus: 2,
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    function submitHandler() {
+        $.modal.close();
+        window.parent.$.table.refresh();
     }
 </script>
 </body>

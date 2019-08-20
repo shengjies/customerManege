@@ -13,6 +13,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="companyId"    column="company_id"    />
         <result property="createTime"    column="create_time"    />
     </resultMap>
+
+
+    <resultMap type="com.ruoyi.project.system.notice.domain.NoticeApp" id="appNoticeResult">
+        <result property="text"    column="notice_content"    />
+        <result property="cid"    column="create_id"    />
+        <result property="status"    column="notice_status"    />
+        <result property="cName"    column="user_name"    />
+        <result property="cPicture"    column="avatar"    />
+        <result property="cTime"    column="create_time"    />
+    </resultMap>
 	
 	<sql id="selectDevNoticeVo">
         select id, notice_content, create_id, receive_by, notice_status, company_id, create_time from dev_notice
@@ -90,6 +100,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectAllNotice" parameterType="Integer" resultMap="DevNoticeResult">
         <include refid="selectDevNoticeVo"/>
         where company_id = #{companyId} and notice_status = 2;
+    </select>
+
+    <!--app端查询发布过的消息-->
+    <select id="appSelectNoticeList" resultMap="appNoticeResult">
+        SELECT a.notice_content,a.create_id,a.notice_status,a.create_time,b.user_name,b.avatar
+        FROM dev_notice as a,sys_user as b where a.create_id = b.user_id and a.notice_status = 2;
+    </select>
+
+    <select id="appSelectNoticeByOne" resultMap="appNoticeResult">
+         SELECT a.notice_content,a.create_id,a.notice_status,a.create_time,b.user_name,b.avatar
+         FROM dev_notice as a,sys_user as b where a.create_id = b.user_id and a.notice_status = 2
+         order by a.create_time desc limit 1;
     </select>
     
 </mapper>

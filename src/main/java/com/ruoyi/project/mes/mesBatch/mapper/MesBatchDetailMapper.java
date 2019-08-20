@@ -74,4 +74,25 @@ public interface MesBatchDetailMapper
 	 * @return 结果
 	 */
 	int deleteMesBatchDetailByBId(@Param("bId") int bId);
+
+	/**
+	 * 通过编码批次查询对应批次信息
+	 * @param batchCode 编码
+	 * @return 结果
+	 */
+	List<MesBatchDetail> selectMesBatchDetailByBatchCode(@Param("batchCode") String batchCode);
+
+	/**
+	 * 查询批次总的记录数
+	 * @param batchCode 批次信息
+	 * @return 结果
+	 */
+    int selectMesBatchTotal(String batchCode);
+
+	/**
+	 * 排序方式查看mes明细
+	 * @param bId 规则主键id
+	 * @return 结果
+	 */
+	List<MesBatchDetail> selectMesBatchDetailByBIdOrder(@Param("bId") Integer bId);
 }

@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
+import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRuleDetail;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +43,7 @@ public class DevWorkOrder extends BaseEntity {
      * 生产线主键ID
      */
     private Integer lineId;
+    private String lineName;
     /**
      * 生产线对象
      */
@@ -206,6 +209,73 @@ public class DevWorkOrder extends BaseEntity {
     private String[] mesMatList;
     /** 配置规则id */
     private Integer ruleId;
+    /**
+     * 对应产品追踪MES规则明细列表
+     */
+    private List<MesBatchRuleDetail> mesRuleDetailList;
+
+    /*******************  app交互参数 *******************/
+    private Integer uid; // app在线用户id
+    private Integer mParentId; // 菜单父id
+    private Integer menuList;
+    private String devCode; //设备编号
+    private String devType; //设备类型
+
+    public List<MesBatchRuleDetail> getMesRuleDetailList() {
+        return mesRuleDetailList;
+    }
+
+    public void setMesRuleDetailList(List<MesBatchRuleDetail> mesRuleDetailList) {
+        this.mesRuleDetailList = mesRuleDetailList;
+    }
+
+    public String getLineName() {
+        return lineName;
+    }
+
+    public void setLineName(String lineName) {
+        this.lineName = lineName;
+    }
+
+    public Integer getMenuList() {
+        return menuList;
+    }
+
+    public void setMenuList(Integer menuList) {
+        this.menuList = menuList;
+    }
+
+    public String getDevCode() {
+        return devCode;
+    }
+
+    public void setDevCode(String devCode) {
+        this.devCode = devCode;
+    }
+
+    public String getDevType() {
+        return devType;
+    }
+
+    public void setDevType(String devType) {
+        this.devType = devType;
+    }
+
+    public Integer getmParentId() {
+        return mParentId;
+    }
+
+    public void setmParentId(Integer mParentId) {
+        this.mParentId = mParentId;
+    }
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
 
     public Integer getRuleId() {
         return ruleId;
@@ -827,6 +897,10 @@ public class DevWorkOrder extends BaseEntity {
                 ", makeType=" + makeType +
                 ", workPrice=" + workPrice +
                 ", single=" + single +
+                ", pbSign=" + pbSign +
+                ", mesBatchList=" + mesBatchList +
+                ", mesMatList=" + Arrays.toString(mesMatList) +
+                ", ruleId=" + ruleId +
                 ", cumulativeNumber=" + cumulativeNumber +
                 ", directPassRate=" + directPassRate +
                 ", paramConfig='" + paramConfig + '\'' +

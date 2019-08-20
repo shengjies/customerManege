@@ -110,4 +110,11 @@ public interface IPageInfoService
 	 * @return 结果
 	 */
 	String checkPageName(PageInfo pageInfo);
+
+	/**
+	 * app端查询看板页面列表
+	 * @param pageInfo 页面信息
+	 * @return 结果
+	 */
+	public List<PageInfo> appSelectPageInfo(PageInfo pageInfo);
 }

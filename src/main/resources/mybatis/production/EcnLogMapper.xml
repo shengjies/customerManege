@@ -14,10 +14,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createId"    column="create_id"    />
         <result property="createPeople"    column="create_people"    />
         <result property="createTime"    column="create_time"    />
+        <result property="ecnNum"    column="ecn_num"    />
+        <result property="ecnStatus"    column="ecn_status"    />
     </resultMap>
 	
 	<sql id="selectEcnLogVo">
-        select id, company_id, ecn_type, save_id, save_code, ecn_text, create_id, create_people, create_time from dev_ecn_log
+        select id, company_id, ecn_type, save_id, save_code, ecn_text, create_id, create_people, create_time,ecn_num,ecn_status from dev_ecn_log
     </sql>
 	
     <select id="selectEcnLogList" parameterType="EcnLog" resultMap="EcnLogResult">
@@ -30,6 +32,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="ecnText != null  and ecnText != '' ">
             and ecn_text like concat('%', #{ecnText}, '%')
         </if>
+        and ecn_num > 0
+        order by create_time desc
     </select>
 
     <select id="selectEcnLogById" parameterType="Integer" resultMap="EcnLogResult">
@@ -48,6 +52,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createId != null  ">create_id,</if>
 			<if test="createPeople != null  and createPeople != ''  ">create_people,</if>
 			<if test="createTime != null  ">create_time,</if>
+            <if test="ecnNum != null  ">ecn_num,</if>
+            <if test="ecnStatus != null  ">ecn_status,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -58,6 +64,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createId != null  ">#{createId},</if>
 			<if test="createPeople != null  and createPeople != ''  ">#{createPeople},</if>
 			<if test="createTime != null  ">#{createTime},</if>
+            <if test="ecnNum != null  ">#{ecnNum},</if>
+            <if test="ecnStatus != null  ">#{ecnStatus},</if>
          </trim>
     </insert>
 
@@ -77,6 +85,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createId != null  ">create_id = #{createId},</if>
             <if test="createPeople != null  and createPeople != ''  ">create_people = #{createPeople},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="ecnNum != null  ">ecn_num = #{ecnNum},</if>
+            <if test="ecnStatus != null  ">ecn_status = #{ecnStatus},</if>
         </trim>
         where id = #{id}
     </update>
@@ -92,5 +102,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <!--查询对应类型对应id的有效ECN信息-->
+    <select id="selectEcnLogBySaveId" resultMap="EcnLogResult">
+        SELECT * FROM dev_ecn_log where ecn_type = #{ecnType} and save_id = #{saveId} and ecn_num > 0 limit 1;
+    </select>
+
+    <!--取消ECN-->
+    <update id="cancelEcn" parameterType="Integer">
+         update dev_ecn_log set ecn_num = 0,ecn_status = 5 where id = #{id}
+    </update>
+
+    <!--更新ECN状态-->
+    <update id="updateEcnStatus" parameterType="Integer">
+         update dev_ecn_log set ecn_status = #{ecnStatus} where id = #{id}
+    </update>
 
 </mapper>

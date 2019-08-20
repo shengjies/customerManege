@@ -30,4 +30,11 @@ public class DevConstants {
      */
     public static final int DEV_TYPE_LINE = 0;
     public static final int DEV_TYPE_HOUSE = 1;
+
+    /**
+     * 硬件禁用启用状态
+     * 0、禁用，1、启用
+     */
+    public static final int DEV_STATUS_NO = 0;
+    public static final int DEV_STATUS_YES = 1;
 }

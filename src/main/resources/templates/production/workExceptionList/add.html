@@ -17,11 +17,11 @@
         <div class="form-group">
             <label class="col-sm-3 control-label">异常类型：</label>
             <div class="col-sm-8">
-                <select id="exceType" name="exceType" class="form-control"
+                <select id="typeName" name="typeName" class="form-control"
                         th:with="exceTypeAll=${@exceType.findExceTypeAll(#httpServletRequest.getCookies())}">
                     <option value="0">请选择</option>
                     <option th:each="exceType : ${exceTypeAll}" th:text="${exceType.typeName}"
-                            th:value="${exceType.Id}">
+                            th:value="${exceType.typeName}">
                     </option>
                 </select>
             </div>
@@ -35,7 +35,14 @@
     </form>
 </div>
 <div th:include="include::footer"></div>
-<script type="text/javascript">
+<script th:inline="javascript">
+    $(function () {
+        $("#typeName").select2({
+            width:"100%",
+            tags:true,
+            placeholder:'请选择'
+        });
+    })
     var prefix = ctx + "production/workExceptionList"
     $("#form-workExceptionList-add").validate({
         // rules: {

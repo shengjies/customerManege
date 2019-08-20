@@ -1,5 +1,6 @@
 package com.ruoyi.project.erp.materiel.service;
 
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.constant.MaterielConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
@@ -17,7 +18,6 @@ import com.ruoyi.project.erp.materielSupplier.domain.MaterielSupplier;
 import com.ruoyi.project.erp.materielSupplier.mapper.MaterielSupplierMapper;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
-import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -80,20 +80,14 @@ public class MaterielServiceImpl implements IMaterielService {
         User sysUser = JwtUtil.getTokenUser(request);
         if (sysUser == null) return Collections.emptyList();
         if (!User.isSys(sysUser)) {
-            materiel.setCompanyId(sysUser.getCompanyId()); // 查询自己公司的物料
+            materiel.setCompanyId(sysUser.getCompanyId());
         }
         List<Materiel> materielList = materielMapper.selectMaterielList(materiel);
-
         for (Materiel mat : materielList) {
-            // 查询物料是否关联了供应商信息
-//            List<MaterielSupplier> materielSuppliers = materielSupplierMapper.selectMaterielSupplierListByMatIdAndSupId(mat.getId(), null);
-//            if (!StringUtils.isEmpty(materielSuppliers)) { // 物料关联了供应商信息
-//                mat.setMaterielSupplier(materielSuppliers.get(0));
-//            }
             // 查询物料是否上传了文件
-            List<FileSourceInfo> fileSourceInfoList = fileSourceInfoMapper.selectFileSourceInfoBySaveIdAndComId(mat.getId(), sysUser.getCompanyId());
-            if (!StringUtils.isEmpty(fileSourceInfoList)) {
-                mat.setFileSourceInfo(fileSourceInfoList.get(0));
+            List<FileSourceInfo> fileSourceInfos = fileSourceInfoMapper.selectFileSourceInfoBySaveId(sysUser.getCompanyId(), FileConstants.FILE_SAVETYPE_MAT, mat.getId());
+            if (StringUtils.isNotEmpty(fileSourceInfos)) {
+                mat.setFileFlag(FileConstants.FILE_SAVE_YES);
             }
         }
         return materielList;
@@ -108,33 +102,14 @@ public class MaterielServiceImpl implements IMaterielService {
     @Override
     public int insertMateriel(Materiel materiel, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        materiel.setCompanyId(user.getCompanyId()); // 所属公司
-        materiel.setCreateId(user.getUserId().intValue()); // 创建者ID
-        materiel.setCreateName(user.getUserName()); // 创建者名称
-        materiel.setCreateTime(new Date()); // 创建时间
+        materiel.setCompanyId(user.getCompanyId());
+        materiel.setCreateId(user.getUserId().intValue());
+        materiel.setCreateName(user.getUserName());
+        materiel.setCreateTime(new Date());
         if (materiel.getPriceImport() != null && materiel.getPriceImport() != 0.00f) {
             materiel.setPrice(new BigDecimal(materiel.getPriceImport()));
         }
         return materielMapper.insertMateriel(materiel);
-        /**
-         * 新增物料更新库存记录
-         */
-        // 查询物料库存是否存在记录
-        //MaterielStock materielStock = materielStockMapper.selectMaterielStockByMaterielId(materiel.getId());
-        // MaterielStock materielStock = materielStockMapper.selectMaterielStockByMatCodeAndComId(materiel.getMaterielCode(), user.getCompanyId());
-        // if (materielStock == null) { // 不存在记录，新增库存记录信息
-        //     materielStock = new MaterielStock();
-        //     materielStock.setCompanyId(user.getCompanyId());
-        //     materielStock.setLastUpdate(new Date());
-        //     materielStock.setMaterielName(materiel.getMaterielName());
-        //     materielStock.setMaterielCode(materiel.getMaterielCode());
-        //     materielStock.setMaterielModel(materiel.getMaterielModel());
-        //     materielStock.setMaterielId(materiel.getId());
-        //     materielStock.setCreateTime(new Date());
-        //     materielStockMapper.insertMaterielStock(materielStock);
-        // }
-
-        // return i;
     }
 
     /**

@@ -102,4 +102,11 @@ public interface IIsoService
 	 * @return 结果
 	 */
 	List<Iso> selectNotConfigBySwId(int parentId, int lineId);
+
+	/**
+	 * app端查询ISO文件系统
+	 * @param iso
+	 * @return
+	 */
+	List<Iso> appSelectList(Iso iso);
 }

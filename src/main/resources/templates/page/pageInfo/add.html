@@ -15,6 +15,7 @@
                     <div class="panel-body">
                         <div class="panel-group" id="accordion1">
                             <form role="form" id="form-page-add">
+                                <input type="hidden" name="imgPath" id="imgPath" value="/js/bk.jpg">
                                 <div class="form-group">
                                     <label class="col-sm-12 control-label">看板名称</label>
                                     <div class="col-sm-12">
@@ -240,7 +241,8 @@
             contentType: false,
             success: function (result) {
                 if (result.msg) {
-                    $("#add_page_back_url").attr('src', result.msg)
+                    $("#add_page_back_url").attr('src', result.data.imgUrl);
+                    $("#imgPath").val(result.data.imgPath);
                 }
                 layer.close(index);
             }
@@ -302,6 +304,7 @@
 
     function add() {
         var pageName = $("input[name='pageName']").val();
+        var imgPath = $("#imgPath").val();
         var layout_type = $("#layout_type").find("option:selected");
         var pageType = $(layout_type).attr("layout-type");
         var layout = $(layout_type).val();
@@ -310,7 +313,8 @@
             pageName: pageName,
             pageType: pageType,
             pageLayoutType: layout,
-            pageBackImg: pageBackImg
+            pageBackImg: pageBackImg,
+            imgPath:imgPath
         }
         switch (pageType) {
             case "1"://产线汇总

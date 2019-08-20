@@ -1,29 +1,21 @@
 package com.ruoyi.project.device.api.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.ruoyi.project.device.api.form.WorkDataForm;
-import com.ruoyi.project.device.api.service.IInitDataManageService;
-import com.ruoyi.project.iso.iso.service.IIsoService;
-import org.apache.ibatis.annotations.Param;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-
 import com.ruoyi.common.utils.DataTurn;
 import com.ruoyi.common.utils.Tools;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.device.api.form.WorkDataForm;
+import com.ruoyi.project.device.api.service.IInitDataManageService;
 import com.ruoyi.project.device.devDevice.domain.DevDevice;
 import com.ruoyi.project.device.devDevice.service.IDevDeviceService;
 import com.ruoyi.project.device.devDeviceCounts.service.IDevDeviceCountsService;
 import com.ruoyi.project.device.devDeviceIo.service.IDevDeviceIoService;
-import com.sun.media.jfxmedia.logging.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户 信息操作处理

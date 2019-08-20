@@ -44,4 +44,26 @@ public interface IEcnLogService
 	 */
 	public int updateEcnLog(int type,int save_id);
 
+	/**
+	 * 查询对应ECN记录信息
+	 * @param ecnType ecn保存类型
+ 	 * @param saveId 保存id
+	 * @return 结果
+	 */
+	EcnLog selectEcnLogBySaveId(int ecnType, int saveId);
+
+	/**
+	 * 取消ECN
+	 * @param id ecn主键
+	 * @return 结果
+	 */
+	int cancelEcn(int id,int ecnType,int saveId);
+
+	/**
+	 * 更新ECN状态
+	 * @param id ecn主键
+	 * @param ecnStatus ecn状态
+	 * @return 结果
+	 */
+	int updateEcnStatus(int id, int ecnStatus);
 }

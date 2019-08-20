@@ -31,6 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pnCode"    column="pn_code"    />
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
+        <result property="sopTag"    column="sop_tag"    />
         <association property="sopName" column="sop_id" select="selectSopName">
             <result property="sopName" column="c_name"/>
         </association>
@@ -48,6 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
             `sop_id`,
             `line_id`,
+            `sop_tag`,
           GROUP_CONCAT(pn_code) AS pn_code
         FROM
             tab_sop_line
@@ -65,6 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT
         `sop_id`,
         `line_id`,
+        `sop_tag`,
         GROUP_CONCAT(pn_code) AS pn_code
         FROM
         tab_sop_line

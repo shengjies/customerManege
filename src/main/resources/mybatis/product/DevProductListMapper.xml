@@ -231,4 +231,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDevProductByRuleId" resultMap="DevProductListResult">
         SELECT * FROM dev_product_list where company_id = #{companyId} and rule_id = #{ruleId}
     </select>
+
+    <!--通过标记查询半成品或者成品-->
+    <select id="selectProAllBySign" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        SELECT id as id, product_code as productCode,rule_id as ruleId FROM dev_product_list where sign = #{sign};
+    </select>
+
+    <!--查看MES规则未配置的半成品明细-->
+    <select id="selectPartListByMesNotCof" resultMap="DevProductListResult">
+        SELECT a.* FROM dev_product_list as a left join
+        (SELECT * from tab_mes_batch_rule_detail where rule_id = #{ruleId} and d_type = 1) as b
+        on a.product_code = b.d_code where b.d_code is null and a.sign = 1
+    </select>
 </mapper>

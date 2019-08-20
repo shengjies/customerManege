@@ -135,8 +135,8 @@
 					}
 				},
 				{
-					field : 'materiels', 
-					title : '物料编码',
+					field : 'materiels',
+					title : '关联编码',
 					width:300,
 					sortable: true,
 					formatter: function(value, row, index) {
@@ -146,11 +146,6 @@
 				{
 					field : 'cTime', 
 					title : '创建时间',
-					sortable: true
-				},
-				{
-					field : 'uTime', 
-					title : '修改时间',
 					sortable: true
 				},
 		        {
@@ -171,7 +166,7 @@
 		 * 添加MES规格
 		 */
 		function addMES() {
-			$.modal.open("添加MES追踪规格", $.table._option.createUrl,'800','500');
+			$.modal.open("添加MES追踪规格", $.table._option.createUrl,'800','600');
 		}
 
 		/**
@@ -189,7 +184,7 @@
 				}
 				url = $.table._option.updateUrl.replace("{id}", id);
 			}
-			$.modal.open("修改MES追踪规格", url,'800','500');
+			$.modal.open("修改MES追踪规格", url,'800','600');
 		}
 
 		/**

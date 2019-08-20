@@ -1,16 +1,16 @@
 package com.ruoyi.project.system.user.domain;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import com.ruoyi.project.device.devCompany.domain.DevCompany;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel.Type;
 import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.system.dept.domain.Dept;
 import com.ruoyi.project.system.role.domain.Role;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 用户对象 sys_user
@@ -271,13 +271,11 @@ public class User extends BaseEntity
         this.avatar = avatar;
     }
 
-    public String getPassword()
-    {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password)
-    {
+    public void setPassword(String password) {
         this.password = password;
     }
 

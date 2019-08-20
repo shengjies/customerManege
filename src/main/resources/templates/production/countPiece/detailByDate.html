@@ -79,6 +79,7 @@
             exportUrl: prefix + "/export",
             modalName: "计件明细",
             search: false,
+            showFooter: true,
             showExport: false,
             showSearch:true,
             showRefresh:true,
@@ -96,6 +97,9 @@
                     sortable: true,
                     formatter:function (value, row, index) {
                         return row.cpUserName;
+                    },
+                    footerFormatter:function () {
+                        return "<span style='font-weight: bold;color: #1E0FBE'>总金额<span>";
                     }
                 },
                 {
@@ -134,6 +138,13 @@
                     sortable: true,
                     formatter:function (value, row, index) {
                         return '<span style="font-weight: bold;color: orangered">'+ row.totalPrice+'</span>';
+                    },
+                    footerFormatter:function (value) {
+                        var sumBalance = 0;
+                        for (var i in value) {
+                            sumBalance += parseInt(value[i].totalPrice);
+                        }
+                        return '<span style="font-weight: bold;color: #1E0FBE">' + sumBalance + '</span>';
                     }
                 },
                 {

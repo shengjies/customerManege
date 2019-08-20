@@ -1,10 +1,11 @@
 package com.ruoyi.project.system.menu.domain;
 
+import com.ruoyi.framework.web.domain.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.ruoyi.framework.web.domain.BaseEntity;
 
 /**
  * 菜单权限表 sys_menu
@@ -44,6 +45,10 @@ public class Menu extends BaseEntity
     
     /** 菜单图标 */
     private String icon;
+    /**
+     * app是否展示标识，默认0不展示，1、展示
+     */
+    private Integer appSign;
     
     /** 子菜单 */
     private List<Menu> children = new ArrayList<Menu>();

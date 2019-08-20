@@ -86,9 +86,9 @@
 						var uid = [[${@user.getSysUser(#httpServletRequest.getCookies())}]];
 						if(uid && uid.userId && live ==""){
 							if(row.deviceLiable && uid.userId == row.deviceLiable){
-								return '<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="liveStatus(\'' + row.id + '\')">'+value+'</a> '
+								return '<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="liveStatus(\'' + row.id + '\',\''+ row.lineName +'\')">'+value+'</a> '
 							}else if(row.deviceLiableTow && uid.userId == row.deviceLiableTow){
-								return '<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="liveStatus(\'' + row.id + '\')">'+value+'</a> '
+								return '<a class="btn btn-success btn-xs " href="javascript:void(0)" onclick="liveStatus(\'' + row.id + '\',\''+ row.lineName +'\')">'+value+'</a> '
 							}else {
 								return value;
 							}
@@ -199,9 +199,9 @@
 		 * 跳转到产线实况页面
 		 * @param id
 		 */
-		function liveStatus(id) {
+		function liveStatus(id,lineName) {
 			var url = prefix+"/live/"+id;
-			createMenuItem(url,'产线实况')
+			createMenuItem(url,lineName+'--产线实况')
 		}
 		function remove(id) {
 			$.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗,同时工位也删除？", function () {

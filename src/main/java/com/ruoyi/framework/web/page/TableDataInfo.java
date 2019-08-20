@@ -66,4 +66,13 @@ public class TableDataInfo implements Serializable
     {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "TableDataInfo{" +
+                "total=" + total +
+                ", rows=" + rows +
+                ", code=" + code +
+                '}';
+    }
 }

@@ -101,5 +101,5 @@ public class UserConstants
      */
     public final static String LOGIN_TAG_REG = "1";
 
-    public static final String NOT_LOGIN = "未登录或登录超时，请先登录再进行操作";
+    public static final String NOT_LOGIN = "未登录或登录超时";
 }

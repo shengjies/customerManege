@@ -83,4 +83,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT file_path,file_name,create_time FROM tab_file_source_info
         where company_id = #{companyId} and save_type = 5 and save_id=#{saveId};
     </select>
+
+    <!--查找对应文件系统-->
+    <select id="selectFileSourceInfoBySaveId" resultMap="FileSourceInfoResult">
+        SELECT * FROM tab_file_source_info where 1=1
+        <if test="companyId != null">
+            and company_id = #{companyId}
+        </if>
+        <if test="saveType != null">
+            and save_type = #{saveType}
+        </if>
+        <if test="saveId != null">
+            and save_id = #{saveId}
+        </if>
+    </select>
 </mapper>

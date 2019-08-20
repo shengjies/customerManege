@@ -12,6 +12,7 @@ import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
+import com.ruoyi.project.system.menu.service.IMenuService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,7 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 产品管理 信息操作处理
@@ -53,7 +56,7 @@ public class DevProductListController extends BaseController {
     @RequiresPermissions("device:devProductList:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(DevProductList devProductList,HttpServletRequest request) {
+    public TableDataInfo list(DevProductList devProductList, HttpServletRequest request) {
         startPage();
         devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
         devProductList.setSign(0);
@@ -90,8 +93,8 @@ public class DevProductListController extends BaseController {
     @Log(title = "产品管理", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(DevProductList devProductList,HttpServletRequest request) {
-        return toAjax(devProductListService.insertDevProductList(devProductList,request));
+    public AjaxResult addSave(DevProductList devProductList, HttpServletRequest request) {
+        return toAjax(devProductListService.insertDevProductList(devProductList, request));
     }
 
     /**
@@ -111,7 +114,7 @@ public class DevProductListController extends BaseController {
     @Log(title = "产品管理", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(DevProductList devProductList,HttpServletRequest request) {
+    public AjaxResult editSave(DevProductList devProductList, HttpServletRequest request) {
         devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
         return toAjax(devProductListService.updateDevProductList(devProductList));
     }
@@ -123,9 +126,9 @@ public class DevProductListController extends BaseController {
     @Log(title = "产品管理", businessType = BusinessType.DELETE)
     @PostMapping("/remove")
     @ResponseBody
-    public AjaxResult remove(String ids,HttpServletRequest request) {
+    public AjaxResult remove(String ids, HttpServletRequest request) {
         try {
-            return toAjax(devProductListService.deleteDevProductListByIds(ids,request));
+            return toAjax(devProductListService.deleteDevProductListByIds(ids, request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -150,7 +153,7 @@ public class DevProductListController extends BaseController {
     @ResponseBody
     public AjaxResult importData(MultipartFile file, boolean updateSupport) throws Exception {
         try {
-            return AjaxResult.success(devProductListService.importProduct(file, updateSupport,0));
+            return AjaxResult.success(devProductListService.importProduct(file, updateSupport, 0));
         } catch (Exception e) {
             return error(e.getMessage());
         }
@@ -164,8 +167,8 @@ public class DevProductListController extends BaseController {
      */
     @PostMapping("/findProductInfo")
     @ResponseBody
-    public AjaxResult findProductInfo(Integer productId,HttpServletRequest request) {
-        DevProductList productCode = devProductListService.findProductInfo(productId,request);
+    public AjaxResult findProductInfo(Integer productId, HttpServletRequest request) {
+        DevProductList productCode = devProductListService.findProductInfo(productId, request);
         return AjaxResult.success("成功", productCode);
     }
 
@@ -177,7 +180,7 @@ public class DevProductListController extends BaseController {
     @PostMapping("/checkProductCodeUnique")
     @ResponseBody
     public String checkProductCodeUnique(DevProductList product, HttpServletRequest request) {
-        return devProductListService.checkProductCodeUnique(product,request);
+        return devProductListService.checkProductCodeUnique(product, request);
     }
 
     /**
@@ -227,8 +230,8 @@ public class DevProductListController extends BaseController {
      */
     @ResponseBody
     @RequestMapping("/selectProductAllByOrderId")
-    public AjaxResult selectProductAllByOrderId(int orderId,HttpServletRequest request){
-        return AjaxResult.success("success",devProductListService.selectProductAllByOrderId(orderId,request));
+    public AjaxResult selectProductAllByOrderId(int orderId, HttpServletRequest request) {
+        return AjaxResult.success("success", devProductListService.selectProductAllByOrderId(orderId, request));
     }
 
 
@@ -236,20 +239,21 @@ public class DevProductListController extends BaseController {
 
     @RequestMapping("/importProductConfig")
     @RequiresPermissions("device:devProductList:importConfig")
-    public String importProductConfig(int type,ModelMap mmap){
-        mmap.put("config",configService.selectImportConfigByType(type));
-        return prefix+"/pconfig";
+    public String importProductConfig(int type, ModelMap mmap) {
+        mmap.put("config", configService.selectImportConfigByType(type));
+        return prefix + "/pconfig";
     }
 
     /**
      * 添加产品导入配置
+     *
      * @param config 配置信息
      * @return
      */
     @ResponseBody
     @RequestMapping("/addProductConfig")
     @RequiresPermissions("device:devProductList:importConfig")
-    public AjaxResult addImportConfig(ImportConfig config){
+    public AjaxResult addImportConfig(ImportConfig config) {
         config.setcType(0);
         return toAjax(configService.insertImportConfig(config));
     }
@@ -266,26 +270,28 @@ public class DevProductListController extends BaseController {
 
     /**
      * 半成品导入配置
+     *
      * @param type 配置类型
      * @param mmap 缓存数据
      * @return
      */
     @RequestMapping("/importPartConfig")
     @RequiresPermissions("device:devPart:importConfig")
-    public String importPartConfig(int type,ModelMap mmap){
-        mmap.put("config",configService.selectImportConfigByType(type));
-        return prefixPart+"/partconfig";
+    public String importPartConfig(int type, ModelMap mmap) {
+        mmap.put("config", configService.selectImportConfigByType(type));
+        return prefixPart + "/partconfig";
     }
 
     /**
      * 添加半成品导入配置
+     *
      * @param config 配置信息
      * @return
      */
     @ResponseBody
     @RequestMapping("/addPartConfig")
     @RequiresPermissions("device:devPart:importConfig")
-    public AjaxResult addImportPartConfig(ImportConfig config){
+    public AjaxResult addImportPartConfig(ImportConfig config) {
         config.setcType(1);
         return toAjax(configService.insertImportConfig(config));
     }
@@ -305,16 +311,17 @@ public class DevProductListController extends BaseController {
     @Log(title = "半成品管理", businessType = BusinessType.INSERT)
     @PostMapping("/addPartSave")
     @ResponseBody
-    public AjaxResult addPartSave(DevProductList devProductList,HttpServletRequest request) {
-        return toAjax(devProductListService.insertDevProductList(devProductList,request));
+    public AjaxResult addPartSave(DevProductList devProductList, HttpServletRequest request) {
+        return toAjax(devProductListService.insertDevProductList(devProductList, request));
     }
+
     /**
      * 查询半成品管理列表
      */
     @RequiresPermissions("device:devPart:list")
     @PostMapping("/partList")
     @ResponseBody
-    public TableDataInfo partList(DevProductList devProductList,HttpServletRequest request) {
+    public TableDataInfo partList(DevProductList devProductList, HttpServletRequest request) {
         startPage();
         devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
         devProductList.setSign(1);
@@ -339,7 +346,7 @@ public class DevProductListController extends BaseController {
     @Log(title = "半成品管理", businessType = BusinessType.UPDATE)
     @PostMapping("/editPart")
     @ResponseBody
-    public AjaxResult editPartSave(DevProductList devProductList,HttpServletRequest request) {
+    public AjaxResult editPartSave(DevProductList devProductList, HttpServletRequest request) {
         devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
         return toAjax(devProductListService.updateDevProductList(devProductList));
     }
@@ -351,9 +358,9 @@ public class DevProductListController extends BaseController {
     @Log(title = "半成品管理", businessType = BusinessType.DELETE)
     @PostMapping("/removePart")
     @ResponseBody
-    public AjaxResult removePart(String ids,HttpServletRequest request) {
+    public AjaxResult removePart(String ids, HttpServletRequest request) {
         try {
-            return toAjax(devProductListService.deleteDevProductListByIds(ids,request));
+            return toAjax(devProductListService.deleteDevProductListByIds(ids, request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -365,7 +372,7 @@ public class DevProductListController extends BaseController {
     @ResponseBody
     public AjaxResult importPart(MultipartFile file, boolean updateSupport) throws Exception {
         try {
-            return AjaxResult.success(devProductListService.importProduct(file, updateSupport,1));
+            return AjaxResult.success(devProductListService.importProduct(file, updateSupport, 1));
         } catch (Exception e) {
             return error(e.getMessage());
         }
@@ -388,17 +395,17 @@ public class DevProductListController extends BaseController {
     /********************MES规则配置***********************/
 
     @GetMapping("/mesConfig")
-    public String mesConfig(int id,ModelMap modelMap){
-        modelMap.put("id",id);
-        modelMap.put("rule",devProductListService.selectMesBatchRuleByPbId(id));
-        return prefix+"/mesConfig";
+    public String mesConfig(int id, ModelMap modelMap) {
+        modelMap.put("id", id);
+        modelMap.put("rule", devProductListService.selectMesBatchRuleByPbId(id));
+        return prefix + "/mesConfig";
     }
 
     @GetMapping("/mesParConfig")
-    public String mesParConfig(int id,ModelMap modelMap){
-        modelMap.put("id",id);
-        modelMap.put("rule",devProductListService.selectMesBatchRuleByPbId(id));
-        return prefixPart+"/mesParConfig";
+    public String mesParConfig(int id, ModelMap modelMap) {
+        modelMap.put("id", id);
+        modelMap.put("rule", devProductListService.selectMesBatchRuleByPbId(id));
+        return prefixPart + "/mesParConfig";
     }
 
     /**
@@ -415,33 +422,67 @@ public class DevProductListController extends BaseController {
 
     /**
      * 保存 MES 规则
-     * @param id 产品/半成品
+     *
+     * @param id     产品/半成品
      * @param ruleId 对应规则id
      * @return
      */
+    @RequiresPermissions("mes:mesBatchRule:remove")
     @ResponseBody
     @PostMapping("/saveMesRule")
-    public AjaxResult saveMesRuleConfig(int id,int ruleId){
+    public AjaxResult saveMesRuleConfig(int id, int ruleId) {
         try {
             return toAjax(devProductListService.saveMesRuleConfig(id,ruleId));
-        }catch (BusinessException e){
+        } catch (BusinessException e) {
             return error(e.getMessage());
         }
     }
 
     /**
      * 取消MES 规则配置
+     *
      * @param id 对应产品/半成品id
      * @return
      */
     @RequiresPermissions("mes:mesBatchRule:remove")
     @ResponseBody
     @RequestMapping("/cancelMes")
-    public AjaxResult cancel(int id){
+    public AjaxResult cancel(Integer id) {
         try {
             return toAjax(devProductListService.cancel(id));
-        }catch (Exception e){
+        } catch (Exception e) {
             return error();
         }
     }
+
+
+    /******************************************************************************************************
+     *********************************** APP产品、半成品编码查询 *******************************************
+     ******************************************************************************************************/
+
+    @Autowired
+    private IMenuService menuService;
+
+    /**
+     * app查询产品或者半成品
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectProList(@RequestBody DevProductList product) {
+        try {
+            if (product != null) {
+                product.appStartPage();
+                Map<String, Object> map = new HashMap<>(16);
+                if (product.getUid() != null && product.getmParentId() != null) {
+                    map.put("menuList", menuService.selectMenuListByParentId(product.getUid(), product.getmParentId()));
+                }
+                map.put("productList", devProductListService.selectDevProductListList(product));
+                return AjaxResult.success("请求成功", map);
+            }
+            return error();
+        } catch (Exception e) {
+            return AjaxResult.error("请求失败");
+        }
+    }
+
 }

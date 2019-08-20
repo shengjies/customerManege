@@ -1,28 +1,24 @@
 package com.ruoyi.project.production.ecnLog.controller;
 
-import java.util.HashMap;
-import java.util.List;
-
-import com.ruoyi.project.product.list.domain.DevProductList;
+import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.production.ecnLog.domain.EcnLog;
+import com.ruoyi.project.production.ecnLog.service.IEcnLogService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.production.ecnLog.domain.EcnLog;
-import com.ruoyi.project.production.ecnLog.service.IEcnLogService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * ECN 变更记录 信息操作处理
@@ -43,6 +39,7 @@ public class EcnLogController extends BaseController {
     public String ecnLog(int ecn_type, int save_id, int ecn_status, ModelMap mmap) {
         mmap.put("ecn_type", ecn_type);
         mmap.put("save_id", save_id);
+        mmap.put("ecnLog", ecnLogService.selectEcnLogBySaveId(ecn_type,save_id));
         mmap.put("ecn_status", ecn_status);
         return prefix + "/ecnLog";
     }
@@ -81,7 +78,11 @@ public class EcnLogController extends BaseController {
     @PostMapping("/addSave")
     @ResponseBody
     public AjaxResult addSave(EcnLog ecnLog){
-        return toAjax(ecnLogService.insertEcnLog(ecnLog));
+        try {
+            return toAjax(ecnLogService.insertEcnLog(ecnLog));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
     }
 
 
@@ -96,5 +97,40 @@ public class EcnLogController extends BaseController {
         return toAjax(ecnLogService.updateEcnLog(type,save_id));
     }
 
+    /**
+     * 取消ECN
+     */
+    @PostMapping("/cancelEcn")
+    @ResponseBody
+    public AjaxResult cancelEcn(int id,int ecnType,int saveId){
+        return toAjax(ecnLogService.cancelEcn(id,ecnType,saveId));
+    }
+
+    /**
+     * 提交ECN
+     */
+    @PostMapping("/submitEcn")
+    @ResponseBody
+    public AjaxResult submitEcn(int id,int ecnStatus){
+        try {
+            return toAjax(ecnLogService.updateEcnStatus(id,ecnStatus));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
+    }
+
+    /**
+     * 审核ECN
+     */
+    @RequiresPermissions("production:ecnLog:examEcn")
+    @PostMapping("/examEcn")
+    @ResponseBody
+    public AjaxResult examEcn(int id,int ecnStatus){
+        try {
+            return toAjax(ecnLogService.updateEcnStatus(id,ecnStatus));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
+    }
 
 }

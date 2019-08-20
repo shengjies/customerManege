@@ -1,6 +1,7 @@
 package com.ruoyi.project.system.user.service;
 
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.domain.UserApp;
 import com.ruoyi.project.system.user.domain.UserQrCode;
 
 import javax.servlet.http.Cookie;
@@ -95,6 +96,8 @@ public interface IUserService
      */
     public int updateUserInfo(User user,HttpServletRequest request) throws Exception;
 
+    public int updateUserInfo1(User user,String token) throws Exception;
+
     /**
      * 修改用户密码信息
      * 
@@ -185,4 +188,24 @@ public interface IUserService
      */
     List<UserQrCode> selectUserQrCode(User user);
 
+    User selectUserInfo(Long userId);
+
+
+    /******************************************************************************************************
+     *********************************** 用户app交互接口 ***************************************************
+     ******************************************************************************************************/
+    /**
+     * 用户app交互接口
+     * @return 结果
+     */
+    List<UserApp> appSelectUserList(UserApp userApp);
+
+    List<UserApp> appSelectUserInfoList(Integer uid);
+
+    /**
+     * 查询用户头像
+     * @param uid
+     * @return
+     */
+    String selectUserInfo(Integer uid);
 }

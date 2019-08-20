@@ -16,6 +16,7 @@
 						<div class="panel-group" id="accordion1">
 							<form role="form" id="form-page-add" th:object="${pageInfo}">
 								<input name="id" id="id" type="hidden"  th:field="*{id}" />
+								<input name="imgPath" id="imgPath" type="hidden"  th:field="*{imgPath}" />
 								<div class="form-group">
 									<label class="col-sm-12 control-label">页面名称</label>
 									<div class="col-sm-12">
@@ -231,7 +232,9 @@
 			contentType: false,
 			success: function(result) {
 				if(result.msg){
-					$("#add_page_back_url").attr('src',result.msg)
+					// $("#add_page_back_url").attr('src',result.msg)
+					$("#add_page_back_url").attr('src', result.data.imgUrl);
+					$("#imgPath").val(result.data.imgPath);
 				}
 				layer.close(index);
 			}
@@ -291,6 +294,7 @@
 	}
 	function edit() {
 		var id = $("input[name='id']").val();
+		var imgPath = $("#imgPath").val();
 		var pageName = $("input[name='pageName']").val();
 		var layout_type = $("#layout_type").find("option:selected");
 		var pageType = $(layout_type).attr("layout-type");
@@ -301,7 +305,8 @@
 			pageName:pageName,
 			pageType:pageType,
 			pageLayoutType:layout,
-			pageBackImg:pageBackImg
+			pageBackImg:pageBackImg,
+			imgPath:imgPath
 		}
 		switch (pageType) {
 			case "1"://宫格布局

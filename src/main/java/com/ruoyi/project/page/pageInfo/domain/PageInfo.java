@@ -51,6 +51,10 @@ public class PageInfo extends BaseEntity
 	/** 创建时间 */
 	@Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Excel.Type.EXPORT)
 	private Date createTime;
+	/**
+	 * app端显示图片地址
+	 */
+	private String imgPath;
 
 	private String pagePwd;//页面密码 默认1234356
 	/** 布局类型*/
@@ -83,6 +87,14 @@ public class PageInfo extends BaseEntity
 
 	/******************* 车间单工位看板详情数据 *****************/
 	private List<PageHouse> pageHouseList;
+
+	public String getImgPath() {
+		return imgPath;
+	}
+
+	public void setImgPath(String imgPath) {
+		this.imgPath = imgPath;
+	}
 
 	public List<PageHouse> getPageHouseList() {
 		return pageHouseList;

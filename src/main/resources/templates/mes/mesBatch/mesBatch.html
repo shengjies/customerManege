@@ -2,47 +2,17 @@
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
 <body class="gray-bg">
-    
      <div class="container-div">
 		<div class="row">
-			<div class="col-sm-12 search-collapse">
-				<form id="formId">
+			<div class="col-sm-12 search-collapse" shiro:hasPermission="mes:mesBatch:list">
+				<form id="formId1">
+					<input name="batchCode" type="hidden" th:value="${mesCode}">
 					<div class="select-list">
 						<ul>
 							<li>
-								主码：<input type="text" name="mesCode"/>
-							</li>
-
-							<li>
-								工单号：<input type="text" name="workCode"/>
-							</li>
-
-							<li>
-								订单号：<input type="text" name="orderCode"/>
-							</li>
-
-							<li>
-								物料批次：<input type="text" name="batchCode"/>
-							</li>
-
-							<li>
 								产品/半成品：<input type="text" name="pbCode"/>
-							</li>
-							<li>
-								MES规则：
-								<select id="ruleName" name="ruleName" th:with="allMesRule=${@mesRule.selectAllMesRule()}">
-									<option value="">请选择</option>
-									<option th:each="item:${allMesRule}" th:text="${item.ruleName}" th:value="${item.ruleName}"></option>
-								</select>
-							</li>
-
-							<li>
-								物料：
-								<select id="ruleMateriel" name="ruleMateriel" th:with="allMat=${@materiel.selectAllMatByComId()}">
-									<option value="">请选择</option>
-									<option th:each="mat:${allMat}" th:text="${mat.materielCode}" th:value="${mat.materielCode}"></option>
-								</select>
 							</li>
 							<li class="select-time">
 								<label>创建时间： </label>
@@ -54,7 +24,22 @@
 							</li>
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
-								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset1()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-12 search-collapse" shiro:hasPermission="mes:mesBatch:list">
+				<form id="formId2">
+					<div class="select-list">
+						<ul>
+							<li>
+								批次信息：<input type="text" id="batchCode"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchMesData()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset2()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
 							</li>
 						</ul>
 					</div>
@@ -72,6 +57,7 @@
 		</div>
 	</div>
     <div th:include="include :: footer"></div>
+	 <script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('mes:mesBatch:edit')}]];
         var removeFlag = [[${@permission.hasPermi('mes:mesBatch:remove')}]];
@@ -84,9 +70,13 @@
 			});
 		})
 		// 重置搜索表单信息
-		function formReset() {
-			$('#formId')[0].reset();//input标签重置
+		function formReset1() {
+			$('#formId1')[0].reset();//input标签重置
 			$("select").val(null).trigger("change"); // select2标签重置
+		}
+		// 重置搜索表单信息
+		function formReset2() {
+			$('#formId2')[0].reset();//input标签重置
 		}
         $(function() {
             var options = {
@@ -109,11 +99,16 @@
 					visible: false
 				},
 				{
+					field : 'pbCode',
+					title : '产品/半成品',
+					sortable: true
+				},
+				{
 					field : 'mesCode', 
-					title : '主码',
+					title : '批次信息',
 					sortable: true,
 					formatter:function (value, row, index) {
-						return '<a href="javascript:void(0)" onclick="showMesDetail(\''+ row.id +'\',\''+ value +'\',\''+ row.workCode+'\')"><span style="font-weight: bold;color: #1E0FBE">'+ value +'</span></a>';
+						return '<a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showMesData(\''+ row.mesCode +'\')"><i></i>'+ value +'</a>';
 					}
 				},
 				{
@@ -127,39 +122,34 @@
 					sortable: true
 				},
 				{
-					field : 'pbCode', 
-					title : '产品/半成品',
-					sortable: true
-				},
-				{
-					field : 'ruleName', 
-					title : 'MES规则名称',
-					sortable: true
-				},
-				{
-					field : 'ruleMateriel',
-					title : '物料',
-					sortable: true,
-					width:300,
-					formatter: function(value, row, index) {
-						return $.table.tooltip(value);
-					}
-				},
-				{
 					field : 'cTime', 
 					title : '创建时间',
 					sortable: true
 				}]
             };
             $.table.init(options);
+			$.table.search("formId1");
         });
 
 		/**
-		 * 查看主码批次追踪明细
+		 * 通过批次查询mes详情信息
 		 */
-		function showMesDetail(id,value,workCode) {
-			var url = prefix + "/showMesDetailByMesCode?id="+id+"&mesCode="+value+"&workCode="+workCode;
-			$.modal.open("查看"+ value+"的MES明细",url,800,700);
+		function searchMesData() {
+			var batchCode = $("#batchCode").val();
+			if (!batchCode || $.common.isEmpty(batchCode)) {
+			    $.modal.alertWarning("请输入批次信息");
+			    return;
+			}
+			var url = prefix + "/selectMesData?batchCode=" + batchCode;
+			createMenuItem(url,"查看" + batchCode + "批次相关信息");
+		}
+
+		/**
+		 * 查看MES明细
+		 */
+		function showMesData(batchCode) {
+			var url = prefix + "/selectMesData?batchCode=" + batchCode;
+			createMenuItem(url,"查看" + batchCode + "批次相关信息");
 		}
     </script>
 </body>

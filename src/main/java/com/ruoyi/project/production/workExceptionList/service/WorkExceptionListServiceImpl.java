@@ -1,24 +1,26 @@
 package com.ruoyi.project.production.workExceptionList.service;
 
-import java.util.Date;
-import java.util.List;
-
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
+import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
+import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
 import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
 import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.production.workExceptionList.mapper.WorkExceptionListMapper;
-import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
-import com.ruoyi.common.support.Convert;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 各个工单异常情况记录 服务层实现
@@ -81,11 +83,29 @@ public class WorkExceptionListServiceImpl implements IWorkExceptionListService {
      * @return 结果
      */
     @Override
-    public int insertWorkExceptionList(WorkExceptionList workExceptionList,HttpServletRequest request) {
-        workExceptionList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId()); // 设置异常公司所属公司
-        workExceptionList.setExceStatut(WorkConstants.WORKEXCE_STATUT_NOHANDLE); // 设置工单异常的处理状态为未处理
-        workExceptionList.setCreateTime(new Date()); // 工单异常的创建时间
-        return workExceptionListMapper.insertWorkExceptionList(workExceptionList);
+    @Transactional(rollbackFor = Exception.class)
+    public int insertWorkExceptionList(WorkExceptionList workExceptionList) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            throw new BusinessException(UserConstants.NOT_LOGIN);
+        }
+        String typeName = workExceptionList.getTypeName();
+        if (StringUtils.isNotEmpty(typeName)) {
+            WorkExceptionType workExcType = workExceptionTypeMapper.selectByCompanyAndTypeName(user.getCompanyId(), typeName);
+            if (workExcType == null) {
+                workExcType = new WorkExceptionType();
+                workExcType.setCompanyId(user.getCompanyId());
+                workExcType.setTypeName(typeName);
+                workExcType.setCreateTime(new Date());
+                workExceptionTypeMapper.insertWorkExceptionType(workExcType);
+            }
+            workExceptionList.setExceType(workExcType.getId());
+            workExceptionList.setCompanyId(JwtUtil.getUser().getCompanyId());
+            workExceptionList.setExceStatut(WorkConstants.WORKEXCE_STATUT_NOHANDLE);
+            workExceptionList.setCreateTime(new Date());
+            return workExceptionListMapper.insertWorkExceptionList(workExceptionList);
+        }
+        return 0;
     }
 
     /**
@@ -121,17 +141,19 @@ public class WorkExceptionListServiceImpl implements IWorkExceptionListService {
 
     /**
      * 执行工单异常操作
+     *
      * @return
      */
     @Override
-    public int handleWorkExcp(WorkExceptionList workExceptionList,HttpServletRequest request) {
+    public int handleWorkExcp(WorkExceptionList workExceptionList, HttpServletRequest request) {
         workExceptionList.setHandleUser(JwtUtil.getTokenUser(request).getUserName()); // 处理者
         workExceptionList.setHandleTime(new Date()); // 处理时间
-        return  workExceptionListMapper.updateWorkExceptionList(workExceptionList);
+        return workExceptionListMapper.updateWorkExceptionList(workExceptionList);
     }
 
     /**
      * 解决完工单异常操作
+     *
      * @return
      */
     @Override
@@ -139,14 +161,15 @@ public class WorkExceptionListServiceImpl implements IWorkExceptionListService {
         //修改异常工单的异常状态变成处理完成
         WorkExceptionList workExceptionList = workExceptionListMapper.selectWorkExceptionListById(id);
         workExceptionList.setExceStatut(WorkConstants.WORKEXCE_STATUT_FINISH); // 正在处理
-        return  workExceptionListMapper.updateWorkExceptionList(workExceptionList);
+        return workExceptionListMapper.updateWorkExceptionList(workExceptionList);
     }
 
     /**
      * 查看当前公司当天的异常记录
+     *
      * @return
      */
-    public List<WorkExceptionList> selectWorkExcToday(Cookie[] cookies){
+    public List<WorkExceptionList> selectWorkExcToday(Cookie[] cookies) {
         User user = JwtUtil.getTokenCookie(cookies);
         List<WorkExceptionList> workExceptionLists = workExceptionListMapper.selectWorkExcToday(user.getCompanyId());
         for (WorkExceptionList workException : workExceptionLists) {
@@ -154,5 +177,15 @@ public class WorkExceptionListServiceImpl implements IWorkExceptionListService {
             workException.setWorkExceptionType(workExceptionTypeMapper.selectWorkExceptionTypeById(workException.getExceType())); // 异常对应类型信息
         }
         return workExceptionLists;
+    }
+
+    /**
+     * app端查看工单异常记录=列表
+     * @param workExceptionList 异常对象
+     * @return 结果
+     */
+    @Override
+    public List<WorkExceptionList> appSelectWorkExcList(WorkExceptionList workExceptionList) {
+        return workExceptionListMapper.appSelectWorkExcList(workExceptionList);
     }
 }

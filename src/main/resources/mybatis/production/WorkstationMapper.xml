@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectWorkstationVo"/>
         <where>  
              and line_id = #{lineId}
-             <if test="wName != null  and wName != '' "> and w_name like concat('%', #{wName}, '%')</if>
+             <if test="wName != null  and wName != '' "> and w_name like concat(#{wName}, '%')</if>
          </where>
     </select>
     

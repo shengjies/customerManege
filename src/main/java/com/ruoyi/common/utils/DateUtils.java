@@ -1,10 +1,11 @@
 package com.ruoyi.common.utils;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
  * 时间工具类
@@ -95,7 +96,11 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     }
 
     public static final String getDateTime(Date date){
-        return DateFormatUtils.format(date,YYYY_MM_DD_HH_MM_SS);
+        if (date == null) {
+            return "--";
+        } else {
+            return DateFormatUtils.format(date,YYYY_MM_DD_HH_MM_SS);
+        }
     }
     /**
      * 日期路径 即年/月/日 如20180808

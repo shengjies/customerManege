@@ -13,6 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="pageType"    column="page_type"    />
         <result property="pageLayoutType"    column="page_layout_type"    />
         <result property="pageBackImg"    column="page_back_img"    />
+        <result property="imgPath"    column="img_path"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="pagePwd"    column="page_pwd"    />
@@ -22,7 +23,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 	
 	<sql id="selectPageInfoVo">
-        select id, page_id, company_id, page_name, page_url, page_type, page_layout_type, page_back_img, create_by, create_time,page_pwd from dev_page_list
+        select id, page_id, company_id, page_name, page_url, page_type, page_layout_type, page_back_img, create_by, create_time,page_pwd,img_path from dev_page_list
     </sql>
 
 
@@ -30,7 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectPageInfoList" parameterType="PageInfo" resultMap="PageInfoResult">
         <include refid="selectPageInfoVo"/>
         <where>
-             <if test="pageId != null  and pageId != '' "> and page_id like concat('%',#{pageId}, '%') </if>
+             <if test="pageId != null  and pageId != '' "> and page_id like concat(#{pageId}, '%') </if>
              <if test="companyId != null and companyId > 0 "> and company_id = #{companyId}</if>
              <if test="pageLayoutType != null and pageLayoutType > 0 "> and page_layout_type = #{pageLayoutType}</if>
              <if test="pageName != null  and pageName != '' "> and page_name like concat('%',#{pageName}, '%') </if>
@@ -61,6 +62,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createBy != null  and createBy != ''  ">create_by,</if>
 			<if test="createTime != null  ">create_time,</if>
 			<if test="pagePwd != null  ">page_pwd,</if>
+            <if test="imgPath != null  ">img_path,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="pageId != null  and pageId != ''  ">#{pageId},</if>
@@ -73,6 +75,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
 			<if test="createTime != null  ">#{createTime},</if>
 			<if test="pagePwd != null  ">#{pagePwd},</if>
+            <if test="imgPath != null  ">#{imgPath},</if>
          </trim>
     </insert>
 	 
@@ -89,6 +92,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createBy != null  and createBy != ''  ">create_by = #{createBy},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
             <if test="pagePwd != null  ">page_pwd = #{pagePwd},</if>
+            <if test="imgPath != null  ">img_path = #{imgPath},</if>
         </trim>
         where id = #{id}
     </update>

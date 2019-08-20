@@ -419,7 +419,9 @@ public class ExcelUtil<T>
                         String readConverterExp = attr.readConverterExp();
                         if (StringUtils.isNotEmpty(dateFormat))
                         {
-                            cell.setCellValue(DateUtils.parseDateToStr(dateFormat, (Date) value));
+                            if ((Date) value != null) { // 时间不为空
+                                cell.setCellValue(DateUtils.parseDateToStr(dateFormat, (Date) value));
+                            }
                         }
                         else if (StringUtils.isNotEmpty(readConverterExp))
                         {
@@ -435,6 +437,7 @@ public class ExcelUtil<T>
                 }
                 catch (Exception e)
                 {
+                    e.printStackTrace();
                     log.error("导出Excel失败{}", e.getMessage());
                 }
             }

@@ -50,7 +50,8 @@
                                 window.parent.$.modal.msgSuccess(result.msg);
                                 window.parent.$.table.refresh();
                                 window.parent.parent.$.table.refresh();
-                                window.parent.$("#ecn-status").attr("data-status",1).removeClass("btn-default").addClass("btn-primary").find("span").text("关闭变更")
+                                // window.parent.$("#ecn-status").attr("data-status",1).removeClass("btn-default").addClass("btn-primary").find("span").text("关闭变更")
+                                window.parent.$("#addEcn").hide();
                             } else {
                                 $.modal.alertError(result.msg);
                             }

@@ -1,8 +1,7 @@
 package com.ruoyi.project.production.ecnLog.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -33,8 +32,28 @@ public class EcnLog extends BaseEntity
 	private String createPeople;
 	/** 创建时间 */
 	private Date createTime;
+	/** ECN初始化次数 */
+	private Integer ecnNum;
+	/** ecn状态0、默认值待提交，1、提交待审核，2、审核待执行，3、执行中，4、执行完毕不显示，5、取消作废的ECN */
+	private Integer ecnStatus;
 
-	public void setId(Integer id) 
+	public Integer getEcnNum() {
+		return ecnNum;
+	}
+
+	public void setEcnNum(Integer ecnNum) {
+		this.ecnNum = ecnNum;
+	}
+
+	public Integer getEcnStatus() {
+		return ecnStatus;
+	}
+
+	public void setEcnStatus(Integer ecnStatus) {
+		this.ecnStatus = ecnStatus;
+	}
+
+	public void setId(Integer id)
 	{
 		this.id = id;
 	}
@@ -116,17 +135,20 @@ public class EcnLog extends BaseEntity
 		return createTime;
 	}
 
-    public String toString() {
-        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-            .append("id", getId())
-            .append("companyId", getCompanyId())
-            .append("ecnType", getEcnType())
-            .append("saveId", getSaveId())
-            .append("saveCode", getSaveCode())
-            .append("ecnText", getEcnText())
-            .append("createId", getCreateId())
-            .append("createPeople", getCreatePeople())
-            .append("createTime", getCreateTime())
-            .toString();
-    }
+	@Override
+	public String toString() {
+		return "EcnLog{" +
+				"id=" + id +
+				", companyId=" + companyId +
+				", ecnType=" + ecnType +
+				", saveId=" + saveId +
+				", saveCode='" + saveCode + '\'' +
+				", ecnText='" + ecnText + '\'' +
+				", createId=" + createId +
+				", createPeople='" + createPeople + '\'' +
+				", createTime=" + createTime +
+				", ecnNum=" + ecnNum +
+				", ecnStatus=" + ecnStatus +
+				'}';
+	}
 }

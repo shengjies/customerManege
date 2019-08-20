@@ -44,6 +44,13 @@ public interface SingleWorkMapper {
      * @return 结果
      */
     public int updateSingleWork(SingleWork singleWork);
+    /**
+     * 修改单工位数据
+     *
+     * @param singleWork 单工位数据信息
+     * @return 结果
+     */
+    public int updateSingleWork1(SingleWork singleWork);
 
     /**
      * 删除单工位数据

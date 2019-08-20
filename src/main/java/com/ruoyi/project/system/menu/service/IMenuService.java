@@ -1,13 +1,14 @@
 package com.ruoyi.project.system.menu.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import com.ruoyi.project.system.menu.domain.Menu;
+import com.ruoyi.project.system.menu.domain.MenuApi;
 import com.ruoyi.project.system.role.domain.Role;
 import com.ruoyi.project.system.user.domain.User;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 菜单 业务层
@@ -124,4 +125,17 @@ public interface IMenuService
      * @return 结果
      */
     public String checkMenuNameUnique(Menu menu);
+
+
+
+    /******************************************************************************************************
+     ***********************************   api 接口交互  ***************************************************
+     ******************************************************************************************************/
+    /**
+     * api接口查询菜单
+     * @param uid 用户id
+     * @param parentId 父id
+     * @return 结果
+     */
+    List<MenuApi> selectMenuListByParentId(Integer uid, Integer parentId);
 }

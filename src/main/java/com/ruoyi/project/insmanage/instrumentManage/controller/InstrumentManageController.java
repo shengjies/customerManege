@@ -188,6 +188,29 @@ public class InstrumentManageController extends BaseController
 	@PostMapping("/checkImCodeUnique")
 	@ResponseBody
 	public String checkImCodeUnique(InstrumentManage instrumentManage){
-		return instrumentManageService.checkImCodeUnique(instrumentManage.getImCode());
+		return instrumentManageService.checkImCodeUnique(instrumentManage);
+	}
+
+
+
+	/******************************************************************************************************
+	 *********************************** app仪器设备管理交互 ***********************************************
+	 ******************************************************************************************************/
+
+	/**
+	 * app端查询设备列表
+	 */
+	@PostMapping("/applist")
+	@ResponseBody
+	public AjaxResult appSelectList(@RequestBody InstrumentManage instrumentManage){
+		try {
+			if (instrumentManage != null) {
+			    instrumentManage.appStartPage();
+				return AjaxResult.success("请求成功",instrumentManageService.appSelectList(instrumentManage));
+			}
+			return error();
+		} catch (Exception e) {
+			return error();
+		}
 	}
 }

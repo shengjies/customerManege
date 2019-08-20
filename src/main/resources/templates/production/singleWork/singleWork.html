@@ -112,11 +112,25 @@
                     visible: false
                 },
                 {
-                    field: '',
-                    title: '车间/设备名称',
+                    field: 'workshopName',
+                    title: '车间/单工位名称',
                     formatter: function (value, row, index) {
                         if (row.sign == 0) { // 车间
                             return '<i class="fa fa-university"></i> <a class="nav-label" onclick="intoNext(\'' + row.id + '\')"><span style="font-weight: bold;color: blue;">' + row.workshopName + '</span></a>';
+                        } else { // 设备名称
+                            if (value == null) {
+                                return '<span>--</span>';
+                            } else {
+                                return '<span style="font-weight: bold;color: #1E0FBE">' + value + '</span>'
+                            }
+                        }
+                    }
+                },
+                {
+                    title: '设备编码',
+                    formatter: function (value, row, index) {
+                        if (row.sign == 0) { // 车间
+                            return '--';
                         } else { // 设备名称
                             return '<span style="color: green">' + row.imCode + '</span>';
                         }
@@ -161,7 +175,7 @@
                         if (row.parentId != 0) {
                             actions.push('<a class="btn btn-xs  btn-primary ' + configDevFlag + '" href="javascript:void(0)" onclick="configDev(\'' + row.id + '\')">配置硬件</a> ');
                             actions.push('<a class="btn btn-xs  btn-primary ' + configSopFlag + '" href="javascript:void(0)" onclick="configSop(\'' + row.id + '\')">配置SOP</a> ');
-                            actions.push('<a class="btn btn-xs  btn-primary ' + singleWork + '" href="javascript:void(0)" onclick="configSingle(' + row.id + ',\''+row.imCode+'\')">配置工单</a> ');
+                            actions.push('<a class="btn btn-xs  btn-primary ' + singleWork + '" href="javascript:void(0)" onclick="configSingle(' + row.id + ',\'' + row.imCode + '\')">配置工单</a> ');
                         }
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 
@@ -287,8 +301,8 @@
      * @param id
      * @param name
      */
-    function configSingle(id,name) {
-        $.modal.open(name+" 工单配置","/production/singleWorkOrder?type=0&orderId=0&singleId="+id,800,700);
+    function configSingle(id, name) {
+        $.modal.open(name + " 工单配置", "/production/singleWorkOrder?type=0&orderId=0&singleId=" + id, 800, 700);
     }
 </script>
 </body>

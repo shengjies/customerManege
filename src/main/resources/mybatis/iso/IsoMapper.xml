@@ -35,7 +35,7 @@
             AND parent_id = #{isoId}
         </if>
         <if test="cName != null and cName != ''">
-            AND c_name like concat('%', #{cName}, '%')
+            AND c_name like concat(#{cName}, '%')
         </if>
     </select>
 

@@ -1,14 +1,17 @@
 package com.ruoyi.project.erp.fileSourceInfo.controller;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-
 import com.ruoyi.common.exception.file.FileNameLengthLimitExceededException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
+import com.ruoyi.project.erp.fileSourceInfo.service.IFileSourceInfoService;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.system.user.domain.User;
@@ -18,16 +21,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
-import com.ruoyi.project.erp.fileSourceInfo.service.IFileSourceInfoService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 文件素材管理 信息操作处理
@@ -69,9 +68,9 @@ public class FileSourceInfoController extends BaseController {
     @RequiresPermissions("erp:fileSourceInfo:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(FileSourceInfo fileSourceInfo, HttpServletRequest request) {
+    public TableDataInfo list(FileSourceInfo fileSourceInfo) {
         startPage();
-        List<FileSourceInfo> list = fileSourceInfoService.selectFileSourceInfoList(fileSourceInfo, request);
+        List<FileSourceInfo> list = fileSourceInfoService.selectFileSourceInfoList(fileSourceInfo);
         return getDataTable(list);
     }
 
@@ -139,6 +138,26 @@ public class FileSourceInfoController extends BaseController {
     @ResponseBody
     public AjaxResult remove(String ids) {
         return toAjax(fileSourceInfoService.deleteFileSourceInfoByIds(ids));
+    }
+
+
+    /******************************************************************************************************
+     *********************************** app端文件体系交互 *************************************************
+     ******************************************************************************************************/
+
+    /**
+     * app端查询文件管理
+     * @saveType 保存类型
+     * @saveId 保存类型对应id
+     */
+    @PostMapping("/appFileList")
+    @ResponseBody
+    public AjaxResult appSelectFileList(@RequestBody FileSourceInfo fileSourceInfo){
+        try {
+            return AjaxResult.success(fileSourceInfoService.selectFileSourceInfoList(fileSourceInfo));
+        } catch (Exception e) {
+            return error();
+        }
     }
 
 }

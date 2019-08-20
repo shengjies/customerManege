@@ -324,26 +324,48 @@
                     sortable: true
                 },
                 {
-                    field: 'workorderStatus',
-                    title: '工单生产状态',
+                    field: 'ecnStatus',
+                    title: 'ECN',
+                    width:30,
                     formatter: function (value, row, index) {
-                        if (row.workorderStatus == 0) {
-                            return '<span class="label label-success">未进行</span>';
-                        } else if (row.workorderStatus == 1) {
-                            return '<span class="label label-primary">进行中</span>';
-                        } else if (row.workorderStatus == 2) {
-                            return '<span class="label label-danger">已完成</span>';
+                        if (row.abolish == 0) {
+                            if (value == 0) {
+                                return '<a class="btn btn-default btn-xs" href="#" onclick="ecnView(' + row.id + ')">无</a>';
+                            }
+                            return '<a class="btn btn-primary btn-xs " href="#" onclick="ecnView(' + row.id + ')">有</a>';
                         }
+                        return "-";
+
                     }
                 },
                 {
-                    field: 'productName',
-                    title: '产品名称',
-                    sortable: true
+                    title: '管理',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.workorderStatus == 0) {
+                            actions.push('<span style="font-weight: bold;color: #1E0FBE">未进行</span> ');
+                        } else if (row.workorderStatus == 1) {
+                            actions.push('<span style="font-weight: bold;color: green">进行中</span> ');
+                        } else if (row.workorderStatus == 2) {
+                            actions.push('<span style="font-weight: bold;color: red">已完成</span> ');
+                        }
+                        if (row.workSign != 1) {
+                            actions.push('<a class="btn btn-primary btn-xs " href="javascript:void(0)" onclick="order(' + row.id + ',0,1)"><i></i>操作</a> ');
+                        } else {
+                            actions.push('<a class="btn btn-primary btn-xs " href="javascript:void(0)"  disabled="true"><i></i>操作</a> ');
+                        }
+                        return actions.join('');
+                    }
                 },
                 {
                     field: 'productCode',
                     title: '产品编码',
+                    sortable: true
+                },
+                {
+                    field: 'productName',
+                    title: '产品名称',
                     sortable: true
                 },
                 {
@@ -361,21 +383,10 @@
                     title: '实际开始时间',
                     sortable: true
                 },
-
                 {
                     field: 'endTime',
                     title: '实际结束时间',
                     sortable: true
-                }, {
-                    title: '操作',
-                    align: 'center',
-                    formatter: function (value, row, index) {
-                        if (row.workSign != 1) {
-                            return '<a class="btn btn-primary btn-xs " href="#" onclick="order(' + row.id + ',0)"><i></i>操作</a> ';
-                        } else {
-                            return '<a class="btn btn-primary btn-xs " href="#"  disabled="true"><i></i>操作</a> ';
-                        }
-                    }
                 }]
         };
         /** 初始化工单信息 */
@@ -505,6 +516,14 @@
         $("#bootstrap-table1").bootstrapTable('refresh', params);
     }
 
+    /**
+     * 查询工单ecn
+     * @param id
+     */
+    function ecnView(id) {
+        $.modal.open("ECN详情", prefix + "/workecn?workId=" + id, 800, 400)
+    }
+
     /** 控制对应的操作按钮 */
     function controllerButtn(o) {
         if (o) {
@@ -553,13 +572,16 @@
      * 选择对应的工单数据
      * @param id
      */
-    function order(id,s) {
+    function order(id,s,tag) {
         $.post("/device/devWorkOrder/findWorkInfoById", {work_id: id}, function (data) {
             if (data.code) {
                 var item = data.code;
                 /** 控制操作按钮 */
                 controllerButtn(item);
                 if(s == 0){
+                    if (item.ecnStatus == 1 && tag == 1) {
+                        $.modal.alertWarning(item.ecnText);
+                    }
                     /** 进行数据填充 */
                     fillData(item,id);
                     searchYc(id);
@@ -627,7 +649,7 @@
                 success: function (data) {
                     if (data.code == 0) {
                         //状态修改
-                        order( $("#work-id").val(),1);
+                        order( $("#work-id").val(),1,0);
                         //查询工单列表数据
                         searchWork();
                     } else {
@@ -660,7 +682,7 @@
                     if (result.code == 0) {
                         $.modal.alertWarning("工单已经结束了...");
                         //更新按钮
-                        order($("#work-id").val(),1);
+                        order($("#work-id").val(),1,0);
                         //保存数据
                         save();
                         //查询对应工单列表数据
@@ -709,7 +731,7 @@
             },
             success: function (data) {
                 $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
-                order($("#work-id").val(),0);
+                order($("#work-id").val(),0,0);
             }
         });
     }
@@ -733,7 +755,7 @@
                     if (result.code == 0) {
                         $.modal.alertWarning("工单已经提交了");
                         // $.table.refresh();
-                        order($("#work-id").val(),1);
+                        order($("#work-id").val(),1,0);
                     } else {
                         $.modal.alertError(result.msg);
                     }

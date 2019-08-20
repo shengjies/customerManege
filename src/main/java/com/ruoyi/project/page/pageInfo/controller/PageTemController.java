@@ -8,20 +8,19 @@ import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import com.ruoyi.project.erp.fileSourceInfo.service.IFileSourceInfoService;
 import com.ruoyi.project.page.pageInfo.domain.PageInfo;
 import com.ruoyi.project.page.pageInfo.service.IPageInfoService;
-import com.ruoyi.project.page.pageInfoConfig.service.IPageInfoConfigService;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
-import com.ruoyi.project.production.devWorkData.service.IDevWorkDataService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -130,7 +129,7 @@ public class PageTemController extends BaseController {
      */
     @PostMapping("/file/list")
     @ResponseBody
-    public TableDataInfo list(FileSourceInfo fileSourceInfo, HttpServletRequest request)
+    public TableDataInfo list(FileSourceInfo fileSourceInfo)
     {
         if(fileSourceInfo.getSaveId() != null) {
             //根据工单id查询对应的产品id
@@ -140,7 +139,7 @@ public class PageTemController extends BaseController {
                 if (productList != null) {
                     fileSourceInfo.setSaveId(productList.getId());
                     startPage();
-                    List<FileSourceInfo> list = fileSourceInfoService.selectFileSourceInfoList(fileSourceInfo,request);
+                    List<FileSourceInfo> list = fileSourceInfoService.selectFileSourceInfoList(fileSourceInfo);
                     return getDataTable(list);
                 }
             }

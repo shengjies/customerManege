@@ -177,4 +177,11 @@ public interface IDevProductListService
 	 * @return 结果
 	 */
     List<DevProductList> selectMesCfList(DevProductList productList);
+
+	/**
+	 * 通过标记查询所有的成品或者半成品
+	 * @param sign 成品0，半成品1
+	 * @return 结果
+	 */
+	List<DevProductList> selectProAllBySign(Integer sign);
 }

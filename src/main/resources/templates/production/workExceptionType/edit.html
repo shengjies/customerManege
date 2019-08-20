@@ -6,7 +6,7 @@
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form class="form-horizontal m" id="form-workExceptionType-edit" th:object="${workExceptionType}">
             <input id="id" name="id" th:field="*{id}"  type="hidden">
-			<div class="form-group">	
+			<div class="form-group">
 				<label class="col-sm-3 control-label">异常类型名称：</label>
 				<div class="col-sm-8">
 					<input id="typeName" name="typeName" th:field="*{typeName}" class="form-control" type="text">
@@ -19,8 +19,30 @@
 		var prefix = ctx + "production/workExceptionType";
 		$("#form-workExceptionType-edit").validate({
 			rules:{
-				xxxx:{
+				typeName:{
 					required:true,
+					remote: {
+						url: prefix + "/checkExcTypeNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							typeName : function() {
+								return $.common.trim($("#typeName").val());
+							},
+							id : function() {
+								return $.common.trim($("#id").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
+				},
+			},
+			messages: {
+				typeName: {
+					required:"异常类型名称必填",
+					remote: "异常类型名称已存在"
 				},
 			}
 		});

@@ -97,6 +97,13 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
                 map.put("data", null);
                 return map;
             }
+            if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
+                //硬件编码被禁用
+                map.put("code", 5);
+                map.put("msg","硬件编码被禁用");
+                map.put("data", null);
+                return map;
+            }
             if (devList.getDevType() == null) {
                 // 硬件未配置流水线工位或者车间单工位
                 map.put("code", 2);
@@ -157,6 +164,16 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             if (devList == null || devList.getCompanyId() == null) {
                 map.put("code", 3);//硬件编码不存在
                 map.put("msg","硬件编码不存在");
+                map.put("status", 0);//没有正在进行的工单
+                map.put("num", 0);//没有正在进行的工单
+                map.put("tag", 0);//流水线标记
+                map.put("workCode", null);//工单编号为空
+                return map;
+            }
+            if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
+                //硬件编码被禁用
+                map.put("code", 5);//硬件编码不存在
+                map.put("msg","硬件编码被禁用");
                 map.put("status", 0);//没有正在进行的工单
                 map.put("num", 0);//没有正在进行的工单
                 map.put("tag", 0);//流水线标记
@@ -390,6 +407,8 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
      * 单工位统计计数
      */
     private void countSingWorkNum(WorkDataForm data, DevList devList, SingleWork singleWork, SingleWork house, DevDataLog devDataLog, DevWorkOrder workOrder) {
+        devDataLog.setWorkId(workOrder.getId());
+        devDataLog.setIoId(singleWork.getId());
         //查询对应日志上传数据数据
         DevDataLog log = devDataLogMapper.selectLineWorkDevIo(house.getId(), workOrder.getId(), devList.getId(), singleWork.getId(), WorkConstants.SING_SINGLE);
         if (log != null) {
@@ -397,8 +416,6 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
             if ((devDataLog.getDataTotal() - log.getDataTotal()) > 0) {
                 // 个人计件统计
                 CountPiece countPiece = getCountPiece(devList, singleWork, workOrder);
-                devDataLog.setWorkId(workOrder.getId());
-                devDataLog.setIoId(singleWork.getId());
                 countPiece.setCpNumber(countPiece.getCpNumber() + (devDataLog.getDataTotal() - log.getDataTotal()));
                 countPiece.setTotalPrice(workOrder.getWorkPrice() * (countPiece.getCpNumber() - countPiece.getCpBadNumber()));
                 countPieceMapper.updateCountPiece(countPiece);
@@ -506,13 +523,19 @@ public class InitDataManageServiceImpl implements IInitDataManageService {
      */
     @Override
     public Map<String, Object> workEx(String code) {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(16);
         try {
             //判断对应的硬件编码是否存在
             DevList devList = devListMapper.selectDevListByCode(code);
             if (devList == null || devList.getCompanyId() == null) {
                 map.put("status", 3);//硬件编码不存在
                 map.put("msg","硬件编码不存在");
+                map.put("code", 0);//上报失败
+                return map;
+            }
+            if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
+                map.put("status", 5);
+                map.put("msg","硬件编码被禁用");
                 map.put("code", 0);//上报失败
                 return map;
             }

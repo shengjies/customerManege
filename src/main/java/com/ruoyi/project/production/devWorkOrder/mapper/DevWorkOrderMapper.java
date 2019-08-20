@@ -287,4 +287,17 @@ public interface DevWorkOrderMapper {
      */
     DevWorkOrder selectWorkInHouseLastByWorkStatus(@Param("companyId") Integer companyId, @Param("lineId") Integer lineId,
                                                    @Param("wlSign") Integer wlSign,@Param("singleId") Integer singleId, @Param("workStatus") Integer workStatus);
+
+    /**
+     * 通过工单号查询工单信息
+     * @param workCode 工单号
+     * @return 结果
+     */
+    DevWorkOrder selectWorkOrderByCode(@Param("workCode") String workCode);
+
+    /**
+     * app端查看两条工单
+     * @return 结果
+     */
+    List<DevWorkOrder> appSelectWorkListTwo();
 }

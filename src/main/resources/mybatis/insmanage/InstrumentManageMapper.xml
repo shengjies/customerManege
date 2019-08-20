@@ -42,14 +42,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="id != null "> and id = #{id}</if>
              <if test="companyId != null "> and company_id = #{companyId}</if>
              <if test="imCode != null  and imCode != '' ">
-                 and im_code like concat ('%',#{imCode},'%')
+                 and im_code like concat (#{imCode},'%')
              </if>
              <if test="imName != null  and imName != '' "> and im_name = #{imName}</if>
              <if test="imModel != null  and imModel != '' ">
-                 and im_model like concat ('%',#{imModel},'%')
+                 and im_model like concat (#{imModel},'%')
              </if>
              <if test="imDepartment != null  and imDepartment != '' ">
-                 and im_department like concat ('%',#{imDepartment},'%')
+                 and im_department like concat (#{imDepartment},'%')
              </if>
              <if test="inType != null and  inType != -1"> and in_type = #{inType}</if>
              <if test="imLiable != null "> and im_liable = #{imLiable}</if>

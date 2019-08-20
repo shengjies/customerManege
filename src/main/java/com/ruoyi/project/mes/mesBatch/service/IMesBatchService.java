@@ -1,6 +1,9 @@
 package com.ruoyi.project.mes.mesBatch.service;
 
 import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
+import com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail;
+import com.ruoyi.project.mes.mesBatch.domain.MesData;
+
 import java.util.List;
 
 /**
@@ -50,5 +53,25 @@ public interface IMesBatchService
      * @return 结果
      */
 	public int deleteMesBatchByIds(String ids);
-	
+
+	/**
+	 * 通过批次号查询MES追溯详情
+	 * @param batchCode 批次号
+	 * @return 结果
+	 */
+    MesData selectMesDataByBatchCode(String batchCode);
+
+	/**
+	 * 分页查询MES数据
+	 * @param mesData 结果
+	 * @return 结果
+	 */
+	List<MesData> selectMesDataByPage(MesBatchDetail mesData);
+
+	/**
+	 * 删除mes追溯
+	 * @param id mesId
+	 * @return 结果
+	 */
+    int removeMesData(int id);
 }

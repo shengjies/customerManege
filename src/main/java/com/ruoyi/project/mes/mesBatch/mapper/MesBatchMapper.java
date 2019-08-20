@@ -82,4 +82,11 @@ public interface MesBatchMapper
 	 * @return 结果
 	 */
 	List<MesBatch> selectMesBatchList2(MesBatch mesBatch);
+
+	/**
+	 * 通过工单编号删除MES批次追踪
+	 * @param workCode 工单编号
+	 * @return 结果
+	 */
+    int deleteMesBatchByWorkCode(@Param("workCode") String workCode);
 }

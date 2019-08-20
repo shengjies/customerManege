@@ -523,3 +523,79 @@ ADD COLUMN `unit` VARCHAR(45) NULL COMMENT '物料添加单位' AFTER `create_ti
 #产品/半成品   规格配置
 ALTER TABLE `bzytest`.`dev_product_list`
 ADD COLUMN `rule_id` INT NULL DEFAULT 0 COMMENT '规格配置' AFTER `unit`;
+
+# 2019-07-25
+# ECN逻辑更新 服务器未执行sql
+ALTER TABLE `bzytest`.`dev_ecn_log`
+ADD COLUMN `ecn_num` INT NULL DEFAULT 3 COMMENT 'ecn更改初始化次数3次' AFTER `create_time`,
+ADD COLUMN `ecn_status` INT NULL DEFAULT 0 COMMENT 'ecn状态(0、默认值待提交，1、提交待审核，2、审核待执行，3、执行中，4、执行完毕不显示)' AFTER `ecn_num`;
+
+
+# 2019-07-26 服务器未执行sql
+# 菜单添加app标记字段，标识哪些需要在app端展示
+ALTER TABLE `octopus`.`sys_menu`
+ADD COLUMN `app_sign` INT NULL DEFAULT 0 COMMENT 'app是否展示标识(0、默认值不展示，1、展示)' AFTER `remark`;
+
+# 2019-07-31
+# 工单报废品数量默认为0
+ALTER TABLE `bzytest`.`dev_work_order`
+CHANGE COLUMN `scrap_num` `scrap_num` INT(11) NULL DEFAULT 0 COMMENT '报废品' ;
+
+# 2019-08-08
+# app端展示预览图字段
+ALTER TABLE `bzytest`.`dev_page_list`
+ADD COLUMN `img_path` VARCHAR(225) NULL COMMENT 'app端预览背景图' AFTER `page_pwd`;
+
+
+# 2019-08-09
+# 添加MES配置规则明细表
+CREATE TABLE `bzytest`.`tab_mes_batch_rule_detail` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'MES规则明细id',
+  `rule_id` INT NULL COMMENT 'MES规则主表id',
+  `d_type` INT NULL DEFAULT 2 COMMENT '配置规则明细类型(1、半成品，2、物料默认值)',
+  `d_code` VARCHAR(125) NULL COMMENT '半成品/物料的编码',
+  `d_tag` INT NULL DEFAULT 0 COMMENT '用于判断半成品是否已经配置了MES规则(0、默认值未配置，1、已配置)',
+  PRIMARY KEY (`id`))
+COMMENT = 'MES配置规则明细';
+
+# 2019-08-10
+# mes工单配置明细添加标记字段
+ALTER TABLE `bzytest`.`tab_mes_batch_detail`
+ADD COLUMN `d_tag` INT NULL DEFAULT 0 COMMENT '关联半成品是否配置(默认值0未配置，1已配置)' AFTER `c_time`,
+ADD COLUMN `d_type` INT NULL DEFAULT 2 COMMENT 'MES关联类型(默认值2物料，1半成品)' AFTER `d_tag`;
+# 添加半成品MES批次记录
+CREATE TABLE `bzytest`.`tab_mes_part_log` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '半成品mes批次追踪记录主键id',
+  `work_code` VARCHAR(45) NULL COMMENT '对应工单编号',
+  `mes_code` VARCHAR(65) NULL COMMENT '对应的主码编号',
+  `part_code` VARCHAR(65) NULL COMMENT '半成品编码',
+  `materiel_code` VARCHAR(65) NULL COMMENT '关联编码',
+  `batch_code` VARCHAR(125) NULL COMMENT '批次信息',
+  `c_time` DATETIME NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`))
+COMMENT = '半成品mes批次追踪记录';
+
+# mes规则排序
+# 2019-08-16
+ALTER TABLE `bzytest`.`tab_mes_batch_rule_detail`
+ADD COLUMN `rule_order` INT NULL COMMENT '规则排序(1优先级别最高，越大优先级别越低)' AFTER `d_tag`;
+
+# mes数据明细添加数量
+# 2019-08-19
+ALTER TABLE `bzytest`.`tab_mes_batch_detail`
+ADD COLUMN `mes_number` INT NULL COMMENT 'mes批次数量' AFTER `d_type`;
+ALTER TABLE `bzytest`.`tab_mes_batch_detail`
+ADD COLUMN `rule_order` INT NULL COMMENT 'mes数据规则排序(1优先级别最高，越大优先级别越低)' AFTER `mes_number`;
+ALTER TABLE `bzytest`.`tab_mes_batch_detail`
+ADD COLUMN `pro_batch_code` VARCHAR(45) NULL COMMENT '生产MES批次信息' AFTER `batch_code`;
+ALTER TABLE `bzytest`.`tab_mes_batch`
+ADD COLUMN `mes_sign` VARCHAR(45) NULL DEFAULT '000000000000' COMMENT 'mes标记扫描字段(1-12优先级别递增)、0代表生产未扫描，1，代表生产已扫描' AFTER `u_time`;
+
+
+
+
+
+
+
+
+

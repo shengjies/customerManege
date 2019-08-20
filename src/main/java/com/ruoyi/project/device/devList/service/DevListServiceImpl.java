@@ -259,4 +259,14 @@ public class DevListServiceImpl implements IDevListService {
     public List<DevList> selectDevNotConfig() {
         return devListMapper.selectDevNotConfig();
     }
+
+    /**
+     * app端查询硬件信息
+     * @param devList 硬件信息
+     * @return 结果
+     */
+    @Override
+    public List<DevList> appSelectDevList(DevList devList) {
+        return devListMapper.selectDevListList(devList);
+    }
 }

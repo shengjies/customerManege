@@ -61,6 +61,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          put_into_number,sign_time,sign_huor,abolish,wl_sign,make_type,work_price,pb_sign from dev_work_order
     </sql>
 
+
     <select id="selectDevWorkOrderList" parameterType="DevWorkOrder" resultMap="DevWorkOrderResult">
         <include refid="selectDevWorkOrderVo"/>
         <where>
@@ -88,11 +89,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="overtimeHour != null "> and overtime_hour = #{overtimeHour}</if>
             <if test="overtimeRace != null "> and overtime_race = #{overtimeRace}</if>
             <if test="manualTime != null "> and manual_time = #{manualTime}</if>
-            <if test="workorderStatus != null "> and workorder_status = #{workorderStatus}</if>
+            <if test="workorderStatus != null and workorderStatus > -1"> and workorder_status = #{workorderStatus}</if>
             <if test="operationStatus != null "> and operation_status = #{operationStatus}</if>
             <if test="initDate != null "> and init_date = #{initDate}</if>
             <if test="workSign != null "> and work_sign = #{workSign}</if>
             <if test="scrapNum != null "> and scrap_num = #{scrapNum}</if>
+            <if test="wlSign != null "> and wl_sign = #{wlSign}</if>
             <if test="actualWarehouseNum != null "> and actual_warehouse_num = #{actualWarehouseNum}</if>
             <if test="abolish != null and abolish > -1"> and abolish = #{abolish}</if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
@@ -299,7 +301,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDayWorkOrder" resultMap="DevWorkOrderResult">
       select id, workorder_number,  operation_status FROM
       dev_work_order where wl_sign = #{wlSign} and company_id= #{company_id} and line_id = #{line_id}
-      and production_start = date_format(now(),'%y%m%d');
+      and production_start BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00')  AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59');
     </select>
 
     <!--查询当天所有的排班计划-->
@@ -426,5 +428,36 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT a.*  FROM dev_work_order as a,tab_single_work_order as b where a.id = b.work_id
             and a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
             and b.single_id = #{singleId} and a.workorder_status = #{workStatus} order by a.end_time desc limit 1
+    </select>
+
+
+    <resultMap type="DevWorkOrder" id="WorkOrderResultByCode">
+        <result property="id"    column="id"    />
+        <result property="workorderNumber"    column="workorder_number"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productNumber"    column="product_number"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="makeType"    column="make_type"    />
+        <association property="lineName" column="line_id" select="selectLineName">
+            <result property="lineName" column="id"/>
+        </association>
+    </resultMap>
+    <!--查询产线名称-->
+    <select id="selectLineName" resultType="java.lang.String">
+        select line_name from dev_production_line where id = #{lineId}
+    </select>
+    <sql id="selectWorkCodeVo">
+        select id,workorder_number,line_id,product_code,product_name,start_time,end_time from dev_work_order
+    </sql>
+    <!--通过工单号查询工单信息-->
+    <select id="selectWorkOrderByCode" resultMap="WorkOrderResultByCode">
+        select workorder_number,line_id,product_code,product_name,product_number,start_time,end_time,make_type from dev_work_order where workorder_number = #{workCode}
+    </select>
+
+    <select id="appSelectWorkListTwo" resultMap="DevWorkOrderResult">
+
     </select>
 </mapper>

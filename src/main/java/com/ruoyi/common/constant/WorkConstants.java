@@ -129,4 +129,17 @@ public class WorkConstants {
     public final static Integer PB_SIGN_YES =0;
     public final static Integer PB_SIGN_NO =1;
 
+    /**
+     * 工单异常类型 是否唯一的返回结果
+     */
+    public final static String EXC_TYPE_NAME_UNIQUE = "0";
+    public final static String EXC_TYPE_NAME_NOT_UNIQUE = "1";
+
+    /**
+     * 工单是否有ECN标记
+     * 0、无ECN，1、有ECN
+     */
+    public final static Integer ECN_STATUS_NO = 0;
+    public final static Integer ECN_STATUS_YES = 1;
+
 }

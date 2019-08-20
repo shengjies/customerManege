@@ -43,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
             AND date_format(cp_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
         </if>
-        group by cp_user_id,cp_date order by cp_date desc
+        group by cp_user_id order by cp_date desc
     </select>
 
     <!--查询计件明细列表-->

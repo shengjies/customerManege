@@ -1,31 +1,26 @@
 package com.ruoyi.project.device.devList.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.device.devList.domain.DevList;
+import com.ruoyi.project.device.devList.service.IDevListService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.device.devList.domain.DevList;
-import com.ruoyi.project.device.devList.service.IDevListService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 硬件 信息操作处理
@@ -221,4 +216,28 @@ public class DevListController extends BaseController
 		map.put("code",devListService.selectAll(request.getCookies()));
 		return map;
 	}
+
+
+
+	/******************************************************************************************************
+	 *********************************** app端硬件交互逻辑 *************************************************
+	 ******************************************************************************************************/
+
+	/**
+	 * app端查询硬件列表
+	 */
+	@PostMapping("/applist")
+	@ResponseBody
+	public AjaxResult appSelectDevList(@RequestBody DevList devList){
+		try {
+			if (devList != null) {
+				devList.appStartPage();
+				return AjaxResult.success(devListService.appSelectDevList(devList));
+			}
+			return error();
+		} catch (Exception e) {
+			return AjaxResult.error();
+		}
+	}
+
 }

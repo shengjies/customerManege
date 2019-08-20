@@ -1,18 +1,19 @@
 package com.ruoyi.project.production.workExceptionType.service;
 
-import java.util.Date;
-import java.util.List;
-
+import com.ruoyi.common.constant.WorkConstants;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
+import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
 import com.ruoyi.project.system.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.project.production.workExceptionType.mapper.WorkExceptionTypeMapper;
-import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
-import com.ruoyi.common.support.Convert;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 工单工单异常类型 服务层实现
@@ -92,5 +93,26 @@ public class WorkExceptionTypeServiceImpl implements IWorkExceptionTypeService {
      */
     public List<WorkExceptionType> findExceTypeAll(Cookie[] cookies){
         return workExceptionTypeMapper.findExceTypeAll(JwtUtil.getTokenCookie(cookies).getCompanyId());
+    }
+
+    /**
+     * 校验异常类型名称的唯一性
+     * @param workExceptionType 异常类型对象
+     * @return 结果
+     */
+    @Override
+    public String checkExcTypeNameUnique(WorkExceptionType workExceptionType) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return WorkConstants.EXC_TYPE_NAME_NOT_UNIQUE;
+        }
+        String typeName = workExceptionType.getTypeName();
+        if (StringUtils.isNotEmpty(typeName)) {
+            WorkExceptionType excTypeUnique = workExceptionTypeMapper.selectByCompanyAndTypeName(user.getCompanyId(), typeName);
+            if (StringUtils.isNotNull(excTypeUnique) && !excTypeUnique.getId().equals(workExceptionType.getId())) {
+                return WorkConstants.EXC_TYPE_NAME_NOT_UNIQUE;
+            }
+        }
+        return WorkConstants.EXC_TYPE_NAME_UNIQUE;
     }
 }

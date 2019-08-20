@@ -206,4 +206,21 @@ public class IsoController extends BaseController {
         return AjaxResult.error();
     }
 
+
+    /******************************************************************************************************
+     *********************************** app端ISO文件系统交互 **********************************************
+     ******************************************************************************************************/
+
+    /**
+     * app端查看ISO文件系统
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectList(@RequestBody Iso iso){
+        try {
+            return AjaxResult.success("请求成功",isoService.appSelectList(iso));
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
 }

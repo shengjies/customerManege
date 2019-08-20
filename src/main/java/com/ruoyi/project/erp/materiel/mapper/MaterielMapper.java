@@ -111,9 +111,16 @@ public interface MaterielMapper {
     List<Materiel> selectAllMatNameByComId(@Param("companyId") Integer companyId);
 
     /**
-     * 查询未配置的物料信息
-     * @param ids 物料编码
+     * 查询对应MES未配置的物料信息
+     * @param ruleId 规则id
      * @return 结果
      */
-    List<Materiel> selectMaterielByMatCodes(String[] ids);
+    List<Materiel> selectMaterielByMesNotCof(@Param("ruleId") Integer ruleId);
+
+    /**
+     * app查询物料信息
+     * @param materiel 物料对象
+     * @return 结果
+     */
+    List<Materiel> appSelectMaterielList(Materiel materiel);
 }

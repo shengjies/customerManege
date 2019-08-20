@@ -51,10 +51,10 @@
                shiro:hasPermission="production:workExceptionList:edit">
                 <i class="fa fa-edit"></i> 修改
             </a>
-            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"
-               shiro:hasPermission="production:workExceptionList:remove">
-                <i class="fa fa-remove"></i> 删除
-            </a>
+            <!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"-->
+               <!--shiro:hasPermission="production:workExceptionList:remove">-->
+                <!--<i class="fa fa-remove"></i> 删除-->
+            <!--</a>-->
             <a class="btn btn-warning" onclick="$.table.exportExcel()"
                shiro:hasPermission="production:workExceptionList:export">
                 <i class="fa fa-download"></i> 导出
@@ -81,6 +81,8 @@
             modalName: "各个工单异常情况记录",
             search: false,
             showExport: true,
+            sortName:'createTime',
+            sortOrder:'desc',
             columns: [{
                 checkbox: true
             },
@@ -143,10 +145,10 @@
                         var actions = [];
                         if (row.exceStatut == 2) { // 异常工单已经处理完成，不能进行编辑和操作
                             actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" disabled="true"><i></i>编辑</a> ');
-                            actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" disabled="true"><i></i>删除</a>');
+                            // actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" disabled="true"><i></i>删除</a>');
                         } else {
                             actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i></i>编辑</a> ');
-                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a>');
+                            // actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a>');
                         }
                         return actions.join('');
                     }

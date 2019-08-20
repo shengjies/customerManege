@@ -144,4 +144,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          SELECT a.*,b.type_name as typeName FROM dev_work_exception_list as a,
           dev_work_exception_type as b where a.exce_type = b.id  and work_id = #{wid};
     </select>
+
+    <!--app端查询工单异常列表-->
+    <select id="appSelectWorkExcList" parameterType="WorkExceptionList" resultType="com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList">
+        SELECT c.workorder_number as workorderNumber,a.remark as remark,b.type_name as typeName,a.create_time as createTime,
+        a.handle_user as handleUser,a.handle_content as handleContent,
+        a.exce_statut as exceStatut,a.handle_time as handleTime
+        FROM dev_work_exception_list as a,dev_work_exception_type as b,dev_work_order as c
+        where a.exce_type = b.id and a.work_id = c.id;
+    </select>
 </mapper>

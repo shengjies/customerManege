@@ -1,32 +1,29 @@
 package com.ruoyi.project.erp.materiel.controller;
 
-import java.util.List;
-
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
-import com.ruoyi.project.erp.materielSupplier.service.IMaterielSupplierService;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.erp.materiel.domain.Materiel;
+import com.ruoyi.project.erp.materiel.service.IMaterielService;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.service.IImportConfigService;
+import com.ruoyi.project.system.menu.service.IMenuService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.erp.materiel.domain.Materiel;
-import com.ruoyi.project.erp.materiel.service.IMaterielService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 物料 信息操作处理
@@ -41,9 +38,6 @@ public class MaterielController extends BaseController {
 
     @Autowired
     private IMaterielService materielService;
-
-//    @Autowired
-//    private IMaterielSupplierService materielSupplierService; // 物料供应商管理服务
 
     @Autowired
     private IImportConfigService configService;
@@ -96,7 +90,6 @@ public class MaterielController extends BaseController {
         try {
             message = materielService.importMateriel(file, updateSupport,2);
         } catch (Exception e) {
-//            e.printStackTrace();
             return AjaxResult.error(e.getMessage());
         }
         return AjaxResult.success(message);
@@ -238,5 +231,33 @@ public class MaterielController extends BaseController {
     public String checkMaterielCodeUnique(Materiel materiel,HttpServletRequest request){
         materiel.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
         return materielService.checkMaterielCodeUnique(materiel);
+    }
+
+    /******************************************************************************************************
+     *********************************** app物料交互逻辑 ***************************************************
+     ******************************************************************************************************/
+
+    @Autowired
+    private IMenuService menuService;
+    /**
+     * app端查询物料信息
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectMaterielList(@RequestBody Materiel materiel,HttpServletRequest request){
+        try {
+            if (materiel != null) {
+                materiel.appStartPage();
+                Map<String,Object> map = new HashMap<>(16);
+                if (materiel.getUid() != null && materiel.getmParentId() != null) {
+                    map.put("menuList",menuService.selectMenuListByParentId(materiel.getUid(),materiel.getmParentId()));
+                }
+                map.put("materielList",materielService.selectMaterielList(materiel,request));
+                return AjaxResult.success("请求成功",map);
+            }
+            return error();
+        } catch (Exception e) {
+            return AjaxResult.error("请求失败");
+        }
     }
 }

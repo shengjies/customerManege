@@ -32,12 +32,13 @@ public interface DevProductListMapper {
 
     /**
      * 根据公司 产品/半成品编码 查询信息
+     *
      * @param company_id
      * @param code
      * @param sign
      * @return
      */
-    DevProductList selectDevProductByCodeAndSign(@Param("company_id") int company_id, @Param("code") String code,@Param("sign")int sign);
+    DevProductList selectDevProductByCodeAndSign(@Param("company_id") int company_id, @Param("code") String code, @Param("sign") int sign);
 
     /**
      * 查询产品管理列表
@@ -89,10 +90,11 @@ public interface DevProductListMapper {
      * @return
      */
 //    @DataSource(value = DataSourceType.SLAVE)
-    List<DevProductList> selectProductAllByCompanyId(@Param("companyId") Integer companyId,@Param("sign")int sign);
+    List<DevProductList> selectProductAllByCompanyId(@Param("companyId") Integer companyId, @Param("sign") int sign);
 
     /**
      * 通过产品id查询产品信息
+     *
      * @param productId 产品id
      * @return 产品信息
      */
@@ -100,6 +102,7 @@ public interface DevProductListMapper {
 
     /**
      * 通过产品编码查询产品信息
+     *
      * @param productCode 产品编码
      * @return 产品信息
      */
@@ -108,8 +111,9 @@ public interface DevProductListMapper {
 
     /**
      * 查询产品编码是否为一
+     *
      * @param productCode 产品编码
-     * @param companyId 公司id
+     * @param companyId   公司id
      * @return 查询结果数量
      */
 //    @DataSource(value = DataSourceType.SLAVE)
@@ -117,6 +121,7 @@ public interface DevProductListMapper {
 
     /**
      * 查询客户关联的产品
+     *
      * @param pid 产品编号集合
      * @return
      */
@@ -125,48 +130,54 @@ public interface DevProductListMapper {
 
     /**
      * 根据订单id查询对应的产品信息
+     *
      * @param orderId 订单id
      * @return
      */
 //    @DataSource(DataSourceType.ERP)
-    List<DevProductList> findProductByOrderId(@Param("orderId")int orderId);
+    List<DevProductList> findProductByOrderId(@Param("orderId") int orderId);
 
     /**
      * 根据产品编码查询对应公司的产品信息
-     * @param companyId 公司id
+     *
+     * @param companyId   公司id
      * @param productCode 产品编码
      * @return
      */
 //    @DataSource(DataSourceType.SLAVE)
-    DevProductList findByCompanyIdAndProductCode(@Param("companyId")int companyId,
-                                                 @Param("productCode")String productCode);
+    DevProductList findByCompanyIdAndProductCode(@Param("companyId") int companyId,
+                                                 @Param("productCode") String productCode);
 
     /**
      * 查询产品名称信息
+     *
      * @param companyId 公司id
      * @return 结果
      */
 //    @DataSource(value = DataSourceType.SLAVE)
-    List<DevProductList> selectProNameAllByComId(@Param("companyId") Integer companyId,@Param("sign")int sign);
+    List<DevProductList> selectProNameAllByComId(@Param("companyId") Integer companyId, @Param("sign") int sign);
 
     /**
      * 根据产线id查询所以未配置的产品信息
+     *
      * @param lineId 产线id
      * @param sopTag sop配置标记流水线或者车间
      * @return 结果
      */
-    List<DevProductList> selectNotConfigByLineId(@Param("lineId")int lineId,@Param("companyid")int companyid,@Param("sopTag") int sopTag);
+    List<DevProductList> selectNotConfigByLineId(@Param("lineId") int lineId, @Param("companyid") int companyid, @Param("sopTag") int sopTag);
 
     /**
      * 根据作业指导书id查询所有配置的产品信息
-     * @param isoId 作业指导书id
+     *
+     * @param isoId     作业指导书id
      * @param companyId 公司id
      * @return 结果
      */
-    List<DevProductList> selectNotConfigByIsoId(@Param("isoId") Integer isoId,@Param("companyId") Integer companyId);
+    List<DevProductList> selectNotConfigByIsoId(@Param("isoId") Integer isoId, @Param("companyId") Integer companyId);
 
     /**
      * 查询公司的所有产品信息包括半成品
+     *
      * @param companyId 公司id
      * @return 结果
      */
@@ -174,14 +185,16 @@ public interface DevProductListMapper {
 
     /**
      * 修改对应的产品MES规则
-     * @param id 产品/半成品id
+     *
+     * @param id     产品/半成品id
      * @param ruleId 规则id
      * @return
      */
-    int saveMesRuleConfig(@Param("id")int id,@Param("ruleId")int ruleId);
+    int saveMesRuleConfig(@Param("id") int id, @Param("ruleId") int ruleId);
 
     /**
      * 查看mes规格配置明细
+     *
      * @param productList 产品
      * @return 结果
      */
@@ -189,9 +202,26 @@ public interface DevProductListMapper {
 
     /**
      * 通过配置规则id查询配置的产品信息
+     *
      * @param companyId 公司id
-     * @param ruleId 追踪规格id
+     * @param ruleId    追踪规格id
      * @return 结果
      */
-    List<DevProductList> selectDevProductByRuleId(@Param("companyId") Integer companyId,@Param("ruleId") Integer ruleId);
+    List<DevProductList> selectDevProductByRuleId(@Param("companyId") Integer companyId, @Param("ruleId") Integer ruleId);
+
+    /**
+     * 通过标记查询半成品或者成品信息
+     *
+     * @param sign 半成品成品标记
+     * @return 结果
+     */
+    List<DevProductList> selectProAllBySign(Integer sign);
+
+    /**
+     * 查询MES配置规则未配置的半成品信息
+     *
+     * @param ruleId MES规则id
+     * @return 结果
+     */
+    List<DevProductList> selectPartListByMesNotCof(@Param("ruleId") Integer ruleId);
 }

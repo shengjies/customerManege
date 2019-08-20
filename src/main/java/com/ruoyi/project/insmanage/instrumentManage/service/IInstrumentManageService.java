@@ -64,10 +64,10 @@ public interface IInstrumentManageService
 
 	/**
 	 * 校验设备编码唯一性
-	 * @param imCode 设备编号
+	 * @param instrumentManage 设备
 	 * @return 结果
 	 */
-    String checkImCodeUnique(String imCode);
+    String checkImCodeUnique(InstrumentManage instrumentManage);
 
 	/**
 	 * 导入仪器设备
@@ -82,4 +82,11 @@ public interface IInstrumentManageService
 	 * @return 结果
 	 */
 	public List<InstrumentManage> selectAllIm(Integer imStatus,Integer imTag);
+
+	/**
+	 * app端查询设备列表
+	 * @param instrumentManage 设备对象
+	 * @return 结果
+	 */
+	public List<InstrumentManage> appSelectList(InstrumentManage instrumentManage);
 }

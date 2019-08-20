@@ -351,6 +351,9 @@ public class IsoServiceImpl implements IIsoService {
         if (devList == null || devList.getCompanyId() == null) {
             throw new BusinessException("硬件不存在或未归属公司");
         }
+        if (devList.getDeviceStatus().equals(DevConstants.DEV_STATUS_NO)) {
+            throw new BusinessException("硬件被禁用");
+        }
         if (devList.getDevType() == null || devList.getSign().equals(DevConstants.DEV_SIGN_NOT_USE)) {
             throw new BusinessException("硬件未被配置");
         }
@@ -476,5 +479,15 @@ public class IsoServiceImpl implements IIsoService {
     @Override
     public List<Iso> selectNotConfigBySwId(int parentId, int lineId) {
         return null;
+    }
+
+    /**
+     * app端查询ISO文件系统
+     * @param iso 文件体系对象
+     * @return 结果
+     */
+    @Override
+    public List<Iso> appSelectList(Iso iso) {
+        return isoMapper.selectIsoList(iso);
     }
 }

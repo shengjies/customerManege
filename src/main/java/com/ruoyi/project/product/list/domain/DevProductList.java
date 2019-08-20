@@ -1,11 +1,8 @@
 package com.ruoyi.project.product.list.domain;
 
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
-import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
-import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+import com.ruoyi.project.erp.productCustomer.domain.ProductCustomer;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -98,9 +95,9 @@ public class DevProductList extends BaseEntity {
      */
     private ProductCustomer productCustomer;
     /**
-     * 封装产品文件信息
+     * 是否上传文件标记
      */
-    private FileSourceInfo fileSourceInfo;
+    private Integer fileFlag;
     /**
      * 库存良品数量
      */
@@ -115,6 +112,52 @@ public class DevProductList extends BaseEntity {
     /** 规格id */
     private Integer ruleId;
 
+    /*******************  app交互参数 *******************/
+    private Integer uid; // app在线用户id
+    private Integer mParentId; // 菜单父id
+    private Integer menuList;
+    private String devCode; //设备编号
+    private String devType; //设备类型
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public Integer getmParentId() {
+        return mParentId;
+    }
+
+    public void setmParentId(Integer mParentId) {
+        this.mParentId = mParentId;
+    }
+
+    public Integer getMenuList() {
+        return menuList;
+    }
+
+    public void setMenuList(Integer menuList) {
+        this.menuList = menuList;
+    }
+
+    public String getDevCode() {
+        return devCode;
+    }
+
+    public void setDevCode(String devCode) {
+        this.devCode = devCode;
+    }
+
+    public String getDevType() {
+        return devType;
+    }
+
+    public void setDevType(String devType) {
+        this.devType = devType;
+    }
 
     public Integer getEcnType() {
         return ecnType;
@@ -131,12 +174,13 @@ public class DevProductList extends BaseEntity {
     public void setGoodNumber(Integer goodNumber) {
         this.goodNumber = goodNumber;
     }
-    public FileSourceInfo getFileSourceInfo() {
-        return fileSourceInfo;
+
+    public Integer getFileFlag() {
+        return fileFlag;
     }
 
-    public void setFileSourceInfo(FileSourceInfo fileSourceInfo) {
-        this.fileSourceInfo = fileSourceInfo;
+    public void setFileFlag(Integer fileFlag) {
+        this.fileFlag = fileFlag;
     }
 
     public ProductCustomer getProductCustomer() {
@@ -323,9 +367,9 @@ public class DevProductList extends BaseEntity {
                 ", comName='" + comName + '\'' +
                 ", productCode='" + productCode + '\'' +
                 ", productModel='" + productModel + '\'' +
-                ", price=" + price +
-                ", priceImport=" + priceImport +
                 ", productName='" + productName + '\'' +
+                ", priceImport=" + priceImport +
+                ", price=" + price +
                 ", standardHourYield=" + standardHourYield +
                 ", remark='" + remark + '\'' +
                 ", createTime=" + createTime +
@@ -336,6 +380,13 @@ public class DevProductList extends BaseEntity {
                 ", imgSize=" + imgSize +
                 ", ecnStatus=" + ecnStatus +
                 ", ecnText='" + ecnText + '\'' +
+                ", ecnType=" + ecnType +
+                ", productCustomer=" + productCustomer +
+                ", fileFlag=" + fileFlag +
+                ", goodNumber=" + goodNumber +
+                ", sign=" + sign +
+                ", unit='" + unit + '\'' +
+                ", ruleId=" + ruleId +
                 '}';
     }
 }

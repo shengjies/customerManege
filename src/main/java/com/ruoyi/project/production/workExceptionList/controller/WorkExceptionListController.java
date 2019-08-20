@@ -1,27 +1,22 @@
 package com.ruoyi.project.production.workExceptionList.controller;
 
-import java.util.List;
-
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
+import com.ruoyi.project.production.workExceptionList.service.IWorkExceptionListService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.production.workExceptionList.domain.WorkExceptionList;
-import com.ruoyi.project.production.workExceptionList.service.IWorkExceptionListService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 各个工单异常情况记录 信息操作处理
@@ -97,8 +92,12 @@ public class WorkExceptionListController extends BaseController {
     @Log(title = "各个工单异常情况记录", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(WorkExceptionList workExceptionList,HttpServletRequest request) {
-        return toAjax(workExceptionListService.insertWorkExceptionList(workExceptionList,request));
+    public AjaxResult addSave(WorkExceptionList workExceptionList) {
+        try {
+            return toAjax(workExceptionListService.insertWorkExceptionList(workExceptionList));
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
     }
 
     /**
@@ -168,6 +167,27 @@ public class WorkExceptionListController extends BaseController {
     @ResponseBody
     public AjaxResult finishWorkExcp(Integer id) {
         return toAjax(workExceptionListService.finishWorkExcp(id));
+    }
+
+
+    /******************************************************************************************************
+     *********************************** app端工单异常信息交互逻辑 *****************************************
+     ******************************************************************************************************/
+    /**
+     * app端查看工单信息记录信息
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectWorkExcList(@RequestBody WorkExceptionList workExceptionList){
+        try {
+            if (workExceptionList != null) {
+                workExceptionList.appStartPage();
+                return AjaxResult.success("请求成功",workExceptionListService.appSelectWorkExcList(workExceptionList));
+            }
+            return error();
+        } catch (Exception e) {
+            return AjaxResult.error("请求失败");
+        }
     }
 
 }

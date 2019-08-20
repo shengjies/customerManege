@@ -50,6 +50,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              </if>
          </where>
     </select>
+
+    <!--app端查询物料信息-->
+    <select id="appSelectMaterielList" parameterType="Materiel" resultMap="MaterielResult">
+        <include refid="selectMaterielVo"/>
+        <where>
+            <if test="id != null "> and id = #{id}</if>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="materielCode != null  and materielCode != '' ">
+                and materiel_code like concat (#{materielCode},'%')
+            </if>
+            <if test="materielName != null  and materielName != '' "> and materiel_name = #{materielName}</if>
+            <if test="materielModel != null  and materielModel != '' ">
+                and materiel_model like concat (#{materielModel},'%')
+            </if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="materielImg != null  and materielImg != '' "> and materiel_img = #{materielImg}</if>
+            <if test="imgSize != null "> and img_size = #{imgSize}</if>
+            <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+            <if test="createId != null "> and create_id = #{createId}</if>
+            <if test="createName != null  and createName != '' "> and create_name = #{createName}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
     
     <select id="selectMaterielById" parameterType="Integer" resultMap="MaterielResult">
         <include refid="selectMaterielVo"/>
@@ -161,10 +189,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!--查询未配置对应规则的物料信息-->
-    <select id="selectMaterielByMatCodes" parameterType="String"  resultMap="MaterielResult">
-        select * from tab_materiel where materiel_code not in
-        <foreach item="item" collection="array" open="(" separator="," close=")">
-            #{item}
-        </foreach>
+    <select id="selectMaterielByMesNotCof" parameterType="Integer" resultMap="MaterielResult">
+        SELECT a.* FROM tab_materiel as a left join
+        (SELECT * from tab_mes_batch_rule_detail where rule_id = #{ruleId} and d_type = 2) as b
+        on a.materiel_code = b.d_code where b.d_code is null
     </select>
 </mapper>

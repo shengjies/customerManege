@@ -1,7 +1,5 @@
 package com.ruoyi.project.production.ecnLog.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.production.ecnLog.domain.EcnLog;
 import org.apache.ibatis.annotations.Param;
 
@@ -76,4 +74,27 @@ public interface EcnLogMapper
 	 */
 //	@DataSource(value = DataSourceType.SLAVE)
 	public int deleteEcnLogByIds(String[] ids);
+
+	/**
+	 * 查询对应ecn有效的变更记录信息
+	 * @param ecnType 保存类型
+	 * @param saveId 对应类型的id
+	 * @return 结果
+	 */
+    EcnLog selectEcnLogBySaveId(@Param("ecnType") int ecnType,@Param("saveId") int saveId);
+
+	/**
+	 * 取消ECN
+	 * @param id ecn主键
+	 * @return 结果
+	 */
+	int cancelEcn(@Param("id") int id);
+
+	/**
+	 * 更新ECN状态
+	 * @param id ecn主键
+	 * @param ecnStatus ecn状态
+	 * @return 结果
+	 */
+	int updateEcnStatus(@Param("id") int id, @Param("ecnStatus") int ecnStatus);
 }

@@ -97,4 +97,11 @@ public interface IDevListService
 	 * @return
 	 */
 	List<DevList> selectDevNotConfig();
+
+	/**
+	 * app端查询硬件列表
+	 * @param devList 硬件信息
+	 * @return 结果
+	 */
+	List<DevList> appSelectDevList(DevList devList);
 }

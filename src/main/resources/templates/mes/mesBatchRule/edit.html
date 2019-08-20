@@ -13,23 +13,27 @@
 				</div>
 			</div>
 			<div class="form-group">	
-				<label class="col-sm-3 control-label">规格类型：</label>
+				<label class="col-sm-3 control-label">配置类型：</label>
 				<div class="col-sm-8">
-					<select id="pType" name="pType" class="form-control" th:field="*{pType}">
-						<option value="-1">请选择</option>
-						<option value="0">成品</option>
-						<option value="1">半成品</option>
-					</select>
+					<!--<select id="pType" name="pType" class="form-control" th:field="*{pType}" onchange="changeCofType(this)">-->
+						<!--<option value="-1">请选择</option>-->
+						<!--<option value="0">成品</option>-->
+						<!--<option value="1">半成品</option>-->
+					<!--</select>-->
+					<input type="hidden" name="pType" id="pType" th:field="*{pType}">
+					<input type="text"  class="form-control" th:value="${mesBatchRule.pType == 0 ?'成品':'半成品'}" readonly="readonly">
 				</div>
 			</div>
 			<div class="form-group">	
-				<label class="col-sm-3 control-label">物料编码：</label>
+				<label class="col-sm-3 control-label">关联编码：</label>
 				<div class="col-sm-8">
 					<select style="width: 100%" id="materiels" name="materiels" multiple="multiple" class="form-control">
-						<option th:each="m:${mesBatchRule.materielList}"
-								selected  th:text="${m}" th:value="${m}"></option>
+						<option th:if="${not #lists.isEmpty(mesBatchRule.mesBatchRuleDetails) && (mesBatchRule.mesBatchRuleDetails).size() > 0}" th:each="item:${mesBatchRule.mesBatchRuleDetails}"
+								th:text="${item.dCode}" th:value="${item.dCode}" selected></option>
 						<option th:if="${not #lists.isEmpty(mesBatchRule.notMaterielList) && (mesBatchRule.notMaterielList).size() > 0}" th:each="item:${mesBatchRule.notMaterielList}"
 								th:text="${item.materielCode}" th:value="${item.materielCode}"></option>
+						<option th:if="${not #lists.isEmpty(mesBatchRule.notPartlList) && (mesBatchRule.notPartlList).size() > 0}" th:each="item:${mesBatchRule.notPartlList}"
+								th:text="${item.productCode}" th:value="${item.productCode}"></option>
 					</select>
 				</div>
 
@@ -38,6 +42,9 @@
     </div>
     <div th:include="include::footer"></div>
     <script type="text/javascript">
+		$(function () {
+			$("#pType").select2("disable",true);
+		})
 		var prefix = ctx + "mes/mesBatchRule";
 		$("#form-mesBatchRule-edit").validate({
 			rules:{
@@ -68,19 +75,44 @@
 				}
 			}
 		});
+
+		/**
+		 * 配置类型改变关联信息更新
+		 */
+		function changeCofType(val) {
+			var item = [];
+			$("#materiels").find("option").remove();
+			var pType = val.value;
+			if (pType > -1) {
+				$.post(prefix + "/selectPType",{"pType":pType},function (res) {
+					if (res.code == web_status.SUCCESS) {
+						var mat = res.data.matList;
+						for (var i = 0; i < mat.length; i++) {
+							item.push("<option value='" + mat[i].materielCode + "'>" + mat[i].materielCode + "</option>")
+						}
+						var parts = res.data.parList;
+						for (var j = 0; j < parts.length; j++) {
+							item.push("<option value='" + parts[j].productCode + "'>" + parts[j].productCode + "</option>")
+						}
+						$("#materiels").append(item); // 添加
+					}
+				})
+			} else {
+				$("#materiels option").remove();
+			}
+		}
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
 				var pType = $("#pType").find("option:selected").val();
 				if (pType <= -1) {
-					$.modal.alertWarning("请选择规格类型");
+					$.modal.alertWarning("请选择配置类型");
 					return;
 				}
-				console.log(pType);
 				//验证产品编码
 				var matSelect = $("#materiels").find("option:selected");
 				if($(matSelect).size() <= 0){
-					$.modal.alertWarning("请选择物料编码");
+					$.modal.alertWarning("请选择关联编码");
 					return;
 				}
 	            $.operate.save(prefix + "/edit", $('#form-mesBatchRule-edit').serialize());

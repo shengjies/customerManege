@@ -68,6 +68,7 @@
             exportUrl: prefix + "/export",
             modalName: "计件信息",
             search: false,
+            showFooter: true,
             showExport: false,
             showSearch:true,
             showRefresh:true,
@@ -79,20 +80,21 @@
                     title: '计件管理主键id',
                     visible: false
                 },
-                {
-                    field: 'cpDate',
-                    title: '计件日期',
-                    sortable: true,
-                    formatter: function (value, row, index) {
-                        var date = new Date(row.cpDate);
-                        var y = date.getFullYear();
-                        var m = date.getMonth() + 1;
-                        var d = date.getDate();
-                        // return y + '-' +m + '-' + d;
-                        return '<i class="fa fa-calendar" aria-hidden="true"></i> <a  href="javascript:void(0)" onclick="showDetaiByCpDate(\'' + y + '-' + m + '-' + d + '\')">' +
-                            '<span style="font-weight: bold;color: blue">' + y + '-' + m + '-' + d + '</span></a>';
-                    }
-                },
+                // {
+                //     field: 'cpDate',
+                //     title: '计件日期',
+                //     sortable: true,
+                //     formatter: function (value, row, index) {
+                //         var date = new Date(row.cpDate);
+                //         var y = date.getFullYear();
+                //         var m = date.getMonth() + 1;
+                //         var d = date.getDate();
+                //         // return y + '-' +m + '-' + d;
+                //         return '<i class="fa fa-calendar" aria-hidden="true"></i> <a  href="javascript:void(0)" onclick="showDetaiByCpDate(\'' + y + '-' + m + '-' + d + '\')">' +
+                //             '<span style="font-weight: bold;color: blue">' + y + '-' + m + '-' + d + '</span></a>';
+                //     },
+                //
+                // },
                 {
                     field: 'cpUserId',
                     title: '计件归属人',
@@ -100,25 +102,35 @@
                     formatter: function (value, row, index) {
                         return '<i class="fa fa-user-circle-o" aria-hidden="true"></i> <a href="javascript:void(0)" onclick="showDetaiByUid(\'' + row.cpUserId + '\',\'' + row.cpUserName + '\')">' +
                             '<span style="font-weight: bold;color: green">' + row.cpUserName + '</span></a>';
+                    },
+                    footerFormatter:function () {
+                        return "<span style='font-weight: bold;color: #1E0FBE'>总金额<span>";
                     }
                 },
                 {
                     field: 'sumCpNumber',
-                    title: '当天个人计件总数',
+                    title: '个人计件总数',
                     formatter: function (value, row, index) {
                         return '<span style="font-weight: bold;color: #00a65a">' + row.sumCpNumber + '</span>'
                     }
                 },
                 {
                     field: 'sumTotalPrice',
-                    title: '当天个人计件总价',
+                    title: '个人计件总价',
                     formatter: function (value, row, index) {
                         return '<span style="font-weight: bold;color:#e08e0b">' + row.sumTotalPrice + '</span>'
+                    },
+                    footerFormatter:function (value) {
+                        var sumBalance = 0;
+                        for (var i in value) {
+                            sumBalance += parseInt(value[i].sumTotalPrice);
+                        }
+                        return '<span style="font-weight: bold;color: #1E0FBE">' + sumBalance + '</span>';
                     }
                 },
                 {
                     field: 'sumCpBadNumber',
-                    title: '当天个人计件不良品数',
+                    title: '个人计件不良品数',
                     formatter: function (value, row, index) {
                         return '<span style="font-weight: bold;color:red">' + row.sumCpBadNumber + '</span>'
                     }

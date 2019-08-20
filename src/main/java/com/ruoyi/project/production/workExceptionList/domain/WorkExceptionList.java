@@ -1,10 +1,9 @@
 package com.ruoyi.project.production.workExceptionList.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.framework.web.domain.BaseEntity;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.workExceptionType.domain.WorkExceptionType;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import com.ruoyi.framework.web.domain.BaseEntity;
 
 import java.util.Date;
 
@@ -17,6 +16,7 @@ import java.util.Date;
 public class WorkExceptionList extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
+    private Integer uid;
     /**
      * 工单异常主键ID
      */
@@ -60,6 +60,7 @@ public class WorkExceptionList extends BaseEntity {
     /**
      * 处理时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date handleTime;
     /**
      * 处理的备注信息
@@ -70,6 +71,14 @@ public class WorkExceptionList extends BaseEntity {
     private String exce;//异常处理
     private String typeName;//异常类型
     private String workorderNumber;//工单号
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;

@@ -58,6 +58,18 @@ public class DevList extends BaseEntity
 	private Integer sign;//标记硬件是否配置 0、未配置 1、已经配置
 	/** 硬件配置对象车间或者流水线 0、车间，1、流水线 */
 	private Integer devType;
+	/**
+	 * app端交互设备类型字段，硬件需要特别判断，其他情况该字段显示为devType
+	 */
+	private String deviceType;
+
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
 
 	public Integer getDevType() {
 		return devType;

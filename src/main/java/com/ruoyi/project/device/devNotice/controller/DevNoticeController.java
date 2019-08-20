@@ -1,26 +1,22 @@
 package com.ruoyi.project.device.devNotice.controller;
 
-import java.util.List;
-
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.device.devNotice.domain.DevNotice;
+import com.ruoyi.project.device.devNotice.service.IDevNoticeService;
+import com.ruoyi.project.system.notice.domain.NoticeApp;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.project.device.devNotice.domain.DevNotice;
-import com.ruoyi.project.device.devNotice.service.IDevNoticeService;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 公司消息通知 信息操作处理
@@ -140,4 +136,22 @@ public class DevNoticeController extends BaseController {
         return toAjax(devNoticeService.publishEnd(id));
     }
 
+
+
+    /******************************************************************************************************
+     *********************************** app端消息交互接口 *************************************************
+     ******************************************************************************************************/
+
+    /**
+     * app端查询公司发布的消息
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectNoticeList(@RequestBody NoticeApp noticeApp) {
+        if (noticeApp != null) {
+            noticeApp.appStartPage();
+            return AjaxResult.success("请求成功",devNoticeService.appSelectNoticeList());
+        }
+        return error();
+    }
 }

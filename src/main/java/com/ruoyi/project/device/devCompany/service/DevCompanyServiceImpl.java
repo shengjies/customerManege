@@ -1,23 +1,16 @@
 package com.ruoyi.project.device.devCompany.service;
 
 import com.ruoyi.common.constant.CompanyConstants;
-import com.ruoyi.common.feign.FeignUtils;
-import com.ruoyi.common.feign.company.CompanyApi;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.framework.config.RuoYiConfig;
-import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
-import feign.Feign;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
+import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,6 +23,9 @@ import java.util.List;
 public class DevCompanyServiceImpl implements IDevCompanyService {
     @Autowired
     private DevCompanyMapper devCompanyMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 查询公司信息
@@ -67,7 +63,7 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
     @Override
     public int insertDevCompany(DevCompany devCompany) {
         int row = devCompanyMapper.insertDevCompany(devCompany);
-        return  row;
+        return row;
     }
 
     /**
@@ -78,16 +74,7 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
      */
     @Override
     public int updateDevCompany(DevCompany devCompany, HttpServletRequest request) {
-//        devCompany.setCreateTime(null);
-//        CompanyApi companyApi = Feign.builder()
-//                .encoder(new GsonEncoder())
-//                .decoder(new GsonDecoder())
-//                .target(CompanyApi.class, FeignUtils.MAIN_PATH);
-//        HashMap<String, Object> result = companyApi.editCompanyInfo(devCompany, JwtUtil.getToken(request));
-//        if (Double.valueOf(result.get("code").toString()) == 0) {
-            return devCompanyMapper.updateDevCompany(devCompany);
-//        }
-//        return 0;
+        return devCompanyMapper.updateDevCompany(devCompany);
     }
 
     /**
@@ -124,5 +111,23 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
             return CompanyConstants.COM_NAME_NOT_UNIQUE;
         }
         return CompanyConstants.COM_NAME_UNIQUE;
+    }
+
+    /**
+     * 查询公司轮播图片
+     *
+     * @param uid 用户id
+     * @return 结果
+     */
+    @Override
+    public DevCompany appSelectComPicList(Integer uid) {
+        User user = userMapper.selectUserInfoById(uid);
+        if (user != null && user.getCompanyId() > 0) {
+            DevCompany company = devCompanyMapper.selectDevCompanyById(user.getCompanyId());
+            if (StringUtils.isNotNull(company)) {
+                return company;
+            }
+        }
+        return null;
     }
 }

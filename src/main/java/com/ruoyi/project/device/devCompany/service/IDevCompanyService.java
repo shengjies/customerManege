@@ -73,4 +73,11 @@ public interface IDevCompanyService
 	 * @return 结果
 	 */
 	String checkComNameUnique(DevCompany company);
+
+	/**
+	 * 查询公司轮播图片
+	 * @param uid 用户id
+	 * @return 结果
+	 */
+    DevCompany appSelectComPicList(Integer uid);
 }

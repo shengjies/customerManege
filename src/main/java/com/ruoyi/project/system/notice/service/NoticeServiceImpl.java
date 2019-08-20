@@ -1,12 +1,14 @@
 package com.ruoyi.project.system.notice.service;
 
-import java.util.List;
+import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.security.ShiroUtils;
+import com.ruoyi.project.system.notice.domain.Notice;
+import com.ruoyi.project.system.notice.mapper.NoticeMapper;
+import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ruoyi.common.utils.security.ShiroUtils;
-import com.ruoyi.project.system.notice.mapper.NoticeMapper;
-import com.ruoyi.project.system.notice.domain.Notice;
-import com.ruoyi.common.support.Convert;
+
+import java.util.List;
 
 /**
  * 公告 服务层实现
@@ -19,6 +21,9 @@ public class NoticeServiceImpl implements INoticeService
 {
     @Autowired
     private NoticeMapper noticeMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 查询公告信息
@@ -81,4 +86,5 @@ public class NoticeServiceImpl implements INoticeService
     {
         return noticeMapper.deleteNoticeByIds(Convert.toStrArray(ids));
     }
+
 }

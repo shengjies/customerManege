@@ -11,9 +11,13 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.service.IIsoService;
-import com.ruoyi.project.product.list.service.IDevProductListService;
+import com.ruoyi.project.iso.sopLine.domain.SopLine;
+import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
+import com.ruoyi.project.production.singleWork.service.ISingleWorkOrderService;
 import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
+import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +25,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 单工位数据 信息操作处理
@@ -39,9 +45,6 @@ public class SingleWorkController extends BaseController {
 
     @Autowired
     private IIsoService iIsoService;
-
-    @Autowired
-    private IDevProductListService productListService;
 
     @RequiresPermissions("production:singleWork:view")
     @GetMapping()
@@ -194,39 +197,115 @@ public class SingleWorkController extends BaseController {
     @GetMapping("/configSop")
     @RequiresPermissions("production:singleWork:configSop")
     public String configSop(Integer parentId, Integer id, ModelMap modelMap) {
-        modelMap.put("parentId",parentId);
-        modelMap.put("id",id);
+        modelMap.put("parentId", parentId);
+        modelMap.put("id", id);
         modelMap.put("sops", iIsoService.selectIsoByParentId(FileConstants.FOLDER_SOP));
         return prefix + "/configSop";
     }
 
-	/**
-	 * 根据id查询对应的
-	 * @param id
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping("/selectById")
-	public AjaxResult selectSingleById(int id){
-		try {
-			return AjaxResult.success(singleWorkService.selectSingleWorkByIdGetUser(id));
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		return AjaxResult.error();
-	}
+    /**
+     * 根据id查询对应的
+     *
+     * @param id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/selectById")
+    public AjaxResult selectSingleById(int id) {
+        try {
+            return AjaxResult.success(singleWorkService.selectSingleWorkByIdGetUser(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return AjaxResult.error();
+    }
 
     /**
      * 查询还未配置sop的车间单工位信息
      */
     @PostMapping("/selectNotConfigSop")
     @ResponseBody
-    public AjaxResult notCofigSop(int parentId,int sopId){
+    public AjaxResult notCofigSop(int parentId, int sopId) {
         User user = JwtUtil.getUser();
         if (user == null) {
             return error(UserConstants.NOT_LOGIN);
         }
-        List<SingleWork> singleWorkList = singleWorkService.selectNotConfigSop(user.getCompanyId(),parentId,sopId,FileConstants.SOP_TAG_SINGWORK);
-        return AjaxResult.success("success",singleWorkList);
+        List<SingleWork> singleWorkList = singleWorkService.selectNotConfigSop(user.getCompanyId(), parentId, sopId, FileConstants.SOP_TAG_SINGWORK);
+        return AjaxResult.success("success", singleWorkList);
+    }
+
+
+    /******************************************************************************************************
+     *********************************** app端单工位业务逻辑 ***********************************************
+     ******************************************************************************************************/
+
+    @Autowired
+    private ISopLineService sopLineService;
+
+    @Autowired
+    private IMenuService menuService;
+
+    @Autowired
+    private ISingleWorkOrderService singleWorkOrderService;
+
+    /**
+     * app端查询产线单工位式列表信息，首次请求parentId为0
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectSingWorkList(@RequestBody SingleWork singleWork) {
+        try {
+            if (singleWork != null) {
+                singleWork.appStartPage();
+                Map<String, Object> map = new HashMap<>(16);
+                if (singleWork.getUid() != null && singleWork.getmParentId() != null) {
+                    map.put("menuList", menuService.selectMenuListByParentId(singleWork.getUid(), singleWork.getmParentId()));
+                }
+                map.put("singWorkList", singleWorkService.appSelectSingleWorkList(singleWork));
+                return AjaxResult.success("请求成功", map);
+            }
+            return error();
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+
+    /**
+     * app端单工位查询sop配置列表
+     *
+     * @param lineId 单工位id
+     * @param sopTag sop标记
+     */
+    @PostMapping("/appSingWorkCfSopList")
+    @ResponseBody
+    public AjaxResult appSingWorkCfSopList(@RequestBody SopLine sopLine) {
+        try {
+            if (sopLine != null) {
+                sopLine.appStartPage();
+                return AjaxResult.success("请求成功", sopLineService.selectSopLineList2(sopLine));
+            }
+            return error();
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+
+    /**
+     * app端查询单工位配置的工单信息
+     *
+     * @param singleId 单工位id
+     */
+    @PostMapping("/appSingWorkCfWorkList")
+    @ResponseBody
+    public AjaxResult appSingWorkCfWorkList(@RequestBody SingleWorkOrder singleWorkOrder) {
+        try {
+            if (singleWorkOrder != null) {
+                singleWorkOrder.appStartPage();
+                return AjaxResult.success("请求成功",singleWorkOrderService.selectSingleWorkOrderList(singleWorkOrder));
+            }
+            return error();
+        } catch (Exception e) {
+            return error();
+        }
     }
 }

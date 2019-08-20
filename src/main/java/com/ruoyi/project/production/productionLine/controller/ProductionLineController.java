@@ -9,8 +9,16 @@ import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.iso.sopLine.domain.SopLine;
+import com.ruoyi.project.iso.sopLine.service.ISopLineService;
+import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
+import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
+import com.ruoyi.project.production.workstation.domain.Workstation;
+import com.ruoyi.project.production.workstation.service.IWorkstationService;
+import com.ruoyi.project.system.menu.domain.MenuApi;
+import com.ruoyi.project.system.menu.service.IMenuService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +26,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -209,6 +218,97 @@ public class ProductionLineController extends BaseController {
     @ResponseBody
     public String checkLineNameUnique(ProductionLine productionLine){
         return productionLineService.checkLineNameUnique(productionLine);
+    }
+
+
+
+    /******************************************************************************************************
+     *********************************** app流水线交互逻辑 *************************************************
+     ******************************************************************************************************/
+    @Autowired
+    private IWorkstationService workstationService;
+
+    @Autowired
+    private ISopLineService sopLineService;
+
+    @Autowired
+    private IMenuService menuService;
+
+    @Autowired
+    private IDevWorkOrderService workOrderService;
+
+    /**
+     * app端查询流水线信息
+     */
+    @PostMapping("/applist")
+    @ResponseBody
+    public AjaxResult appSelectLineList(@RequestBody ProductionLine productionLine){
+        try {
+            if (productionLine != null) {
+                productionLine.appStartPage();
+                Map<String,Object> map = new HashMap<>(16);
+                if (productionLine.getmParentId() != null && productionLine.getUid() != null) {
+                    List<MenuApi> menuApiList = menuService.selectMenuListByParentId(productionLine.getUid(), productionLine.getmParentId());
+                    map.put("menuList",menuApiList);
+                }
+                map.put("lineList",productionLineService.appSelectLineList(productionLine));
+                return AjaxResult.success("请求成功",map);
+            }
+            return error();
+        } catch (Exception e) {
+            return AjaxResult.error("请求失败");
+        }
+    }
+
+    /**
+     * app端查询流水线工位配置的列表
+     */
+    @PostMapping("/appLineCfDevList")
+    @ResponseBody
+    public AjaxResult appSelectLineCfDevList(@RequestBody Workstation workstation){
+        try {
+            return  AjaxResult.success("请求成功",workstationService.selectWorkstationList(workstation));
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+
+    /**
+     * app端流水线查询sop配置列表
+     */
+    @PostMapping("/appLineCfSopList")
+    @ResponseBody
+    public AjaxResult appSelectLintCfSopList(@RequestBody SopLine sopLine){
+        try {
+            return AjaxResult.success("请求成功",sopLineService.selectSopLineList(sopLine));
+        } catch (Exception e) {
+            return error("请求失败");
+        }
+    }
+
+
+    /**
+     * 通过产线id查询在该产线的工单列表 -- 产线实况
+     * @param lineId 产线id
+     * @param wlSign 流水线传0 单工位传1
+     */
+    @PostMapping("/appWorkInLine")
+    @ResponseBody
+    public AjaxResult appSelectLineWorkList(@RequestBody DevWorkOrder workOrder){
+        try {
+            if (workOrder != null) {
+                workOrder.appStartPage();
+                Map<String,Object> map = new HashMap<>(16);
+                if (workOrder != null && workOrder.getMenuList() != null && workOrder.getUid() != null) {
+                    map.put("menuList",menuService.selectMenuListByParentId(workOrder.getUid(),workOrder.getMenuList()));
+                }
+                map.put("workOrderList",workOrderService.selectDevWorkOrderList(workOrder));
+                return AjaxResult.success("请求成功",map);
+            }
+            return error();
+        } catch (Exception e) {
+            return error("请求失败");
+        }
     }
 
 }

@@ -1,24 +1,24 @@
 package com.ruoyi.project.mes.mesBatch.controller;
 
-import java.util.List;
-
+import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.framework.aspectj.lang.annotation.Log;
+import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.web.controller.BaseController;
+import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail;
+import com.ruoyi.project.mes.mesBatch.domain.MesPartLog;
 import com.ruoyi.project.mes.mesBatch.service.IMesBatchDetailService;
+import com.ruoyi.project.mes.mesBatch.service.IMesPartLogService;
+import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleDetailService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.framework.aspectj.lang.annotation.Log;
-import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
-import com.ruoyi.framework.web.controller.BaseController;
-import com.ruoyi.framework.web.page.TableDataInfo;
-import com.ruoyi.framework.web.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * MES批准追踪详情 信息操作处理
@@ -34,6 +34,12 @@ public class MesBatchDetailController extends BaseController
 	
 	@Autowired
 	private IMesBatchDetailService mesBatchDetailService;
+
+	@Autowired
+	private IMesPartLogService mesPartLogService;
+
+	@Autowired
+	private IMesBatchRuleDetailService mesBatchRuleDetailService;
 	
 	@RequiresPermissions("mes:mesBatchDetail:view")
 	@GetMapping()
@@ -123,6 +129,32 @@ public class MesBatchDetailController extends BaseController
 	public AjaxResult remove(String ids)
 	{		
 		return toAjax(mesBatchDetailService.deleteMesBatchDetailByIds(ids));
+	}
+
+	/**
+	 * 查看物料批次二维码
+	 */
+	@GetMapping("/showCode")
+	public String showCode(String code,ModelMap map){
+		map.put("code",code);
+		return "mes/mesBatch/code";
+	}
+
+	/**
+	 * MES数据列表查看半成品追踪数据
+	 */
+	@GetMapping("/partCofMes")
+	public String partCofMes1(String mesCode,String partCode,String workCode,ModelMap map){
+		map.put("mesCode",mesCode);
+		map.put("partCode",partCode);
+		map.put("workCode",workCode);
+		List<MesPartLog> mesPartLogList = mesPartLogService.selectMesPartLogListByCode(workCode, mesCode, partCode);
+		if (StringUtils.isNotEmpty(mesPartLogList) && mesPartLogList.size() > 0) {
+			map.put("mesPartLog", mesPartLogList);
+		} else {
+			map.put("mesRuleList",mesBatchRuleDetailService.selectMesBatchRuleDetailListByPcode(partCode));
+		}
+		return "mes/mesBatch/partCofMes";
 	}
 	
 }

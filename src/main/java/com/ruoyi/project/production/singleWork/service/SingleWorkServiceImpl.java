@@ -50,46 +50,44 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     private SopLineWorkMapper sopLineWorkMapper;
 
     /**
-	@Autowired
-	private UserMapper userMapper;
-
-	/**
-     * 查询单工位数据信息
-     *
      * @param id 单工位数据ID
      * @return 单工位数据信息
+     * @Autowired private UserMapper userMapper;
+     * <p>
+     * /**
+     * 查询单工位数据信息
      */
     @Override
-	public SingleWork selectSingleWorkById(Integer id)
-	{
-	    return singleWorkMapper.selectSingleWorkById(id);
-	}
-
-	/**
-	 * 根据id查询车间信息，并获取相关责任人信息
-	 * @param id 车间id
-	 * @return
-	 */
-	@Override
-	public SingleWork selectSingleWorkByIdGetUser(Integer id) {
-		SingleWork work = singleWorkMapper.selectSingleWorkById(id);
-		if(work != null){
-			if(work.getLiableOne() != null){
-				work.setLiableOneName(userMapper.selectUserById(work.getLiableOne().longValue()).getUserName());
-			}
-			if(work.getLiableTwo() != null){
-				work.setLiableTwoName(userMapper.selectUserById(work.getLiableTwo().longValue()).getUserName());
-			}
-		}
-		return work;
-	}
-
-	/**
     public SingleWork selectSingleWorkById(Integer id) {
         return singleWorkMapper.selectSingleWorkById(id);
     }
 
     /**
+     * 根据id查询车间信息，并获取相关责任人信息
+     *
+     * @param id 车间id
+     * @return
+     */
+    @Override
+    public SingleWork selectSingleWorkByIdGetUser(Integer id) {
+        SingleWork work = singleWorkMapper.selectSingleWorkById(id);
+        if (work != null) {
+            if (work.getLiableOne() != null) {
+                work.setLiableOneName(userMapper.selectUserById(work.getLiableOne().longValue()).getUserName());
+            }
+            if (work.getLiableTwo() != null) {
+                work.setLiableTwoName(userMapper.selectUserById(work.getLiableTwo().longValue()).getUserName());
+            }
+        }
+        return work;
+    }
+
+    /**
+     * public SingleWork selectSingleWorkById(Integer id) {
+     * return singleWorkMapper.selectSingleWorkById(id);
+     * }
+     * <p>
+     * /**
      * 查询单工位数据列表
      *
      * @param singleWork 单工位数据信息
@@ -106,34 +104,33 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     }
 
     /**
-	@Override
-	public List<SingleWork> selectSingleWorkList(SingleWork singleWork)
-	{
-		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-		if (user == null) {
-		    return Collections.emptyList();
-		}
-		singleWork.setCompanyId(user.getCompanyId());
-		return singleWorkMapper.selectSingleWorkList(singleWork);
-	}
+     * @return
+     * @Override public List<SingleWork> selectSingleWorkList(SingleWork singleWork)
+     * {
+     * User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+     * if (user == null) {
+     * return Collections.emptyList();
+     * }
+     * singleWork.setCompanyId(user.getCompanyId());
+     * return singleWorkMapper.selectSingleWorkList(singleWork);
+     * }
+     * <p>
+     * /**
+     * 查询所以车间
+     */
+    @Override
+    public List<SingleWork> selectSingleWorkListSign0() {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        SingleWork singleWork = new SingleWork();
+        singleWork.setSign(0);
+        singleWork.setCompanyId(user.getCompanyId());
+        return singleWorkMapper.selectSingleWorkList(singleWork);
+    }
 
-	/**
-	 * 查询所以车间
-	 * @return
-	 */
-	@Override
-	public List<SingleWork> selectSingleWorkListSign0() {
-		User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-		if (user == null) {
-			return Collections.emptyList();
-		}
-		SingleWork singleWork = new SingleWork();
-		singleWork.setSign(0);
-		singleWork.setCompanyId(user.getCompanyId());
-		return singleWorkMapper.selectSingleWorkList(singleWork);
-	}
-
-	/**
+    /**
      * 新增单工位数据
      *
      * @param singleWork 单工位数据信息
@@ -169,17 +166,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
      */
     @Override
     public int updateSingleWork(SingleWork singleWork) {
-        // 原始单工位信息
-        SingleWork oldSingleWork = singleWorkMapper.selectSingleWorkById(singleWork.getId());
-        Integer parentId = singleWork.getParentId();
-        // 单工位修改设备责任人
-        if (StringUtils.isNotNull(parentId) && parentId != 0) {
-            // 更新硬件使用状态，还原之前硬件状态
-            oldSingleWork.setLiableOne(singleWork.getLiableOne());
-            return singleWorkMapper.updateSingleWork(oldSingleWork);
-        } else {
-            return singleWorkMapper.updateSingleWork(singleWork);
-        }
+        return singleWorkMapper.updateSingleWork1(singleWork);
     }
 
     /**
@@ -210,19 +197,19 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             }
             // 更新计数器硬件配置标记
             if (singleWork.getDevId() != null && singleWork.getDevId() != 0) {
-                devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.getDevId(),DevConstants.DEV_SIGN_NOT_USE,null);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
             // 更新看板硬件配置标记
             if (singleWork.getWatchId() != null && singleWork.getWatchId() != 0) {
-                devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.getWatchId(),DevConstants.DEV_SIGN_NOT_USE,null);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getWatchId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
             // 更新扫码枪硬件配置标记
-            if (singleWork.geteId() != null && singleWork.geteId() != 0 ) {
-                devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.geteId(),DevConstants.DEV_SIGN_NOT_USE,null);
+            if (singleWork.geteId() != null && singleWork.geteId() != 0) {
+                devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
             // 删除单工位配置
-            sopLineMapper.deleteSopLine(user.getCompanyId(),swId,null, FileConstants.SOP_TAG_SINGWORK);
-            sopLineWorkMapper.deleteSopLineWorkByWId(user.getCompanyId(),swId,null,FileConstants.SOP_TAG_SINGWORK);
+            sopLineMapper.deleteSopLine(user.getCompanyId(), swId, null, FileConstants.SOP_TAG_SINGWORK);
+            sopLineWorkMapper.deleteSopLineWorkByWId(user.getCompanyId(), swId, null, FileConstants.SOP_TAG_SINGWORK);
         }
         return singleWorkMapper.deleteSingleWorkByIds(Convert.toStrArray(ids));
     }
@@ -237,21 +224,11 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     @Override
     public String checkNameUnique(SingleWork singleWork) {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        Integer id = singleWork.getId();
-        if (StringUtils.isNotNull(id)) {
-            SingleWork work = singleWorkMapper.selectSingleWorkById(id);
-            if (StringUtils.isNotNull(work) && work.getWorkshopName().equals(singleWork.getWorkshopName())) {
-                return WorkConstants.WORKHOUSE_NAME_UNIQUE;
-            }
+        SingleWork singleWorkUnique = singleWorkMapper.selectSingleWorkByWorkshopName(user.getCompanyId(), singleWork.getWorkshopName());
+        if (StringUtils.isNotNull(singleWorkUnique) && !singleWorkUnique.getId().equals(singleWork.getId())) {
+            return WorkConstants.WORKHOUSE_NAME_NOT_UNIQUE;
         }
-        String workshopName = singleWork.getWorkshopName();
-        if (StringUtils.isNotEmpty(workshopName)) {
-            SingleWork unique = singleWorkMapper.selectSingleWorkByWorkshopName(user.getCompanyId(), workshopName);
-            if (StringUtils.isNull(unique)) {
-                return WorkConstants.WORKHOUSE_NAME_UNIQUE;
-            }
-        }
-        return WorkConstants.WORKHOUSE_NAME_NOT_UNIQUE;
+        return WorkConstants.WORKHOUSE_NAME_UNIQUE;
     }
 
     /**
@@ -275,7 +252,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
                 DevList devList = devListMapper.selectDevListById(singleWork.getDevId());
                 if (devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0) {
                     singleWork.setDevCode(devList.getDeviceId());
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED, DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     throw new BusinessException("计数器硬件编码配置错误");
                 }
@@ -285,16 +262,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.getDevId() != null && singleWork.getDevId() > 0) {
                 if (!singleWork.getDevId().equals(sw.getDevId())) {
                     // 还原之前硬件
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE,null);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE, null);
                     // 修改最新硬件
                     DevList devList = devListMapper.selectDevListById(singleWork.getDevId());
                     singleWork.setDevCode(devList.getDeviceId());
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getDevId(), DevConstants.DEV_SIGN_USED, DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     singleWork.setDevCode(sw.getDevCode());
                 }
             } else {
-                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE,null);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getDevId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
         }
 
@@ -305,7 +282,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
                 DevList devList = devListMapper.selectDevListById(singleWork.getWatchId());
                 if (devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0) {
                     singleWork.setWatchCode(devList.getDeviceId());
-                    devListMapper.updateDevSignAndType(user.getCompanyId(),singleWork.getWatchId(),DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getWatchId(), DevConstants.DEV_SIGN_USED, DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     throw new BusinessException("看板硬件编码配置错误");
                 }
@@ -315,16 +292,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.getWatchId() != null && singleWork.getWatchId() > 0) {
                 if (!singleWork.getWatchId().equals(sw.getWatchId())) {
                     // 还原之前硬件
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE,null);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE, null);
                     // 修改最新硬件
                     DevList devList = devListMapper.selectDevListById(singleWork.getWatchId());
                     singleWork.setWatchCode(devList.getDeviceId());
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getWatchId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.getWatchId(), DevConstants.DEV_SIGN_USED, DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     singleWork.setWatchCode(sw.getWatchCode());
                 }
             } else {
-                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE,null);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.getWatchId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
         }
 
@@ -335,7 +312,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
                 DevList devList = devListMapper.selectDevListById(singleWork.geteId());
                 if (devList != null && devList.getDefId() == 0 && devList.getDeviceStatus() == 1 && devList.getSign() == 0) {
                     singleWork.seteCode(devList.getDeviceId());
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED, DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     throw new BusinessException("扫码枪硬件编码配置错误");
                 }
@@ -345,16 +322,16 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.geteId() != null && singleWork.geteId() > 0) {
                 if (!singleWork.geteId().equals(sw.geteId())) {
                     // 还原之前硬件
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE,null);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE, null);
                     // 修改最新硬件
                     DevList devList = devListMapper.selectDevListById(singleWork.geteId());
                     singleWork.seteCode(devList.getDeviceId());
-                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED,DevConstants.DEV_TYPE_HOUSE);
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_USED, DevConstants.DEV_TYPE_HOUSE);
                 } else {
                     singleWork.seteCode(sw.geteCode());
                 }
             } else {
-                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE,null);
+                devListMapper.updateDevSignAndType(user.getCompanyId(), sw.geteId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
         }
         return singleWorkMapper.updateSingleWork(singleWork);
@@ -362,6 +339,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
 
     /**
      * 根据车间id查询所以单位信息
+     *
      * @param pid 车间id
      * @return
      */
@@ -372,34 +350,45 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
 
     /**
      * int order_id,int pid
+     *
      * @param order_id
      * @param pid
      * @return
      */
-    public List<SingleWork> selectAllNotConfigWorkByOrderId(int order_id,int pid ){
-        return singleWorkMapper.selectAllNotConfigWorkByOrderId(order_id,pid);
+    public List<SingleWork> selectAllNotConfigWorkByOrderId(int order_id, int pid) {
+        return singleWorkMapper.selectAllNotConfigWorkByOrderId(order_id, pid);
     }
 
     /**
-     *
      * @param parentId 车间id
-     * @param sopId sopid
-     * @param sopTag sop配置标记
+     * @param sopId    sopid
+     * @param sopTag   sop配置标记
      * @return
      */
     @Override
-    public List<SingleWork> selectNotConfigSop(int companyId,int parentId, int sopId, int sopTag) {
-        return singleWorkMapper.selectNotConfigSop(companyId,parentId,sopId,sopTag);
+    public List<SingleWork> selectNotConfigSop(int companyId, int parentId, int sopId, int sopTag) {
+        return singleWorkMapper.selectNotConfigSop(companyId, parentId, sopId, sopTag);
     }
 
     /**
      * 通过父id查询车间信息
+     *
      * @param companyId 公司id
-     * @param parentId 父id
+     * @param parentId  父id
      * @return 结果
      */
     @Override
-    public List<SingleWork> selectSingleWorkByParentId(int companyId, int parentId) {
-        return singleWorkMapper.selectSingleWorkByParentId(companyId,parentId);
+    public List<SingleWork> selectSingleWorkByParentId(Integer companyId, Integer parentId) {
+        return singleWorkMapper.selectSingleWorkByParentId(companyId, parentId);
+    }
+
+    /**
+     * app端查询单工位列表
+     * @param singleWork 单工位对象
+     * @return 结果
+     */
+    @Override
+    public List<SingleWork> appSelectSingleWorkList(SingleWork singleWork) {
+        return singleWorkMapper.selectSingleWorkList(singleWork);
     }
 }

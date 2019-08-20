@@ -58,4 +58,10 @@ public interface IMesBatchDetailService
 	 * @return 结果
 	 */
 	public List<MesBatchDetail> selectMesBatchDetailListByBId(int bId);
+
+	/**
+	 * 查询搜索的MES批次总的记录数
+	 * @param batchCode 批次号
+	 */
+    int selectMesBatchTotal(String batchCode);
 }

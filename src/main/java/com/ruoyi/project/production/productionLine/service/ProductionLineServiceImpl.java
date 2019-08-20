@@ -132,42 +132,42 @@ public class ProductionLineServiceImpl implements IProductionLineService {
     @Transactional
     public int deleteProductionLineById(Integer id, HttpServletRequest request) {
         User sysUser = JwtUtil.getTokenUser(request); // 在线用户
-        ProductionLine  productionLine = productionLineMapper.selectProductionLineById(id);
+        ProductionLine productionLine = productionLineMapper.selectProductionLineById(id);
         if (productionLine != null && !User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) { // 非系统用户或者非注册用户
             // 删除的时候判断是否为该工单的负责人
-             // 查询产线信息
+            // 查询产线信息
             checkDeviceLiable(sysUser, productionLine);
         }
-        if(productionLine != null){
+        if (productionLine != null) {
             //查询是否有工单信息
             DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByLineId(id);
-            if(workOrder != null){
+            if (workOrder != null) {
                 throw new BusinessException("该产线有未完成工单，不能删除...");
             }
         }
         //查询对应产线的工位信息
         List<Workstation> workstations = workstationMapper.selectAllByLineId(id);
-        if(workstations != null && workstations.size() >0){
+        if (workstations != null && workstations.size() > 0) {
             DevList devList = null;
             for (Workstation workstation : workstations) {
                 //将对应硬件设置为未配置
-                if(workstation.getDevId() >0){
+                if (workstation.getDevId() > 0) {
                     devList = devListMapper.selectDevListById(workstation.getDevId());
-                    if(devList != null){
+                    if (devList != null) {
                         devList.setSign(0);
                         devListMapper.updateDevSign(devList);
                     }
                 }
-                if(workstation.getcId() >0){
+                if (workstation.getcId() > 0) {
                     devList = devListMapper.selectDevListById(workstation.getcId());
-                    if(devList != null){
+                    if (devList != null) {
                         devList.setSign(0);
                         devListMapper.updateDevSign(devList);
                     }
                 }
-                if(workstation.geteId() >0){
+                if (workstation.geteId() > 0) {
                     devList = devListMapper.selectDevListById(workstation.geteId());
-                    if(devList != null){
+                    if (devList != null) {
                         devList.setSign(0);
                         devListMapper.updateDevSign(devList);
                     }
@@ -301,26 +301,55 @@ public class ProductionLineServiceImpl implements IProductionLineService {
 
     /**
      * 通过作业指导书id查询未配置的产线信息
-     * @param isoId 作业指导书id
+     *
+     * @param isoId     作业指导书id
      * @param companyId 公司id
      * @return 结果
      */
     @Override
     public List<ProductionLine> selectLineNotConfigByIsoId(Integer isoId, Integer companyId) {
-        return productionLineMapper.selectLineNotConfigByIsoId(isoId,companyId);
+        return productionLineMapper.selectLineNotConfigByIsoId(isoId, companyId);
     }
 
     /**
      * 校验产线名的唯一性
+     *
      * @param productionLine 产线对象
      * @return 结果
      */
     @Override
     public String checkLineNameUnique(ProductionLine productionLine) {
-        ProductionLine uniqueLine = productionLineMapper.selectProductionLineByName(JwtUtil.getUser().getCompanyId(),productionLine.getLineName());
+        ProductionLine uniqueLine = productionLineMapper.selectProductionLineByName(JwtUtil.getUser().getCompanyId(), productionLine.getLineName());
         if (StringUtils.isNotNull(uniqueLine) && !uniqueLine.getId().equals(productionLine.getId())) {
             return WorkConstants.LINE_NAME_NOT_UNIQUE;
         }
         return WorkConstants.LINE_NAME_UNIQUE;
+    }
+
+    /**
+     * app端查询流水线列表
+     *
+     * @param productionLine 流水线对象
+     * @return 结果
+     */
+    @Override
+    public List<ProductionLine> appSelectLineList(ProductionLine productionLine) {
+        if (productionLine == null) {
+            return productionLineMapper.selectAllDef0(JwtUtil.getUser().getCompanyId());
+        } else {
+            List<ProductionLine> productionLines = productionLineMapper.selectProductionLineList(productionLine);
+            User user = null;
+            for (ProductionLine line : productionLines) {
+                user = userMapper.selectUserInfoById(line.getDeviceLiable() == null ? 0 : line.getDeviceLiable());
+                if (user != null) {
+                    line.setDeviceLiableName(user.getUserName());
+                }
+                user = userMapper.selectUserInfoById(line.getDeviceLiableTow() == null ? 0 : line.getDeviceLiableTow());
+                if (user != null) {
+                    line.setDeviceLiableTowName(user.getUserName());
+                }
+            }
+            return productionLines;
+        }
     }
 }

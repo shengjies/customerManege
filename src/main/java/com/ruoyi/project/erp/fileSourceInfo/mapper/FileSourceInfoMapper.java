@@ -1,7 +1,5 @@
 package com.ruoyi.project.erp.fileSourceInfo.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -63,4 +61,14 @@ public interface FileSourceInfoMapper
 	 * @return
 	 */
     List<FileSourceInfo> selectFileSourceBySaveIdAndComId(@Param("saveId") Integer saveId, @Param("companyId") Integer companyId);
+
+	/**
+	 * 根据对应类型对应id查询是否存在文件信息
+	 * @param companyId 公司id
+	 * @param saveType 保存类型
+	 * @param saveId 保存id
+	 * @return 结果
+	 */
+	List<FileSourceInfo> selectFileSourceInfoBySaveId(@Param("companyId") Integer companyId, @Param("saveType") Integer saveType,
+												@Param("saveId") Integer saveId);
 }

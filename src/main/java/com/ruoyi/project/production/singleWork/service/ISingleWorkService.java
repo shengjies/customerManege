@@ -108,5 +108,12 @@ public interface ISingleWorkService
 	 * @param parentId 父id
 	 * @return 结果
 	 */
-	List<SingleWork> selectSingleWorkByParentId(int companyId,int parentId);
+	List<SingleWork> selectSingleWorkByParentId(Integer companyId,Integer parentId);
+
+	/**
+	 * app端查询单工位列表信息
+	 * @param singleWork 单工位对象
+	 * @return 结果
+	 */
+	List<SingleWork> appSelectSingleWorkList(SingleWork singleWork);
 }

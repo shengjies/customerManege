@@ -112,9 +112,10 @@ public class JwtUtil {
 
     /**
      * 获取用户
+     *
      * @return 用户
      */
-    public static User getUser(){
-         return getTokenUser(ServletUtils.getRequest());
+    public static User getUser() {
+        return getTokenUser(ServletUtils.getRequest());
     }
 }

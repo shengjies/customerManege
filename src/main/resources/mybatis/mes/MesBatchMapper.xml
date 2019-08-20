@@ -16,10 +16,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ruleMateriel"    column="rule_materiel"    />
         <result property="cTime"    column="c_time"    />
         <result property="uTime"    column="u_time"    />
+        <result property="mesSign"    column="mes_sign"    />
     </resultMap>
 	
 	<sql id="selectMesBatchVo">
-        select id, company_id, mes_code, work_code, order_code, pb_code, rule_id, rule_name, rule_materiel, c_time, u_time from tab_mes_batch
+        select id, company_id, mes_code, work_code, order_code, pb_code, rule_id, rule_name, rule_materiel, c_time, u_time,mes_sign from tab_mes_batch
     </sql>
 	
     <select id="selectMesBatchList" parameterType="MesBatch" resultMap="MesBatchResult">
@@ -43,23 +44,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectMesBatchList2" parameterType="MesBatch" resultMap="MesBatchResult">
-        SELECT * FROM tab_mes_batch as a,tab_mes_batch_detail as b where a.id = b.b_id
+        SELECT a.* FROM tab_mes_batch as a,tab_mes_batch_detail as b where a.id = b.b_id
         <if test="batchCode != null and batchCode != ''">
-            and b.batch_code like concat (#{batchCode},'%')
+            and b.batch_code = #{batchCode}
         </if>
-        <if test="mesCode != null  and mesCode != '' "> and a.mes_code like concat(#{mesCode},'%')</if>
-        <if test="workCode != null  and workCode != '' "> and a.work_code like concat(#{workCode},'%')</if>
-        <if test="orderCode != null  and orderCode != '' "> and a.order_code like concat (#{orderCode},'%')</if>
         <if test="pbCode != null  and pbCode != '' "> and a.pb_code like concat(#{pbCode},'%')</if>
-        <if test="ruleId != null "> and a.rule_id = #{ruleId}</if>
-        <if test="ruleName != null  and ruleName != '' "> and a.rule_name = #{ruleName}</if>
-        <if test="ruleMateriel != null  and ruleMateriel != '' "> and a.rule_materiel like concat(#{ruleMateriel},'%')</if>
         <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
             AND date_format(a.c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
         </if>
         <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
             AND date_format(a.c_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
         </if>
+        group by a.id
     </select>
     
     <select id="selectMesBatchById" parameterType="Integer" resultMap="MesBatchResult">
@@ -80,6 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="ruleMateriel != null  and ruleMateriel != ''  ">rule_materiel,</if>
 			<if test="cTime != null  ">c_time,</if>
 			<if test="uTime != null  ">u_time,</if>
+            <if test="mesSign != null and mesSign != '' ">mes_sign,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -92,6 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="ruleMateriel != null  and ruleMateriel != ''  ">#{ruleMateriel},</if>
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="uTime != null  ">#{uTime},</if>
+            <if test="mesSign != null and mesSign != '' ">#{mesSign},</if>
          </trim>
     </insert>
 	 
@@ -108,6 +106,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="ruleMateriel != null  and ruleMateriel != ''  ">rule_materiel = #{ruleMateriel},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="uTime != null  ">u_time = #{uTime},</if>
+            <if test="mesSign != null  and mesSign != ''  ">mes_sign = #{mesSign},</if>
         </trim>
         where id = #{id}
     </update>
@@ -132,5 +131,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectMesBatchByMesCode" resultMap="MesBatchResult">
         SELECT * FROM tab_mes_batch where mes_code = #{mesCode} and company_id = #{companyId} limit 1
     </select>
+
+    <!--通过工单编号删除MES批次追踪信息-->
+    <delete id="deleteMesBatchByWorkCode" parameterType="String">
+        delete from tab_mes_batch where work_code = #{workCode}
+    </delete>
     
 </mapper>

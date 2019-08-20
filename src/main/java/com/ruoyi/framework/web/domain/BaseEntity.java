@@ -1,10 +1,13 @@
 package com.ruoyi.framework.web.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
+import com.ruoyi.common.utils.StringUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.google.common.collect.Maps;
 
 /**
  * Entity基类
@@ -37,6 +40,27 @@ public class BaseEntity implements Serializable
 
     /** 请求参数 */
     private Map<String, Object> params;
+
+    /** app端分页 当前记录起始索引 */
+    private Integer pageNum;
+    /** app端分页 每页显示记录数 */
+    private Integer pageSize;
+
+    public Integer getPageNum() {
+        return pageNum;
+    }
+
+    public void setPageNum(Integer pageNum) {
+        this.pageNum = pageNum;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public String getSearchValue()
     {
@@ -110,5 +134,16 @@ public class BaseEntity implements Serializable
     public void setParams(Map<String, Object> params)
     {
         this.params = params;
+    }
+
+    /**
+     * app端设置请求分页数据
+     */
+    public void appStartPage()
+    {
+        if (StringUtils.isNotNull(getPageNum()) && StringUtils.isNotNull(getPageSize()))
+        {
+            PageHelper.startPage(pageNum, pageSize);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.project.mes.mesBatchRule.controller;
 
+import com.ruoyi.common.constant.MesConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -8,8 +9,11 @@ import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.erp.materiel.service.IMaterielService;
 import com.ruoyi.project.mes.mesBatchRule.domain.MesBatchRule;
+import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleDetailService;
 import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleService;
+import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +43,12 @@ public class MesBatchRuleController extends BaseController
 
 	@Autowired
 	private IDevProductListService productListService;
+
+	@Autowired
+	private IMesBatchRuleDetailService ruleDetailService;
+
+	@Autowired
+	private IMaterielService materielService;
 
 	@RequiresPermissions("mes:mesBatchRule:view")
 	@GetMapping()
@@ -79,7 +90,7 @@ public class MesBatchRuleController extends BaseController
 	@GetMapping("/add")
 	public String add()
 	{
-	    return prefix + "/add";
+	    return prefix + "/add1";
 	}
 	
 	/**
@@ -89,7 +100,7 @@ public class MesBatchRuleController extends BaseController
 	@Log(title = "MES批准追踪规则", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(MesBatchRule mesBatchRule)
+	public AjaxResult addSave(@RequestBody MesBatchRule mesBatchRule)
 	{
 		try {
 			return toAjax(mesBatchRuleService.insertMesBatchRule(mesBatchRule));
@@ -106,7 +117,7 @@ public class MesBatchRuleController extends BaseController
 	{
 		MesBatchRule mesBatchRule = mesBatchRuleService.selectMesBatchRuleById(id);
 		mmap.put("mesBatchRule", mesBatchRule);
-	    return prefix + "/edit";
+	    return prefix + "/edit1";
 	}
 	
 	/**
@@ -116,9 +127,13 @@ public class MesBatchRuleController extends BaseController
 	@Log(title = "MES批准追踪规则", businessType = BusinessType.UPDATE)
 	@PostMapping("/edit")
 	@ResponseBody
-	public AjaxResult editSave(MesBatchRule mesBatchRule)
-	{		
-		return toAjax(mesBatchRuleService.updateMesBatchRule(mesBatchRule));
+	public AjaxResult editSave(@RequestBody MesBatchRule mesBatchRule)
+	{
+		try {
+			return toAjax(mesBatchRuleService.updateMesBatchRule(mesBatchRule));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 	
 	/**
@@ -162,10 +177,62 @@ public class MesBatchRuleController extends BaseController
 	 */
 	@PostMapping("/selectMesBatchRuleById")
 	@ResponseBody
-	public AjaxResult selectMesBatchRuleById(int id){
+	public AjaxResult selectMesBatchRuleById(int ruleId){
 		Map<String,Object> map = new HashMap<>(16);
-		map.put("mesList",mesBatchRuleService.selectMesBatchRuleById(id));
+		map.put("ruleList",ruleDetailService.selectMesBatchRuleByRuleId(ruleId));
 		map.put("mesCode", CodeUtils.getMesCode());
 		return AjaxResult.success(map);
+	}
+
+	/**
+	 * 配置规格选择不同类型查询不同数据
+	 */
+	@PostMapping("/selectPType")
+	@ResponseBody
+	public AjaxResult selectPType(Integer pType){
+		// 查询半成品和物料
+		HashMap<String,Object> map = new HashMap<>(16);
+		if (pType != null && pType.equals(MesConstants.MES_TYPE_PRO)) {
+		    map.put("parList",productListService.selectProAllBySign(MesConstants.MES_TYPE_PARTS));
+		    map.put("matList",materielService.selectAllMatByComId());
+		} else if (pType != null && pType.equals(MesConstants.MES_TYPE_PARTS)){
+			map.put("parList", Collections.emptyList());
+			map.put("matList",materielService.selectAllMatByComId());
+		}
+		return AjaxResult.success(map);
+	}
+
+
+	/******************************************************************************************************
+	 *********************************** app端MES规则交互 **************************************************
+	 ******************************************************************************************************/
+
+	@Autowired
+	private IDevProductListService devProductListService;
+
+	/**
+	 * app端查看MES规则列表
+	 */
+	@PostMapping("/applist")
+	@ResponseBody
+	public AjaxResult appSelectList(@RequestBody MesBatchRule mesBatchRule){
+		try {
+			return AjaxResult.success("请求成功",mesBatchRuleService.selectMesBatchRuleList(mesBatchRule));
+		} catch (Exception e) {
+			return error("请求失败");
+		}
+	}
+
+	/**
+	 * app查看对应规则配置的产品信息
+	 */
+	@PostMapping("/appDetailList")
+	@ResponseBody
+	public AjaxResult appSelectDetailList(@RequestBody DevProductList product){
+		try {
+			return AjaxResult.success(devProductListService.selectDevProductListList(product));
+		} catch (Exception e) {
+			return error();
+		}
 	}
 }

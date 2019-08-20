@@ -85,10 +85,30 @@
 		var prefix = ctx + "insmanage/instrumentManage";
 		$("#form-instrumentManage-edit").validate({
 			rules:{
-
+				imCode:{
+					required:true,
+					remote: {
+						url: prefix + "/checkImCodeUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							name : function() {
+								return $.common.trim($("#imCode").val());
+							},
+							id : function() {
+								return $.common.trim($("#id").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
+				},
 			},
 			messages:{
-
+				"imCode":{
+					remote: "仪器编码已存在"
+				}
 			}
 		});
 		

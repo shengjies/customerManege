@@ -1,10 +1,11 @@
 package com.ruoyi.project.system.menu.mapper;
 
+import com.ruoyi.project.system.menu.domain.Menu;
+import com.ruoyi.project.system.menu.domain.MenuApi;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
-
-import org.apache.ibatis.annotations.Param;
-import com.ruoyi.project.system.menu.domain.Menu;
 
 /**
  * 菜单表 数据层
@@ -131,4 +132,11 @@ public interface MenuMapper
      */
     public List<Menu> selectMenusByCompanyId(Long companyId);
 
+    /**
+     * api接口查询菜单
+     * @param userId 用户id
+     * @param parentId 父id
+     * @return 结果
+     */
+    List<MenuApi> selectMenuListByParentId(@Param("userId") Integer userId,@Param("parentId") Integer parentId);
 }

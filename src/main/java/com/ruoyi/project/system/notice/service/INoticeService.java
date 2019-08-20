@@ -1,6 +1,8 @@
 package com.ruoyi.project.system.notice.service;
 
 import com.ruoyi.project.system.notice.domain.Notice;
+import com.ruoyi.project.system.notice.domain.NoticeApp;
+
 import java.util.List;
 
 /**
@@ -49,4 +51,6 @@ public interface INoticeService
      * @return 结果
      */
     public int deleteNoticeByIds(String ids);
+
+
 }

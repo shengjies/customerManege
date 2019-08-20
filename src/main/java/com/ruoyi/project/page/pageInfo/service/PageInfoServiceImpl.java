@@ -533,4 +533,14 @@ public class PageInfoServiceImpl implements IPageInfoService {
         }
         return PageTypeConstants.PAGE_NAME_UNIQUE;
     }
+
+    /**
+     * app端查询页面列表信息
+     * @param pageInfo 页面信息
+     * @return 结果
+     */
+    @Override
+    public List<PageInfo> appSelectPageInfo(PageInfo pageInfo) {
+        return pageInfoMapper.selectPageInfoList(pageInfo);
+    }
 }
