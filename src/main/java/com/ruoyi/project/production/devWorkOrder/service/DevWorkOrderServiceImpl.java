@@ -1,5 +1,14 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
+import cn.jiguang.common.ClientConfig;
+import cn.jiguang.common.resp.APIConnectionException;
+import cn.jiguang.common.resp.APIRequestException;
+import cn.jpush.api.JPushClient;
+import cn.jpush.api.push.PushResult;
+import cn.jpush.api.push.model.Platform;
+import cn.jpush.api.push.model.PushPayload;
+import cn.jpush.api.push.model.audience.Audience;
+import cn.jpush.api.push.model.notification.Notification;
 import com.alibaba.fastjson.JSON;
 import com.baidu.aip.ocr.AipOcr;
 import com.ruoyi.common.constant.EcnConstants;
@@ -417,6 +426,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);  // 修改工单的状态为进行中
                 devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);   // 修改工单的操作状态为正在进行，页面显示暂停按钮
                 devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
+                //流水线消息推送
+                JPushMsg(1,devWorkOrder);
                 // 通过产线id获取各个工位信息
                 List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(), devWorkOrder.getLineId());
                 WorkData workData = null;
@@ -507,6 +518,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     // 初始化工单数据表
                     WorkData workData = null;
                     SingleWork singleWork = null;
+                    JPushMsg(2,devWorkOrder);
                     for (SingleWorkOrder singleWorkOrder : singleWorkOrders) {
                         singleWork = singleWorkMapper.selectSingleWorkById(singleWorkOrder.getSingleId());
                         if (singleWork.getDevId() > 0) {
@@ -527,6 +539,60 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         }
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
     }
+
+    /***************************消息推送开始**********************************/
+
+    @Value("${jpush.mastersecret}")
+    private String MASTER_SECRET;
+
+    @Value("${jpush.appkey}")
+    private  String APP_KEY;
+
+    private void JPushMsg(int type,DevWorkOrder order){
+        if(order == null)
+            return;
+        List<String> alias = null;
+        if(type == 1){
+            //流水线信息推送
+            //1、查询对应产线
+            ProductionLine line =  productionLineMapper.selectProductionLineById(order.getLineId());
+            //2、查询对应产线所有配置SOP看板硬件的硬件编码
+            if(line != null){
+                alias = workstationMapper.countLineKBCode(line.getCompanyId(),line.getId());
+            }
+        }else if(type == 2){
+            //车间信息推送
+            //1、查询对应的车间
+            SingleWork singleWork =  singleWorkMapper.selectSingleWorkById(order.getLineId());
+            //2、查询对应车间的SOP硬件编码
+            if(singleWork != null){
+                alias = singleWorkOrderMapper.countSingleWorkKBCode(singleWork.getCompanyId(),order.getId());
+            }
+        }
+        if(alias == null || alias.size() <=0 ){
+            return;
+        }
+        JSONObject data = new JSONObject();
+        data.put("msg","1");
+        //进行消息推送
+        JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY, null, ClientConfig.getInstance());
+        PushPayload payload = PushPayload.newBuilder()
+                .setPlatform(Platform.all())
+                .setAudience(Audience.alias(alias))
+                .setNotification(Notification.alert(data.toString()))
+                .build();
+        try {
+            PushResult result = jpushClient.sendPush(payload);
+        } catch (APIConnectionException e) {
+            e.printStackTrace();
+        } catch (APIRequestException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    /********************************消息推送结束*******************************/
 
     /**
      * 校验流水线是否只有一个处于生产状态的工单

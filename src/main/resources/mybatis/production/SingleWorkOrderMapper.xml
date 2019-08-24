@@ -131,5 +131,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} and b.dev_id >0
             and c.work_id = #{workId} and b.liable_one = #{liableOne}
     </select>
-    
+
+    <!--根据公司id和车间id查询对应的车间单工位配置的SOP看板硬件编码-->
+    <select id="countSingleWorkKBCode" resultType="java.lang.String">
+        SELECT watch_code FROM tab_single_work where company_id = #{companyId} and  id in (SELECT single_id FROM tab_single_work_order where work_id = #{workId}) and watch_code is not null;
+    </select>
 </mapper>

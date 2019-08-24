@@ -191,7 +191,7 @@ public class WorkstationServiceImpl implements IWorkstationService {
                     devListMapper.updateDevSign(devList);
                 }
             }
-            if (workstation.geteId() > 0) {
+            if (workstation.geteId() != null &&  workstation.geteId() > 0) {
                 devList = devListMapper.selectDevListById(workstation.geteId());
                 if (devList != null) {
                     devList.setSign(1);

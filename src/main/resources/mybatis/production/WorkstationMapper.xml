@@ -159,4 +159,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDevName" resultType="java.lang.String">
         SELECT device_name FROM dev_list where id = #{devId};
     </select>
+
+    <!--根据公司和产线id查询对应产线已经配置的SOP看板硬件编码-->
+    <select id="countLineKBCode" resultType="java.lang.String">
+      SELECT c_code FROM tab_workstation where company_id = #{companyId} and line_id = #{lineId} and c_code is not null;
+    </select>
 </mapper>

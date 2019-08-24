@@ -124,4 +124,12 @@ public interface WorkstationMapper
 	 * @return 结果
 	 */
     List<Workstation> selectWorkstationListByLineId(@Param("companyId") Integer companyId, @Param("lineId") Integer lineId);
+
+	/**
+	 * 根据公司和产线id查询对应产线已经配置的SOP看板硬件编码
+	 * @param companyId 公司id
+	 * @param lineId 产线id
+	 * @return
+	 */
+	List<String> countLineKBCode(@Param("companyId")Integer companyId,@Param("lineId")Integer lineId);
 }
