@@ -58,7 +58,7 @@ public class ProductionLineController extends BaseController {
     @ResponseBody
     public TableDataInfo list(ProductionLine productionLine, HttpServletRequest request) {
         startPage();
-        List<ProductionLine> list = productionLineService.selectProductionLineList(productionLine,request);
+        List<ProductionLine> list = productionLineService.selectProductionLineList(productionLine, request);
         return getDataTable(list);
     }
 
@@ -69,8 +69,8 @@ public class ProductionLineController extends BaseController {
     @RequiresPermissions("production:productionLine:export")
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(ProductionLine productionLine,HttpServletRequest request) {
-        List<ProductionLine> list = productionLineService.selectProductionLineList(productionLine,request);
+    public AjaxResult export(ProductionLine productionLine, HttpServletRequest request) {
+        List<ProductionLine> list = productionLineService.selectProductionLineList(productionLine, request);
         ExcelUtil<ProductionLine> util = new ExcelUtil<ProductionLine>(ProductionLine.class);
         return util.exportExcel(list, "productionLine");
     }
@@ -90,8 +90,8 @@ public class ProductionLineController extends BaseController {
     @Log(title = "生产线", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(ProductionLine productionLine,HttpServletRequest request) {
-        return toAjax(productionLineService.insertProductionLine(productionLine,request));
+    public AjaxResult addSave(ProductionLine productionLine, HttpServletRequest request) {
+        return toAjax(productionLineService.insertProductionLine(productionLine, request));
     }
 
     /**
@@ -111,9 +111,9 @@ public class ProductionLineController extends BaseController {
     @Log(title = "生产线", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(ProductionLine productionLine,HttpServletRequest request) {
+    public AjaxResult editSave(ProductionLine productionLine, HttpServletRequest request) {
         try {
-            return toAjax(productionLineService.updateProductionLine(productionLine,request));
+            return toAjax(productionLineService.updateProductionLine(productionLine, request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -127,9 +127,9 @@ public class ProductionLineController extends BaseController {
     @Log(title = "生产线", businessType = BusinessType.DELETE)
     @PostMapping("/remove")
     @ResponseBody
-    public AjaxResult remove(Integer id,HttpServletRequest request) {
+    public AjaxResult remove(Integer id, HttpServletRequest request) {
         try {
-            return toAjax(productionLineService.deleteProductionLineById(id,request));
+            return toAjax(productionLineService.deleteProductionLineById(id, request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -158,9 +158,9 @@ public class ProductionLineController extends BaseController {
     @ResponseBody
     @RequestMapping("/save/config")
     @RequiresPermissions("production:productionLine:devconfig")
-    public AjaxResult saveDevConfig(@RequestBody ProductionLine line,HttpServletRequest request) {
+    public AjaxResult saveDevConfig(@RequestBody ProductionLine line, HttpServletRequest request) {
         try {
-            return toAjax(productionLineService.updateLineConfigClear(line,request));
+            return toAjax(productionLineService.updateLineConfigClear(line, request));
         } catch (BusinessException e) {
             return error(e.getMessage());
         }
@@ -216,10 +216,9 @@ public class ProductionLineController extends BaseController {
      */
     @PostMapping("/checkLineNameUnique")
     @ResponseBody
-    public String checkLineNameUnique(ProductionLine productionLine){
+    public String checkLineNameUnique(ProductionLine productionLine) {
         return productionLineService.checkLineNameUnique(productionLine);
     }
-
 
 
     /******************************************************************************************************
@@ -242,17 +241,17 @@ public class ProductionLineController extends BaseController {
      */
     @PostMapping("/applist")
     @ResponseBody
-    public AjaxResult appSelectLineList(@RequestBody ProductionLine productionLine){
+    public AjaxResult appSelectLineList(@RequestBody ProductionLine productionLine) {
         try {
             if (productionLine != null) {
                 productionLine.appStartPage();
-                Map<String,Object> map = new HashMap<>(16);
+                Map<String, Object> map = new HashMap<>(16);
                 if (productionLine.getmParentId() != null && productionLine.getUid() != null) {
                     List<MenuApi> menuApiList = menuService.selectMenuListByParentId(productionLine.getUid(), productionLine.getmParentId());
-                    map.put("menuList",menuApiList);
+                    map.put("menuList", menuApiList);
                 }
-                map.put("lineList",productionLineService.appSelectLineList(productionLine));
-                return AjaxResult.success("请求成功",map);
+                map.put("lineList", productionLineService.appSelectLineList(productionLine));
+                return AjaxResult.success("请求成功", map);
             }
             return error();
         } catch (Exception e) {
@@ -265,9 +264,9 @@ public class ProductionLineController extends BaseController {
      */
     @PostMapping("/appLineCfDevList")
     @ResponseBody
-    public AjaxResult appSelectLineCfDevList(@RequestBody Workstation workstation){
+    public AjaxResult appSelectLineCfDevList(@RequestBody Workstation workstation) {
         try {
-            return  AjaxResult.success("请求成功",workstationService.selectWorkstationList(workstation));
+            return AjaxResult.success("请求成功", workstationService.selectWorkstationList(workstation));
         } catch (Exception e) {
             return error("请求失败");
         }
@@ -278,9 +277,9 @@ public class ProductionLineController extends BaseController {
      */
     @PostMapping("/appLineCfSopList")
     @ResponseBody
-    public AjaxResult appSelectLintCfSopList(@RequestBody SopLine sopLine){
+    public AjaxResult appSelectLintCfSopList(@RequestBody SopLine sopLine) {
         try {
-            return AjaxResult.success("请求成功",sopLineService.selectSopLineList(sopLine));
+            return AjaxResult.success("请求成功", sopLineService.selectSopLineList(sopLine));
         } catch (Exception e) {
             return error("请求失败");
         }
@@ -289,21 +288,22 @@ public class ProductionLineController extends BaseController {
 
     /**
      * 通过产线id查询在该产线的工单列表 -- 产线实况
+     *
      * @param lineId 产线id
      * @param wlSign 流水线传0 单工位传1
      */
     @PostMapping("/appWorkInLine")
     @ResponseBody
-    public AjaxResult appSelectLineWorkList(@RequestBody DevWorkOrder workOrder){
+    public AjaxResult appSelectLineWorkList(@RequestBody DevWorkOrder workOrder) {
         try {
             if (workOrder != null) {
                 workOrder.appStartPage();
-                Map<String,Object> map = new HashMap<>(16);
+                Map<String, Object> map = new HashMap<>(16);
                 if (workOrder != null && workOrder.getMenuList() != null && workOrder.getUid() != null) {
-                    map.put("menuList",menuService.selectMenuListByParentId(workOrder.getUid(),workOrder.getMenuList()));
+                    map.put("menuList", menuService.selectMenuListByParentId(workOrder.getUid(), workOrder.getMenuList()));
                 }
-                map.put("workOrderList",workOrderService.selectDevWorkOrderList(workOrder));
-                return AjaxResult.success("请求成功",map);
+                map.put("workOrderList", workOrderService.appSelectDevWorkOrderList(workOrder));
+                return AjaxResult.success("请求成功", map);
             }
             return error();
         } catch (Exception e) {

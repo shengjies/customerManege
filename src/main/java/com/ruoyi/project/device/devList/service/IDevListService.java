@@ -4,7 +4,6 @@ import com.ruoyi.project.device.devList.domain.DevList;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -96,7 +95,13 @@ public interface IDevListService
 	 * 查询所以未配置的硬件
 	 * @return
 	 */
-	List<DevList> selectDevNotConfig();
+	List<DevList> selectJSDevNotConfig();
+
+	/**
+	 * 查询所以未配置的硬件
+	 * @return
+	 */
+	List<DevList> selectKBDevNotConfig();
 
 	/**
 	 * app端查询硬件列表

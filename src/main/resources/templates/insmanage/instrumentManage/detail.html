@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div id="work-order-detail" class="ibox-content" th:object="${instrumentManage}">
+    <style type="text/css">
+        #work-order-detail .col-sm-4{
+            text-align: right;
+        }
+        #work-order-detail .row{
+            margin-top: 5px;
+        }
+    </style>
+    <div class="row">
+        <div class="col-sm-6">
+            <label class="col-sm-4">仪器编号:</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imCode}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">仪器型号:</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imModel}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 5px">
+        <div class="col-sm-6">
+            <label class="col-sm-4">仪器名称：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imName}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">设备类型：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.inTypeName}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 5px">
+        <div class="col-sm-6">
+            <label class="col-sm-4">使用部门:</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imDepartment}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">设备责任人：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imLiableName}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 5px">
+        <div class="col-sm-6">
+            <label class="col-sm-4">设备状态：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imStatus == 0? '已停用':'已启用'}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">校验证书号码：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imCheckNumber}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 5px">
+        <div class="col-sm-6">
+            <label class="col-sm-4">校验有效期：</label>
+            <div class="col-sm-8">
+                <span th:utext="${#dates.format(instrumentManage.imStartDate,'yyyy-MM-dd')}"></span><span>--</span>
+                <span th:utext="${#dates.format(instrumentManage.imEndDate,'yyyy-MM-dd')}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">检验证书：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imCheckBook}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 5px">
+        <div class="col-sm-6">
+            <label class="col-sm-4">校验机构：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imCheckMechanism}"></span>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <label class="col-sm-4">供应商：</label>
+            <div class="col-sm-8">
+                <span th:utext="${instrumentManage.imSupplier}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 5px">
+        <div class="col-sm-6">
+            <label class="col-sm-4">启用日期：</label>
+            <div class="col-sm-8">
+                <span th:utext="${#dates.format(instrumentManage.imStartTime,'yyyy-MM-dd HH:mm')}"></span>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    function submitHandler() {
+        $.modal.close();
+        // window.parent.$.table.refresh();
+    }
+</script>
+</body>
+</html>

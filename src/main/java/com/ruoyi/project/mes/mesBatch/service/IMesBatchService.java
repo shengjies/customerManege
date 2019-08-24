@@ -74,4 +74,11 @@ public interface IMesBatchService
 	 * @return 结果
 	 */
     int removeMesData(int id);
+
+	/**
+	 * 通过工单搜索查询工单追溯信息
+	 * @param workCode 工单号
+	 * @return 结果
+	 */
+	MesData selectMesDataByWorkCode(String workCode);
 }

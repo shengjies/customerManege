@@ -254,6 +254,10 @@ public interface IDevWorkOrderService {
      */
     int deleteDevWorkOrderById(Integer id, Integer uid);
 
+    /**
+     * app端首页展示两条当天的工单信息
+     * @return 结果
+     */
     List<DevWorkOrder> appSelectWorkListTwo();
 
     /**

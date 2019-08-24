@@ -457,7 +457,4 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select workorder_number,line_id,product_code,product_name,product_number,start_time,end_time,make_type from dev_work_order where workorder_number = #{workCode}
     </select>
 
-    <select id="appSelectWorkListTwo" resultMap="DevWorkOrderResult">
-
-    </select>
 </mapper>

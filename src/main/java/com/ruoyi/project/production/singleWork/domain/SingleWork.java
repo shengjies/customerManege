@@ -36,7 +36,7 @@ public class SingleWork extends BaseEntity
 	/** 计数器硬件信息硬件id(默认是0、未配置) */
 	private Integer devId;
 	private String devCode;
-	/** 看板硬件信息(默认是0、未配置)*/
+	/** SOP看板编码信息(默认是0、未配置)*/
 	private Integer watchId;
 	private String watchCode;
 	/** 扫码枪硬件信息(默认是0、未配置)*/

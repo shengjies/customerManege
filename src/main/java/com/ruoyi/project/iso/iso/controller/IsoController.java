@@ -2,6 +2,7 @@ package com.ruoyi.project.iso.iso.controller;
 
 import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.exception.BusinessException;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -218,7 +219,11 @@ public class IsoController extends BaseController {
     @ResponseBody
     public AjaxResult appSelectList(@RequestBody Iso iso){
         try {
-            return AjaxResult.success("请求成功",isoService.appSelectList(iso));
+            if (StringUtils.isNotNull(iso)) {
+                iso.appStartPage();
+                return AjaxResult.success("请求成功",isoService.appSelectList(iso));
+            }
+            return error();
         } catch (Exception e) {
             return error("请求失败");
         }

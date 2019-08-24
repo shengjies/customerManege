@@ -160,6 +160,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (workOrder.getWlSign() == 0) {
             ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
             workOrder.setParam1(productionLine.getLineName());
+            workOrder.setManual(productionLine.getManual());
             User user = userMapper.selectUserInfoById(productionLine.getDeviceLiable());
             workOrder.setParam2(user == null ? "" : user.getUserName());
             productionLine.setDeviceLiableName(user == null ? "" : user.getUserName());
@@ -171,6 +172,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             //查询车间
             SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
             if (work != null) {
+                workOrder.setManual(0);
                 workOrder.setSingle(work.getId());
                 workOrder.setParam1(work.getWorkshopName());
                 User user = userMapper.selectUserInfoById(work.getLiableOne());
@@ -569,6 +571,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
              * 车间
              */
         } else {
+            SingleWork singleWork = singleWorkMapper.selectSingleWorkById(devWorkOrder.getLineId());
+            if (StringUtils.isNotNull(singleWork) && singleWork.getLiableOne() != userId.intValue() && singleWork.getLiableTwo() != userId.intValue()) {
+                throw new BusinessException("不是工单负责人");
+            }
             updateWork(user, devWorkOrder);
         }
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
@@ -666,11 +672,13 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             if (workOrder.getWlSign() == 0) {
                 ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
                 if (null != productionLine) {
+                    workOrder.setManual(productionLine.getManual());
                     workOrder.setParam1(productionLine.getLineName());
                 }
             } else if (workOrder.getWlSign() == 1) {
                 SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
                 if (work != null) {
+                    workOrder.setManual(0);
                     workOrder.setParam1(work.getWorkshopName());
                 }
             }
@@ -1615,6 +1623,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         return devWorkOrderMapper.deleteDevWorkOrderById(id);
     }
 
+    /**
+     * app端首页展示今日排单信息
+     * @return 结果
+     */
     @Override
     public List<DevWorkOrder> appSelectWorkListTwo() {
         User user =JwtUtil.getUser();
@@ -1622,6 +1634,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             return Collections.emptyList();
         }
         List<DevWorkOrder> workOrders = devWorkOrderMapper.selectWorkOrderAllToday(user.getCompanyId());
+        getLineOrHouseName(workOrders);
         return workOrders;
     }
 

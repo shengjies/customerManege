@@ -23,6 +23,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createId"    column="create_id"    />
         <result property="createTime"    column="create_time"    />
         <result property="imTag"    column="im_tag"    />
+        <result property="imStartDate"    column="im_start_date"    />
+        <result property="imEndDate"    column="im_end_date"    />
         <association property="imLiableName" column="im_liable" select="selectLiableName">
             <result property="imLiableName" column="user_name"/>
         </association>
@@ -33,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<sql id="selectInstrumentManageVo">
         select id, company_id, im_code, im_name, im_model,in_type, im_department, im_liable, im_status, im_check_number, im_check_period, im_check_book,
-        im_check_mechanism, im_supplier, im_start_time, create_id, create_time,im_tag from tab_instrument_manage
+        im_check_mechanism, im_supplier, im_start_time, create_id, create_time,im_tag,im_start_date,im_end_date from tab_instrument_manage
     </sql>
 	
     <select id="selectInstrumentManageList" parameterType="InstrumentManage" resultMap="InstrumentManageResult">
@@ -100,6 +102,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createId != null  ">create_id,</if>
 			<if test="createTime != null  ">create_time,</if>
             <if test="imTag != null  ">im_tag,</if>
+            <if test="imStartDate != null  ">im_start_date,</if>
+            <if test="imEndDate != null  ">im_end_date,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -119,6 +123,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="createId != null  ">#{createId},</if>
 			<if test="createTime != null  ">#{createTime},</if>
             <if test="imTag != null  ">#{imTag},</if>
+            <if test="imStartDate != null  ">#{imStartDate},</if>
+            <if test="imEndDate != null  ">#{imEndDate},</if>
          </trim>
     </insert>
 	 
@@ -142,6 +148,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createId != null  ">create_id = #{createId},</if>
             <if test="createTime != null  ">create_time = #{createTime},</if>
             <if test="imTag != null  ">im_tag = #{imTag},</if>
+            <if test="imStartDate != null  ">im_start_date = #{imStartDate},</if>
+            <if test="imEndDate != null  ">im_end_date = #{imEndDate},</if>
         </trim>
         where id = #{id}
     </update>

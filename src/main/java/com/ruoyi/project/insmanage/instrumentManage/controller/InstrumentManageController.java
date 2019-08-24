@@ -135,6 +135,17 @@ public class InstrumentManageController extends BaseController
 		mmap.put("instrumentManage", instrumentManage);
 	    return prefix + "/edit";
 	}
+
+	/**
+	 * 查看设备明细
+	 */
+	@GetMapping("/detail/{id}")
+	public String detail(@PathVariable("id") Integer id, ModelMap mmap)
+	{
+		InstrumentManage instrumentManage = instrumentManageService.selectInstrumentManageById(id);
+		mmap.put("instrumentManage", instrumentManage);
+		return prefix + "/detail";
+	}
 	
 	/**
 	 * 修改保存仪器设备管理

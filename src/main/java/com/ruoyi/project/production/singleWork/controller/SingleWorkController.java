@@ -20,6 +20,8 @@ import com.ruoyi.project.production.singleWork.service.ISingleWorkService;
 import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,6 +40,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/production/singleWork")
 public class SingleWorkController extends BaseController {
+
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SingleWorkController.class);
+
     private String prefix = "production/singleWork";
 
     @Autowired
@@ -301,11 +307,28 @@ public class SingleWorkController extends BaseController {
         try {
             if (singleWorkOrder != null) {
                 singleWorkOrder.appStartPage();
-                return AjaxResult.success("请求成功",singleWorkOrderService.selectSingleWorkOrderList(singleWorkOrder));
+                return AjaxResult.success("请求成功", singleWorkOrderService.selectSingleWorkOrderList(singleWorkOrder));
             }
             return error();
         } catch (Exception e) {
             return error();
+        }
+    }
+
+    /**
+     * app端配置单工位的硬件
+     */
+    @PostMapping("/appEdit")
+    @ResponseBody
+    public AjaxResult appUpdateSingWork(@RequestBody SingleWork singleWork) {
+        try {
+            return toAjax( singleWorkService.appUpdateSingWork(singleWork));
+        } catch (BusinessException e) {
+            LOGGER.error("单工位配置硬件出现异常：" + e.getMessage());
+            return AjaxResult.error(e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("单工位配置硬件出现异常：" + e.getMessage());
+            return AjaxResult.error();
         }
     }
 }

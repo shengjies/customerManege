@@ -116,4 +116,9 @@ public interface ISingleWorkService
 	 * @return 结果
 	 */
 	List<SingleWork> appSelectSingleWorkList(SingleWork singleWork);
+
+	/**
+	 * app端配置单工位硬件
+	 */
+    int appUpdateSingWork(SingleWork singleWork);
 }

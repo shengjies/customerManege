@@ -20,19 +20,14 @@
 
 							<li>
 								设备类型：
-								<select id="inType" name="inType" th:with="allInsType=${@ins.selectAllInsType()}">
+								<select style="width: 180px;" id="inType" name="inType" th:with="allInsType=${@ins.selectAllInsType()}">
 									<option value="-1">全部</option>
 									<option th:each="insType:${allInsType}" th:utext="${insType.inType}" th:value="${insType.id}"></option>
 								</select>
 							</li>
-
-							<li>
-								使用部门：<input type="text" name="imDepartment"/>
-							</li>
-
 							<li>
 								设备责任人：
-								<select style="width: 200px" id="imLiable" name="imLiable"
+								<select style="width: 150px" id="imLiable" name="imLiable"
 										th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
 									<option value="">全部</option>
 									<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
@@ -41,7 +36,7 @@
 
 							<li>
 								设备状态：
-								<select name="imStatus" id="imStatus">
+								<select name="imStatus" id="imStatus" style="width: 80px">
 									<option value="">请选择</option>
 									<option value="0">停用</option>
 									<option value="1">启用</option>
@@ -90,6 +85,7 @@
                 url: prefix + "/list",
                 createUrl: prefix + "/add",
                 updateUrl: prefix + "/edit/{id}",
+				detailUrl: prefix + "/detail/{id}",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
 				importUrl: prefix + "/importData",
@@ -112,15 +108,13 @@
 				{
 					field : 'imCode', 
 					title : '仪器编号',
-					sortable: true
+					sortable: true,
+					formatter:function (value, row, index) {
+						return '<a href="javascript:void(0)" title="查看明细" onclick="showImDetail('+ row.id +')"><span style="font-weight: bold;color: blue">'+ value +'</span></a>'
+					}
 				},
 				{
-					field : 'imName', 
-					title : '仪器名称',
-					sortable: true
-				},
-				{
-					field : 'imModel', 
+					field : 'imModel',
 					title : '仪器型号',
 					sortable: true
 				},
@@ -131,11 +125,6 @@
 					formatter:function (value,row,index) {
 						return row.inTypeName;
 					}
-				},
-				{
-					field : 'imDepartment', 
-					title : '使用部门',
-					sortable: true
 				},
 				{
 					field : 'imLiable', 
@@ -158,29 +147,20 @@
                     }
 				},
 				{
-					field : 'imCheckNumber', 
-					title : '校验证书号码',
-					sortable: true
-				},
-				{
 					field : 'imCheckPeriod', 
 					title : '校验有效期',
-					sortable: true
-				},
-				{
-					field : 'imCheckBook', 
-					title : '校验证书',
-					sortable: true
-				},
-				{
-					field : 'imCheckMechanism', 
-					title : '校验机构',
-					sortable: true
-				},
-				{
-					field : 'imSupplier', 
-					title : '供应商',
-					sortable: true
+					sortable: true,
+					formatter:function (value, row, index) {
+						var actions = [];
+						if (row.imStartDate != null) {
+							actions.push('<span>'+ row.imStartDate +'</span>');
+						}
+						actions.push('<span>—</span>');
+						if (row.imEndDate != null) {
+							actions.push('<span>'+ row.imEndDate +'</span>');
+						}
+						return actions.join('');
+					}
 				},
 				{
 					field : 'imStartTime', 
@@ -215,6 +195,13 @@
                 $.operate.post(prefix + "/changeStatus", {"id": id, "imStatus": 1});
             })
         }
+
+		/**
+		 * 查看设备明细
+		 */
+		function showImDetail(id) {
+			$.operate.detail(id,800,400)
+		}
 
     </script>
 </body>

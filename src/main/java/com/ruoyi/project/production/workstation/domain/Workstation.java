@@ -1,8 +1,7 @@
 package com.ruoyi.project.production.workstation.domain;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
+
 import java.util.Date;
 
 /**
@@ -33,7 +32,7 @@ public class Workstation extends BaseEntity
 	private String devCode;
 	/** 看板硬件id */
 	private Integer cId;
-	/** 看板硬件编码 */
+	/** sop看板硬件编码 */
 	private String cCode;
 	/** ECM 扫描枪硬件id */
 	private Integer eId;

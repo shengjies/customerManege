@@ -180,11 +180,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         update dev_list set company_id = #{companyId},device_name=#{deviceName},remark=#{remark},config_date=now()  where device_id = #{deviceId};
     </update>
 
-    <!--查询所以未配置的硬件信息-->
-    <select id="selectDevNotConfig" resultMap="DevListResult">
+    <!--查询所以未配置的计数器硬件信息-->
+    <select id="selectJSDevNotConfig" resultMap="DevListResult">
         <include refid="selectDevListVo"/>
         <where>
-            and def_id = 0  and sign = 0 and device_status = 1
+            and def_id = 0  and sign = 0 and device_status = 1 and device_id like concat ('JS%');
+        </where>
+    </select>
+
+    <!--查询所以未配置的看板硬件信息-->
+    <select id="selectKBDevNotConfig" resultMap="DevListResult">
+        <include refid="selectDevListVo"/>
+        <where>
+            and def_id = 0  and sign = 0 and device_status = 1 and device_id like concat ('KB%');
         </where>
     </select>
 

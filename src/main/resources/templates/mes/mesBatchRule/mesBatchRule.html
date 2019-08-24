@@ -40,14 +40,6 @@
 								<input type="text" class="time-input" id="endTime" placeholder="结束时间"
 									   name="params[endTime]"/>
 							</li>
-							<li class="select-time">
-								<label>最后修改时间： </label>
-								<input type="text" class="time-input" id="startUTime" placeholder="开始时间"
-									   name="params[beginUTime]"/>
-								<span>-</span>
-								<input type="text" class="time-input" id="endUTime" placeholder="结束时间"
-									   name="params[endUTime]"/>
-							</li>
 
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -89,6 +81,7 @@
 			$("#materiels").val("-1").trigger("change");
 		}
         var editFlag = [[${@permission.hasPermi('mes:mesBatchRule:edit')}]];
+		var listFlag = [[${@permission.hasPermi('mes:mesBatchRule:list')}]];
         var removeFlag = [[${@permission.hasPermi('mes:mesBatchRule:remove')}]];
         var prefix = ctx + "mes/mesBatchRule";
 
@@ -154,6 +147,7 @@
 		            formatter: function(value, row, index) {
 		            	var actions = [];
 		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="editMES(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+						actions.push('<a class="btn btn-warning btn-xs ' + listFlag + '" href="javascript:void(0)" onclick="showRuleDetail(\'' + row.id + '\')"><i class="fa fa-eye"></i>明细</a> ');
                         actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 						return actions.join('');
 		            }
@@ -166,7 +160,7 @@
 		 * 添加MES规格
 		 */
 		function addMES() {
-			$.modal.open("添加MES追踪规格", $.table._option.createUrl,'800','600');
+			$.modal.open("添加MES追踪规则", $.table._option.createUrl,'800','600');
 		}
 
 		/**
@@ -184,7 +178,15 @@
 				}
 				url = $.table._option.updateUrl.replace("{id}", id);
 			}
-			$.modal.open("修改MES追踪规格", url,'800','600');
+			$.modal.open("修改MES追踪规则", url,'800','600');
+		}
+
+		/**
+		 * 查看MES追踪规则
+		 */
+		function showRuleDetail(id) {
+			var url = prefix + "/showRuleDetail?id=" + id;
+			$.modal.open("查看MES追踪规则", url,'800','600');
 		}
 
 		/**

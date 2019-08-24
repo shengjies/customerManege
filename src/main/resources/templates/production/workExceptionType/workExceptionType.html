@@ -18,12 +18,12 @@
 							</select>
 							</li>
 							<li>
-								异常类型名称：<input type="text" name="typeName"/>
+								异常类型名称：<input style="width: 200px" type="text" name="typeName"/>
 							</li>
 
 							<li>
 								是否删除:
-								<select name="defId">
+								<select name="defId" style="width: 200px">
 									<option value="">所有</option>
 									<option value="1">已删除</option>
 									<option value="0">未删除</option>
@@ -48,9 +48,9 @@
 				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="production:workExceptionType:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
-				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:workExceptionType:export">
-						<i class="fa fa-download"></i> 导出
-				 </a>
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:workExceptionType:export">-->
+						<!--<i class="fa fa-download"></i> 导出-->
+				 <!--</a>-->
 			</div>
 			<div class="col-sm-12 select-table table-striped">
 				<table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -72,7 +72,11 @@
 				exportUrl: prefix + "/export",
                 modalName: "工单工单异常类型",
 				search: false,
-		        showExport: true,
+				showExport: false,
+				showSearch:true,
+				showRefresh:true,
+				showColumns:false,
+				showToggle:true,
                 columns: [{
 		            checkbox: true
 		        },

@@ -1,5 +1,6 @@
 package com.ruoyi.project.insmanage.instrumentManage.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
@@ -53,8 +54,14 @@ public class InstrumentManage extends BaseEntity
 	/** 校验证书号码 */
 	@Excel(name = "校验证书号码",type= Excel.Type.ALL)
 	private String imCheckNumber;
-	/** 校验有效期 */
+
 	private String imCheckPeriod;
+	/** 有效期开始时间 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date imStartDate;
+	/** 有效期结束时间 */
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private Date imEndDate;
 	/** 校验机构 */
 	@Excel(name = "校验机构",type= Excel.Type.ALL)
 	private String imCheckMechanism;
@@ -69,6 +76,22 @@ public class InstrumentManage extends BaseEntity
 	private Date createTime;
 	/** 设备标记状态(0、未配置过，1、配置过了) */
 	private Integer imTag;
+
+	public Date getImStartDate() {
+		return imStartDate;
+	}
+
+	public void setImStartDate(Date imStartDate) {
+		this.imStartDate = imStartDate;
+	}
+
+	public Date getImEndDate() {
+		return imEndDate;
+	}
+
+	public void setImEndDate(Date imEndDate) {
+		this.imEndDate = imEndDate;
+	}
 
 	public Integer getImTag() {
 		return imTag;

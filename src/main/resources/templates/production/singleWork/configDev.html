@@ -13,11 +13,11 @@
     <form class="form-horizontal m" id="form-configDev-add">
         <input id="id" name="id" th:field="*{id}"  type="hidden">
         <div class="form-group">
-            <label class="col-sm-3 control-label">计数器硬件编码：</label>
+            <label class="col-sm-3 control-label">计数器编码：</label>
             <div class="col-sm-8">
                 <select style="width: 100%" id="devId" class="form-control" th:field="*{devId}"
                         name="devId"
-                        th:with="devList = ${@devList.selectDevNotConfig()}">
+                        th:with="devList = ${@devList.selectJSDevNotConfig()}">
                     <option value="0">请选择</option>
                     <option th:if="${singleWork.devId != null and singleWork.devId != 0}"  th:text="${singleWork.devCode}"
                             th:value="${singleWork.devId}"></option>
@@ -27,11 +27,11 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-3 control-label">看板硬件编码：</label>
+            <label class="col-sm-3 control-label">SOP看板编码：</label>
             <div class="col-sm-8">
                 <select style="width: 100%" id="watchId" class="form-control" th:field="*{watchId}"
                         name="cId"
-                        th:with="devList = ${@devList.selectDevNotConfig()}">
+                        th:with="devList = ${@devList.selectKBDevNotConfig()}">
                     <option value="0">请选择</option>
                     <option th:if="${singleWork.watchId != null and singleWork.watchId != 0}"  th:text="${singleWork.watchCode}"
                             th:value="${singleWork.watchId}"></option>
@@ -40,20 +40,20 @@
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col-sm-3 control-label">MES硬件编码：</label>
-            <div class="col-sm-8">
-                <select style="width: 100%" id="eId" class="form-control" th:field="*{eId}"
-                        name="eId"
-                        th:with="devList = ${@devList.selectDevNotConfig()}">
-                    <option value="0">请选择</option>
-                    <option th:if="${singleWork.eId != null and singleWork.eId != 0}"  th:text="${singleWork.eCode}"
-                            th:value="${singleWork.eId}"></option>
-                    <option th:each="item : ${devList}"  th:text="${item.deviceId}"
-                            th:value="${item.id}"></option>
-                </select>
-            </div>
-        </div>
+        <!--<div class="form-group">-->
+            <!--<label class="col-sm-3 control-label">MES硬件编码：</label>-->
+            <!--<div class="col-sm-8">-->
+                <!--<select style="width: 100%" id="eId" class="form-control" th:field="*{eId}"-->
+                        <!--name="eId"-->
+                        <!--th:with="devList = ${@devList.selectDevNotConfig()}">-->
+                    <!--<option value="0">请选择</option>-->
+                    <!--<option th:if="${singleWork.eId != null and singleWork.eId != 0}"  th:text="${singleWork.eCode}"-->
+                            <!--th:value="${singleWork.eId}"></option>-->
+                    <!--<option th:each="item : ${devList}"  th:text="${item.deviceId}"-->
+                            <!--th:value="${item.id}"></option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
     </form>
 </div>
 <div th:include="include::footer"></div>

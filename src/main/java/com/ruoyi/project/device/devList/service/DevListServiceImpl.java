@@ -252,12 +252,21 @@ public class DevListServiceImpl implements IDevListService {
     }
 
     /**
-     * 查询所以未配置的硬件
+     * 查询所以未配置的计数器硬件
      * @return
      */
     @Override
-    public List<DevList> selectDevNotConfig() {
-        return devListMapper.selectDevNotConfig();
+    public List<DevList> selectJSDevNotConfig() {
+        return devListMapper.selectJSDevNotConfig();
+    }
+
+    /**
+     * 查询所以未配置的看板硬件
+     * @return
+     */
+    @Override
+    public List<DevList> selectKBDevNotConfig() {
+        return devListMapper.selectKBDevNotConfig();
     }
 
     /**

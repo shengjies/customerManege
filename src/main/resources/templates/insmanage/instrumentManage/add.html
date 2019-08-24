@@ -1,132 +1,143 @@
 <!DOCTYPE HTML>
-<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
 <body class="white-bg">
-    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-        <form class="form-horizontal m" id="form-instrumentManage-add">
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">仪器编号：</label>
-				<div class="col-sm-8">
-					<input id="imCode" name="imCode" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">仪器名称：</label>
-				<div class="col-sm-8">
-					<input id="imName" name="imName" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">仪器型号：</label>
-				<div class="col-sm-8">
-					<input id="imModel" name="imModel" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-3 control-label">仪器类型：</label>
-				<div class="col-sm-8">
-					<select id="inTypeName" name="inTypeName" class="form-control" th:with="allInsType=${@ins.selectAllInsType()}">
-						<option value="">请选择</option>
-						<option th:each="insType:${allInsType}" th:text="${insType.inType}" th:value="${insType.id}"></option>
-					</select>
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">使用部门：</label>
-				<div class="col-sm-8">
-					<input id="imDepartment" name="imDepartment" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">设备责任人：</label>
-				<div class="col-sm-8">
-					<select id="imLiable" name="imLiable" class="form-control" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
-						<option value="">请选择</option>
-						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
-					</select>
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">校验证书号码：</label>
-				<div class="col-sm-8">
-					<input id="imCheckNumber" name="imCheckNumber" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">校验有效期：</label>
-				<div class="col-sm-8">
-					<input id="imCheckPeriod" name="imCheckPeriod" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">校验证书：</label>
-				<div class="col-sm-8">
-					<input id="imCheckBook" name="imCheckBook" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">校验机构：</label>
-				<div class="col-sm-8">
-					<input id="imCheckMechanism" name="imCheckMechanism" class="form-control" type="text">
-				</div>
-			</div>
-			<div class="form-group">	
-				<label class="col-sm-3 control-label">供应商：</label>
-				<div class="col-sm-8">
-					<input id="imSupplier" name="imSupplier" class="form-control" type="text">
-				</div>
-			</div>
-		</form>
-	</div>
-    <div th:include="include::footer"></div>
-    <script th:inline="javascript">
-		$(function () {
-			$("#inTypeName").select2({
-				width:"100%",
-				tags:true,
-				placeholder:'请选择'
-			});
-			$("#imLiable").select2({
-				width:"100%",
-				placeholder:'请选择'
-			});
-		})
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-instrumentManage-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">仪器编号：</label>
+            <div class="col-sm-8">
+                <input id="imCode" name="imCode" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">仪器名称：</label>
+            <div class="col-sm-8">
+                <input id="imName" name="imName" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">仪器型号：</label>
+            <div class="col-sm-8">
+                <input id="imModel" name="imModel" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">仪器类型：</label>
+            <div class="col-sm-8">
+                <select id="inTypeName" name="inTypeName" class="form-control"
+                        th:with="allInsType=${@ins.selectAllInsType()}">
+                    <option value="">请选择</option>
+                    <option th:each="insType:${allInsType}" th:text="${insType.inType}"
+                            th:value="${insType.inType}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">使用部门：</label>
+            <div class="col-sm-8">
+                <input id="imDepartment" name="imDepartment" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">设备责任人：</label>
+            <div class="col-sm-8">
+                <select id="imLiable" name="imLiable" class="form-control"
+                        th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+                    <option value="">请选择</option>
+                    <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">校验证书号码：</label>
+            <div class="col-sm-8">
+                <input id="imCheckNumber" name="imCheckNumber" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">校验有效期：</label>
+            <div class="col-sm-3">
+                <input placeholder="开始时间" id="imStartDate" name="imStartDate" class="form-control time-input">
+            </div>
+            <div class="col-sm-1">
+                <label class="control-label">至</label>
+            </div>
+            <div class="col-sm-3">
+                <input placeholder="结束时间" id="imEndDate" name="imEndDate" class="form-control time-input">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">校验证书：</label>
+            <div class="col-sm-8">
+                <input id="imCheckBook" name="imCheckBook" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">校验机构：</label>
+            <div class="col-sm-8">
+                <input id="imCheckMechanism" name="imCheckMechanism" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">供应商：</label>
+            <div class="col-sm-8">
+                <input id="imSupplier" name="imSupplier" class="form-control" type="text">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        $("#inTypeName").select2({
+            width: "100%",
+            tags: true,
+            placeholder: '请选择'
+        });
+        $("#imLiable").select2({
+            width: "100%",
+            placeholder: '请选择'
+        });
+    })
 
-		var prefix = ctx + "insmanage/instrumentManage"
-		$("#form-instrumentManage-add").validate({
-			rules:{
-				imCode:{
-					required:true,
-					remote: {
-						url: prefix + "/checkImCodeUnique",
-						type: "post",
-						dataType: "json",
-						data: {
-							name : function() {
-								return $.common.trim($("#imCode").val());
-							}
-						},
-						dataFilter: function(data, type) {
-							return $.validate.unique(data);
-						}
-					}
-				},
-			},
-			messages:{
-				"imCode":{
-					remote: "仪器编码已存在"
-				}
-			}
-		});
-		
-		function submitHandler() {
-	        if ($.validate.form()) {
-	        	// alert($("#imLiable").val());
-	            $.operate.save(prefix + "/add", $('#form-instrumentManage-add').serialize());
-	        }
-	    }
+    var prefix = ctx + "insmanage/instrumentManage"
+    $("#form-instrumentManage-add").validate({
+        rules: {
+            imCode: {
+                required: true,
+                remote: {
+                    url: prefix + "/checkImCodeUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name: function () {
+                            return $.common.trim($("#imCode").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+        },
+        messages: {
+            "imCode": {
+                remote: "仪器编码已存在"
+            }
+        }
+    });
 
-	</script>
+    function submitHandler() {
+        if ($.validate.form()) {
+            // alert($("#imLiable").val());
+            $.operate.save(prefix + "/add", $('#form-instrumentManage-add').serialize());
+        }
+    }
+
+</script>
 </body>
 </html>

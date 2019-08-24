@@ -91,7 +91,7 @@
 				},
 				{
 					field : 'cCode',
-					title : '看板硬件编码',
+					title : 'SOP看板编码',
 					sortable: true,
 					formatter:function (value, row, index) {
 						if(row.cId == 0){
@@ -100,17 +100,17 @@
 						return value;
 					}
 				},
-				{
-					field : 'eCode',
-					title : 'MES硬件编码',
-					sortable: true,
-					formatter:function (value, row, index) {
-						if(row.eId == 0){
-							return "未配置"
-						}
-						return value;
-					}
-				},
+				// {
+				// 	field : 'eCode',
+				// 	title : 'MES硬件编码',
+				// 	sortable: true,
+				// 	formatter:function (value, row, index) {
+				// 		if(row.eId == 0){
+				// 			return "未配置"
+				// 		}
+				// 		return value;
+				// 	}
+				// },
 				{
 					field : 'sign',
 					title : '数据标识',

@@ -82,6 +82,7 @@
     function changeCofType(val) {
         $("#add-mes-detail").children().remove();
         totalNum = 0;
+        orderNum = 0;
         $("#add-detail-btn").css("display","inline-block"); //显示
     }
     var orderNum = 0;
@@ -114,7 +115,7 @@
                         '                                    <select name="dCode" class="form-control">'+ item +
                         '                                    </select>' +
                         '                                </td>' +
-                        '                                <td><input type="number" class="form-control" name="ruleOrder" value="'+ orderNum +'"></td>' +
+                        '                                <td><input type="number" onchange="checkRuleSize(this)" class="form-control" name="ruleOrder" value="'+ orderNum +'"></td>' +
                         '                                <td>' +
                         '                                    <a class="btn  btn-danger btn-del btn-sm" name="removeBtn"  onclick="removeMatCode(this)">' +
                         '                                    <i class="fa fa-remove"></i>移除</a>' +
@@ -126,11 +127,12 @@
                     });
                 }
             })
+            totalNum++;
+            if (totalNum == 6) {
+                $("#add-detail-btn").css("display","none"); //隐藏
+            }
         }
-        totalNum++;
-        if (totalNum == 6) {
-            $("#add-detail-btn").css("display","none"); //隐藏
-        }
+
     }
 
     /**
@@ -155,6 +157,10 @@
             //封装MES规则明细
             var tagNum = 0;
             var mesRuleDetail = [];
+            var checkCodeNum = 0;
+            var checkCodeArray = new Array();
+            var checkOrderNum = 0;
+            var checkOrderArray = new Array();
             $("#add-mes-detail").find("tr").each(function () {
                 var item = {};
                 item.dType = $(this).find("td").find("select").find("option:selected").attr("data-dtype");//编码类型
@@ -162,6 +168,22 @@
                 item.ruleOrder = $(this).find("td").find("input[name='ruleOrder']").val(); // 排序
                 if (item.dType == null || item.dType == '') {
                     tagNum++;
+                }
+                if (item.dCode != null && item.dCode != ""){
+                    var index = $.inArray(item.dCode,checkCodeArray);
+                    if(index >= 0){
+                        checkCodeNum ++;
+                    }else {
+                        checkCodeArray.push(item.dCode);
+                    }
+                }
+                if (item.ruleOrder != null && item.ruleOrder != ""){
+                    var index = $.inArray(item.ruleOrder,checkOrderArray);
+                    if(index >= 0 || item.ruleOrder <= 0){
+                        checkOrderNum ++;
+                    }else {
+                        checkOrderArray.push(item.ruleOrder);
+                    }
                 }
                 mesRuleDetail.push(item);
             })
@@ -175,6 +197,14 @@
             }
             if (tagNum > 0) {
                 $.modal.alertWarning("编码信息必填");
+                return;
+            }
+            if (checkCodeNum > 0) {
+                $.modal.alertWarning("规则编码不能相同");
+                return;
+            }
+            if (checkOrderNum > 0) {
+                $.modal.alertWarning("排序必须大于0并且不能相同");
                 return;
             }
             mesRule.mesBatchRuleDetails = mesRuleDetail;
@@ -195,6 +225,18 @@
             $.ajax(config)
         }
     }
+
+    /**
+     * 校验排序长度
+     */
+    function checkRuleSize(val) {
+        var inputVal = val.value;
+        var ruleSize =  $("#add-mes-detail").find("tr").length;
+        if (inputVal > ruleSize) {
+            $(val).parent("td").find("input[name='ruleOrder']").val(ruleSize);
+        }
+    }
+
 </script>
 </body>
 </html>

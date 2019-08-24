@@ -24,7 +24,6 @@ public class DevList extends BaseEntity
 	private String deviceId;
 
 	/** 型号*/
-	@Excel(name = "型号")
 	private String devModel;
 	/**  */
 	private Integer deviceStatus;
@@ -39,7 +38,6 @@ public class DevList extends BaseEntity
 	private Integer deviceUploadTime;
 	/**  */
 	private Integer companyId;
-	@Excel(name = "所属公司")
 	private String comName;
 	/** 备注信息 */
 	@Excel(name = "备注信息")
@@ -47,7 +45,6 @@ public class DevList extends BaseEntity
 	/**  */
 	private Integer defId;
 	/** 配置时间 */
-	@Excel(name = "配置时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Excel.Type.EXPORT)
 	private Date configDate;
 	/** 创建时间 */
 	@Excel(name = "创建时间", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss", type = Excel.Type.EXPORT)

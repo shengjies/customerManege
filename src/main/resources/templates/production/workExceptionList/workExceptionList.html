@@ -44,6 +44,9 @@
         </div>
 
         <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-default" onclick="showExcList()" shiro:hasPermission="production:workExceptionType:list">
+                <i class="fa fa-bars"></i> 异常类型
+            </a>
             <a class="btn btn-success" onclick="add()" shiro:hasPermission="production:workExceptionList:add">
                 <i class="fa fa-plus"></i> 添加
             </a>
@@ -55,10 +58,10 @@
                <!--shiro:hasPermission="production:workExceptionList:remove">-->
                 <!--<i class="fa fa-remove"></i> 删除-->
             <!--</a>-->
-            <a class="btn btn-warning" onclick="$.table.exportExcel()"
-               shiro:hasPermission="production:workExceptionList:export">
-                <i class="fa fa-download"></i> 导出
-            </a>
+            <!--<a class="btn btn-warning" onclick="$.table.exportExcel()"-->
+               <!--shiro:hasPermission="production:workExceptionList:export">-->
+                <!--<i class="fa fa-download"></i> 导出-->
+            <!--</a>-->
         </div>
         <div class="col-sm-12 select-table table-striped">
             <table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -230,6 +233,13 @@
                 }
             });
         });
+    }
+
+    /**
+     * 查看异常类型列表
+     */
+    function showExcList() {
+        $.modal.open("查看异常类型","/production/workExceptionType");
     }
 </script>
 </body>

@@ -32,7 +32,7 @@ public class WorkExceptionTypeController extends BaseController
 	@Autowired
 	private IWorkExceptionTypeService workExceptionTypeService;
 	
-	@RequiresPermissions("production:workExceptionType:view")
+	@RequiresPermissions("production:workExceptionType:list")
 	@GetMapping()
 	public String workExceptionType()
 	{

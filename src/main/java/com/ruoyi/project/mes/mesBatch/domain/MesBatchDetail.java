@@ -1,8 +1,6 @@
 package com.ruoyi.project.mes.mesBatch.domain;
 
 import com.ruoyi.framework.web.domain.BaseEntity;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.Date;
 import java.util.List;
@@ -35,6 +33,8 @@ public class MesBatchDetail extends BaseEntity
 	private Integer dType;
 	/** 批次数量 */
 	private Integer mesNumber;
+	/** 物料用量总数 */
+	private Integer totalNum;
 	/** 批次先后排序(1-6优先级别递减，1最高) */
 	private Integer ruleOrder;
 
@@ -56,6 +56,14 @@ public class MesBatchDetail extends BaseEntity
 	private Date endTimePart;
 	/** MES半成品二级追溯明细，明细为物料相关信息 */
 	private List<MesBatchDetail> mesPartList;
+
+	public Integer getTotalNum() {
+		return totalNum;
+	}
+
+	public void setTotalNum(Integer totalNum) {
+		this.totalNum = totalNum;
+	}
 
 	public String getProBatchCode() {
 		return proBatchCode;

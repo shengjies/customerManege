@@ -355,4 +355,43 @@ public class MesBatchServiceImpl implements IMesBatchService {
         mesBatchDetailMapper.deleteMesBatchDetailByBId(id);
         return mesBatchMapper.deleteMesBatchById(id);
     }
+
+    /**
+     * 通过工单号查询工单追溯信息
+     * @param workCode 工单号
+     * @return 结果
+     */
+    @Override
+    public MesData selectMesDataByWorkCode(String workCode) {
+        List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(workCode);
+        if (StringUtils.isEmpty(mesBatchList)) {
+            return null;
+        }
+        MesData mesWork = new MesData();
+        // 查询工单基本信息
+        DevWorkOrder workOrder = workOrderMapper.selectWorkOrderByCode(workCode);
+        if (StringUtils.isNotNull(workOrder)) {
+            mesWork.setWorkCodePro(workOrder.getWorkorderNumber());
+            mesWork.setLineNamePro(workOrder.getLineName());
+            mesWork.setProductCodePro(workOrder.getProductCode());
+            mesWork.setProductNamePro(workOrder.getProductName());
+            mesWork.setStartTimePro(workOrder.getStartTime());
+            mesWork.setEndTimePro(workOrder.getEndTime());
+            mesWork.setWorkNumber(workOrder.getProductNumber());
+        }
+        // 查询原材料总数
+        List<MesBatchDetail> matTotalList = mesBatchDetailMapper.selectMesBatchTotalByWorkCode(workCode);
+        if (StringUtils.isNotEmpty(matTotalList)) {
+            mesWork.setMesProList(matTotalList);
+        }
+        // 查询MES追溯明细列表
+        for (MesBatch mesBatch : mesBatchList) {
+            List<MesBatchDetail> mesBatchDetailList = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+            if (StringUtils.isNotEmpty(mesBatchDetailList)) {
+                mesBatch.setMesBatchDetailList(mesBatchDetailList);
+            }
+        }
+        mesWork.setMesBatchList(mesBatchList);
+        return mesWork;
+    }
 }

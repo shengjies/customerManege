@@ -37,6 +37,8 @@ public class MesData extends BaseEntity {
     private Date endTimePro;
     /** 生产类型(0、默认值生产的是成品，1、生产半成品) */
     private Integer makeTypePro;
+    /** 工单追溯主码列表 */
+    private List<MesBatch> mesBatchList;
 
     /********************* MES追溯相关 ***********************/
     /** mes追溯标记 0、正向追溯，1、反向追溯 */
@@ -48,6 +50,15 @@ public class MesData extends BaseEntity {
 
     /********************* MES反向追溯相关 ***********************/
     private List<MesData> mesDataList;
+
+
+    public List<MesBatch> getMesBatchList() {
+        return mesBatchList;
+    }
+
+    public void setMesBatchList(List<MesBatch> mesBatchList) {
+        this.mesBatchList = mesBatchList;
+    }
 
     public String getBatchCode() {
         return batchCode;

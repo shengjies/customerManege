@@ -108,10 +108,16 @@ public interface DevListMapper
 	DevList selectDevListByCode(@Param("code")String code);
 
 	/**
-	 * 查询所以未配置
+	 * 查询所以未配置的计数器硬件
 	 * @return
 	 */
-	List<DevList> selectDevNotConfig();
+	List<DevList> selectJSDevNotConfig();
+
+	/**
+	 * 查询所以未配置的看板硬件
+	 * @return
+	 */
+	List<DevList> selectKBDevNotConfig();
 
 	/**
 	 * 通过硬件id更新是否被配置标记状态

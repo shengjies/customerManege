@@ -95,4 +95,11 @@ public interface MesBatchDetailMapper
 	 * @return 结果
 	 */
 	List<MesBatchDetail> selectMesBatchDetailByBIdOrder(@Param("bId") Integer bId);
+
+	/**
+	 * 通过工单查询工单材料用料总数
+	 * @param workCode
+	 * @return
+	 */
+    List<MesBatchDetail> selectMesBatchTotalByWorkCode(@Param("workCode") String workCode);
 }

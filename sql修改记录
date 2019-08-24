@@ -589,7 +589,24 @@ ADD COLUMN `rule_order` INT NULL COMMENT 'mes数据规则排序(1优先级别最
 ALTER TABLE `bzytest`.`tab_mes_batch_detail`
 ADD COLUMN `pro_batch_code` VARCHAR(45) NULL COMMENT '生产MES批次信息' AFTER `batch_code`;
 ALTER TABLE `bzytest`.`tab_mes_batch`
-ADD COLUMN `mes_sign` VARCHAR(45) NULL DEFAULT '000000000000' COMMENT 'mes标记扫描字段(1-12优先级别递增)、0代表生产未扫描，1，代表生产已扫描' AFTER `u_time`;
+ADD COLUMN `mes_sign` VARCHAR(45) NULL COMMENT 'mes标记扫描字段(1-12优先级别递增)、0代表生产未扫描，1，代表生产已扫描' AFTER `u_time`;
+
+# 新增售后服务功能
+# 2019-08-20
+CREATE TABLE `bzytest`.`tab_after_service` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '售后服务主键',
+  `input_batch_info`  VARCHAR(400) NULL COMMENT '录入批次信息',
+  `input_time` DATETIME NULL COMMENT '录入时间',
+  `input_user_id` INT NULL COMMENT '录入对象id',
+  `batch_code` VARCHAR(125) NULL COMMENT '批次号(预留字段)',
+  PRIMARY KEY (`id`))
+COMMENT = '售后服务';
+
+# 设备管理新增有效期开始结束时间
+# 2019-08-23
+ALTER TABLE `bzytest`.`tab_instrument_manage`
+ADD COLUMN `im_start_date` DATE NULL COMMENT '有效期开始时间' AFTER `im_tag`,
+ADD COLUMN `im_end_date` DATE NULL COMMENT '有效期结束时间' AFTER `im_start_date`;
 
 
 

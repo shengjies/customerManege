@@ -48,11 +48,11 @@
                                                    name="add-mesBatchDetail">
                                                 <thead>
                                                 <tr>
-                                                    <th width="2%">序号</th>
-                                                    <th width="35%">关联编码</th>
-                                                    <th width="25%">配料批次</th>
-                                                    <th width="12%">批次数量</th>
-                                                    <th width="25%">生产批次</th>
+                                                    <th width="1%">序号</th>
+                                                    <th width="30%">关联编码</th>
+                                                    <th width="28%" style="color:red">配料批次</th>
+                                                    <th width="13%">批次数量</th>
+                                                    <th width="28%">生产批次</th>
                                                 </tr>
                                                 </thead>
                                                 <tbody name="add-mesBatchDetail-body"
@@ -69,11 +69,11 @@
                                                         <span name="materielCode" class="form-control"
                                                               th:utext="${item2.materielCode}"></span>
                                                     </td>
-                                                    <td>
+                                                    <td style="color: red">
                                                         <span name="batchCode" class="form-control"
                                                               th:utext="${item2.batchCode}"></span>
                                                     </td>
-                                                    <td><input type="text" name="mesNumber" class="form-control"
+                                                    <td><input type="number" name="mesNumber" class="form-control"
                                                                th:value="${item2.mesNumber}"></td>
                                                     <td>
                                                         <input th:readonly="${item2.batchCode != null? false:true}"
@@ -166,7 +166,19 @@
                 $.modal.disable();
             },
             success: function (result) {
-                $.operate.ajaxSuccess(result);
+                if (result.code == web_status.SUCCESS) {
+                    layer.confirm(result.msg, {
+                        icon: 3,
+                        title: "系统提示",
+                        btn: ['确认'],
+                        btnclass: ['btn btn-primary'],
+                    }, function (index) {
+                        layer.close(index);
+                        refreshTab();
+                    });
+                } else {
+                    $.modal.alertError(result.msg);
+                }
             }
         };
         $.ajax(config)
@@ -182,12 +194,10 @@
         var ruleOrder = $(val).parent().parent().find("input[name='ruleOrder']").val();
         var mesSign = $(val).parent().parent().parent().parent().parent().parent().find("input[name='mesSign']").val();
         var failNum = 0;
-        var failMsg = '';
         for (var i = 1; i < ruleOrder; i++) {
-            var mesTag = mesSign.substring(i-1,i);
+            var mesTag = mesSign.substring(i - 1, i);
             if (mesTag != 1 && mesTag != 2) {
-                failNum ++;
-                failMsg += i + ",";
+                failNum++;
             }
         }
         if (failNum > 0) {
@@ -195,6 +205,16 @@
             $(val).parent().parent().find("td").find("input[name='proBatchCode']").val('');
             return;
         }
+    }
+
+    /**
+     * 刷新页面
+     */
+    function refreshTab() {
+        var currentId = window.parent.$('.page-tabs-content').find('.active').attr('data-id');
+        var target = window.parent.$('.RuoYi_iframe[data-id="' + currentId + '"]');
+        var url = target.attr('src');
+        target.attr('src', url).ready();
     }
 </script>
 </body>

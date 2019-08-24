@@ -497,6 +497,7 @@ public class DevWorkOrderController extends BaseController {
     /**
      * 配料
      */
+    @RequiresPermissions("device:devWorkOrder:configMes")
     @GetMapping("/woConfigMes")
     public String woConfigMes(int id, ModelMap map) {
         map.put("mesCode", CodeUtils.getMesCode());
@@ -507,6 +508,7 @@ public class DevWorkOrderController extends BaseController {
     /**
      * 生产
      */
+    @RequiresPermissions("device:devWorkOrder:produceMes")
     @GetMapping("/mesProduce")
     public String mesProduce(int id, ModelMap map) {
         map.put("workOrder", devWorkOrderService.selectWorkMesOrderByWorkId(id));

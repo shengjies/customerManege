@@ -147,7 +147,8 @@
     var removeFlag = [[${@permission.hasPermi('device:devWorkOrder:remove')}]];
     var workChange = [[${@permission.hasPermi('production:workOrderChange:list')}]];
     var workSingle = [[${@permission.hasPermi('production:singleWorkOrder:list')}]];
-    var woMesFlag = [[${@permission.hasPermi('mes:mesBatch:add')}]];
+    var configMes = [[${@permission.hasPermi('device:devWorkOrder:configMes')}]];
+    var produceMes = [[${@permission.hasPermi('device:devWorkOrder:produceMes')}]];
     var prefix = ctx + "device/devWorkOrder";
 
     $(function () {
@@ -215,8 +216,8 @@
                     formatter: function (value, row, index) {
                         var actions = [];
                         if (row.abolish == 0) {
-                            actions.push('<a class="btn btn-primary btn-xs ' + woMesFlag + '" href="javascript:void(0)" onclick="woConfigMes(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>配料</a> ');
-                            actions.push('<a class="btn btn-success btn-xs ' + woMesFlag + '" href="javascript:void(0)" onclick="mesProduce(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>生产</a> ');
+                            actions.push('<a class="btn btn-primary btn-xs ' + configMes + '" href="javascript:void(0)" onclick="woConfigMes(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>配料</a> ');
+                            actions.push('<a class="btn btn-success btn-xs ' + produceMes + '" href="javascript:void(0)" onclick="mesProduce(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>生产</a> ');
                         }
                         return actions.join('');
                     }
@@ -305,7 +306,6 @@
                             } else if (row.workSign == 1) { // 工单已经提交，不能修改
                                 actions.push('<a class="btn btn-default btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>编辑</a> ');
                                 actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>已提</a> ');
-                                actions.push('<a class="btn btn-primary btn-xs ' + woMesFlag + '" href="javascript:void(0)" disabled="true"><i></i>MES</a> ');
                             }
                         }
 
@@ -558,7 +558,7 @@
     /**
      * 工单MES生产
      */
-    function mesProduce() {
+    function mesProduce(id, code) {
         var url = prefix + "/mesProduce?id=" + id;
         createMenuItem(url, code + "--MES生产");
     }

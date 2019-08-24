@@ -44,6 +44,8 @@ public class DevWorkOrder extends BaseEntity {
      */
     private Integer lineId;
     private String lineName;
+    /** 工单累计产量标记是否可改 0不可改，1可改 */
+    private Integer manual;
     /**
      * 生产线对象
      */
@@ -220,6 +222,14 @@ public class DevWorkOrder extends BaseEntity {
     private Integer menuList;
     private String devCode; //设备编号
     private String devType; //设备类型
+
+    public Integer getManual() {
+        return manual;
+    }
+
+    public void setManual(Integer manual) {
+        this.manual = manual;
+    }
 
     public List<MesBatchRuleDetail> getMesRuleDetailList() {
         return mesRuleDetailList;

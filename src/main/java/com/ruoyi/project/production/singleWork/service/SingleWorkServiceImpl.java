@@ -391,4 +391,92 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     public List<SingleWork> appSelectSingleWorkList(SingleWork singleWork) {
         return singleWorkMapper.selectSingleWorkList(singleWork);
     }
+
+    /**
+     * app端配置硬件
+     * @param singleWork 单工位信息
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int appUpdateSingWork(SingleWork singleWork) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return 0;
+        }
+        Integer id = singleWork.getId();
+        if (id == null) {
+            return 0;
+        }
+        SingleWork work = singleWorkMapper.selectSingleWorkById(id);
+        if (work == null) {
+            throw new BusinessException("单工位被删除");
+        }
+        //操作硬件
+        DevList devList = null;
+        // 计数器硬件
+        if (StringUtils.isNotEmpty(singleWork.getDevCode())) {
+            devList = devListMapper.selectDevListByCode(singleWork.getDevCode());
+            if (devList == null || devList.getSign().equals(DevConstants.DEV_SIGN_USED)) {
+                throw new BusinessException("硬件不存在或者被使用");
+            }
+            if (work.getDevId() > 0) {
+                if (!singleWork.getDevCode().equals(work.getDevCode())) {
+                    // 还原之前硬件为未使用
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), work.getDevId(), DevConstants.DEV_SIGN_NOT_USE, null);
+                    // 更新上传硬件被使用
+                    devList.setSign(DevConstants.DEV_SIGN_USED);
+                    devList.setDevType(DevConstants.DEV_TYPE_LINE);
+                    devListMapper.updateDevSign(devList);
+                    singleWork.setDevId(devList.getId());
+                }
+            } else {
+                // 更新上传硬件被使用
+                devList.setSign(DevConstants.DEV_SIGN_USED);
+                devList.setDevType(DevConstants.DEV_TYPE_LINE);
+                devListMapper.updateDevSign(devList);
+                singleWork.setDevId(devList.getId());
+            }
+        } else {
+            if (work.getDevId() > 0) {
+                // 还原之前硬件为未使用
+                devListMapper.updateDevSignAndType(user.getCompanyId(), work.getDevId(), DevConstants.DEV_SIGN_NOT_USE, null);
+                singleWork.setDevId(0);
+                singleWork.setDevCode(null);
+            }
+        }
+
+        // 看板硬件
+        if (StringUtils.isNotEmpty(singleWork.getWatchCode())) {
+            devList = devListMapper.selectDevListByCode(singleWork.getWatchCode());
+            if (devList == null || devList.getSign().equals(DevConstants.DEV_SIGN_USED)) {
+                throw new BusinessException("硬件不存在或者被使用");
+            }
+            if (work.getWatchId() > 0) {
+                if (!singleWork.getWatchCode().equals(work.getWatchCode())) {
+                    // 还原之前硬件为未使用
+                    devListMapper.updateDevSignAndType(user.getCompanyId(), work.getWatchId(), DevConstants.DEV_SIGN_NOT_USE, null);
+                    // 更新最新硬件为使用
+                    devList.setSign(DevConstants.DEV_SIGN_USED);
+                    devList.setDevType(DevConstants.DEV_TYPE_LINE);
+                    devListMapper.updateDevSign(devList);
+                    singleWork.setWatchId(devList.getId());
+                }
+            } else {
+                // 更新最新硬件为使用
+                devList.setSign(DevConstants.DEV_SIGN_USED);
+                devList.setDevType(DevConstants.DEV_TYPE_LINE);
+                devListMapper.updateDevSign(devList);
+                singleWork.setWatchId(devList.getId());
+            }
+        } else {
+            if (work.getWatchId() > 0) {
+                // 还原之前硬件为未使用
+                devListMapper.updateDevSignAndType(user.getCompanyId(), work.getWatchId(), DevConstants.DEV_SIGN_NOT_USE, null);
+                singleWork.setWatchId(0);
+                singleWork.setWatchCode(null);
+            }
+        }
+        return singleWorkMapper.updateSingleWork(singleWork);
+    }
 }

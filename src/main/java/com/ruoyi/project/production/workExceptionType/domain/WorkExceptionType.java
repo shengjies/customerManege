@@ -1,8 +1,9 @@
 package com.ruoyi.project.production.workExceptionType.domain;
 
+import com.ruoyi.framework.aspectj.lang.annotation.Excel;
+import com.ruoyi.framework.web.domain.BaseEntity;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.ruoyi.framework.web.domain.BaseEntity;
 
 import java.util.Date;
 
@@ -26,6 +27,7 @@ public class WorkExceptionType extends BaseEntity {
     /**
      * 异常类型名称
      */
+    @Excel(name = "类型名称", type = Excel.Type.EXPORT)
     private String typeName;
     /**
      * 是否删除
@@ -34,6 +36,7 @@ public class WorkExceptionType extends BaseEntity {
     /**
      * 创建时间
      */
+    @Excel(name = "创建时间", type = Excel.Type.EXPORT, dateFormat = "yyyy-MM-dd HH:ss")
     private Date createTime;
 
     public void setId(Integer id) {

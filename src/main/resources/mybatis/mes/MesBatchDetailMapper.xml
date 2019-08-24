@@ -114,5 +114,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectMesBatchTotal" resultType="Integer">
          SELECT COUNT(*) FROM tab_mes_batch_detail where batch_code = #{batchCode}
     </select>
+
+    <!--通过工单查询物料用料信息-->
+    <select id="selectMesBatchTotalByWorkCode" resultType="com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail">
+        select a.materiel_code as materielCode,COALESCE(SUM(mes_number),0) as totalNum from tab_mes_batch_detail as a, tab_mes_batch as b where a.b_id = b.id
+        and b.work_code = #{workCode} and a.mes_number >0 group by a.materiel_code;
+    </select>
     
 </mapper>

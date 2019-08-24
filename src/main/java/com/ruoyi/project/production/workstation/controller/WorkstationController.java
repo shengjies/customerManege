@@ -1,6 +1,7 @@
 package com.ruoyi.project.production.workstation.controller;
 
 import com.ruoyi.common.constant.FileConstants;
+import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -12,6 +13,8 @@ import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.workstation.domain.Workstation;
 import com.ruoyi.project.production.workstation.service.IWorkstationService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,6 +35,9 @@ import java.util.Map;
 @RequestMapping("/production/workstation")
 public class WorkstationController extends BaseController
 {
+	/** logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(WorkstationController.class);
+
     private String prefix = "production/workstation";
 
 	@Autowired
@@ -141,10 +147,31 @@ public class WorkstationController extends BaseController
 	@PostMapping("/findByLineId")
 	@ResponseBody
 	public AjaxResult findByLineId(Integer lineId,Integer isoId){
-		Map map = new HashMap<String,Object>();
+		Map map = new HashMap<String,Object>(16);
 		map.put("proList", productListService.selectNotConfigByLineId(lineId, JwtUtil.getUser().getCompanyId(), FileConstants.SOP_TAG_LINE));
 		map.put("work",workstationService.selectAllByLineId(lineId));
 		return AjaxResult.success(map);
 	}
-	
+
+
+	/******************************************************************************************************
+	 *********************************** app端工位硬件配置 *************************************************
+	 ******************************************************************************************************/
+	/**
+	 * 流水线工位配置硬件
+	 */
+	@PostMapping("/appEdit")
+	@ResponseBody
+	public AjaxResult appEdit(@RequestBody Workstation workstation){
+		try {
+
+			return toAjax(workstationService.appUpdateWorkstation(workstation));
+		}catch (BusinessException e){
+			LOGGER.error("APP端工位配置硬件出现异常：" + e.getMessage());
+			return AjaxResult.error(e.getMessage());
+		}catch (Exception e){
+			LOGGER.error("APP端工位配置硬件出现异常：" + e.getMessage());
+			return AjaxResult.error();
+		}
+	}
 }

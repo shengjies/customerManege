@@ -12,7 +12,7 @@
 					<div class="select-list">
 						<ul>
 							<li>
-								产品/半成品：<input type="text" name="pbCode"/>
+								产品/半成编码：<input type="text" name="pbCode"/>
 							</li>
 							<li class="select-time">
 								<label>创建时间： </label>
@@ -31,15 +31,28 @@
 				</form>
 			</div>
 			<div class="col-sm-12 search-collapse" shiro:hasPermission="mes:mesBatch:list">
-				<form id="formId2">
+				<form id="formId2" class="col-sm-6">
 					<div class="select-list">
 						<ul>
 							<li>
-								批次信息：<input type="text" id="batchCode"/>
+								批次号：<input type="text" id="batchCode"/>
 							</li>
 							<li>
 								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchMesData()"><i class="fa fa-search"></i>&nbsp;搜索</a>
 								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset2()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+				<form id="formId3" class="col-sm-6">
+					<div class="select-list">
+						<ul>
+							<li>
+								工单号：<input type="text" id="workCode"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchWorkData()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset3()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
 							</li>
 						</ul>
 					</div>
@@ -77,6 +90,10 @@
 		// 重置搜索表单信息
 		function formReset2() {
 			$('#formId2')[0].reset();//input标签重置
+		}
+		// 重置搜索表单信息
+		function formReset3() {
+			$('#formId3')[0].reset();//input标签重置
 		}
         $(function() {
             var options = {
@@ -150,6 +167,19 @@
 		function showMesData(batchCode) {
 			var url = prefix + "/selectMesData?batchCode=" + batchCode;
 			createMenuItem(url,"查看" + batchCode + "批次相关信息");
+		}
+
+		/**
+		 * 通过工单号查询明细
+		 */
+		function searchWorkData() {
+			var workCode = $("#workCode").val();
+			if ($.common.isEmpty(workCode)) {
+			    $.modal.alertWarning("请输入工单号");
+			    return;
+			}
+			var url = prefix + "/selectWorkData?workCode=" + workCode;
+			createMenuItem(url,"查看工单" + workCode + "相关追溯信息");
 		}
     </script>
 </body>

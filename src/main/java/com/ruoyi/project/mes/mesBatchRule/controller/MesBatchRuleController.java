@@ -119,6 +119,17 @@ public class MesBatchRuleController extends BaseController
 		mmap.put("mesBatchRule", mesBatchRule);
 	    return prefix + "/edit1";
 	}
+
+	/**
+	 * 查看MES批准追踪规则
+	 */
+	@GetMapping("/showRuleDetail")
+	public String showRuleDetail(Integer id, ModelMap mmap)
+	{
+		MesBatchRule mesBatchRule = mesBatchRuleService.selectMesBatchRuleById(id);
+		mmap.put("mesBatchRule", mesBatchRule);
+		return prefix + "/ruleDetail";
+	}
 	
 	/**
 	 * 修改保存MES批准追踪规则

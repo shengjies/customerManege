@@ -19,6 +19,8 @@ import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleService;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -36,6 +38,8 @@ import java.util.List;
 @RequestMapping("/mes/mesBatch")
 public class MesBatchController extends BaseController {
     private String prefix = "mes/mesBatch";
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(MesBatchController.class);
 
     @Autowired
     private IMesBatchService mesBatchService;
@@ -100,6 +104,7 @@ public class MesBatchController extends BaseController {
         try {
             return toAjax(mesBatchService.insertMesBatch(mesBatch));
         } catch (BusinessException e) {
+            LOGGER.error("新增MES追踪批次出现异常：" + e.getMessage());
             return error(e.getMessage());
         }
     }
@@ -209,6 +214,16 @@ public class MesBatchController extends BaseController {
         int count = mesBatchDetailService.selectMesBatchTotal(mesData.getBatchCode());
         dataTable.setTotal(count);
         return dataTable;
+    }
+
+    /**
+     * 输入工单号查询工单相关追溯信息
+     */
+    @GetMapping("/selectWorkData")
+    public String selectWorkData(String workCode,ModelMap map){
+        map.put("workCode",workCode);
+        map.put("mesData",mesBatchService.selectMesDataByWorkCode(workCode));
+        return prefix + "/workMesData";
     }
 
     /******************************************************************************************************
