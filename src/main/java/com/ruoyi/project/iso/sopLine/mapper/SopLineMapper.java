@@ -42,12 +42,16 @@ public interface SopLineMapper
 	 * 批量删除作业指导书  产线 配置
 	 * @param companyId 公司id
 	 * @param lineId 产线id
-	 * @param sopid SOP id
+	 * @param wId 单工位id
+	 * @param sopId SOP id
 	 * @param sopTag sop配置标记
 	 * @return 结果
 	 */
-	public int deleteSopLine(@Param("companyId")int companyId,
-							 @Param("lineId")int lineId,@Param("sopId")Integer sopid,@Param("sopTag") Integer sopTag);
+	public int deleteSopLine(@Param("companyId")Integer companyId,
+							 @Param("lineId")Integer lineId,
+							 @Param("wId")Integer wId,
+							 @Param("sopId")Integer sopId,
+							 @Param("sopTag") Integer sopTag);
 
 	/**
 	 * 根据公司id 产线id SOP id查询所以的产线SOP 配置细心
@@ -69,14 +73,17 @@ public interface SopLineMapper
 	List<SopLine> selectSopLineListBySopId(@Param("companyId") Integer companyId,@Param("sopId") Integer isoId);
 
     /**
-     * 根据公司id 产线id 产品编号查询对应SOP 配置
+     * 查询作业指导书配置信息
      * @param companyId 公司id
-     * @param lineId 产线id
-     * @param code 产品code
-     * @return
+     * @param lineId 产线或者车间id
+     * @param pnCode 产品code
+	 * @param wId 工位或者单工位id
+	 * @param sopTag sop产线车间配置标记
+     * @return 结果
      */
 	SopLine selectSopByCompanyAndLineAndCode(@Param("companyId") int companyId,@Param("lineId") int lineId,
-                                             @Param("code")String code);
+                                             @Param("pnCode")String pnCode,@Param("wId") int wId,
+											 @Param("sopTag")Integer sopTag);
 
 
 	/**
@@ -85,4 +92,40 @@ public interface SopLineMapper
 	 * @return 结果
 	 */
 	List<SopLine> selectSopLineList2(SopLine sopLine);
+
+	/**
+	 * 通过主表id查询配置的产品信息
+	 * @param sId 主表id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopConfigProBySId(@Param("sId") Integer sId);
+
+	/**
+	 * 查询所有工位配置
+	 * @param sId 主表id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopConfigWorkBySId(@Param("sId") Integer sId);
+
+	/**
+	 * 通过主表id删除SOP配置
+	 * @param sId 主表id
+	 * @return 结果
+	 */
+	int deleteSopLineBySId(@Param("sId") Integer sId);
+
+	/**
+	 * 删除sop配置明细
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+    int deleteSopLineBySIds(String[] ids);
+
+	/**
+	 * 通过页id查询配置列表
+	 * @param companyId 公司id
+	 * @param pageId 作业指导书页id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopLineListByPageId(@Param("companyId") Integer companyId, @Param("pageId") Integer pageId);
 }

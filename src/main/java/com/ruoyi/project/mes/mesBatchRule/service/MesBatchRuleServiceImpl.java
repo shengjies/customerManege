@@ -101,10 +101,10 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService {
         // 半成品或者物料编码
         Integer dType = null;
         DevProductList product = null;
-        String materiles = "";
+        StringBuilder materiles = new StringBuilder();
         for (MesBatchRuleDetail ruleDetail : mesBatchRuleDetails) {
             dCode = ruleDetail.getdCode();
-            materiles += dCode + ",";
+            materiles.append(dCode).append(",");
             dType = ruleDetail.getdType();
             // 判断类型 1为半成品，2为物料
             if (dType != null && dType.equals(MesConstants.MES_TYPE_PARTS)) {
@@ -117,7 +117,8 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService {
             ruleDetail.setRuleId(mesBatchRule.getId());
             batchRuleDetailMapper.insertMesBatchRuleDetail(ruleDetail);
         }
-        mesBatchRule.setMateriels(materiles);
+        StringBuilder replace = materiles.replace(materiles.lastIndexOf(","), materiles.length(), "");
+        mesBatchRule.setMateriels(replace.toString());
         return mesBatchRuleMapper.updateMesBatchRule(mesBatchRule);
     }
 
@@ -153,10 +154,10 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService {
         // 半成品或者物料编码
         Integer dType = null;
         DevProductList product = null;
-        String materiles = "";
+        StringBuilder materiles = new StringBuilder();
         for (MesBatchRuleDetail ruleDetail : mesBatchRuleDetails) {
             dCode = ruleDetail.getdCode();
-            materiles += dCode + ",";
+            materiles.append(dCode).append(",");
             dType = ruleDetail.getdType();
             // 判断类型 1为半成品，2为物料
             if (dType != null && dType.equals(MesConstants.MES_TYPE_PARTS)) {
@@ -174,7 +175,8 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService {
             p.setRuleId(mesBatchRule.getId());
             productListMapper.updateDevProductList(p);
         }
-        mesBatchRule.setMateriels(materiles);
+        StringBuilder replace = materiles.replace(materiles.lastIndexOf(","), materiles.length(), "");
+        mesBatchRule.setMateriels(replace.toString());
         return mesBatchRuleMapper.updateMesBatchRule(mesBatchRule);
     }
 

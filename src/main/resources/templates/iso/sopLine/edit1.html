@@ -5,14 +5,21 @@
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-sopLine-add">
+        <input type="hidden" id="id" name="id" th:value="${sop.id}">
+        <input type="hidden" id="lineId" name="lineId" th:value="${sop.lineId}">
         <div class="col-sm-6">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">配置名称：</label>
+                <div class="col-sm-8">
+                    <input type="text" id="cnfName" name="cnfName" th:value="${sop.cnfName}" class="form-control">
+                </div>
+            </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label">SOP：</label>
                 <div class="col-sm-8">
                     <select style="width: 100%" id="sopId" onchange="sopChange(this)"     class="form-control" name="sopId">
                         <option value="0">请选择</option>
-                        <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" selected  th:text="${sopLines[0].sopName}" th:value="${sopLines[0].sopId}"></option>
-                        <option th:each="item : ${iso}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
+                        <option th:each="item : ${iso}"  th:text="${item.cName}" th:value="${item.isoId}" th:selected="${sop.sopId == item.isoId}"></option>
                     </select>
                 </div>
             </div>
@@ -75,10 +82,33 @@
             sopId:{
                 required:true,
             },
+            cnfName:{
+                required:true,
+                remote: {
+                    url: ctx + "iso/sop/checkCnfNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name : function() {
+                            return $.common.trim($("#cnfName").val());
+                        },
+                        id : function() {
+                            return $.common.trim($("#id").val());
+                        }
+                    },
+                    dataFilter: function(data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
         },
         messages:{
             sopId:{
                 required:"请选择SOP",
+            },
+            cnfName:{
+                required:"配置名称必填",
+                remote:"配置名称已存在",
             },
         }
     });
@@ -86,42 +116,44 @@
     function submitHandler() {
         if ($.validate.form()) {
             //先验证书
-            var id = $("#sopId").find("option:selected").val();
-            if(id <=0){
+            var sopId = $("#sopId").find("option:selected").val();
+            if(sopId <=0){
                 $.modal.alertWarning("请选择SOP");
                 return;
             }
             //验证产品编码
             var pnSelect = $("#pnId").find("option:selected");
             if($(pnSelect).size() <= 0){
-                $.modal.alertWarning("请选择产线编码");
+                $.modal.alertWarning("请选择产品编码");
                 return;
             }
             var pns =[];
             for(var i =0;i<$(pnSelect).size();i++){
                 pns.push($(pnSelect[i]).val())
             }
-            var sopLineWorks =[];
+            var sopLines =[];
             //获取工位
             $("#add-sop-w-table-body").find("tr").each(function () {
                 var work ={
-                    lineId:[[${line}]],
-                    sopId:id,
+                    lineId:$("#lineId").val(),
+                    sopId:sopId,
                     sopTag:0,
                     wId:$(this).find("td").attr("data-w-id"),
                     pageId:$(this).find("td").find("select[name='wId'] option:selected").val()
                 }
-                sopLineWorks.push(work);
+                sopLines.push(work);
             })
             var data={
-                lineId:[[${line}]],
-                sopId:id,
-                pns:pns,
+                id:$("#id").val(),
+                lineId:$("#lineId").val(),
+                cnfName:$("#cnfName").val(),
+                sopId:sopId,
+                pnsId:pns,
                 sopTag:0,
-                sopLineWorks:sopLineWorks
+                sopLines:sopLines
             }
             var config = {
-                url: prefix + "/edit",
+                url: "/iso/sop/edit",
                 type: "post",
                 dataType: "json",
                 contentType: 'application/json',

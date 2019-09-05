@@ -83,10 +83,10 @@ public interface ISopLineService
 	/**
 	 * 查询作业指导书工位配置列表
 	 * @param companyId 公司id
-	 * @param isoId 作业指导书id
+	 * @param pageId 作业指导书页id
 	 * @return 结果
 	 */
-	List<SopLineWork> selectSopLineWorkListBySopId(Integer companyId, Integer isoId);
+	List<SopLine> selectSopLineListByPageId(Integer companyId, Integer pageId);
 
 	/**
 	 * 单工位SOP配置列表
@@ -105,4 +105,18 @@ public interface ISopLineService
 	 * @return 结果
 	 */
 	SopLineWork selectSopLineWorkInfo(int companyId, int lineId, int sopId, int wId, int sopTag);
+
+	/**
+	 * 通过配置主表id查询已经配置的产品
+	 * @param sId 主表id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopConfigProBySId(Integer sId);
+
+	/**
+	 * 查询所有工位配置
+	 * @param sId 主表id
+	 * @return 结果
+	 */
+	List<SopLine> selectSopConfigWorkBySId(Integer sId);
 }

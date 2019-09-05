@@ -119,4 +119,12 @@ public interface IsoMapper {
      * @return
      */
     Iso selectIsoByFolderNameUnique(@Param("iType") Integer iType, @Param("parentId") Integer parentId, @Param("cName") String cName);
+
+    /**
+     * 查询所有的作业指导书
+     * @param parentId 父id
+     * @param companyId 公司id
+     * @return 结果
+     */
+    List<Iso> selectASOPList(@Param("parentId") Integer parentId,@Param("companyId") Integer companyId);
 }

@@ -611,6 +611,64 @@ ADD COLUMN `im_end_date` DATE NULL COMMENT '有效期结束时间' AFTER `im_sta
 
 
 
+ ###############################  服务器未执行sql  ##############################
+ ###############################  版本优化  #####################################
+
+# 作业指导书模块更新
+# 2019-08-30
+ALTER TABLE `asop`.`tab_sop_line`
+ADD COLUMN `w_id` INT(11) NULL AFTER `sop_tag`,
+ADD COLUMN `page_id` INT NULL AFTER `w_id`,
+ADD COLUMN `cnf_name` VARCHAR(145) NULL AFTER `page_id`;
+
+CREATE TABLE `tab_sop` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) DEFAULT NULL COMMENT '公司id',
+  `cnf_name` varchar(245) DEFAULT NULL COMMENT '配置名称',
+  `line_id` int(11) DEFAULT NULL COMMENT '产线名称',
+  `sop_id` int(11) DEFAULT NULL COMMENT 'sop书id',
+  `p_id` varchar(845) DEFAULT NULL COMMENT '产品id ',
+  `p_code` text COMMENT '产品编码',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `company_name_uindex` (`company_id`,`cnf_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='SOP配置主表';
+
+ALTER TABLE `asop`.`tab_sop_line`
+DROP COLUMN `cnf_name`,
+ADD COLUMN `s_id` INT NULL COMMENT '主表id' AFTER `page_id`,
+CHANGE COLUMN `w_id` `w_id` INT(11) NULL DEFAULT NULL COMMENT '工位id' ,
+CHANGE COLUMN `page_id` `page_id` INT(11) NULL DEFAULT NULL COMMENT '页id' ,
+DROP INDEX `cnf_uindex` ,
+ADD UNIQUE INDEX `cnf_uindex` (`company_id` ASC, `line_id` ASC, `sop_id` ASC, `pn_id` ASC, `w_id` ASC, `page_id` ASC, `sop_tag` ASC, `s_id` ASC) VISIBLE;
+;
+
+# SOP配置主表添加配置标记
+ALTER TABLE `bzy8081`.`tab_sop`
+ADD COLUMN `sop_tag` INT NULL DEFAULT 0 COMMENT 'sop配置标记(0、流水线，1、车间)' AFTER `create_time`;
+
+# 添加流水线工位极光推送更新标记
+# 2019-09-02
+ALTER TABLE `bzy8081`.`tab_workstation`
+ADD COLUMN `jpush_tag` INT NULL COMMENT '工位极光更新标记(0、未更新，1、已更新)' AFTER `def_id`;
+
+# 添加车间单工位极光推送更新标记
+ALTER TABLE `bzy8081`.`tab_single_work`
+ADD COLUMN `jpush_tag` INT NULL COMMENT '单工位极光更新标记(0、未更新，1、已更新)' AFTER `sop_sign`;
+
+# 工单新增极光推送更新标记  0 未全部更新，1 已全部更新
+# 2019-09-02
+ALTER TABLE `bzy8081`.`dev_work_order`
+ADD COLUMN `jpush_tag` INT NULL COMMENT '工单极光更新标记(0、未全部更新，1、已全部更新)' AFTER `pb_sign`;
+
+
+
+
+
+
+
+
+
 
 
 

@@ -26,6 +26,14 @@ public interface IWorkstationService
      * @return 工位配置集合
      */
 	public List<Workstation> selectWorkstationList(Workstation workstation);
+
+	/**
+	 * 查询工位配置列表
+	 *
+	 * @param workstation 工位配置信息
+	 * @return 工位配置集合
+	 */
+	public List<Workstation> selectWorkstationList2(Workstation workstation);
 	
 	/**
      * 新增工位配置

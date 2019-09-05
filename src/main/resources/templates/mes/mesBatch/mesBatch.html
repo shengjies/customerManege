@@ -122,7 +122,7 @@
 				},
 				{
 					field : 'mesCode', 
-					title : '批次信息',
+					title : '主码信息',
 					sortable: true,
 					formatter:function (value, row, index) {
 						return '<a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showMesData(\''+ row.mesCode +'\')"><i></i>'+ value +'</a>';
@@ -152,8 +152,8 @@
 		 * 通过批次查询mes详情信息
 		 */
 		function searchMesData() {
-			var batchCode = $("#batchCode").val();
-			if (!batchCode || $.common.isEmpty(batchCode)) {
+			var batchCode = $.common.trim($("#batchCode").val());
+			if ($.common.isEmpty(batchCode)) {
 			    $.modal.alertWarning("请输入批次信息");
 			    return;
 			}
@@ -173,7 +173,7 @@
 		 * 通过工单号查询明细
 		 */
 		function searchWorkData() {
-			var workCode = $("#workCode").val();
+			var workCode = $.common.trim($("#workCode").val());
 			if ($.common.isEmpty(workCode)) {
 			    $.modal.alertWarning("请输入工单号");
 			    return;

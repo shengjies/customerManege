@@ -9,7 +9,7 @@
         <input type="hidden" name="orderCode" id="orderCode" th:value="${workOrder.orderCode}">
         <input type="hidden" name="pbCode" id="pbCode" th:value="${workOrder.productCode}">
         <input type="hidden" name="ruleId" id="ruleId" th:value="${workOrder.ruleId}">
-        <div class="ibox-title" style="text-align: center;padding: 0px;min-height: 20px">
+        <div class="ibox-title" style="padding: 0px;min-height: 20px;margin-left: 20px">
             <span style="font-weight: bold;color: #0a0a0a;font-size: x-large">工单号：</span>
             <span id="workCode" style="font-weight: bold;color: #0a0a0a;font-size: x-large"
                   th:utext="${workOrder.workorderNumber}"></span>
@@ -18,15 +18,11 @@
             <div class="panel-body">
                 <div class="panel-group">
                     <div class="row" id="mes-body">
-                        <div class="col-sm-12" style="text-align: center"
+                        <div class="col-sm-8" style="margin-left: 15px"
                              th:if="${workOrder.mesBatchList == null && workOrder.mesRuleDetailList == null}">
-                            <h2><a style="color: red">该工单生产的产品未配置MES规则</a></h2>
+                            <h2><span style="color: red">该工单生产的产品未配置MES信息</span></h2>
                         </div>
-                        <div class="col-sm-12" style="text-align: center"
-                             th:if="${workOrder.mesBatchList == null && workOrder.mesRuleDetailList != null}">
-                            <h2><a style="color: red">该工单生产的产品未进行MES配置</a></h2>
-                        </div>
-                        <div class="col-sm-6" th:if="${workOrder.mesBatchList != null}"
+                        <div class="col-sm-8" th:if="${workOrder.mesBatchList != null}"
                              th:each="item:${workOrder.mesBatchList}">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
@@ -49,7 +45,7 @@
                                                 <thead>
                                                 <tr>
                                                     <th width="1%">序号</th>
-                                                    <th width="30%">关联编码</th>
+                                                    <th width="30%">物料编码</th>
                                                     <th width="28%" style="color:red">配料批次</th>
                                                     <th width="13%">批次数量</th>
                                                     <th width="28%">生产批次</th>
@@ -143,6 +139,7 @@
             item.materielCode = $(this).find("td").find("span[name='materielCode']").html();
             item.batchCode = $(this).find("td").find("span[name='batchCode']").html();
             item.ruleOrder = $(this).find("td").find("span[name='ruleOrder']").html(); // 规则排序
+            item.mesNumber = $(this).find("td").find("input[name='mesNumber']").val();
             item.proBatchCode = $(this).find("td").find("input[name='proBatchCode']").val();
             if ($.common.isNotEmpty(item.proBatchCode) && item.batchCode != item.proBatchCode) {
                 faliNum++;
@@ -216,6 +213,7 @@
         var url = target.attr('src');
         target.attr('src', url).ready();
     }
+
 </script>
 </body>
 </html>

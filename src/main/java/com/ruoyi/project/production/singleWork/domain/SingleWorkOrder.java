@@ -39,8 +39,30 @@ public class SingleWorkOrder extends BaseEntity
 	private int workorderStatus;
 	/** 生产数量 */
 	private int productNumber;
+	/** 流水线工位极光推送标记 0未更新，1已更新 */
+	private Integer jpushTag;
 
 	private int type;
+
+	/****** app单工位工单分配 ********/
+	/** app端分配工单时单工位的计数器编码 */
+	private String jsCode;
+
+	public Integer getJpushTag() {
+		return jpushTag;
+	}
+
+	public void setJpushTag(Integer jpushTag) {
+		this.jpushTag = jpushTag;
+	}
+
+	public String getJsCode() {
+		return jsCode;
+	}
+
+	public void setJsCode(String jsCode) {
+		this.jsCode = jsCode;
+	}
 
 	public Integer getId() {
 		return id;

@@ -32,7 +32,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="fileName != null  and fileName != '' "> and file_name = #{fileName}</if>
              <if test="createTime != null "> and create_time = #{createTime}</if>
          </where>
-        ${params.dataScope}
+         order by create_time desc
     </select>
     
     <select id="selectFileSourceInfoById" parameterType="Integer" resultMap="FileSourceInfoResult">
@@ -72,6 +72,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <delete id="deleteFileSourceInfoById" parameterType="Integer">
+         delete from tab_file_source_info where id = #{id}
+    </delete>
+
     <!--通过公司id和保存明细id查询文件信息-->
     <select id="selectFileSourceInfoBySaveIdAndComId" resultMap="FileSourceInfoResult">
         <include refid="selectFileSourceInfoVo"/>
@@ -97,4 +101,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and save_id = #{saveId}
         </if>
     </select>
+
+    <!--通过文件名查询文件是否存在-->
+    <select id="selectFileSourceByFileName" resultMap="FileSourceInfoResult">
+        <include refid="selectFileSourceInfoVo"/>
+        <where>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="saveType != null "> and save_type = #{saveType}</if>
+            <if test="fileName != null  and fileName != '' "> and file_name = #{fileName}</if>
+        </where>
+    </select>
+
+    <!--修改文件信息-->
+    <update id="updateFileInfo" parameterType="FileSourceInfo">
+        update tab_file_source_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fileName != null  ">file_name = #{fileName},</if>
+            <if test="savePath != null  ">save_path = #{savePath},</if>
+            <if test="filePath != null  ">file_path = #{filePath},</if>
+        </trim>
+        where id = #{id}
+    </update>
 </mapper>

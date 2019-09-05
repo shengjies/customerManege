@@ -1,9 +1,12 @@
 package com.ruoyi.project.production.report.controller;
 
 import com.ruoyi.common.constant.WorkConstants;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.project.iso.iso.domain.Iso;
+import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
 import com.ruoyi.project.production.report.domain.AppReport;
@@ -15,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +32,56 @@ public class ReportController extends BaseController {
     @Autowired
     private IReportService reportService;
 
+    @Autowired
+    private IIsoService isoService;
 
+    @RequestMapping("/download")
+    @ResponseBody
+    public void downloadFile(String filePath) throws UnsupportedEncodingException{
+        HttpServletResponse response = ServletUtils.getResponse();
+        String fileName = filePath.substring(filePath.lastIndexOf("/"));
+        Iso iso = isoService.selectIsoById(1);
+        if (iso != null) {
+            String savePath = iso.getDisk() + "/" + fileName;
+            //下载文件
+            File file = new File(savePath);
+            if(file.exists()){
+                response.setContentType("application/force-download");// 设置强制下载不打开
+                response.addHeader("Content-Disposition", "attachment;fileName=" + URLEncoder.encode(fileName, "UTF-8"));
+                response.setHeader("Content-Length",""+file.length());
+                byte[] buffer = new byte[1024];
+                FileInputStream fis = null;
+                BufferedInputStream bis = null;
+                try {
+                    fis = new FileInputStream(file);
+                    bis = new BufferedInputStream(fis);
+                    OutputStream outputStream = response.getOutputStream();
+                    int index = bis.read(buffer);
+                    while (index != -1){
+                        outputStream.write(buffer,0,index);
+                        index = bis.read(buffer);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }finally {
+                    if(bis != null){
+                        try {
+                            bis.close();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                    if(fis != null){
+                        try {
+                            fis.close();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+    }
     /**
      * 查询报表数
      *
@@ -49,11 +104,12 @@ public class ReportController extends BaseController {
     @ResponseBody
     @RequestMapping("/line/pdf")
     @RequiresPermissions("production:report:pdf")
-    public void exportReport(int lineId, String productCode, String startTime, String endTime) {
+    public AjaxResult exportReport(int lineId, String productCode, String startTime, String endTime) {
         try {
-            reportService.lineReport(lineId, productCode, startTime, endTime,null);
+            return AjaxResult.success(reportService.lineReport(lineId, productCode, startTime, endTime));
         } catch (Exception e) {
             e.printStackTrace();
+            return error();
         }
     }
 
@@ -69,11 +125,15 @@ public class ReportController extends BaseController {
     @ResponseBody
     @RequestMapping("/single/pdf")
     @RequiresPermissions("production:report:pdf")
-    public void exportSingleReport(int singleId, int userId, String productCode, String startTime, String endTime) {
+    public AjaxResult exportSingleReport(int singleId, int userId, String productCode, String startTime, String endTime) {
         try {
-            reportService.singleReport(singleId, userId, productCode, startTime, endTime,null);
+            String filePath = reportService.singleReport(singleId, userId, productCode, startTime, endTime);
+            if (filePath != null) {
+                return AjaxResult.success(filePath);
+            }
+            return error();
         } catch (Exception e) {
-            e.printStackTrace();
+            return error();
         }
     }
 
@@ -131,9 +191,9 @@ public class ReportController extends BaseController {
         try {
             if (appReport != null) {
                 if (appReport.getWlSign().equals(WorkConstants.SING_LINE)) {
-                    return AjaxResult.success("请求成功",reportService.lineReport(appReport.getLineId(), appReport.getProductCode(), appReport.getStartTime(), appReport.getEndTime(), appReport.getDevType()));
+                    return AjaxResult.success("请求成功",reportService.lineReport(appReport.getLineId(), appReport.getProductCode(), appReport.getStartTime(), appReport.getEndTime()));
                 } else if (appReport.getWlSign().equals(WorkConstants.SING_SINGLE)) {
-                    return AjaxResult.success("请求成功",reportService.singleReport(appReport.getLineId(), appReport.getUserId(), appReport.getProductCode(), appReport.getStartTime(), appReport.getEndTime(), appReport.getDevType()));
+                    return AjaxResult.success("请求成功",reportService.singleReport(appReport.getLineId(), appReport.getUserId(), appReport.getProductCode(), appReport.getStartTime(), appReport.getEndTime()));
                 }
             }
             return error();

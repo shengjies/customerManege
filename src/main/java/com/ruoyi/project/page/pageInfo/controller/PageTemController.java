@@ -1,25 +1,25 @@
 package com.ruoyi.project.page.pageInfo.controller;
 
 import com.ruoyi.common.constant.PageTypeConstants;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 import com.ruoyi.project.erp.fileSourceInfo.service.IFileSourceInfoService;
+import com.ruoyi.project.page.pageInfo.domain.AppPageData;
 import com.ruoyi.project.page.pageInfo.domain.PageInfo;
 import com.ruoyi.project.page.pageInfo.service.IPageInfoService;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +33,9 @@ import java.util.Map;
 @RequestMapping("/t")
 public class PageTemController extends BaseController {
     private String prefix = "tem";
+
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(PageTemController.class);
 
     @Autowired
     private IPageInfoService pageInfoService;
@@ -145,5 +148,35 @@ public class PageTemController extends BaseController {
             }
         }
         return getDataTable(Collections.emptyList());
+    }
+
+    /******************************************************************************************************
+     *********************************** app端查询看板内容 *************************************************
+     ******************************************************************************************************/
+
+    /**
+     * app端查看看板
+     */
+    @PostMapping("/watch")
+    @ResponseBody
+    public AjaxResult appSelectPageInfo(@RequestBody AppPageData appPageData){
+        try {
+            if (appPageData != null && StringUtils.isNotEmpty(appPageData.getPageCode()) && StringUtils.isNotEmpty(appPageData.getPagePwd())) {
+                PageInfo info = pageInfoService.selectPageByCode(appPageData.getPageCode());
+                if (info == null) {
+                    return error("页面不存在");
+                }
+                if(!info.getPagePwd().equals(appPageData.getPagePwd())){
+                    return error("密码错误");
+                }
+                Map<String,Object> map = new HashMap<>(16);
+                map.put("info",info);
+                return success("请求成功",map);
+            }
+            return error();
+        } catch (Exception e) {
+            LOGGER.error("app端查看看板内容出现异常:" + e.getMessage());
+            return error();
+        }
     }
 }

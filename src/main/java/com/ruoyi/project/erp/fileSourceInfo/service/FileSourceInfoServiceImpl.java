@@ -1,5 +1,6 @@
 package com.ruoyi.project.erp.fileSourceInfo.service;
 
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.support.Convert;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
@@ -10,10 +11,12 @@ import com.ruoyi.project.erp.fileSourceInfo.mapper.FileSourceInfoMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -105,5 +108,50 @@ public class FileSourceInfoServiceImpl implements IFileSourceInfoService
 			throw new Exception("产品不存在");
 		}
 		return fileSourceInfoMapper.selectFileSourceBySaveIdAndComId(productList.getId(),productList.getCompanyId());
+	}
+
+	/**
+	 * 修改保存文件名
+	 * @param fileSourceInfo 文件信息
+	 * @return 结果
+	 */
+	@Override
+	public int saveFileName(FileSourceInfo fileSourceInfo) throws IOException {
+		User user = JwtUtil.getUser();
+		if (user == null) {
+		    return 0;
+		}
+		FileSourceInfo fileInfo = fileSourceInfoMapper.selectFileSourceInfoById(fileSourceInfo.getId());
+		if (fileInfo != null ) {
+			String savePath = fileInfo.getSavePath();
+			String filePath = fileInfo.getFilePath();
+			String newFileName = fileSourceInfo.getFileName() + ".pdf";
+			File file = new File(savePath);
+			if (file.exists()) {
+				// 创建新的文件
+				File newFile = new File(savePath.substring(0,savePath.lastIndexOf("/")) + "/" + fileSourceInfo.getFileName() + ".pdf");
+				FileUtils.copyFile(file,newFile);
+				file.delete();
+				fileInfo.setFileName(newFileName);
+				fileInfo.setSavePath(savePath.substring(0,savePath.lastIndexOf("/")) + "/" + newFileName);
+				fileInfo.setFilePath(filePath.substring(0,filePath.lastIndexOf("/")) + "/" + newFileName);
+			}
+			return fileSourceInfoMapper.updateFileInfo(fileInfo);
+		}
+		return 0;
+	}
+
+	/**
+	 * 校验文件名是否重复
+	 * @param fileSourceInfo 文件信息
+	 * @return
+	 */
+	@Override
+	public String checkFileNameNameUnique(FileSourceInfo fileSourceInfo) {
+		FileSourceInfo uniqueFile = fileSourceInfoMapper.selectFileSourceByFileName(null, null, fileSourceInfo.getFileName() + ".pdf");
+		if (StringUtils.isNotNull(uniqueFile) && !uniqueFile.getId() .equals(fileSourceInfo.getId())) {
+		    return FileConstants.FILE_NAME_NOT_UNIQUE;
+		}
+		return FileConstants.FILE_NAME_UNIQUE;
 	}
 }

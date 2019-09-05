@@ -12,6 +12,9 @@
                     <input type="hidden" id="sopId" name="sopId" th:value="${isoId}">
                     <ul>
                         <li>
+                            配置名称：<input type="text" name="cnfName"/>
+                        </li>
+                        <li>
                             工位设备：
                             <select name="lineId" id="lineId">
                                 <option value="-1">请选择</option>
@@ -19,7 +22,7 @@
                             </select>
                         </li>
                         <li>
-                            产品编码：<input type="text" name="pnCode"/>
+                            产品编码：<input type="text" name="pCode"/>
                         </li>
 
                         <li>
@@ -38,7 +41,7 @@
 </div>
 <div th:include="include :: footer"></div>
 <script th:inline="javascript">
-    var prefix = ctx + "iso/sopLine";
+    var prefix = ctx + "iso/sop";
 
     $(function () {
         var options = {
@@ -57,31 +60,36 @@
                     visible: false
                 },
                 {
+                    field : 'cnfName',
+                    title : '配置名称',
+                    sortable: true,
+                },
+                {
                     field: 'lineId',
                     title: '工位设备编码',
                     sortable: true,
                     formatter: function (value, row, index) {
-                        return row.imName;
+                        return row.lineName;
                     }
                 },
                 {
-                    field: 'sopId',
-                    title: 'SOP',
-                    sortable: true,
-                    formatter: function (value, row, index) {
-                        return row.sopName;
-                    }
-                },
-                {
-                    field: 'pnCode',
+                    field: 'pCode',
                     title: '产品编码',
-                    sortable: true
+                    sortable: true,
+                    width:400,
+                    formatter:function (value, row, index) {
+                        return $.table.tooltip(value);
+                    }
                 }]
         };
         $.table.init(options);
         $.table.search("formId")
     });
 
+    // 关闭窗口
+    function submitHandler() {
+        $.modal.close();
+    }
 </script>
 </body>
 </html>

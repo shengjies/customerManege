@@ -45,10 +45,39 @@ public class SopLine extends BaseEntity
 	 */
 	private Integer sopTag;
 
+	private Integer wId; // 工位id
+	private Integer pageId; // 指导书页id
+	/** 配置主表id */
+	private Integer sId;
+
 	private Integer[] pns;//产品编码
 	private List<SopLineWork> sopLineWorks;//工位配置
 	private String lineName;//产线名称
 	private String sopName;//SOP名称
+
+	public Integer getsId() {
+		return sId;
+	}
+
+	public void setsId(Integer sId) {
+		this.sId = sId;
+	}
+
+	public Integer getwId() {
+		return wId;
+	}
+
+	public void setwId(Integer wId) {
+		this.wId = wId;
+	}
+
+	public Integer getPageId() {
+		return pageId;
+	}
+
+	public void setPageId(Integer pageId) {
+		this.pageId = pageId;
+	}
 
 	public String getImName() {
 		return imName;
@@ -177,11 +206,15 @@ public class SopLine extends BaseEntity
 				", companyId=" + companyId +
 				", sopId=" + sopId +
 				", lineId=" + lineId +
+				", parentId=" + parentId +
+				", imName='" + imName + '\'' +
 				", pnId=" + pnId +
 				", pnCode='" + pnCode + '\'' +
 				", cId=" + cId +
 				", cTime=" + cTime +
 				", sopTag=" + sopTag +
+				", wId=" + wId +
+				", pageId=" + pageId +
 				", pns=" + Arrays.toString(pns) +
 				", sopLineWorks=" + sopLineWorks +
 				", lineName='" + lineName + '\'' +

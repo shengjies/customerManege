@@ -8,18 +8,21 @@
     <div class="row">
         <div class="col-sm-12 search-collapse">
             <form id="formId">
+                <input type="hidden" id="lineId" name="lineId" th:value="${line}"/>
                 <div class="select-list">
                     <ul>
-
                         <li>
-                            SOP：<select name="sopId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
-                            <option value="-1">请选择</option>
-                            <option th:each="item : ${sops}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
-                        </select>
-                            <input type="hidden" name="lineId" th:value="${line}"/>
+                          配置名称：
+                            <input type="text" name="cnfName">
                         </li>
                         <li>
-                            产品编码：<input type="text" name="pnCode"/>
+                            SOP：<select name="sopId" th:with="Company=${@devCompany.selectDevCompanyAll()}">
+                                    <option value="-1">请选择</option>
+                                    <option th:each="item : ${sops}"  th:text="${item.cName}" th:value="${item.isoId}"></option>
+                                </select>
+                        </li>
+                        <li>
+                            产品编码：<input type="text" name="pCode"/>
                         </li>
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
@@ -34,6 +37,9 @@
             <a class="btn btn-success" onclick="add()" shiro:hasPermission="iso:sopLine:add">
                 <i class="fa fa-plus"></i> 添加
             </a>
+            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="iso:sopLine:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
         </div>
         <div class="col-sm-12 select-table table-striped">
             <table id="bootstrap-table" data-mobile-responsive="true"></table>
@@ -44,13 +50,12 @@
 <script th:inline="javascript">
     var editFlag = [[${@permission.hasPermi('iso:sopLine:edit')}]];
     var removeFlag = [[${@permission.hasPermi('iso:sopLine:remove')}]];
-    var prefix = ctx + "iso/sopLine";
+    var prefix = ctx + "iso/sop";
 
     $(function() {
         var options = {
             url: prefix + "/list",
-            createUrl: prefix + "/addConfig",
-            updateUrl: prefix + "/editConfig",
+            createUrl: "/iso/sopLine/addConfig",
             removeUrl: prefix + "/remove",
             modalName: "SOP配置",
             search: false,
@@ -64,12 +69,9 @@
                     visible: false
                 },
                 {
-                    field : 'lineId',
-                    title : '产线',
+                    field : 'cnfName',
+                    title : '配置名称',
                     sortable: true,
-                    formatter:function (value, row, index) {
-                        return row.lineName;
-                    }
                 },
                 {
                     field : 'sopId',
@@ -80,23 +82,27 @@
                     }
                 },
                 {
-                    field : 'pnCode',
+                    field : 'pCode',
                     title : '产品编码',
-                    sortable: true
+                    sortable: true,
+                    width:400,
+                    formatter:function (value, row, index) {
+                        return $.table.tooltip(value);
+                    }
                 },
                 {
                     title: '操作',
                     align: 'center',
                     formatter: function(value, row, index) {
                         var actions = [];
-                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.sopId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.sopId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.cnfName+ '\',\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
                         return actions.join('');
                     }
                 }]
         };
         $.table.init(options);
-        $.table.search();
+        $.table.search("formId");
     });
 
     /**
@@ -111,22 +117,11 @@
      * 修改产线 SOP 配置信息
      * @param sopId SOP id
      */
-    function edit(sopId) {
-        var url =  $.table._option.updateUrl+"/"+[[${line}]]+"/"+sopId;
-        $.modal.open("修改SOP配置", url,1000,600);
+    function edit(cnfName,id) {
+        var url =  prefix + "/editLineSop?id=" + id;
+        $.modal.open("修改" + cnfName, url,1000,600);
     }
 
-    /**
-     * 删除 产线SOP 配置
-     * @param sopId SOP id
-     */
-    function remove(sopId) {
-        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗？", function () {
-            var url =  $.table._option.removeUrl;
-            var data = {lineId: [[${line}]],sopId:sopId};
-            $.operate.submit(url, "post", "json", data);
-        });
-    }
 </script>
 </body>
 </html>

@@ -105,6 +105,7 @@ public class DevWorkOrder extends BaseEntity {
      * 责任人id主键
      */
     private Integer deviceLiable;
+    private Integer deviceLiableTwo;
     /**
      * 责任人对象
      */
@@ -203,6 +204,8 @@ public class DevWorkOrder extends BaseEntity {
     private Integer single;//用于查询车间
     /** 暂停开始计数标志(0、默认值需要计数，1、不需要计数) */
     private Integer pbSign;
+    /** 极光推送标记 0 未更新，1已更新 */
+    private Integer jpushTag;
 
     /*******************  工单MES相关 *******************/
     /** mes批次追踪列表 */
@@ -223,6 +226,14 @@ public class DevWorkOrder extends BaseEntity {
     private String devCode; //设备编号
     private String devType; //设备类型
 
+    public Integer getJpushTag() {
+        return jpushTag;
+    }
+
+    public void setJpushTag(Integer jpushTag) {
+        this.jpushTag = jpushTag;
+    }
+
     public Integer getManual() {
         return manual;
     }
@@ -237,6 +248,14 @@ public class DevWorkOrder extends BaseEntity {
 
     public void setMesRuleDetailList(List<MesBatchRuleDetail> mesRuleDetailList) {
         this.mesRuleDetailList = mesRuleDetailList;
+    }
+
+    public Integer getDeviceLiableTwo() {
+        return deviceLiableTwo;
+    }
+
+    public void setDeviceLiableTwo(Integer deviceLiableTwo) {
+        this.deviceLiableTwo = deviceLiableTwo;
     }
 
     public String getLineName() {

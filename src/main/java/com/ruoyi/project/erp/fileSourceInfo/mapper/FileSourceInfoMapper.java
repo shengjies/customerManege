@@ -71,4 +71,27 @@ public interface FileSourceInfoMapper
 	 */
 	List<FileSourceInfo> selectFileSourceInfoBySaveId(@Param("companyId") Integer companyId, @Param("saveType") Integer saveType,
 												@Param("saveId") Integer saveId);
+
+	/**
+	 * 通过文件名查询文件是否存在
+	 * @param companyId 公司id
+	 * @param saveType 保存类型
+	 * @param fileName 文件名
+	 * @return 结果
+	 */
+    FileSourceInfo selectFileSourceByFileName(@Param("companyId") Integer companyId, @Param("saveType") Integer saveType, @Param("fileName") String fileName);
+
+	/**
+	 * 通过文件保存id删除文件信息
+	 * @param id 文件主键id
+	 * @return 结果
+	 */
+	int deleteFileSourceInfoById(@Param("id") Integer id);
+
+	/**
+	 * 修改文件信息
+	 * @param fileSourceInfo 文信信息
+	 * @return 结果
+	 */
+	int updateFileInfo(FileSourceInfo fileSourceInfo);
 }

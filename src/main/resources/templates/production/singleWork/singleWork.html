@@ -12,10 +12,10 @@
                 <div class="select-list">
                     <ul>
                         <li>
-                            车间名称：<input type="text" name="workshopName"/>
+                            <span id="houseName">车间名称：</span><span id="imCodeName" style="display: none">单工位名称：</span><input type="text" name="workshopName" id="workshopName"/>
                         </li>
 
-                        <li>
+                        <li id="imCheck" style="display: none">
                             设备编号：
                             <select id="imId" name="imId" th:with="allIm=${@im.selectAllIm(-1,-1)}">
                                 <option value="-1">所有</option>
@@ -23,7 +23,7 @@
                             </select>
                         </li>
                         <li>
-                            责任人/员工:
+                            <span id="fuZeRen">责任人一：</span><span id="yuanGong" style="display: none">负责员工：</span>
                             <select id="liableOne" name="liableOne"
                                     th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
                                 <option value="-1">请选择</option>
@@ -32,7 +32,7 @@
                         </li>
 
                         <li>
-                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="searchInitData()"><i
                                     class="fa fa-search"></i>&nbsp;搜索</a>
                             <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
                                     class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -42,25 +42,32 @@
             </form>
         </div>
 
-        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+        <!--车间-->
+        <div class="btn-group-sm hidden-xs" id="toolbar1" role="group" style="display: inline-block">
             <a id="addHouse" class="btn btn-success" onclick="addHouse(0)"
                shiro:hasPermission="production:singleWork:add">
                 <i class="fa fa-plus"></i> 新建车间
             </a>
-            <a id="addIm" class="btn btn-primary" onclick="addIm()" shiro:hasPermission="production:singleWork:add"
-               style="display: none">
+        </div>
+
+        <!--设备-->
+        <div class="btn-group-sm hidden-xs" id="toolbar2" role="group" style="display: none">
+            <a id="addIm" class="btn btn-primary" onclick="addIm()" shiro:hasPermission="production:singleWork:add">
                 <i class="fa fa-gavel"></i> 新增设备
             </a>
-            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"
-               shiro:hasPermission="production:singleWork:remove">
-                <i class="fa fa-remove"></i> 删除
-            </a>
-            <a id="goBackTag" class="btn btn-default" onclick="goBack()" style="display: none">
+            <a id="goBackTag" class="btn btn-default" onclick="goBack()">
                 <i class="fa fa-mail-reply"></i> 返回上一级
             </a>
         </div>
-        <div class="col-sm-12 select-table table-striped">
-            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+
+
+        <!--车间-->
+        <div class="col-sm-12 select-table table-striped" id="houseData" style="display: inline-block">
+            <table id="bootstrap-table1" data-mobile-responsive="true"></table>
+        </div>
+        <!--设备-->
+        <div class="col-sm-12 select-table table-striped" id="imCodeData" style="display: none">
+            <table id="bootstrap-table2" data-mobile-responsive="true"></table>
         </div>
     </div>
 </div>
@@ -71,6 +78,12 @@
             width: "200px",
             placeholder: '请选择'
         });
+        var parentId = $("#parentId").val();
+        if (parentId != 0) {
+            initTableData(1);
+        } else {
+            initTableData(0);
+        }
     })
 
     // 重置搜索表单信息
@@ -88,103 +101,7 @@
     var prefix = ctx + "production/singleWork";
 
     $(function () {
-        var options = {
-            url: prefix + "/list",
-            createUrl: prefix + "/add",
-            createImUrl: prefix + "/addIm/{id}",
-            updateUrl: prefix + "/edit/{id}",
-            updateImUrl: prefix + "/editIm/{id}",
-            removeUrl: prefix + "/remove",
-            exportUrl: prefix + "/export",
-            modalName: "单工位数据",
-            search: false,
-            showExport: false,
-            showSearch: true,
-            showRefresh: true,
-            showColumns: false,
-            showToggle: true,
-            columns: [{
-                checkbox: true
-            },
-                {
-                    field: 'id',
-                    title: '单工位主键id',
-                    visible: false
-                },
-                {
-                    field: 'workshopName',
-                    title: '车间/单工位名称',
-                    formatter: function (value, row, index) {
-                        if (row.sign == 0) { // 车间
-                            return '<i class="fa fa-university"></i> <a class="nav-label" onclick="intoNext(\'' + row.id + '\')"><span style="font-weight: bold;color: blue;">' + row.workshopName + '</span></a>';
-                        } else { // 设备名称
-                            if (value == null) {
-                                return '<span>--</span>';
-                            } else {
-                                return '<span style="font-weight: bold;color: #1E0FBE">' + value + '</span>'
-                            }
-                        }
-                    }
-                },
-                {
-                    title: '设备编码',
-                    formatter: function (value, row, index) {
-                        if (row.sign == 0) { // 车间
-                            return '--';
-                        } else { // 设备名称
-                            return '<span style="color: green">' + row.imCode + '</span>';
-                        }
-                    }
-                },
-                {
-                    field: 'sign',
-                    title: '类型',
-                    sortable: true,
-                    formatter: function (value, row, index) {
-                        if (row.sign == 0) {
-                            return "车间";
-                        } else {
-                            return "设备";
-                        }
-                    }
-                },
-                {
-                    field: 'liableOne',
-                    title: '负责人',
-                    sortable: true,
-                    formatter: function (value, row, index) {
-                        if (row.sign == 0) {
-                            return row.liableOneName == null ? '-' : row.liableOneName + "/" + (row.liableTwoName == null ? '-' : row.liableTwoName);
-                        } else {
-                            return row.liableOneName == null ? '-' : row.liableOneName;
-                        }
-                    }
-                },
-                {
-                    field: 'cTime',
-                    title: '创建时间',
-                    sortable: true
-                },
-                {
-                    title: '操作',
-                    align: 'center',
-                    formatter: function (value, row, index) {
-                        var actions = [];
-                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        // 单工位设备列表
-                        if (row.parentId != 0) {
-                            actions.push('<a class="btn btn-xs  btn-primary ' + configDevFlag + '" href="javascript:void(0)" onclick="configDev(\'' + row.id + '\')">配置硬件</a> ');
-                            actions.push('<a class="btn btn-xs  btn-primary ' + configSopFlag + '" href="javascript:void(0)" onclick="configSop(\'' + row.id + '\')">配置SOP</a> ');
-                            actions.push('<a class="btn btn-xs  btn-primary ' + singleWork + '" href="javascript:void(0)" onclick="configSingle(' + row.id + ',\'' + row.imCode + '\')">配置工单</a> ');
-                        }
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 
-                        return actions.join('');
-                    }
-                }]
-        };
-        $.table.init(options);
-        $.table.search("formId");
     });
 
     /**
@@ -199,24 +116,28 @@
      * 进入车间下一级
      */
     function intoNext(parentId) {
-        $("#addHouse").hide();
-        $("#addIm").show();
-        $("#goBackTag").show();
+        $("#houseName").css("display","none");
+        $("#imCodeName").css("display","inline-block");
+        $("#imCheck").css("display","inline-block");
+        $("#fuZeRen").css("display","none");
+        $("#yuanGong").css("display","inline-block");
         $.form.reset();
         $("#parentId").val(parentId);
-        $.table.search("formId");
+        initTableData(1);
     }
 
     /**
      * 返回上一级
      */
     function goBack() {
-        $("#addHouse").show();
-        $("#addIm").hide();
-        $("#goBackTag").hide();
+        $("#houseName").css("display","inline-block");  //显示
+        $("#imCodeName").css("display","none");  //隐藏
+        $("#imCheck").css("display","none");  //隐藏
+        $("#fuZeRen").css("display","inline-block");
+        $("#yuanGong").css("display","none");
         $.form.reset();
         $("#parentId").val(0);
-        $.table.search("formId");
+        initTableData(0);
     }
 
     /**
@@ -273,9 +194,9 @@
     /**
      * 配置单工位SOP
      */
-    function configSop(id) {
+    function configSop(imCode, id) {
         var parentId = $("#parentId").val();
-        createMenuItem(prefix + "/configSop?parentId=" + parentId + "&id=" + id, "配置单工位作业指导书");
+        createMenuItem(prefix + "/configSop?parentId=" + parentId + "&id=" + id, "设备" + imCode + ":ASOP配置");
     }
 
     /**
@@ -286,14 +207,46 @@
         var msg = '';
         if (parentId != 0) {
             msg = '单工位信息以及所有相关配置吗?'
+            $.modal.confirm("确定删除该条" + msg, function () {
+                var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
+                var data = {"ids": id};
+                submit(url, "post", "json", data, 1);
+            });
         } else {
             msg = '车间信息吗?';
+            $.modal.confirm("确定删除该条" + msg, function () {
+                var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
+                var data = {"ids": id};
+                submit(url, "post", "json", data, 0);
+            });
         }
-        $.modal.confirm("确定删除该条" + msg, function () {
-            var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
-            var data = {"ids": id};
-            $.operate.submit(url, "post", "json", data);
-        });
+
+    }
+
+    function submit(url, type, dataType, data, val) {
+        var config = {
+            url: url,
+            type: type,
+            dataType: dataType,
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $.modal.msgSuccess(result.msg);
+                    if (val == 0) {
+                        $("#bootstrap-table1").bootstrapTable('refresh');
+                    } else {
+                        $("#bootstrap-table2").bootstrapTable('refresh');
+                    }
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            }
+        };
+        $.ajax(config)
     }
 
     /**
@@ -303,6 +256,343 @@
      */
     function configSingle(id, name) {
         $.modal.open(name + " 工单配置", "/production/singleWorkOrder?type=0&orderId=0&singleId=" + id, 800, 700);
+    }
+
+    function searchInitData() {
+        var parentId = $("#parentId").val();
+        if (parentId != 0) {
+            initTableData(1);
+        } else {
+            initTableData(0);
+        }
+    }
+
+    function initTableData(val) {
+        if (val == 0) {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                createImUrl: prefix + "/addIm/{id}",
+                updateUrl: prefix + "/edit/{id}",
+                updateImUrl: prefix + "/editIm/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "单工位数据",
+                search: false,
+                showExport: false,
+                showSearch: true,
+                showRefresh: true,
+                showColumns: false,
+                showToggle: true,
+                columns: [
+                    {
+                        field: 'id',
+                        title: '单工位主键id',
+                        visible: false
+                    },
+                    {
+                        field: 'workshopName',
+                        title: '车间名称',
+                        formatter: function (value, row, index) {
+                            if (row.sign == 0) { // 车间
+                                return '<i class="fa fa-university"></i> <a class="nav-label" onclick="intoNext(\'' + row.id + '\')"><span style="font-weight: bold;color: blue;">' + row.workshopName + '</span></a>';
+                            } else { // 设备名称
+                                if (value == null) {
+                                    return '<span>--</span>';
+                                } else {
+                                    return '<span style="font-weight: bold;color: #1E0FBE">' + value + '</span>'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        field: 'liableOne',
+                        title: '责任人一',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.liableOneName;
+                        }
+                    },
+                    {
+                        field: 'liableTwo',
+                        title: '责任人二',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.liableTwoName;
+                        }
+                    },
+                    {
+                        field: 'cTime',
+                        title: '创建时间',
+                        sortable: true
+                    },
+                    {
+                        title: '车间管理',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                            return actions.join('');
+                        }
+                    }]
+            };
+            initTable1(options, "bootstrap-table1");
+            searchData(0);
+        } else {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                createImUrl: prefix + "/addIm/{id}",
+                updateUrl: prefix + "/edit/{id}",
+                updateImUrl: prefix + "/editIm/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "单工位数据",
+                search: false,
+                showExport: false,
+                showSearch: true,
+                showRefresh: true,
+                showColumns: false,
+                showToggle: true,
+                columns: [
+                    {
+                        field: 'id',
+                        title: '单工位主键id',
+                        visible: false
+                    },
+                    {
+                        field: 'workshopName',
+                        title: '单工位名称',
+                        formatter: function (value, row, index) {
+                            if (row.sign == 0) { // 车间
+                                return '<i class="fa fa-university"></i> <a class="nav-label" onclick="intoNext(\'' + row.id + '\')"><span style="font-weight: bold;color: blue;">' + row.workshopName + '</span></a>';
+                            } else { // 设备名称
+                                if (value == null) {
+                                    return '<span>--</span>';
+                                } else {
+                                    return '<span style="font-weight: bold;color: #1E0FBE">' + value + '</span>'
+                                }
+                            }
+                        }
+                    },
+                    {
+                        title: '设备编码',
+                        formatter: function (value, row, index) {
+                            if (row.sign == 0) { // 车间
+                                return '--';
+                            } else { // 设备名称
+                                return '<span style="color: green">' + row.imCode + '</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'liableOne',
+                        title: '负责员工',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            return row.liableOneName;
+                        }
+                    },
+                    {
+                        field: 'devId',
+                        title: '计数器编码',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            if (value != 0) {
+                                return '<span style="color: green;font-weight: bold">' + row.devCode + '</span>';
+                            } else {
+                                return '<span style="color: red;font-weight: bold">未配置</span>';
+                            }
+                        }
+                    },
+                    {
+                        field: 'watchId',
+                        title: 'ASOP看板编码',
+                        sortable: true,
+                        formatter: function (value, row, index) {
+                            if (value != 0) {
+                                return '<span style="color: green;font-weight: bold">' + row.watchCode + '</span>';
+                            } else {
+                                return '<span style="color: red;font-weight: bold">未配置</span>';
+                            }
+                        }
+                    },
+                    {
+                        title: '单工位管理',
+                        align: 'center',
+                        formatter: function (value, row, index) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                            // 单工位设备列表
+                            if (row.parentId != 0) {
+                                actions.push('<a class="btn btn-xs  btn-primary ' + configDevFlag + '" href="javascript:void(0)" onclick="configDev(\'' + row.id + '\')">配置硬件</a> ');
+                                actions.push('<a class="btn btn-xs  btn-primary ' + configSopFlag + '" href="javascript:void(0)" onclick="configSop(\'' + row.imCode + '\',\'' + row.id + '\')">配置SOP</a> ');
+                                actions.push('<a class="btn btn-xs  btn-primary ' + singleWork + '" href="javascript:void(0)" onclick="configSingle(' + row.id + ',\'' + row.imCode + '\')">分配工单</a> ');
+                            }
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+
+                            return actions.join('');
+                        }
+                    }]
+            };
+            initTable2(options, "bootstrap-table2");
+            searchData(1);
+        }
+    }
+
+    /**
+     * 初始化对应的表格
+     */
+    function initTable1(options, id) {
+        $.table._option = options;
+        $.table._params = $.common.isEmpty(options.queryParams) ? $.table.queryParams : options.queryParams;
+        _sortOrder = $.common.isEmpty(options.sortOrder) ? "asc" : options.sortOrder;
+        _sortName = $.common.isEmpty(options.sortName) ? "" : options.sortName;
+        _pageSize = $.common.isEmpty(options.pageSize) ? 3 : options.pageSize;
+        _striped = $.common.isEmpty(options.striped) ? false : options.striped;
+        _escape = $.common.isEmpty(options.escape) ? false : options.escape;
+        _showFooter = $.common.isEmpty(options.showFooter) ? false : options.showFooter;
+        _fixedColumns = $.common.isEmpty(options.fixedColumns) ? false : options.fixedColumns;
+        _fixedNumber = $.common.isEmpty(options.fixedNumber) ? 0 : options.fixedNumber;
+        _rightFixedColumns = $.common.isEmpty(options.rightFixedColumns) ? false : options.rightFixedColumns;
+        _rightFixedNumber = $.common.isEmpty(options.rightFixedNumber) ? 0 : options.rightFixedNumber;
+        $('#' + id).bootstrapTable({
+            url: options.url,                                   // 请求后台的URL（*）
+            contentType: "application/x-www-form-urlencoded",   // 编码类型
+            method: 'post',                                     // 请求方式（*）
+            cache: false,                                       // 是否使用缓存
+            striped: _striped,                                  // 是否显示行间隔色
+            sortable: true,                                     // 是否启用排序
+            sortStable: true,                                   // 设置为 true 将获得稳定的排序
+            sortName: _sortName,                                // 排序列名称
+            sortOrder: _sortOrder,                              // 排序方式  asc 或者 desc
+            pagination: $.common.visible(options.pagination),   // 是否显示分页（*）
+            pageNumber: 1,                                      // 初始化加载第一页，默认第一页
+            pageSize: 10,                                // 每页的记录行数（*）
+            pageList: [10, 25, 50],                             // 可供选择的每页的行数（*）
+            escape: _escape,                                    // 转义HTML字符串
+            showFooter: _showFooter,                            // 是否显示表尾
+            iconSize: 'outline',                                // 图标大小：undefined默认的按钮尺寸 xs超小按钮sm小按钮lg大按钮
+            toolbar: '#toolbar1',                                // 指定工作栏
+            sidePagination: "server",                           // 启用服务端分页
+            search: $.common.visible(options.search),           // 是否显示搜索框功能
+            showSearch: $.common.visible(options.showSearch),   // 是否显示检索信息
+            showRefresh: $.common.visible(options.showRefresh), // 是否显示刷新按钮
+            showColumns: $.common.visible(options.showColumns), // 是否显示隐藏某列下拉框
+            showToggle: $.common.visible(options.showToggle),   // 是否显示详细视图和列表视图的切换按钮
+            showExport: $.common.visible(options.showExport),   // 是否支持导出文件
+            fixedColumns: _fixedColumns,                        // 是否启用冻结列（左侧）
+            fixedNumber: _fixedNumber,                          // 列冻结的个数（左侧）
+            rightFixedColumns: _rightFixedColumns,              // 是否启用冻结列（右侧）
+            rightFixedNumber: _rightFixedNumber,                // 列冻结的个数（右侧）
+            queryParams: $.table._params,                       // 传递参数（*）
+            columns: options.columns,                           // 显示列信息（*）
+        });
+
+    }
+
+    /**
+     * 初始化对应的表格
+     */
+    function initTable2(options, id) {
+        $.table._option = options;
+        $.table._params = $.common.isEmpty(options.queryParams) ? $.table.queryParams : options.queryParams;
+        _sortOrder = $.common.isEmpty(options.sortOrder) ? "asc" : options.sortOrder;
+        _sortName = $.common.isEmpty(options.sortName) ? "" : options.sortName;
+        _pageSize = $.common.isEmpty(options.pageSize) ? 3 : options.pageSize;
+        _striped = $.common.isEmpty(options.striped) ? false : options.striped;
+        _escape = $.common.isEmpty(options.escape) ? false : options.escape;
+        _showFooter = $.common.isEmpty(options.showFooter) ? false : options.showFooter;
+        _fixedColumns = $.common.isEmpty(options.fixedColumns) ? false : options.fixedColumns;
+        _fixedNumber = $.common.isEmpty(options.fixedNumber) ? 0 : options.fixedNumber;
+        _rightFixedColumns = $.common.isEmpty(options.rightFixedColumns) ? false : options.rightFixedColumns;
+        _rightFixedNumber = $.common.isEmpty(options.rightFixedNumber) ? 0 : options.rightFixedNumber;
+        $('#' + id).bootstrapTable({
+            url: options.url,                                   // 请求后台的URL（*）
+            contentType: "application/x-www-form-urlencoded",   // 编码类型
+            method: 'post',                                     // 请求方式（*）
+            cache: false,                                       // 是否使用缓存
+            striped: _striped,                                  // 是否显示行间隔色
+            sortable: true,                                     // 是否启用排序
+            sortStable: true,                                   // 设置为 true 将获得稳定的排序
+            sortName: _sortName,                                // 排序列名称
+            sortOrder: _sortOrder,                              // 排序方式  asc 或者 desc
+            pagination: $.common.visible(options.pagination),   // 是否显示分页（*）
+            pageNumber: 1,                                      // 初始化加载第一页，默认第一页
+            pageSize: 10,                                // 每页的记录行数（*）
+            pageList: [10, 25, 50],                             // 可供选择的每页的行数（*）
+            escape: _escape,                                    // 转义HTML字符串
+            showFooter: _showFooter,                            // 是否显示表尾
+            iconSize: 'outline',                                // 图标大小：undefined默认的按钮尺寸 xs超小按钮sm小按钮lg大按钮
+            toolbar: '#toolbar2',                                // 指定工作栏
+            sidePagination: "server",                           // 启用服务端分页
+            search: $.common.visible(options.search),           // 是否显示搜索框功能
+            showSearch: $.common.visible(options.showSearch),   // 是否显示检索信息
+            showRefresh: $.common.visible(options.showRefresh), // 是否显示刷新按钮
+            showColumns: $.common.visible(options.showColumns), // 是否显示隐藏某列下拉框
+            showToggle: $.common.visible(options.showToggle),   // 是否显示详细视图和列表视图的切换按钮
+            showExport: $.common.visible(options.showExport),   // 是否支持导出文件
+            fixedColumns: _fixedColumns,                        // 是否启用冻结列（左侧）
+            fixedNumber: _fixedNumber,                          // 列冻结的个数（左侧）
+            rightFixedColumns: _rightFixedColumns,              // 是否启用冻结列（右侧）
+            rightFixedNumber: _rightFixedNumber,                // 列冻结的个数（右侧）
+            queryParams: $.table._params,                       // 传递参数（*）
+            columns: options.columns,                           // 显示列信息（*）
+        });
+    }
+
+    /** 查询数据信息 */
+    function searchData(val) {
+        if (val == 0) {
+            $("#toolbar1").css("display", "inline-block");  //显示
+            $("#toolbar2").css("display", "none");  //隐藏
+            $("#houseData").css("display", "inline-block");  //显示
+            $("#imCodeData").css("display", "none");  //隐藏
+            var params = $("#bootstrap-table1").bootstrapTable('getOptions');
+            params.queryParams = function (p) {
+                var params = {};
+                params.beginTime = $("#startTime").val();
+                params.endTime = $("#endTime").val();
+                var search = {};
+                search.params = params;
+                search.parentId = $("#parentId").val();
+                search.workshopName = $("#workshopName").val();
+                search.imId = $("#imId").find("option:selected").val();
+                search.liableOne = $("#liableOne").find("option:selected").val();
+                search.pageSize = p.limit;
+                search.pageNum = p.offset / p.limit + 1;
+                search.searchValue = p.search;
+                search.orderByColumn = p.sort;
+                search.isAsc = p.order;
+                return search;
+            }
+            $("#bootstrap-table1").bootstrapTable('refresh', params);
+        } else {
+            $("#toolbar1").css("display", "none");  //显示
+            $("#toolbar2").css("display", "inline-block");  //隐藏
+            $("#imCodeData").css("display", "inline-block");  //显示
+            $("#houseData").css("display", "none");  //隐藏
+            var params = $("#bootstrap-table2").bootstrapTable('getOptions');
+            params.queryParams = function (p) {
+                var params = {};
+                params.beginTime = $("#startTime").val();
+                params.endTime = $("#endTime").val();
+                var search = {};
+                search.params = params;
+                search.parentId = $("#parentId").val();
+                search.workshopName = $("#workshopName").val();
+                search.imId = $("#imId").find("option:selected").val();
+                search.liableOne = $("#liableOne").find("option:selected").val();
+                search.pageSize = p.limit;
+                search.pageNum = p.offset / p.limit + 1;
+                search.searchValue = p.search;
+                search.orderByColumn = p.sort;
+                search.isAsc = p.order;
+                return search;
+            }
+            $("#bootstrap-table2").bootstrapTable('refresh', params);
+        }
     }
 </script>
 </body>

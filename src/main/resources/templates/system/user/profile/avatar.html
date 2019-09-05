@@ -84,6 +84,8 @@ function submitHandler() {
 				$("#c_img",parent.document).attr("src",result.data);
 				$("#imgUrl",parent.parent.document).attr("src",result.data);
                 $("#left_img",parent.parent.document).attr("src",result.data);
+			} else {
+				$.modal.alertError("修改头像失败");
 			}
         }
     })

@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.productionLine.service;
 
+import com.ruoyi.common.constant.FileConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
@@ -8,6 +9,8 @@ import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
+import com.ruoyi.project.iso.sop.mapper.SopMapper;
+import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
@@ -49,6 +52,12 @@ public class ProductionLineServiceImpl implements IProductionLineService {
 
     @Autowired
     private DevListMapper devListMapper;
+
+    @Autowired
+    private SopMapper sopMapper;
+
+    @Autowired
+    private SopLineMapper sopLineMapper;
 
     /**
      * 查询生产线信息
@@ -129,11 +138,11 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @return 结果
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int deleteProductionLineById(Integer id, HttpServletRequest request) {
-        User sysUser = JwtUtil.getTokenUser(request); // 在线用户
+        User sysUser = JwtUtil.getTokenUser(request);
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(id);
-        if (productionLine != null && !User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) { // 非系统用户或者非注册用户
+        if (productionLine != null && !User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) {
             // 删除的时候判断是否为该工单的负责人
             // 查询产线信息
             checkDeviceLiable(sysUser, productionLine);
@@ -176,6 +185,10 @@ public class ProductionLineServiceImpl implements IProductionLineService {
                 workstationMapper.deleteWorkstationById(workstation.getId());
             }
         }
+        // 删除ASOP相关配置
+        sopMapper.deleteSop(sysUser.getCompanyId(),id, FileConstants.SOP_TAG_LINE);
+        sopLineMapper.deleteSopLine(sysUser.getCompanyId(),id,null,null,FileConstants.SOP_TAG_LINE);
+
         return productionLineMapper.deleteProductionLineById(id);
     }
 
@@ -192,8 +205,9 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      */
     @Override
     public int updateLineConfigClear(ProductionLine line, HttpServletRequest request) {
-        User sysUser = JwtUtil.getTokenUser(request); // 在线用户
-        ProductionLine productionLine = productionLineMapper.selectProductionLineById(line.getId()); // 查询产线信息
+        User sysUser = JwtUtil.getTokenUser(request);
+        // 查询产线信息
+        ProductionLine productionLine = productionLineMapper.selectProductionLineById(line.getId());
         checkDeviceLiable(sysUser, productionLine);
         try {
             if (line == null || line.getId() == null) return 0;
@@ -234,7 +248,8 @@ public class ProductionLineServiceImpl implements IProductionLineService {
      * @param productionLine
      */
     private void checkDeviceLiable(User sysUser, ProductionLine productionLine) {
-        if (!User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) { // 非系统用户或者非注册用户
+        // 非系统用户或者非注册用户
+        if (!User.isSys(sysUser) && !sysUser.getLoginName().equals(sysUser.getCreateBy())) {
             //不属于第一或者第二责任人不允许修改产线
             if (productionLine.getDeviceLiable() != null && productionLine.getDeviceLiableTow() != null) {
                 if (sysUser.getUserId().longValue() != productionLine.getDeviceLiable() && sysUser.getUserId().longValue() != productionLine.getDeviceLiableTow()) {
@@ -351,5 +366,18 @@ public class ProductionLineServiceImpl implements IProductionLineService {
             }
             return productionLines;
         }
+    }
+
+    /**
+     * 查询所有的产线信息
+     * @return 结果
+     */
+    @Override
+    public List<ProductionLine> selectAllLineByComId() {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return productionLineMapper.selectAllProductionLineByCompanyId(user.getCompanyId());
     }
 }

@@ -104,4 +104,10 @@ public interface IProductionLineService
 	 * @return 结果
 	 */
 	List<ProductionLine> appSelectLineList(ProductionLine productionLine);
+
+	/**
+	 * 查询所有的产线信息
+	 * @return 结果
+	 */
+	List<ProductionLine> selectAllLineByComId();
 }

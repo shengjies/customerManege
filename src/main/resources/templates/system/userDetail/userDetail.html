@@ -207,6 +207,16 @@
     }
 
     /**
+     * 刷新页面
+     */
+    function refreshTab() {
+        var currentId = window.parent.$('.page-tabs-content').find('.active').attr('data-id');
+        var target = window.parent.$('.RuoYi_iframe[data-id="' + currentId + '"]');
+        var url = target.attr('src');
+        target.attr('src', url).ready();
+    }
+
+    /**
      * 用户信息修改
      */
     $("#form-user-edit").validate({
@@ -243,8 +253,31 @@
 
     function submitUserInfo() {
         if ($.validate.form()) {
-            $.operate.save(ctx + "system/user/profile/update", $('#form-user-edit').serialize());
+            saveInfo(ctx + "system/user/profile/update", $('#form-user-edit').serialize());
         }
+    }
+
+    function saveInfo(url,data){
+        var config = {
+            url: url,
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    refreshTab();
+                } else {
+                    $.modal.alertError("修改失败");
+                }
+                $.modal.closeLoading();
+                $.modal.enable();
+            }
+        };
+        $.ajax(config)
     }
 
     /**
@@ -281,7 +314,7 @@
 
     function editCompany(){
         if ($.validate.form()) {
-            $.operate.save(ctx + "device/devCompany/edit", $('#form-company-edit').serialize());
+            saveInfo(ctx + "device/devCompany/edit", $('#form-company-edit').serialize());
         }
     }
 
@@ -332,7 +365,7 @@
 
     function submitChangPassword() {
         if ($.validate.form()) {
-            $.operate.save(ctx + "system/user/profile/resetPwd", $('#form-user-resetPwd').serialize());
+            saveInfo(ctx + "system/user/profile/resetPwd", $('#form-user-resetPwd').serialize());
         }
     }
 

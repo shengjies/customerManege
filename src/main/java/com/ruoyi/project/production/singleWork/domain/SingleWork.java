@@ -50,12 +50,22 @@ public class SingleWork extends BaseEntity
 	 * 是否配置SOP标志(0、未配置，1、已配置)
 	 */
 	private Integer sopSign;
+	/** 流水线工位极光推送标记 0未更新，1已更新 */
+	private Integer jpushTag;
 
 	/*******************  app交互参数 *******************/
 	private Integer uid; // app在线用户id
 	private Integer mParentId; // 菜单父id
 	private String deviceCode; //设备编号
 	private String devType; //设备类型
+
+	public Integer getJpushTag() {
+		return jpushTag;
+	}
+
+	public void setJpushTag(Integer jpushTag) {
+		this.jpushTag = jpushTag;
+	}
 
 	public Integer getUid() {
 		return uid;

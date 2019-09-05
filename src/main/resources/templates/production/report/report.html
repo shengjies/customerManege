@@ -3,147 +3,301 @@
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <body class="gray-bg">
-    <div class="container-div">
-        <div class="row">
-            <div class="col-sm-12 search-collapse">
-                <div class="nav-tabs-custom">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#line-report" data-toggle="tab" aria-expanded="true">产线报表</a></li>
-                        <li><a href="#single-report" data-toggle="tab" aria-expanded="false">车间报表</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <!--产线-->
-                        <div class="tab-pane active" id="line-report">
-                            <form class="form-horizontal m col-sm-6" id="line-report-data-form">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">选择产线：</label>
-                                    <div class="col-sm-8">
-                                        <select  name="lineId" id="lineId" class="form-control m-b"
-                                                 th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
-                                            <option value="-1">请选择</option>
-                                            <option th:each="line : ${productionLine}" th:text="${line.lineName}"
-                                                    th:value="${line.Id}"></option>
-                                        </select>
-                                    </div>
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#line-report" data-toggle="tab" aria-expanded="true">产线报表</a></li>
+                    <li><a href="#single-report" data-toggle="tab" aria-expanded="false">车间报表</a></li>
+                </ul>
+                <div class="tab-content">
+                    <!--产线-->
+                    <div class="tab-pane active" id="line-report">
+                        <form class="form-horizontal m col-sm-6" id="line-report-data-form">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">选择产线：</label>
+                                <div class="col-sm-8">
+                                    <select name="lineId" id="lineId" class="form-control m-b"
+                                            th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
+                                        <option value="-1">请选择</option>
+                                        <option th:each="line : ${productionLine}" th:text="${line.lineName}"
+                                                th:value="${line.Id}"></option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">产品/半成品：</label>
-                                    <div class="col-sm-8">
-                                        <select id="productCode" name="productCode"
-                                                class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(0)}">
-                                            <option value="">请选择</option>
-                                            <option th:each="pro : ${productList}"  th:text="${pro.productName+'-'+pro.productCode}" th:value="${pro.productCode}"></option>
-                                        </select>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">产品/半成品：</label>
+                                <div class="col-sm-8">
+                                    <select id="productCode" name="productCode"
+                                            class="form-control"
+                                            th:with="productList=${@product.selectProductAllByCompanyId(0)}">
+                                        <option value="">请选择</option>
+                                        <option th:each="pro : ${productList}"
+                                                th:text="${pro.productName+'-'+pro.productCode}"
+                                                th:value="${pro.productCode}"></option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">创建时间：</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="time-input form-control" id="startTime"   placeholder="开始时间" name="startTime"/>
-                                        <span>-</span>
-                                        <input type="text" class="time-input form-control" id="endTime" placeholder="结束时间" name="endTime"/>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">创建时间：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="time-input form-control" id="startTime" placeholder="开始时间"
+                                           name="startTime"/>
+                                    <span>-</span>
+                                    <input type="text" class="time-input form-control" id="endTime" placeholder="结束时间"
+                                           name="endTime"/>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12" style="text-align: center">
-                                        <a class="btn btn-warning" onclick="toExport()" shiro:hasPermission="production:productionLine:export">
-                                            <i class="fa fa-download"></i> 导出报表
-                                        </a>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12" style="text-align: center">
+                                    <a class="btn btn-warning" onclick="toSaveReport(0)"
+                                       shiro:hasPermission="production:productionLine:export">
+                                        <i class="fa fa-eye"></i> 查看
+                                    </a>
+                                    <a class="btn btn-primary" onclick="toSaveReport(1)"
+                                       shiro:hasPermission="production:productionLine:export">
+                                        <i class="fa fa-download"></i> 下载
+                                    </a>
                                 </div>
-                            </form>
-                        </div>
-                        <!--车间-->
-                        <div class="tab-pane" id="single-report">
-                            <form class="form-horizontal m col-sm-6" id="single-report-data-form">
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">选择车间：</label>
-                                    <div class="col-sm-8">
-                                        <select  name="singleId" id="singleId" class="form-control m-b"
-                                                 th:with="single=${@single.selectSingleWorkListSign0()}">
-                                            <option value="-1">请选择</option>
-                                            <option th:each="item : ${single}" th:text="${item.workshopName}"
-                                                    th:value="${item.id}"></option>
-                                        </select>
-                                    </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--车间-->
+                    <div class="tab-pane" id="single-report">
+                        <form class="form-horizontal m col-sm-6" id="single-report-data-form">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">选择车间：</label>
+                                <div class="col-sm-8">
+                                    <select name="singleId" id="singleId" class="form-control m-b"
+                                            th:with="single=${@single.selectSingleWorkListSign0()}">
+                                        <option value="-1">请选择</option>
+                                        <option th:each="item : ${single}" th:text="${item.workshopName}"
+                                                th:value="${item.id}"></option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">产品/半成品：</label>
-                                    <div class="col-sm-8">
-                                        <select id="singleProductCode" name="productCode"
-                                                class="form-control" th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
-                                            <option value="">请选择</option>
-                                            <option th:each="pro : ${productList}"  th:text="${pro.productName +'-'+ pro.productCode}" th:value="${pro.productCode}"></option>
-                                        </select>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">产品/半成品：</label>
+                                <div class="col-sm-8">
+                                    <select id="singleProductCode" name="productCode"
+                                            class="form-control"
+                                            th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                                        <option value="">请选择</option>
+                                        <option th:each="pro : ${productList}"
+                                                th:text="${pro.productName +'-'+ pro.productCode}"
+                                                th:value="${pro.productCode}"></option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">选择员工：</label>
-                                    <div class="col-sm-8">
-                                        <select id="userId" name="userId"
-                                                class="form-control" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
-                                            <option value="-1">请选择</option>
-                                            <option th:each="item : ${user}"  th:text="${item.userName}" th:value="${item.userId}"></option>
-                                        </select>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">选择员工：</label>
+                                <div class="col-sm-8">
+                                    <select id="userId" name="userId"
+                                            class="form-control"
+                                            th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">
+                                        <option value="-1">请选择</option>
+                                        <option th:each="item : ${user}" th:text="${item.userName}"
+                                                th:value="${item.userId}"></option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 control-label">创建时间：</label>
-                                    <div class="col-sm-8">
-                                        <input type="text" class="time-input form-control" id="singleStartTime"   placeholder="开始时间" name="startTime"/>
-                                        <span>-</span>
-                                        <input type="text" class="time-input form-control" id="singleEndTime" placeholder="结束时间" name="endTime"/>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">创建时间：</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="time-input form-control" id="singleStartTime"
+                                           placeholder="开始时间" name="startTime"/>
+                                    <span>-</span>
+                                    <input type="text" class="time-input form-control" id="singleEndTime"
+                                           placeholder="结束时间" name="endTime"/>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12" style="text-align: center">
-                                        <a class="btn btn-warning" onclick="toSingleExport()" shiro:hasPermission="production:productionLine:export">
-                                            <i class="fa fa-download"></i> 导出报表
-                                        </a>
-                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12" style="text-align: center">
+                                    <a class="btn btn-warning" onclick="toSingleExport(0)"
+                                       shiro:hasPermission="production:productionLine:export">
+                                        <i class="fa fa-eye"></i> 查看
+                                    </a>
+                                    <a class="btn btn-primary" onclick="toSingleExport(1)"
+                                       shiro:hasPermission="production:productionLine:export">
+                                        <i class="fa fa-download"></i> 下载
+                                    </a>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <span class="badge badge-primary">报表历史记录</span>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
     </div>
-    <div th:include="include :: footer"></div>
-    <script th:src="@{/ajax/libs/select/select2.js}"></script>
-<script type="text/javascript">
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/ajax/libs/select/select2.js}"></script>
+<script th:inline="javascript">
+    var removeFlag = [[${@permission.hasPermi('erp:fileSourceInfo:remove')}]];
+    var listFlag = [[${@permission.hasPermi('erp:fileSourceInfo:list')}]];
+    var editFlag = [[${@permission.hasPermi('erp:fileSourceInfo:add')}]];
+    var prefix = ctx + "erp/fileSourceInfo";
     $("#line-report-data-form").validate({
-        rules:{
-            startTime:{
-                required:true,
+        rules: {
+            startTime: {
+                required: true,
             },
-            endTime:{
-                required:true,
+            endTime: {
+                required: true,
             },
         }
     });
     $("#single-report-data-form").validate({
-        rules:{
-            startTime:{
-                required:true,
+        rules: {
+            startTime: {
+                required: true,
             },
-            endTime:{
-                required:true,
+            endTime: {
+                required: true,
             },
         }
     });
-    /** 导出产线报表 */
-    function toExport() {
+
+    /** 保存产线报表 */
+    function toSaveReport(val) {
         if ($.validate.form("line-report-data-form")) {
-            window.location.href="/production/report/line/pdf?lineId="+$("#lineId").val()+"&productCode="+$("#productCode").val()+"&startTime="+$("#startTime").val()+"&endTime="+$("#endTime").val();
+            var url = "/production/report/line/pdf?lineId=" + $("#lineId").val() + "&productCode=" + $("#productCode").val() + "&startTime=" + $("#startTime").val() + "&endTime=" + $("#endTime").val();
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json', // 要什么类型的数据
+                contentType: 'application/json', //发什么类型的数据
+                async: false,  //同步请求，
+                cache: false, // 不使用缓存
+                success: function (result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.table.refresh(); // 重新刷新
+                        if (val == 0) {
+                            window.open(result.msg);
+                        } else {
+                            window.location.href = "/production/report/download?filePath=" + result.msg;
+                        }
+                    } else {
+                        $.modal.alertError("保存失败");
+                    }
+                }
+            });
         }
     }
+
     /** 导出车间报表 */
-    function toSingleExport() {
+    function toSingleExport(val) {
         if ($.validate.form("single-report-data-form")) {
-            window.location.href="/production/report/single/pdf?singleId="+$("#singleId").val()+"&productCode="+$("#singleProductCode").val()+"&startTime="+$("#singleStartTime").val()+"&endTime="+$("#singleEndTime").val()+"&userId="+$("#userId").val();
+            var url = "/production/report/single/pdf?singleId=" + $("#singleId").val() + "&productCode=" + $("#singleProductCode").val() + "&startTime=" + $("#singleStartTime").val() + "&endTime=" + $("#singleEndTime").val() + "&userId=" + $("#userId").val();
+            $.ajax({
+                type: 'get',
+                url: url,
+                dataType: 'json', // 要什么类型的数据
+                contentType: 'application/json', //发什么类型的数据
+                async: false,  //同步请求，
+                cache: false, // 不使用缓存
+                success: function (result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.table.refresh(); // 重新刷新
+                        if (val == 0) {
+                            window.open(result.msg);
+                        } else {
+                            window.location.href = "/production/report/download?filePath=" + result.msg;
+                        }
+                    } else {
+                        $.modal.alertError("保存失败");
+                    }
+                }
+            });
         }
+    }
+
+    var data = {
+        saveType: 14,
+    }
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            modalName: "文件素材管理",
+            queryParams: data,
+            pageSize: 10,
+            search: false,
+            showSearch: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            showExport: false,
+            sortName:'createTime',
+            sortOrder:'desc',
+            columns: [
+                {
+                    field: 'id',
+                    title: '主键，自增长',
+                    visible: false
+                },
+                {
+                    field: 'fileName',
+                    title: '文件名称',
+                },
+                {
+                    field: 'saveId',
+                    title: '报表类型',
+                    formatter: function (value, row, index) {
+                        if (row.saveType == 14) {
+                            if (value == 1) {
+                                return "流水线报表";
+                            } else {
+                                return "车间报表"
+                            }
+                        } else {
+                            return "未知";
+                        }
+                    }
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间',
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-default btn-xs ' + listFlag + '" href="#" onclick="showReportFile(\'' + row.filePath + '\')"><i class="fa fa-eye"></i>查看</a> ');
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="editFileName(\'' + row.id + '\',\'' + row.fileName + '\')"><i class="fa fa-edit"></i>修改文件名</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 查看报表文件
+     */
+    function showReportFile(filePath) {
+        window.open(filePath);
+    }
+
+    /**
+     * 修改文件名
+     * @param id
+     * @param fileName
+     */
+    function editFileName(id, fileName) {
+        var url = prefix + '/editFileName?id=' + id + "&fileName=" + fileName;
+        $.modal.open("修改文件名", url, '650', '300');
     }
 </script>
 </body>

@@ -134,6 +134,13 @@ public interface IDevProductListService
 	 * @return
 	 */
 	List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid,Integer sopTag);
+	/**
+	 * 根据单工位未配置的产品信息
+	 * @param wId 单工位id
+	 * @param sopTag sop配置标记
+	 * @return 结果
+	 */
+	List<DevProductList> selectNotConfigByWId(Integer wId,Integer companyid,Integer sopTag);
 
 	/**
 	 * 根据作业指导书id查询所以未配置的产品信息

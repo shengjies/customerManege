@@ -17,7 +17,6 @@ import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.mapper.IsoMapper;
 import com.ruoyi.project.iso.sopLine.domain.SopLine;
-import com.ruoyi.project.iso.sopLine.domain.SopLineWork;
 import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
 import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
 import com.ruoyi.project.page.pageInfo.domain.SopApi;
@@ -34,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -345,6 +345,7 @@ public class IsoServiceImpl implements IIsoService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> selectSopByDevCode(String code){
         Map<String,Object> map = new HashMap<>(16);
         DevList devList = devListMapper.selectDevListByCode(code);
@@ -369,21 +370,34 @@ public class IsoServiceImpl implements IIsoService {
             //根据硬件编码查询对应的工位信息
             Workstation workstation = workstationMapper.selectByDevCode(code);
             if (workstation == null) throw new BusinessException("工位不存在");
+
+            // 更新工位极光推送为已经更新
+            workstation.setJpushTag(WorkConstants.JPUSH_UPDATED);
+            workstationMapper.updateWorkstation(workstation);
+
             //查询对应产线
             ProductionLine line = productionLineMapper.selectProductionLineById(workstation.getLineId());
             if (line == null) throw new BusinessException("产线不存在");
+
             //查询正在进行的工单
             DevWorkOrder workOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), workstation.getLineId(), WorkConstants.SING_LINE);
             if (workOrder == null || StringUtils.isEmpty(workOrder.getProductCode())) throw new BusinessException("没有正在进行的工单");
+
+            // 工位极光状态查询
+            List<Workstation> workstationList = workstationMapper.selectWorkListJPushTagByLineId(workOrder.getLineId(),WorkConstants.JPUSH_NOT_UPDATED);
+            if (StringUtils.isEmpty(workstationList)) {
+                // 工位看板全部更新，更新工单极光推送标记
+                workOrder.setJpushTag(WorkConstants.JPUSH_UPDATED);
+                devWorkOrderMapper.updateDevWorkOrder(workOrder);
+            }
+
             //查询对应SOP配置
-            SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(), line.getId(), workOrder.getProductCode());
+            SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(workstation.getCompanyId(),workstation.getLineId(),workOrder.getProductCode(),workstation.getId(), FileConstants.SOP_TAG_LINE);
             if (sopLine == null) throw new BusinessException("没有配置SOP");
-            //查询对应的指导书页
-            SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(workstation.getCompanyId(), line.getId(), sopLine.getSopId(), workstation.getId(),FileConstants.SOP_TAG_LINE);
-            if (sopLineWork == null) throw new BusinessException("产线没有配置SOP");
+
             //查询对应SOP
-            Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
-            if (iso == null) throw new BusinessException("工位没有配置SOP");
+            Iso iso = isoMapper.selectIsoById(sopLine.getPageId());
+            if (iso == null) throw new BusinessException("未配置作业指导书或作业指导书被删除");
             iso.setFileSize(line.getLineName()+" "+ workstation.getwName());
             iso.setcId(0);
             // 设置作业指导书看板相关信息
@@ -409,6 +423,11 @@ public class IsoServiceImpl implements IIsoService {
             if (StringUtils.isNull(singleWork)) {
                 throw new BusinessException("单工位不存在");
             }
+
+            // 更新单工位极光推送状态
+            singleWork.setJpushTag(WorkConstants.JPUSH_UPDATED);
+            singleWorkMapper.updateSingleWork1(singleWork);
+
             SingleWork house = singleWorkMapper.selectSingleWorkById(singleWork.getParentId());
             if (StringUtils.isNull(house)) {
                 throw new BusinessException("车间不存在");
@@ -418,20 +437,24 @@ public class IsoServiceImpl implements IIsoService {
             if (StringUtils.isNull(workOrder)) {
                 throw new BusinessException("没有正在进行的工单");
             }
+
+            // 查询配置过该工单的所有单工位信息
+            List<SingleWork> singleWorkList = singleWorkMapper.selectSingleWorkJPushTagByPId(workOrder.getId(),house.getId(),WorkConstants.JPUSH_NOT_UPDATED);
+            if (StringUtils.isEmpty(singleWorkList)) {
+                // 更新工单极光推送为全部更新
+                workOrder.setJpushTag(WorkConstants.JPUSH_UPDATED);
+                devWorkOrderMapper.updateDevWorkOrder(workOrder);
+            }
+
             // 查询对应的sop配置
-            SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(devList.getCompanyId(), singleWork.getId(), workOrder.getProductCode());
+            SopLine sopLine = sopLineMapper.selectSopByCompanyAndLineAndCode(devList.getCompanyId(), house.getId(), workOrder.getProductCode(),singleWork.getId(),FileConstants.SOP_TAG_SINGWORK);
             if (StringUtils.isNull(sopLine)) {
                 throw new BusinessException("没有配置SOP");
             }
-            // 查询对应的指导书页
-            SopLineWork sopLineWork = sopLineWorkMapper.selectInfoByApi(devList.getCompanyId(), house.getId(), sopLine.getSopId(), singleWork.getId(),FileConstants.SOP_TAG_SINGWORK);
-            if (StringUtils.isNull(sopLineWork)) {
-                throw new BusinessException("单工位没有配置SOP");
-            }
-            //查询对应SOP
-            Iso iso = isoMapper.selectIsoById(sopLineWork.getPageId());
+            //查询对应ISO信息
+            Iso iso = isoMapper.selectIsoById(sopLine.getPageId());
             if (StringUtils.isNull(iso)) {
-                throw new BusinessException("无对应的作业指导书");
+                throw new BusinessException("未配置作业指导书或作业指导书被删除");
             }
             iso.setFileSize(house.getWorkshopName()+" "+ singleWork.getImCode());
             iso.setcId(0);
@@ -476,10 +499,6 @@ public class IsoServiceImpl implements IIsoService {
         return sopApi;
     }
 
-    @Override
-    public List<Iso> selectNotConfigBySwId(int parentId, int lineId) {
-        return null;
-    }
 
     /**
      * app端查询ISO文件系统
@@ -489,5 +508,19 @@ public class IsoServiceImpl implements IIsoService {
     @Override
     public List<Iso> appSelectList(Iso iso) {
         return isoMapper.selectIsoList(iso);
+    }
+
+    /**
+     * 查询所有的作业指导书
+     * @param parentId 父id，7为作业指导书
+     * @return 结果
+     */
+    @Override
+    public List<Iso> selectASOPList(Integer parentId) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return isoMapper.selectASOPList(parentId,user.getCompanyId());
     }
 }

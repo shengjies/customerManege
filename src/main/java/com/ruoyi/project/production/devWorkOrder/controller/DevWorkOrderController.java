@@ -14,14 +14,21 @@ import com.ruoyi.project.mes.mesBatch.domain.MesBatch;
 import com.ruoyi.project.mes.mesBatch.domain.MesBatchDetail;
 import com.ruoyi.project.mes.mesBatch.service.IMesBatchDetailService;
 import com.ruoyi.project.mes.mesBatch.service.IMesBatchService;
+import com.ruoyi.project.mes.mesBatchRule.service.IMesBatchRuleDetailService;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.service.IImportConfigService;
+import com.ruoyi.project.production.devWorkOrder.domain.AppWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.production.productionLine.domain.ProductionLine;
 import com.ruoyi.project.production.productionLine.service.IProductionLineService;
+import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
+import com.ruoyi.project.production.singleWork.service.ISingleWorkOrderService;
+import com.ruoyi.project.system.menu.domain.MenuApi;
 import com.ruoyi.project.system.menu.service.IMenuService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -43,6 +50,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/device/devWorkOrder")
 public class DevWorkOrderController extends BaseController {
+
+    /** logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DevWorkOrderController.class);
+
     private String prefix = "production/devWorkOrder";
 
     @Autowired
@@ -515,6 +526,26 @@ public class DevWorkOrderController extends BaseController {
         return prefix + "/mesProduce";
     }
 
+    /**
+     * 流水线工单跳转查看看板更新明细
+     */
+    @GetMapping("/showJPush")
+    public String showJPush(Integer lineId,ModelMap map){
+        map.put("lineId",lineId);
+        return "production/workstation/jpushDetail";
+    }
+
+
+    /**
+     * 车间工单跳转查看看板更新明细
+     */
+    @GetMapping("/showJPush2")
+    public String showJPush2(Integer id,Integer lineId,ModelMap map){
+        map.put("lineId",lineId);
+        map.put("workId",id);
+        return "production/singleWork/jpushDetail";
+    }
+
 
     /******************************************************************************************************
      *********************************** app工单业务接口 ***************************************************
@@ -529,12 +560,17 @@ public class DevWorkOrderController extends BaseController {
     @Autowired
     private IMesBatchDetailService mesBatchDetailService;
 
+    @Autowired
+    private IMesBatchRuleDetailService ruleDetailService;
+
+    @Autowired
+    private ISingleWorkOrderService singleWorkOrderService;
+
     /**
      * app端查询工单列表信息
-     *
-     * @param wlSign    标记工单属于流水线还是单工位，0为流水线，1为单工位
-     * @param uid       用户id
-     * @param mParentId 菜单父id
+     * wlSign  标记工单属于流水线还是单工位，0为流水线，1为单工位
+     * uid      用户id
+     * mParentId 菜单父id
      */
     @PostMapping("/applist")
     @ResponseBody
@@ -543,8 +579,13 @@ public class DevWorkOrderController extends BaseController {
             if (workOrder != null) {
                 workOrder.appStartPage();
                 Map<String, Object> map = new HashMap<>(16);
+                List<MenuApi> menuApiList = menuService.selectMenuListByParentId(workOrder.getUid(), workOrder.getMenuList());
                 if (workOrder.getUid() != null && workOrder.getMenuList() != null) {
-                    map.put("menuList", menuService.selectMenuListByParentId(workOrder.getUid(), workOrder.getMenuList()));
+                    map.put("menuList", menuApiList);
+                }
+                if (workOrder.getUid() != null && workOrder.getmParentId() != null) {
+                    menuApiList.addAll(menuService.selectMenuListByParentId(workOrder.getUid(), workOrder.getmParentId()));
+                    map.put("menuList", menuApiList);
                 }
                 map.put("workOrderList",devWorkOrderService.appSelectDevWorkOrderList(workOrder));
                 return AjaxResult.success("请求成功", map);
@@ -572,6 +613,7 @@ public class DevWorkOrderController extends BaseController {
             return error();
         }
     }
+
 
     /**
      * app开始暂停结束工单逻辑
@@ -619,10 +661,10 @@ public class DevWorkOrderController extends BaseController {
         }
     }
 
+
     /**
      * 工单查询MES数据列表
-     *
-     * @param workCode 工单号
+     * workCode 工单号
      */
     @PostMapping("/appWorkMesList")
     @ResponseBody
@@ -640,8 +682,7 @@ public class DevWorkOrderController extends BaseController {
 
     /**
      * 查询MES数据明细列表
-     *
-     * @param bId 数据主表id
+     * bId 数据主表id
      */
     @PostMapping("/appWorkMesDetailList")
     @ResponseBody
@@ -679,5 +720,93 @@ public class DevWorkOrderController extends BaseController {
             return AjaxResult.success(devWorkOrderService.selectDevWorkOrderById(workOrder.getId()));
         }
         return error();
+    }
+
+    /**
+     * app端工单配置MES模块
+     */
+    @PostMapping("/appWorkMes")
+    @ResponseBody
+    public AjaxResult appWorkMes(@RequestBody AppWorkOrder appWork){
+        try {
+            if (appWork != null && appWork.getWorkId() != null) {
+                return AjaxResult.success(devWorkOrderService.appSelectWorkMes(appWork));
+            }
+            return error();
+        } catch (BusinessException e) {
+            LOGGER.error("app端查询工单配置MES模块出现异常：" + e.getMessage());
+            return error(e.getMessage());
+        } catch (Exception e){
+            LOGGER.error("app端查询工单配置MES模块出现异常：" + e.getMessage());
+            return error();
+        }
+    }
+
+    /**
+     * app端仓库添加MES追溯明细
+     */
+    @PostMapping("/appAddMesRule")
+    @ResponseBody
+    public AjaxResult appAddMesRule(@RequestBody AppWorkOrder appWork){
+        try {
+            if (appWork != null && appWork.getRuleId() > 0) {
+                Map<String,Object> map = new HashMap<>(16);
+                map.put("ruleList",ruleDetailService.selectMesBatchRuleByRuleId(appWork.getRuleId()));
+                map.put("mesCode", CodeUtils.getMesCode());
+                return AjaxResult.success(map);
+            }
+            return error();
+        } catch (Exception e) {
+            LOGGER.error("app端仓库添加MES追溯明细出现异常：" + e.getMessage());
+            return error();
+        }
+    }
+
+    /**
+     * app端仓库删除mes配置信息
+     */
+    @PostMapping("/appRemoveMesData")
+    @ResponseBody
+    public AjaxResult appRemoveMesData(@RequestBody MesBatch mesBatch){
+        try {
+            if (mesBatch != null && mesBatch.getId() != null) {
+                return toAjax(mesBatchService.removeMesData(mesBatch.getId()));
+            }
+            return error();
+        } catch (Exception e) {
+            LOGGER.error("app端仓库删除MES配料出现异常：" + e.getMessage());
+            return error();
+        }
+    }
+
+    /**
+     * 查看app端单工位分配工单列表
+     */
+    @PostMapping("/appShareWorkList")
+    @ResponseBody
+    public AjaxResult appShareWorkList(@RequestBody SingleWorkOrder singleWorkOrder){
+        if (singleWorkOrder != null && singleWorkOrder.getWorkId() != null) {
+            //根据工单查询
+            singleWorkOrder.setType(1);
+            return AjaxResult.success("请求成功", singleWorkOrderService.selectSingleWorkOrderList(singleWorkOrder));
+        }
+        return AjaxResult.error();
+    }
+
+    /**
+     * app端单工位工单分配保存
+     * 传参jsCode workId
+     */
+    @PostMapping("/appSaveShareWork")
+    @ResponseBody
+    public AjaxResult appSaveShareWork(@RequestBody SingleWorkOrder singleWorkOrder){
+        try {
+            if (singleWorkOrder != null && singleWorkOrder.getJsCode() != null && singleWorkOrder.getWorkId() != null) {
+                return toAjax(singleWorkOrderService.appSaveShareWork(singleWorkOrder));
+            }
+            return error();
+        } catch (BusinessException e) {
+            return error(e.getMessage());
+        }
     }
 }

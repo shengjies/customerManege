@@ -58,6 +58,17 @@ public class WorkstationServiceImpl implements IWorkstationService {
     }
 
     /**
+     * 查询工位配置列表
+     *
+     * @param workstation 工位配置信息
+     * @return 工位配置集合
+     */
+    @Override
+    public List<Workstation> selectWorkstationList2(Workstation workstation) {
+        return workstationMapper.selectWorkstationList2(workstation);
+    }
+
+    /**
      * 新增工位配置
      *
      * @param workstation 工位配置信息

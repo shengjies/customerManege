@@ -81,8 +81,8 @@ public class SopLineServiceImpl implements ISopLineService {
         if (sopLine != null) {
             //操作对应产品SOP 配置
             handleSopConfig(sopLine);
-            //操作产线 SOP 工位配置
-            handleSop(sopLine);
+            // //操作产线 SOP 工位配置
+            // handleSop(sopLine);
             return 1;
         }
         return 0;
@@ -107,20 +107,20 @@ public class SopLineServiceImpl implements ISopLineService {
              */
             if (FileConstants.SOP_TAG_LINE.equals(sopLine.getSopTag())) {
                 //删除对应公司 对应产线 对应 SOP 配置信息
-                sopLineMapper.deleteSopLine(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId(),FileConstants.SOP_TAG_LINE);
+                sopLineMapper.deleteSopLine(sopLine.getCompanyId(), sopLine.getLineId(),null, sopLine.getSopId(),FileConstants.SOP_TAG_LINE);
                 //删除 工位配置
-                sopLineWorkMapper.deleteSopLineWork(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId(),FileConstants.SOP_TAG_LINE);
+                // sopLineWorkMapper.deleteSopLineWork(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId(),FileConstants.SOP_TAG_LINE);
                 //操作产线 SOP 工位配置
-                handleSop(sopLine);
+                // handleSop(sopLine);
             } else {
                 //删除对应公司 对应单工位配置信息
-                sopLineMapper.deleteSopLine(sopLine.getCompanyId(), sopLine.getLineId(), sopLine.getSopId(),FileConstants.SOP_TAG_SINGWORK);
+                sopLineMapper.deleteSopLine(sopLine.getCompanyId(), sopLine.getLineId(),null, sopLine.getSopId(),FileConstants.SOP_TAG_SINGWORK);
                 // 删除 车间单工位配置
-                sopLineWorkMapper.deleteSopLineWorkByWId(sopLine.getCompanyId(),sopLine.getLineId(),sopLine.getSopId(),FileConstants.SOP_TAG_SINGWORK);
+                // sopLineWorkMapper.deleteSopLineWorkByWId(sopLine.getCompanyId(),sopLine.getLineId(),sopLine.getSopId(),FileConstants.SOP_TAG_SINGWORK);
                 //操作产线 SOP 工位配置
-                handleSop(sopLine);
+                // handleSop(sopLine);
+
             }
-            //操作对应产品SOP 配置
             handleSopConfig(sopLine);
             return 1;
         }
@@ -132,18 +132,22 @@ public class SopLineServiceImpl implements ISopLineService {
      * @param sopLine
      */
     private void handleSopConfig(SopLine sopLine) {
-        if (sopLine.getPns() != null && sopLine.getPns().length > 0) {
+        if (sopLine.getPns() != null && sopLine.getPns().length > 0 && sopLine.getSopLineWorks() != null && sopLine.getSopLineWorks().size() > 0) {
             DevProductList productList = null;
             for (Integer pn : sopLine.getPns()) {
-                //获取对应产品信息
-                productList = productListMapper.selectDevProductListById(pn);
-                if (productList == null) {
-                    continue;
+                for (SopLineWork work : sopLine.getSopLineWorks()) {
+                    //获取对应产品信息
+                    productList = productListMapper.selectDevProductListById(pn);
+                    if (productList == null) {
+                        continue;
+                    }
+                    sopLine.setPnId(pn);
+                    sopLine.setPnCode(productList.getProductCode());
+                    sopLine.setwId(work.getwId());
+                    sopLine.setPageId(work.getPageId());
+                    sopLine.setcTime(new Date());
+                    sopLineMapper.insertSopLine(sopLine);
                 }
-                sopLine.setPnId(pn);
-                sopLine.setPnCode(productList.getProductCode());
-                sopLine.setcTime(new Date());
-                sopLineMapper.insertSopLine(sopLine);
             }
         }
     }
@@ -176,7 +180,7 @@ public class SopLineServiceImpl implements ISopLineService {
     public int deleteSopLine(int companyId, int lineId, int sopId,int sopTag) {
         try {
             //删除对应公司 对应产线 对应 SOP 配置信息
-            sopLineMapper.deleteSopLine(companyId, lineId, sopId,FileConstants.SOP_TAG_LINE);
+            sopLineMapper.deleteSopLine(companyId,null, lineId, sopId,FileConstants.SOP_TAG_LINE);
             //删除 工位配置
             if (sopTag == FileConstants.SOP_TAG_LINE) {
                 sopLineWorkMapper.deleteSopLineWork(companyId, lineId, sopId,sopTag);
@@ -232,12 +236,12 @@ public class SopLineServiceImpl implements ISopLineService {
      * 查询作业指导书工位配置列表
      *
      * @param companyId 公司id
-     * @param isoId     作业指导书id
+     * @param pageId     作业指导书页id
      * @return 结果
      */
     @Override
-    public List<SopLineWork> selectSopLineWorkListBySopId(Integer companyId, Integer isoId) {
-        return sopLineWorkMapper.selectSopLineWorkListBySopId(companyId, isoId);
+    public List<SopLine> selectSopLineListByPageId(Integer companyId, Integer pageId) {
+        return sopLineMapper.selectSopLineListByPageId(companyId, pageId);
     }
 
 
@@ -287,5 +291,25 @@ public class SopLineServiceImpl implements ISopLineService {
             sopLineWork.setcName(isoMapper.selectIsoById(sopLineWork.getPageId()).getcName());
         }
         return sopLineWork;
+    }
+
+    /**
+     * 通过主表id查看配置明细
+     * @param sId 主表id
+     * @return 结果
+     */
+    @Override
+    public List<SopLine> selectSopConfigProBySId(Integer sId) {
+        return sopLineMapper.selectSopConfigProBySId(sId);
+    }
+
+    /**
+     * 查询所有工位配置
+     * @param sId 主表id
+     * @return 结果
+     */
+    @Override
+    public List<SopLine> selectSopConfigWorkBySId(Integer sId) {
+        return sopLineMapper.selectSopConfigWorkBySId(sId);
     }
 }

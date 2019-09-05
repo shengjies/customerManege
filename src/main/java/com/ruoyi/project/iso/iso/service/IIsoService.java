@@ -96,17 +96,16 @@ public interface IIsoService
 	Map<String,Object> selectSopByDevCode(String code);
 
 	/**
-	 * 通过单工位id查询所有配置sop的iso列表
-	 * @param parentId 父id
-	 * @param lineId 单工位id
-	 * @return 结果
-	 */
-	List<Iso> selectNotConfigBySwId(int parentId, int lineId);
-
-	/**
 	 * app端查询ISO文件系统
 	 * @param iso
 	 * @return
 	 */
 	List<Iso> appSelectList(Iso iso);
+
+	/**
+	 * 查询所有的作业指导书
+	 * @param parentId 父id，7为作业指导书
+	 * @return 结果
+	 */
+	List<Iso> selectASOPList(Integer parentId);
 }

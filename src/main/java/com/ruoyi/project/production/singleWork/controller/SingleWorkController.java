@@ -13,6 +13,7 @@ import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.service.IIsoService;
 import com.ruoyi.project.iso.sopLine.domain.SopLine;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
+import com.ruoyi.project.product.list.service.IDevProductListService;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.service.ISingleWorkOrderService;
@@ -52,6 +53,9 @@ public class SingleWorkController extends BaseController {
     @Autowired
     private IIsoService iIsoService;
 
+    @Autowired
+    private IDevProductListService productListService;
+
     @RequiresPermissions("production:singleWork:view")
     @GetMapping()
     public String singleWork() {
@@ -67,6 +71,17 @@ public class SingleWorkController extends BaseController {
     public TableDataInfo list(SingleWork singleWork) {
         startPage();
         List<SingleWork> list = singleWorkService.selectSingleWorkList(singleWork);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询单工位数据列表
+     */
+    @PostMapping("/jpushList")
+    @ResponseBody
+    public TableDataInfo jpushList(SingleWorkOrder singleWorkOrder) {
+        startPage();
+        List<SingleWork> list = singleWorkService.selectSingleWorkList2(singleWorkOrder);
         return getDataTable(list);
     }
 
@@ -203,8 +218,8 @@ public class SingleWorkController extends BaseController {
     @GetMapping("/configSop")
     @RequiresPermissions("production:singleWork:configSop")
     public String configSop(Integer parentId, Integer id, ModelMap modelMap) {
-        modelMap.put("parentId", parentId);
-        modelMap.put("id", id);
+        modelMap.put("lineId", parentId);
+        modelMap.put("wId", id);
         modelMap.put("sops", iIsoService.selectIsoByParentId(FileConstants.FOLDER_SOP));
         return prefix + "/configSop";
     }
@@ -231,13 +246,25 @@ public class SingleWorkController extends BaseController {
      */
     @PostMapping("/selectNotConfigSop")
     @ResponseBody
-    public AjaxResult notCofigSop(int parentId, int sopId) {
+    public AjaxResult selectNotConfigSop(int wId) {
         User user = JwtUtil.getUser();
         if (user == null) {
             return error(UserConstants.NOT_LOGIN);
         }
-        List<SingleWork> singleWorkList = singleWorkService.selectNotConfigSop(user.getCompanyId(), parentId, sopId, FileConstants.SOP_TAG_SINGWORK);
-        return AjaxResult.success("success", singleWorkList);
+        return AjaxResult.success("success",  productListService.selectNotConfigByWId(wId, user.getCompanyId(), FileConstants.SOP_TAG_SINGWORK));
+    }
+
+    /**
+     * 通过车间id查询该车间的单工位信息
+     */
+    @PostMapping("/selectSingWorkByPId")
+    @ResponseBody
+    public AjaxResult selectSingWorkByPId(int houseId){
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return error();
+        }
+        return AjaxResult.success(singleWorkService.selectSingleWorkByParentId(user.getCompanyId(),houseId));
     }
 
 

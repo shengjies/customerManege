@@ -17,7 +17,7 @@ public interface IReportService {
      * @param startTime 开始时间
      * @param endTime 结束时间
      */
-    String lineReport(int lineId,String productCode,String startTime,String endTime,String devType) throws IOException, DocumentException;
+    String lineReport(int lineId,String productCode,String startTime,String endTime) throws IOException, DocumentException;
 
     /**
      * 车间报表导出
@@ -27,7 +27,7 @@ public interface IReportService {
      * @param startTime 开始时间
      * @param endTime 结束时间
      */
-    String singleReport(int singleId,int userId,String productCode,String startTime,String endTime,String devType) throws IOException, DocumentException;
+    String singleReport(int singleId,int userId,String productCode,String startTime,String endTime) throws IOException, DocumentException;
 
     /**
      * 删除app端下载缓存文件

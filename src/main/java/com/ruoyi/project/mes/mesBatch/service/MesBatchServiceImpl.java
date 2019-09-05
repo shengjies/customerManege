@@ -106,7 +106,7 @@ public class MesBatchServiceImpl implements IMesBatchService {
          * 新增MES
          */
         // 初始化生产扫码标记字段
-        StringBuffer mesSign = new StringBuffer(MesConstants.MES_PRO_SCAN_INIT);
+        StringBuilder mesSign = new StringBuilder(MesConstants.MES_PRO_SCAN_INIT);
         mesBatch.setCompanyId(user.getCompanyId());
         mesBatch.setcTime(new Date());
         mesBatchMapper.insertMesBatch(mesBatch);

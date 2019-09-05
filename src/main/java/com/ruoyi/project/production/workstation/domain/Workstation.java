@@ -44,6 +44,16 @@ public class Workstation extends BaseEntity
 	private Date cTime;
 	/** 标记是否需要删除 */
 	private Integer defId;
+	/** 流水线工位极光推送标记 0未更新，1已更新 */
+	private Integer jpushTag;
+
+	public Integer getJpushTag() {
+		return jpushTag;
+	}
+
+	public void setJpushTag(Integer jpushTag) {
+		this.jpushTag = jpushTag;
+	}
 
 	public String getDevName() {
 		return devName;
@@ -174,6 +184,7 @@ public class Workstation extends BaseEntity
 				", wName='" + wName + '\'' +
 				", sopId=" + sopId +
 				", devId=" + devId +
+				", devName='" + devName + '\'' +
 				", devCode='" + devCode + '\'' +
 				", cId=" + cId +
 				", cCode='" + cCode + '\'' +
@@ -182,6 +193,7 @@ public class Workstation extends BaseEntity
 				", sign=" + sign +
 				", cTime=" + cTime +
 				", defId=" + defId +
+				", jpushTag=" + jpushTag +
 				'}';
 	}
 }

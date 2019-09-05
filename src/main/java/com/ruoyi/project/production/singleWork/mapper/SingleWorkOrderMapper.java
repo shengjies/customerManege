@@ -1,8 +1,6 @@
 package com.ruoyi.project.production.singleWork.mapper;
 
-import com.ruoyi.project.page.pageInfo.domain.PageHouse;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
-import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -72,21 +70,18 @@ public interface SingleWorkOrderMapper {
     List<SingleWorkOrder> selectSingleWorkByWorkIdAndPid(@Param("singleP") Integer singleP, @Param("workId") Integer workId);
 
     /**
-     * 查询车间对应工单个人负责的工单生产数量
-     * @param companyId 公司id
-     * @param workId 工单id
-     * @param sign 车间或者单工位标记
-     * @param liableOne 设备责任人id
-     * @return 结果
-     */
-    PageHouse selectWorkInHouseCountNumByUid(@Param("companyId") Integer companyId, @Param("workId") Integer workId,
-                                             @Param("sign") Integer sign, @Param("liableOne") Integer liableOne);
-
-    /**
      * 根据公司id和工单id查询对应的车间单工位配置的SOP看板硬件编码
      * @param companyId 公司id
      * @param workId 工单id
      * @return
      */
     List<String> countSingleWorkKBCode(@Param("companyId")Integer companyId,@Param("workId")Integer workId);
+
+    /**
+     * 根据工单id和单工位id查询单工位分配的工单信息
+     * @param workId 工单id
+     * @param singleId 工单位id
+     * @return 结果
+     */
+    SingleWorkOrder selectSingleWorkByWorkIdAndSId(@Param("workId") Integer workId, @Param("singleId") Integer singleId);
 }

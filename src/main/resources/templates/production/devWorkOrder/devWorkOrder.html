@@ -195,7 +195,13 @@
                         if (row.wlSign == 1 && workSingle == "") {
                             return '<a class="btn btn-primary btn-xs" href="#" onclick="configSingle(' + row.id + ',' + row.lineId + ',\'' + value + '\')">' + value + '</a>';
                         }
-                        return value;
+                        if (row.jpushTag == 0 && row.workorderStatus < 2) {
+                            return '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="showJPush(\''+ row.workorderNumber +'\',\''+ row.lineId +'\')">'+ value +'</a>';
+                        } else if (row.jpushTag == 1 && row.workorderStatus < 2){
+                            return '<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="showJPush(\''+ row.workorderNumber +'\',\''+ row.lineId +'\')">'+ value +'</a>';
+                        } else {
+                            return value;
+                        }
                     }
                 },
                 {
@@ -571,6 +577,13 @@
         createMenuItem(url, code + "--MES生产");
     }
 
+    /**
+     * 查看极光推送明细
+     */
+    function showJPush(workorderNumber,lineId) {
+        var url = prefix + "/showJPush?lineId=" + lineId;
+        $.modal.open(workorderNumber + "-看板更新信息",url);
+    }
 </script>
 </body>
 </html>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.iso.sop.mapper.SopMapper">
+    
+    <resultMap type="Sop" id="SopResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="cnfName"    column="cnf_name"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="pId"    column="p_id"    />
+        <result property="pCode"    column="p_code"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="sopTag"    column="sop_tag"    />
+        <association property="sopName" column="sop_id" select="selectSopName">
+            <result property="sopName" column="c_name"/>
+        </association>
+        <association property="lineName" column="line_id" select="selectLineName">
+            <result property="lineName" column="line_name"/>
+        </association>
+    </resultMap>
+
+    <resultMap type="Sop" id="SopResult1">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="cnfName"    column="cnf_name"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="pId"    column="p_id"    />
+        <result property="pCode"    column="p_code"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="sopTag"    column="sop_tag"    />
+        <association property="sopName" column="sop_id" select="selectSopName">
+            <result property="sopName" column="c_name"/>
+        </association>
+        <association property="lineName" column="line_id" select="selectWorkName">
+            <result property="lineName" column="im_code"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectSopVo">
+        select id, company_id, cnf_name, line_id, sop_id, p_id, p_code, create_time,sop_tag from tab_sop
+    </sql>
+	
+    <select id="selectSopList" parameterType="Sop" resultMap="SopResult">
+        <include refid="selectSopVo"/>
+        <where>
+             <if test="sopTag != null "> and sop_tag = #{sopTag}</if>
+             <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="cnfName != null  and cnfName != '' ">
+                and cnf_name like concat (#{cnfName},'%')
+             </if>
+             <if test="lineId != null and lineId != -1 "> and line_id = #{lineId}</if>
+             <if test="sopId != null and sopId != -1 "> and sop_id = #{sopId}</if>
+             <if test="pId != null  and pId != '' "> and p_id = #{pId}</if>
+             <if test="pCode != null  and pCode != '' ">
+              and p_code like concat ('%',#{pCode},'%')
+              </if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+
+    <select id="selectSopList2" parameterType="Sop" resultMap="SopResult1">
+        <include refid="selectSopVo"/>
+        <where>
+            <if test="sopTag != null "> and sop_tag = #{sopTag}</if>
+            <if test="id != null "> and id = #{id}</if>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="cnfName != null  and cnfName != '' ">
+                and cnf_name like concat (#{cnfName},'%')
+            </if>
+            <if test="lineId != null and lineId != -1 "> and line_id = #{lineId}</if>
+            <if test="sopId != null and sopId != -1 "> and sop_id = #{sopId}</if>
+            <if test="pId != null  and pId != '' "> and p_id = #{pId}</if>
+            <if test="pCode != null  and pCode != '' ">
+                and p_code like concat ('%',#{pCode},'%')
+            </if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+        </where>
+    </select>
+    <!--SOP名称-->
+    <select id="selectSopName" resultType="java.lang.String">
+        SELECT c_name FROM tab_iso where iso_id = #{sop_id} ;
+    </select>
+    <!--产线名称-->
+    <select id="selectLineName" resultType="java.lang.String">
+        SELECT line_name  FROM dev_production_line where id = #{line_id};
+    </select>
+    <!--单工位设备号-->
+    <select id="selectWorkName" resultType="java.lang.String">
+        SELECT im_code FROM tab_single_work where id = #{line_id};
+    </select>
+
+    <select id="selectSopById" parameterType="Integer" resultMap="SopResult">
+        <include refid="selectSopVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSop" parameterType="Sop" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_sop
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="cnfName != null  and cnfName != ''  ">cnf_name,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="sopId != null  ">sop_id,</if>
+			<if test="pId != null  and pId != ''  ">p_id,</if>
+			<if test="pCode != null  and pCode != ''  ">p_code,</if>
+			<if test="createTime != null  ">create_time,</if>
+            <if test="sopTag != null and sopTag != '' ">sop_tag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="cnfName != null  and cnfName != ''  ">#{cnfName},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="sopId != null  ">#{sopId},</if>
+			<if test="pId != null  and pId != ''  ">#{pId},</if>
+			<if test="pCode != null  and pCode != ''  ">#{pCode},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+            <if test="sopTag != null and sopTag != '' ">#{sopTag},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSop" parameterType="Sop">
+        update tab_sop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="cnfName != null  and cnfName != ''  ">cnf_name = #{cnfName},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="sopId != null  ">sop_id = #{sopId},</if>
+            <if test="pId != null  and pId != ''  ">p_id = #{pId},</if>
+            <if test="pCode != null  and pCode != ''  ">p_code = #{pCode},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="sopTag != null and sopTag != '' ">sop_tag = #{sopTag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteSopById" parameterType="Integer">
+        delete from tab_sop where id = #{id}
+    </delete>
+	
+    <delete id="deleteSopByIds" parameterType="String">
+        delete from tab_sop where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过配置名称查询配置信息-->
+    <select id="selectSopByCnfName" resultType="com.ruoyi.project.iso.sop.domain.Sop">
+        select id as id,cnf_name as cnfName from tab_sop where company_id = #{companyId} and cnf_name = #{cnfName} limit 1;
+    </select>
+
+    <!--通过作业指导书id查询配置列表-->
+    <select id="selectSopListBySopId" resultType="com.ruoyi.project.iso.sop.domain.Sop">
+        select id as id,cnf_name as cnfName from tab_sop where company_id = #{companyId} and sop_id = #{sopId}
+    </select>
+
+    <!--删除SOP主表配置-->
+    <delete id="deleteSop">
+         delete from tab_sop where company_id = #{companyId}
+        <if test="lineId != null">and line_id = #{lineId}</if>
+        <if test="lineId != null">and sop_tag = #{sopTag}</if>
+    </delete>
+    
+</mapper>

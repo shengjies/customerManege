@@ -272,7 +272,7 @@
      */
     function showLineInfo(isoId,cName) {
         var url = $.common.isEmpty(isoId) ? $.table._option.createShowSopLineUrl : $.table._option.createShowSopLineUrl.replace("{id}", isoId);
-        $.modal.open(cName + " 产线配置明细", url);
+        $.modal.open(cName + " 配置明细", url);
     }
 
     /**

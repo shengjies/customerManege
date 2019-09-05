@@ -35,8 +35,8 @@ public class PageInfo extends BaseEntity
 	/** 页面URL */
 	@Excel(name = "页面URL")
 	private String pageUrl;
-	/** 布局类型 */
-	private Integer pageType;  //布局类型  1、产线汇总 2、产线详情
+	/** 布局类型 1、产线汇总 2、产线详情 3、车间看板 */
+	private Integer pageType;
 	/**  */
 	private Integer pageLayoutType;//
 	/** 布局类型名称 */

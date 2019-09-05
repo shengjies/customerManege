@@ -123,17 +123,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </if>
     </select>
 
-    <!--查询车间对应工单个人负责的工单生产数量-->
-    <select id="selectWorkInHouseCountNumByUid" resultType="com.ruoyi.project.page.pageInfo.domain.PageHouse">
-        select coalesce(sum(cumulative_num),0) as countNum from tab_single_work_order as a
-            left join tab_single_work as b on a.single_id = b.id
-            left join dev_work_data as c on b.id = c.io_id
-            where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} and b.dev_id >0
-            and c.work_id = #{workId} and b.liable_one = #{liableOne}
-    </select>
-
     <!--根据公司id和车间id查询对应的车间单工位配置的SOP看板硬件编码-->
     <select id="countSingleWorkKBCode" resultType="java.lang.String">
         SELECT watch_code FROM tab_single_work where company_id = #{companyId} and  id in (SELECT single_id FROM tab_single_work_order where work_id = #{workId}) and watch_code is not null;
+    </select>
+
+    <!--通过工单id和单工位id查询单工位工单信息-->
+    <select id="selectSingleWorkByWorkIdAndSId" resultMap="SingleWorkOrderResult">
+        <include refid="selectSingleWorkOrderVo"/>
+        <where>
+            <if test="workId != null">
+                and work_id = #{workId}
+            </if>
+            <if test="workId != null">
+                and single_id = #{singleId}
+            </if>
+        </where>
     </select>
 </mapper>

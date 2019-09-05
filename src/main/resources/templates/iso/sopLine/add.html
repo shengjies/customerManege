@@ -8,9 +8,15 @@
 		<input type="hidden" id="isoId" name="isoId" th:value="${isoId}">
 		<div class="col-sm-6">
 			<div class="form-group">
+				<label class="col-sm-3 control-label">配置名称：</label>
+				<div class="col-sm-8">
+					<input type="text" id="cnfName" name="cnfName" class="form-control">
+				</div>
+			</div>
+			<div class="form-group">
 				<label class="col-sm-3 control-label">产线：</label>
 				<div class="col-sm-8">
-					<select style="width: 100%" id="id" onchange="lineChange(this)" class="form-control" name="id">
+					<select style="width: 100%" id="lineId" onchange="lineChange(this)" class="form-control" name="lineId">
 						<option value="0">请选择</option>
 						<option th:each="item : ${lineList}"  th:text="${item.lineName}" th:value="${item.id}"></option>
 					</select>
@@ -50,14 +56,34 @@
     var prefix = ctx + "iso/sopLine"
     $("#form-sopLine-add").validate({
         rules:{
-            id:{
+			lineId:{
                 required:true,
             },
+			cnfName:{
+				required:true,
+				remote: {
+					url: ctx + "iso/sop/checkCnfNameUnique",
+					type: "post",
+					dataType: "json",
+					data: {
+						name : function() {
+							return $.common.trim($("#cnfName").val());
+						},
+					},
+					dataFilter: function(data, type) {
+						return $.validate.unique(data);
+					}
+				}
+			}
         },
         messages:{
-            id:{
+			lineId:{
                 required:"请选择产线",
             },
+			cnfName:{
+				required:"配置名称必填",
+				remote:"配置名称已存在",
+			}
         }
     });
 
@@ -66,9 +92,9 @@
      */
     function submitHandler() {
         if ($.validate.form()) {
-            //先验证书
-            var id = $("#id").find("option:selected").val();
-            if(id <=0){
+            //先验证产线
+            var lineId = $("#lineId").find("option:selected").val();
+            if(lineId <=0){
                 $.modal.alertWarning("请选择产线");
                 return;
             }
@@ -82,25 +108,28 @@
             for(var i =0;i<$(pnSelect).size();i++){
                 pns.push($(pnSelect[i]).val())
             }
-            var sopLineWorks =[];
+            var sopLines =[];
             //获取工位
             $("#add-sop-w-table-body").find("tr").each(function () {
                 var work ={
-                    lineId:id,
+                    lineId:lineId,
                     sopId:[[${isoId}]],
+					sopTag:0,
                     wId:$(this).find("td").attr("data-w-id"),
                     pageId:$(this).find("td").find("select[name='wId'] option:selected").val()
                 }
-                sopLineWorks.push(work);
+				sopLines.push(work);
             })
             var data={
-                lineId:id,
+                lineId:lineId,
                 sopId:[[${isoId}]],
-                pns:pns,
-                sopLineWorks:sopLineWorks
+				cnfName:$("#cnfName").val(),
+				pnsId:pns,
+				sopTag:0,
+				sopLines:sopLines
             }
             var config = {
-                url: prefix + "/add",
+                url: "/iso/sop/add",
                 type: "post",
                 dataType: "json",
                 contentType: 'application/json',
@@ -152,6 +181,8 @@
                             '</tr>';
                         $("#add-sop-w-table-body").append(workDetail);
                     }
+					$("#add-sop-w-table-body select").select2({
+					});
                 }else{
                     $.modal.alertWarning("操作异常...")
                 }

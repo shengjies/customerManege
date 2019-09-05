@@ -18,6 +18,7 @@ public class AppReport extends BaseEntity {
     private Integer uid; // app在线用户id
     private String devCode; //设备编号
     private String devType; //设备类型
+    private Integer reportTag; // 报表保存下载标记 0 保存，1 下载
     /**
      * 导出报表参数
      */
@@ -28,6 +29,14 @@ public class AppReport extends BaseEntity {
     private String startTime; // 开始时间
     private String endTime; // 结束时间
     private String fileName; // pdf文件名
+
+    public Integer getReportTag() {
+        return reportTag;
+    }
+
+    public void setReportTag(Integer reportTag) {
+        this.reportTag = reportTag;
+    }
 
     public String getFileName() {
         return fileName;

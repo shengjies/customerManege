@@ -5,11 +5,17 @@
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-sopLine-add">
+        <input type="hidden" id="isoId" th:value="${isoId}">
         <div class="form-group">
-            <input type="hidden" id="isoId" th:value="${isoId}">
+            <label class="col-sm-3 control-label">配置名称：</label>
+            <div class="col-sm-8">
+                <input type="text" id="cnfName" name="cnfName" class="form-control"/>
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-sm-3 control-label">车间：</label>
             <div class="col-sm-8">
-                <select style="width: 100%" id="houseId" onchange="singWorkChange(this)" name="houseId" class="form-control">
+                <select style="width: 100%" id="houseId" onchange="houseChange(this)" name="houseId" class="form-control">
                     <option value="0">请选择</option>
                     <option th:each="item : ${house}" th:text="${item.workshopName}" th:value="${item.id}"></option>
                 </select>
@@ -18,7 +24,7 @@
         <div class="form-group">
             <label class="col-sm-3 control-label">单工位：</label>
             <div class="col-sm-8">
-                <select style="width: 100%" id="swId" class="form-control" name="swId">
+                <select style="width: 100%" id="swId" class="form-control" name="swId" onchange="singWorkChange(this)">
                     <option value="0">请选择</option>
                 </select>
             </div>
@@ -45,6 +51,34 @@
 </div>
 <div th:include="include::footer"></div>
 <script th:inline="javascript">
+
+    $("#form-sopLine-add").validate({
+        rules:{
+            cnfName:{
+                required:true,
+                remote: {
+                    url: ctx + "iso/sop/checkCnfNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name : function() {
+                            return $.common.trim($("#cnfName").val());
+                        },
+                    },
+                    dataFilter: function(data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            }
+        },
+        messages:{
+            cnfName:{
+                required:"配置名称必填",
+                remote:"配置名称已存在",
+            }
+        }
+    });
+
     $(function () {
         $("#houseId").select2({
             placeholder: '请选择',
@@ -69,80 +103,84 @@
      * 保存配置
      */
     function submitHandler() {
-        //先验车间
-        var houseId = $("#houseId").find("option:selected").val();
-        if (houseId <= 0) {
-            $.modal.alertWarning("请选择车间");
-            return;
-        }
-        //验证单工位
-        var swId = $("#swId").find("option:selected").val();
-        if (swId <= 0) {
-            $.modal.alertWarning("请选择单工位信息");
-            return;
-        }
-        // 验证产品
-        var pnSelect = $("#pnId").find("option:selected");
-        if ($(pnSelect).size() <= 0) {
-            $.modal.alertWarning("请选择产品编码");
-            return;
-        }
-        var pageId = $("#pageId").find("option:selected").val();
-        if (pageId <= 0) {
-            $.modal.alertWarning("请选择指导书页");
-            return;
-        }
-        var pns = [];
-        for (var i = 0; i < $(pnSelect).size(); i++) {
-            pns.push($(pnSelect[i]).val())
-        }
-        // 单工位信息
-        var sopLineWorks = [];
-        var work = {
-            lineId: houseId,
-            sopId: [[${isoId}]],
-            sopTag: 1,
-            wId: swId,
-            pageId: pageId,
-        }
-        sopLineWorks.push(work);
-        var data = {
-            lineId: swId,
-            sopId: [[${isoId}]],
-            pns: pns,
-            sopTag: 1,
-            sopLineWorks: sopLineWorks
-        }
-        var config = {
-            url: prefix + "/add",
-            type: "post",
-            dataType: "json",
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            beforeSend: function () {
-                $.modal.loading("正在处理中，请稍后...");
-                $.modal.disable();
-            },
-            success: function (result) {
-                $.operate.successCallback(result);
+        if ($.validate.form()) {
+            //先验车间
+            var houseId = $("#houseId").find("option:selected").val();
+            if (houseId <= 0) {
+                $.modal.alertWarning("请选择车间");
+                return;
             }
-        };
-        $.ajax(config)
+            //验证单工位
+            var wId = $("#swId").find("option:selected").val();
+            if (wId <= 0) {
+                $.modal.alertWarning("请选择单工位信息");
+                return;
+            }
+            // 验证产品
+            var pnSelect = $("#pnId").find("option:selected");
+            if ($(pnSelect).size() <= 0) {
+                $.modal.alertWarning("请选择产品编码");
+                return;
+            }
+            var pageId = $("#pageId").find("option:selected").val();
+            if (pageId <= 0) {
+                $.modal.alertWarning("请选择指导书页");
+                return;
+            }
+            var pns = [];
+            for (var i = 0; i < $(pnSelect).size(); i++) {
+                pns.push($(pnSelect[i]).val())
+            }
+            // 单工位信息
+            var sopLines = [];
+            var work = {
+                lineId: houseId,
+                sopId: [[${isoId}]],
+                sopTag: 1,
+                wId: wId,
+                pageId: pageId,
+            }
+            sopLines.push(work);
+            var data = {
+                lineId: wId,
+                sopId: [[${isoId}]],
+                cnfName: $("#cnfName").val(),
+                pnsId: pns,
+                sopTag: 1,
+                sopLines: sopLines
+            }
+            var config = {
+                url: ctx + "iso/sop/add",
+                type: "post",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
+                success: function (result) {
+                    $.operate.successCallback(result);
+                }
+            };
+            $.ajax(config)
+        }
     }
 
     /**
      * 车间下拉选择
      */
-    function singWorkChange(val) {
+    function houseChange(val) {
         // 车间id
-        var parentId = $(val).find("option:selected").val();
-        if (parentId > 0) {
+        var houseId = $(val).find("option:selected").val();
+        if (houseId > 0) {
             $("#swId option").remove();
+            $("#pnId option").remove();
             $("#swId select").select2({
                 data: [{id: 0, text: '请选择'}]
             });
-            //或者对应车间的所有还未配置过的对应iso的单工位信息,以及所有的产品信息
-            $.post("/production/singleWork/selectNotConfigSop", {parentId: parentId,sopId:[[${isoId}]]}, function (res) {
+            //查询所有对应车间的单工位信息
+            $.post("/production/singleWork/selectSingWorkByPId", {houseId: houseId}, function (res) {
                 if (res.code == 0) {
                     var rows = [{id: 0, text: '请选择'}];
                     var item = res.data;
@@ -163,7 +201,47 @@
         } else {
             var data = [{id: 0, text: '请选择'}];
             $("#swId option").remove();
+            $("#pnId option").remove();
             $("#swId").select2({
+                data: data
+            });
+        }
+    }
+
+    /**
+     * 单工位下拉改变
+     */
+    function singWorkChange(val) {
+        // 单工位id
+        var wId = $(val).find("option:selected").val();
+        if (wId > 0) {
+            $("#pnId option").remove();
+            $("#pnId select").select2({
+                data: [{id: 0, text: '请选择'}]
+            });
+            //查询所有对应车间的单工位信息
+            $.post("/production/singleWork/selectNotConfigSop", {wId: wId}, function (res) {
+                if (res.code == 0) {
+                    var rows = [{id: 0, text: '请选择'}];
+                    var item = res.data;
+                    for (var i = 0; i < item.length; i++) {
+                        var row = {
+                            id: item[i].id,
+                            text: item[i].productCode
+                        }
+                        rows.push(row);
+                    }
+                    $("#pnId").select2({
+                        data: rows
+                    });
+                } else {
+                    $.modal.alertWarning("操作异常...")
+                }
+            })
+        } else {
+            var data = [{id: 0, text: '请选择'}];
+            $("#pnId option").remove();
+            $("#pnId").select2({
                 data: data
             });
         }

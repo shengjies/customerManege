@@ -1,6 +1,8 @@
 package com.ruoyi.project.production.singleWork.service;
 
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
+
 import java.util.List;
 
 /**
@@ -33,6 +35,13 @@ public interface ISingleWorkService
      * @return 单工位数据集合
      */
 	public List<SingleWork> selectSingleWorkList(SingleWork singleWork);
+	/**
+	 * 查询单工位数据列表
+	 *
+	 * @param singleWorkOrder 单工位数据信息
+	 * @return 单工位数据集合
+	 */
+	public List<SingleWork> selectSingleWorkList2(SingleWorkOrder singleWorkOrder);
 
 	/**
 	 * 查询所以车间

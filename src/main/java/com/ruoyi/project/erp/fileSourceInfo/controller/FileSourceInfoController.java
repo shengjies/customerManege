@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -129,6 +130,37 @@ public class FileSourceInfoController extends BaseController {
         }
     }
 
+    /**
+     * 修改文件名
+     */
+    @GetMapping("/editFileName")
+    public String editFileName(Integer id,String fileName,ModelMap map){
+        map.put("id",id);
+        map.put("fileName",fileName.substring(0,fileName.lastIndexOf(".")));
+        return prefix + "/editFileName";
+    }
+
+    /**
+     * 检验文件名是否重复
+     */
+    @PostMapping("/checkFileNameNameUnique")
+    @ResponseBody
+    public String checkFileNameNameUnique(FileSourceInfo  fileSourceInfo) {
+        return fileSourceInfoService.checkFileNameNameUnique(fileSourceInfo);
+    }
+
+    /**
+     * 修改保存文件名
+     */
+    @PostMapping("/saveFileName")
+    @ResponseBody
+    public AjaxResult saveFileName(FileSourceInfo fileSourceInfo){
+        try {
+            return toAjax(fileSourceInfoService.saveFileName(fileSourceInfo));
+        } catch (IOException e) {
+            return error();
+        }
+    }
     /**
      * 删除文件素材管理
      */

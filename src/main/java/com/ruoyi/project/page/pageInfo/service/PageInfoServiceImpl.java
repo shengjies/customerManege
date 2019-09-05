@@ -280,7 +280,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 return selectLineHz(info);
             } else if (info.getPageType() == PageTypeConstants.PAGE_TYPE_XQ) {
                 return selectLineDetail(info);
-            }else if(info.getPageType() == PageTypeConstants.PAGE_TYPE_CJ){
+            } else if (info.getPageType() == PageTypeConstants.PAGE_TYPE_CJ) {
                 return selectWorkshopDetail(info);
             }
         }
@@ -289,6 +289,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
 
     /**
      * 车间汇总看板
+     *
      * @param info info对象
      * @return 结果
      */
@@ -298,7 +299,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
             return null;
         }
         // 查询所有的单工位明细
-        List<PageHouse> pageHouseList = singleWorkMapper.selectHouseDetailByParentId(info.getCompanyId(),pageInfoConfig.getLineId(),WorkConstants.WORK_STATUS_STARTING);
+        List<PageHouse> pageHouseList = singleWorkMapper.selectHouseDetailByParentId(info.getCompanyId(), pageInfoConfig.getLineId(), WorkConstants.WORK_STATUS_STARTING);
         if (pageHouseList == null) {
             return null;
         }
@@ -331,11 +332,6 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 if (countPiece != null) {
                     pageHouse.setCountNum(countPiece.getCpNumber());
                 }
-                // PageHouse count = singleWorkOrderMapper.selectWorkInHouseCountNumByUid(info.getCompanyId(),pageHouse.getWorkId(),
-                //         FileConstants.SIGN_SINGWORK,pageHouse.getLiableOneId());
-                // if (count != null && count.getCountNum() != null) {
-                //     pageHouse.setCountNum(count.getCountNum());
-                // }
             }
         }
         info.setPageHouseList(pageHouseList);
@@ -373,7 +369,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 tem.setPersonLiable(user.getUserName());
             }
             //查询各个产线正在进行的工单
-            DevWorkOrder order = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId(),WorkConstants.SING_LINE);
+            DevWorkOrder order = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId(), WorkConstants.SING_LINE);
             if (order != null) {
                 tem.setWorkCode(order.getWorkorderNumber());
                 tem.setProductCode(order.getProductCode());
@@ -386,7 +382,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
                 Workstation workstation = workstationMapper.selectWorkstationSignByLineId(line.getId(), line.getCompanyId());
                 if (workstation != null) {
                     DevWorkData workData = devWorkDataMapper.selectWorkDataByCompanyLineWorkDev(line.getCompanyId(),
-                            line.getId(), order.getId(), workstation.getDevId(), workstation.getId(),WorkConstants.SING_LINE);
+                            line.getId(), order.getId(), workstation.getDevId(), workstation.getId(), WorkConstants.SING_LINE);
                     if (workData != null) tem.setOutputNum(workData.getCumulativeNum());
                 }
                 //查询对应工单是否出现未处理异常情况
@@ -419,24 +415,26 @@ public class PageInfoServiceImpl implements IPageInfoService {
      */
     private PageInfo selectLineDetail(PageInfo info) {
         ProductionLine line = productionLineMapper.selectLineDetailByPageId(info.getId());
-        if (line == null) return null;
+        if (line == null) {
+            return null;
+        }
         //查询相关人员
         if (line.getEdUser() != null && line.getEdUser() > 0) {
-            line.setEdUserInfo(userMapper.selectUserById(line.getEdUser().longValue()));
+            line.setEdUserInfo(userMapper.selectUserInfoById(line.getEdUser()));
         }
         if (line.getIpqcUser() != null && line.getIpqcUser() > 0) {
-            line.setIpqcUserInfo(userMapper.selectUserById(line.getIpqcUser().longValue()));
+            line.setIpqcUserInfo(userMapper.selectUserInfoById(line.getIpqcUser()));
         }
         if (line.getMeUser() != null && line.getMeUser() > 0) {
-            line.setMeUserInfo(userMapper.selectUserById(line.getMeUser().longValue()));
+            line.setMeUserInfo(userMapper.selectUserInfoById(line.getMeUser()));
         }
         if (line.getTeUser() != null && line.getTeUser() > 0) {
-            line.setTeUserInfo(userMapper.selectUserById(line.getTeUser().longValue()));
+            line.setTeUserInfo(userMapper.selectUserInfoById(line.getTeUser()));
         }
         //设置产线
         info.setLine(line);
         //查询正在进行工单
-        DevWorkOrder devWorkOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId(),WorkConstants.SING_LINE);
+        DevWorkOrder devWorkOrder = devWorkOrderMapper.selectWorkByCompandAndLine(line.getCompanyId(), line.getId(), WorkConstants.SING_LINE);
         if (devWorkOrder != null) {
             info.setWork(devWorkOrder);
             //查询正在进行工单所有异常
@@ -453,14 +451,14 @@ public class PageInfoServiceImpl implements IPageInfoService {
         if (workstation != null && devWorkOrder != null) {
             int devId = workstation.getDevId() == null ? 0 : workstation.getDevId();
             r = devDataLogMapper.selectLineWorkSysTemData(line.getCompanyId(), line.getId(),
-                    devWorkOrder.getId(), devId, workstation.getId(),WorkConstants.SING_LINE);
+                    devWorkOrder.getId(), devId, workstation.getId(), WorkConstants.SING_LINE);
             hour = dayHourMapper.selectInfoByCompanyLineWorkDevIo(line.getCompanyId(), line.getId(), devWorkOrder.getId(), devId, workstation.getId());
         }
         //实际产量
-        PageReal real = new PageReal(hour,r);
+        PageReal real = new PageReal(hour, r);
         info.setReal(real);
         //查询当天工单
-        info.setWorkOrder(devWorkOrderMapper.selectDayWorkOrder(WorkConstants.SING_LINE,line.getCompanyId(), line.getId()));
+        info.setWorkOrder(devWorkOrderMapper.selectDayWorkOrder(WorkConstants.SING_LINE, line.getCompanyId(), line.getId()));
         return info;
     }
 
@@ -501,17 +499,18 @@ public class PageInfoServiceImpl implements IPageInfoService {
 
     /**
      * 查询所以车间
+     *
      * @param pid 页面id
      * @return
      */
     @Override
     public List<SingleWork> selectSingleWork(int pid) {
         List<SingleWork> works = singleWorkService.selectSingleWorkListSign0();
-        if(works != null && works.size()>0){
+        if (works != null && works.size() > 0) {
             for (SingleWork work : works) {
                 work.setParentId(0);
-                PageInfoConfig config = pageInfoConfigMapper.selectPageConfigByPidAndLineId(pid,work.getId());
-                if(config != null){
+                PageInfoConfig config = pageInfoConfigMapper.selectPageConfigByPidAndLineId(pid, work.getId());
+                if (config != null) {
                     work.setParentId(1);
                 }
             }
@@ -522,12 +521,13 @@ public class PageInfoServiceImpl implements IPageInfoService {
 
     /**
      * 校验看板名称的唯一性
+     *
      * @param pageInfo 看板对象
      * @return 结果
      */
     @Override
     public String checkPageName(PageInfo pageInfo) {
-        PageInfo uniquePageInfo = pageInfoMapper.selectPageInfoByPageName(JwtUtil.getUser().getCompanyId(),pageInfo.getPageName());
+        PageInfo uniquePageInfo = pageInfoMapper.selectPageInfoByPageName(JwtUtil.getUser().getCompanyId(), pageInfo.getPageName());
         if (com.ruoyi.common.utils.StringUtils.isNotNull(uniquePageInfo) && !pageInfo.getId().equals(uniquePageInfo.getId())) {
             return PageTypeConstants.PAGE_NAME_NOT_UNIQUE;
         }
@@ -536,6 +536,7 @@ public class PageInfoServiceImpl implements IPageInfoService {
 
     /**
      * app端查询页面列表信息
+     *
      * @param pageInfo 页面信息
      * @return 结果
      */

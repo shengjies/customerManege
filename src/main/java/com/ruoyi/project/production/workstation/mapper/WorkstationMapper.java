@@ -44,6 +44,14 @@ public interface WorkstationMapper
      * @return 工位配置集合
      */
 	public List<Workstation> selectWorkstationList(Workstation workstation);
+
+	/**
+	 * 查询工位配置列表
+	 *
+	 * @param workstation 工位配置信息
+	 * @return 工位配置集合
+	 */
+	public List<Workstation> selectWorkstationList2(Workstation workstation);
 	
 	/**
      * 新增工位配置
@@ -132,4 +140,12 @@ public interface WorkstationMapper
 	 * @return
 	 */
 	List<String> countLineKBCode(@Param("companyId")Integer companyId,@Param("lineId")Integer lineId);
+
+	/**
+	 * 查询所有看板更新过的工位极光信息
+	 * @param lineId 产线id
+	 * @return 结果
+	 */
+	List<Workstation> selectWorkListJPushTagByLineId(@Param("lineId") Integer lineId,
+													 @Param("jpushTag") Integer jpushTag);
 }

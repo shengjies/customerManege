@@ -6,8 +6,14 @@
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-sopLine-add">
         <div class="form-group">
-            <input type="hidden" id="parentId" th:value="${parentId}">
-            <input type="hidden" id="lineId" th:value="${lineId}">
+            <label class="col-sm-3 control-label">配置名称：</label>
+            <div class="col-sm-8">
+                <input type="text" name="cnfName" id="cnfName" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="hidden" id="lineId" name="lineId" th:value="${lineId}">
+            <input type="hidden" id="wId" name="wId" th:value="${wId}">
             <label class="col-sm-3 control-label">SOP：</label>
             <div class="col-sm-8">
                 <select style="width: 100%" id="sopId" onchange="sopChange(this)" name="sopId" class="form-control">
@@ -48,78 +54,106 @@
         });
     });
     var prefix = ctx + "iso/sopLine";
-
+    $("#form-sopLine-add").validate({
+        rules:{
+            cnfName:{
+                required:true,
+                remote: {
+                    url: ctx + "iso/sop/checkCnfNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name : function() {
+                            return $.common.trim($("#cnfName").val());
+                        },
+                    },
+                    dataFilter: function(data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            }
+        },
+        messages:{
+            cnfName:{
+                required:"配置名称必填",
+                remote:"配置名称已存在",
+            }
+        }
+    });
     /**
      * 保存配置
      */
     function submitHandler() {
-        //先验证书
-        var sopId = $("#sopId").find("option:selected").val();
-        if (sopId <= 0) {
-            $.modal.alertWarning("请选择SOP");
-            return;
-        }
-        //验证产品编码
-        var pnSelect = $("#pnId").find("option:selected");
-        if ($(pnSelect).size() <= 0) {
-            $.modal.alertWarning("请选择产品编码");
-            return;
-        }
-        var pageId = $("#pageId").find("option:selected").val();
-        if (pageId <= 0) {
-            $.modal.alertWarning("请选择指导书页");
-            return;
-        }
-        var pns = [];
-        for (var i = 0; i < $(pnSelect).size(); i++) {
-            pns.push($(pnSelect[i]).val())
-        }
-        // 单工位信息
-        var sopLineWorks = [];
-        var work = {
-            lineId: [[${parentId}]],
-            sopId: sopId,
-            sopTag: 1,
-            wId: [[${lineId}]],
-            pageId: pageId,
-        }
-        sopLineWorks.push(work);
-        var data = {
-            lineId: [[${lineId}]],
-            sopId: sopId,
-            pns: pns,
-            sopTag: 1,
-            sopLineWorks: sopLineWorks
-        }
-        var config = {
-            url: prefix + "/add",
-            type: "post",
-            dataType: "json",
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            beforeSend: function () {
-                $.modal.loading("正在处理中，请稍后...");
-                $.modal.disable();
-            },
-            success: function (result) {
-                $.operate.successCallback(result);
+        if ($.validate.form()) {
+            //先验证书
+            var sopId = $("#sopId").find("option:selected").val();
+            if (sopId <= 0) {
+                $.modal.alertWarning("请选择SOP");
+                return;
             }
-        };
-        $.ajax(config)
+            //验证产品编码
+            var pnSelect = $("#pnId").find("option:selected");
+            if ($(pnSelect).size() <= 0) {
+                $.modal.alertWarning("请选择产品编码");
+                return;
+            }
+            var pageId = $("#pageId").find("option:selected").val();
+            if (pageId <= 0) {
+                $.modal.alertWarning("请选择指导书页");
+                return;
+            }
+            var pns = [];
+            for (var i = 0; i < $(pnSelect).size(); i++) {
+                pns.push($(pnSelect[i]).val())
+            }
+            // 单工位信息
+            var sopLines = [];
+            var work = {
+                lineId: [[${lineId}]],
+                sopId: sopId,
+                sopTag: 1,
+                wId: [[${wId}]],
+                pageId: pageId,
+            }
+            sopLines.push(work);
+            var data = {
+                lineId: [[${wId}]],
+                sopId: sopId,
+                cnfName: $("#cnfName").val(),
+                pnsId: pns,
+                sopTag: 1,
+                sopLines: sopLines
+            }
+            var config = {
+                url: ctx + "iso/sop/add",
+                type: "post",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                    $.modal.disable();
+                },
+                success: function (result) {
+                    $.operate.successCallback(result);
+                }
+            };
+            $.ajax(config)
+        }
     }
 
     /**
      * sop下拉选择
      */
     function sopChange(val) {
-        var id = $(val).find("option:selected").val();
-        if (id > 0) {
+        var sopId = $(val).find("option:selected").val();
+        if (sopId > 0) {
             $("#pageId option").remove();
             $("#pageId select").select2({
                 data: [{id: 0, text: '请选择'}]
             });
             //获取对应书下的页
-            $.post("/iso/iso/findByPid", {pid: id}, function (res) {
+            $.post("/iso/iso/findByPid", {pid: sopId}, function (res) {
                 if (res.code == 0) {
                     var rows = [{id: 0, text: '请选择'}];
                     var item = res.data;

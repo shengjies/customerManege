@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +43,10 @@ public class WorkstationController extends BaseController
 	private IWorkstationService workstationService;
 
 	@Autowired
-	private IIsoService isoService;
+	private IDevProductListService productListService;
 
 	@Autowired
-	private IDevProductListService productListService;
+	private IIsoService isoService;
 
 
 	@GetMapping("/{id}")
@@ -71,6 +70,18 @@ public class WorkstationController extends BaseController
 	}
 
 	/**
+	 * 查询工位配置列表
+	 */
+	@PostMapping("/jpushList")
+	@ResponseBody
+	public TableDataInfo jpushList(Workstation workstation)
+	{
+		startPage();
+		List<Workstation> list = workstationService.selectWorkstationList2(workstation);
+		return getDataTable(list);
+	}
+
+	/**
 	 * 新增工位配置
 	 */
 	@GetMapping("/add")
@@ -87,10 +98,10 @@ public class WorkstationController extends BaseController
 	@Log(title = "工位配置", businessType = BusinessType.INSERT)
 	@PostMapping("/add")
 	@ResponseBody
-	public AjaxResult addSave(Workstation workstation,HttpServletRequest request)
+	public AjaxResult addSave(Workstation workstation)
 	{
 	    try {
-	    	workstation.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
+	    	workstation.setCompanyId(JwtUtil.getUser().getCompanyId());
             workstationService.insertWorkstation(workstation);
             return AjaxResult.success();
         }catch (Exception e){
@@ -147,8 +158,9 @@ public class WorkstationController extends BaseController
 	@PostMapping("/findByLineId")
 	@ResponseBody
 	public AjaxResult findByLineId(Integer lineId,Integer isoId){
-		Map map = new HashMap<String,Object>(16);
+		Map<String,Object> map = new HashMap<>(16);
 		map.put("proList", productListService.selectNotConfigByLineId(lineId, JwtUtil.getUser().getCompanyId(), FileConstants.SOP_TAG_LINE));
+		map.put("isoList",isoService.selectIsoByParentId(isoId));
 		map.put("work",workstationService.selectAllByLineId(lineId));
 		return AjaxResult.success(map);
 	}

@@ -82,4 +82,8 @@ public class FileConstants {
     public static final Integer FILE_SAVE_NO = 0;
     public static final Integer FILE_SAVE_YES = 1;
 
+    /** 文件名是否唯一的返回结果码 */
+    public final static String FILE_NAME_UNIQUE = "0";
+    public final static String FILE_NAME_NOT_UNIQUE = "1";
+
 }

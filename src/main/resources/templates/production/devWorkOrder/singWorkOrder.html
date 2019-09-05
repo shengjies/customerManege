@@ -182,8 +182,10 @@
                     field: 'param1',
                     title: '车间',
                     formatter: function (value, row, index) {
-                        if (row.wlSign == 1 && workSingle == "") {
-                            return '<a class="btn btn-primary btn-xs" href="#" onclick="configSingle(' + row.id + ',' + row.lineId + ',\'' + value + '\')">' + value + '</a>';
+                        if (row.jpushTag == 0 && row.workorderStatus < 2) {
+                            return '<a class="btn btn-danger btn-xs" href="javascript:void(0)" onclick="showJPush(' + row.id + ',' + row.lineId + ',\'' + row.workorderNumber + '\')">' + value + '</a>';
+                        } else if (row.jpushTag == 1 && row.workorderStatus < 2) {
+                            return '<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="showJPush(' + row.id + ',' + row.lineId + ',\'' + row.workorderNumber + '\')">' + value + '</a>';
                         }
                         return value;
                     }
@@ -298,6 +300,7 @@
                     align: 'center',
                     formatter: function (value, row, index) {
                         var actions = [];
+                        actions.push('<a class="btn btn-primary btn-xs" href="#" onclick="configSingle(\'' + row.id + '\',\'' + row.lineId + '\',\'' + row.param1 + '\')"><i></i>分配</a> ')
                         if (row.abolish == 0) {
                             // 工单提交状态 已经提交的工单不可修改和删除
                             if (row.workSign == 0) {  // 工单还未提交可进行修改
@@ -548,7 +551,7 @@
      * @param name
      */
     function configSingle(id, singleId, name) {
-        $.modal.open(name + " 单工位配置", "/production/singleWorkOrder?type=1&singleId=" + singleId + "&orderId=" + id, 800, 700);
+        $.modal.open(name + " 工单分配", "/production/singleWorkOrder?type=1&singleId=" + singleId + "&orderId=" + id, 800, 700);
     }
 
     function woConfigMes(id, code) {
@@ -561,6 +564,14 @@
     function mesProduce(id, code) {
         var url = prefix + "/mesProduce?id=" + id;
         createMenuItem(url, code + "--MES生产");
+    }
+
+    /**
+     * 查看单工位看板更新信息
+     */
+    function showJPush(id,lineId,workorderNumber) {
+        var url = prefix + "/showJPush2?id=" + id + "&lineId=" + lineId;
+        $.modal.open(workorderNumber + "-看板更新明细",url);
     }
 
 </script>

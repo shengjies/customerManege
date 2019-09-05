@@ -9,9 +9,10 @@ import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devList.domain.DevList;
 import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.insmanage.instrumentManage.mapper.InstrumentManageMapper;
+import com.ruoyi.project.iso.sop.mapper.SopMapper;
 import com.ruoyi.project.iso.sopLine.mapper.SopLineMapper;
-import com.ruoyi.project.iso.sopLine.mapper.SopLineWorkMapper;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
@@ -47,14 +48,9 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     private SopLineMapper sopLineMapper;
 
     @Autowired
-    private SopLineWorkMapper sopLineWorkMapper;
+    private SopMapper sopMapper;
 
     /**
-     * @param id 单工位数据ID
-     * @return 单工位数据信息
-     * @Autowired private UserMapper userMapper;
-     * <p>
-     * /**
      * 查询单工位数据信息
      */
     @Override
@@ -83,11 +79,6 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     }
 
     /**
-     * public SingleWork selectSingleWorkById(Integer id) {
-     * return singleWorkMapper.selectSingleWorkById(id);
-     * }
-     * <p>
-     * /**
      * 查询单工位数据列表
      *
      * @param singleWork 单工位数据信息
@@ -104,19 +95,22 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
     }
 
     /**
-     * @return
-     * @Override public List<SingleWork> selectSingleWorkList(SingleWork singleWork)
-     * {
-     * User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-     * if (user == null) {
-     * return Collections.emptyList();
-     * }
-     * singleWork.setCompanyId(user.getCompanyId());
-     * return singleWorkMapper.selectSingleWorkList(singleWork);
-     * }
-     * <p>
-     * /**
-     * 查询所以车间
+     * 查询单工位数据列表
+     *
+     * @param singleWorkOrder 单工位数据信息
+     * @return 单工位数据集合
+     */
+    @Override
+    public List<SingleWork> selectSingleWorkList2(SingleWorkOrder singleWorkOrder) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return singleWorkMapper.selectSingleWorkList2(singleWorkOrder);
+    }
+
+    /**
+     * 查询所有车间
      */
     @Override
     public List<SingleWork> selectSingleWorkListSign0() {
@@ -207,9 +201,11 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
             if (singleWork.geteId() != null && singleWork.geteId() != 0) {
                 devListMapper.updateDevSignAndType(user.getCompanyId(), singleWork.geteId(), DevConstants.DEV_SIGN_NOT_USE, null);
             }
-            // 删除单工位配置
-            sopLineMapper.deleteSopLine(user.getCompanyId(), swId, null, FileConstants.SOP_TAG_SINGWORK);
-            sopLineWorkMapper.deleteSopLineWorkByWId(user.getCompanyId(), swId, null, FileConstants.SOP_TAG_SINGWORK);
+
+            // 删除单工位ASOP相关配置
+            sopMapper.deleteSop(user.getCompanyId(),swId,FileConstants.SOP_TAG_SINGWORK);
+            sopLineMapper.deleteSopLine(user.getCompanyId(), null, swId, null,FileConstants.SOP_TAG_SINGWORK);
+
         }
         return singleWorkMapper.deleteSingleWorkByIds(Convert.toStrArray(ids));
     }
@@ -355,6 +351,7 @@ public class SingleWorkServiceImpl implements ISingleWorkService {
      * @param pid
      * @return
      */
+    @Override
     public List<SingleWork> selectAllNotConfigWorkByOrderId(int order_id, int pid) {
         return singleWorkMapper.selectAllNotConfigWorkByOrderId(order_id, pid);
     }

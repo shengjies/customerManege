@@ -52,5 +52,11 @@ public interface ISingleWorkOrderService
      * @return 结果
      */
 	public int deleteSingleWorkOrderByIds(String ids);
-	
+
+	/**
+	 * app端单工位分配工单
+	 * @param singleWorkOrder 单工位与工单进行配置信息
+	 * @return 结果
+	 */
+	int appSaveShareWork(SingleWorkOrder singleWorkOrder);
 }

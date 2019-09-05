@@ -520,11 +520,22 @@ public class DevProductListServiceImpl implements IDevProductListService {
      * 根据产线id查询所以未配置的产品信息
      * @param lineId 产线id
      * @param sopTag sop配置标记
-     * @return
+     * @return 结果
      */
     @Override
     public List<DevProductList> selectNotConfigByLineId(Integer lineId,Integer companyid,Integer sopTag) {
         return devProductListMapper.selectNotConfigByLineId(lineId,companyid,sopTag);
+    }
+
+    /**
+     * 根据单工位未配置的产品信息
+     * @param wId 单工位id
+     * @param sopTag sop配置标记
+     * @return 结果
+     */
+    @Override
+    public List<DevProductList> selectNotConfigByWId(Integer wId,Integer companyid,Integer sopTag) {
+        return devProductListMapper.selectNotConfigByWId(wId,companyid,sopTag);
     }
 
     /**

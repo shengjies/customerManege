@@ -153,4 +153,17 @@
          SELECT i.iso_id,i.c_name,i.i_type FROM tab_iso as i left join
          (select * from tab_sop_line where  line_id = #{lineId} and sop_tag = #{sopTag}) as l on i.iso_id = l.sop_id where i.parent_id = #{pid} and l.sop_id is null;
     </select>
+
+    <!--查询所有的作业指导书-->
+    <select id="selectASOPList" resultMap="IsoResult">
+        <include refid="selectIsoVo"/>
+        <where>
+            <if test="companyId != null and companyId != 0">
+                AND company_id = #{companyId}
+            </if>
+            <if test="parentId != null and parentId != 0 ">
+                AND parent_id = #{parentId}
+            </if>
+        </where>
+    </select>
 </mapper>

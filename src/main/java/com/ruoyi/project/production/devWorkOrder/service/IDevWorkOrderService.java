@@ -1,6 +1,7 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
+import com.ruoyi.project.production.devWorkOrder.domain.AppWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -266,4 +267,9 @@ public interface IDevWorkOrderService {
      * @return 结果
      */
     DevWorkOrder selectWorkMesOrderByWorkId(int workId);
+
+    /**
+     * app端查询MES配置信息
+     */
+    AppWorkOrder appSelectWorkMes(AppWorkOrder appWork);
 }

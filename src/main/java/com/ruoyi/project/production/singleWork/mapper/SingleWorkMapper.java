@@ -2,6 +2,7 @@ package com.ruoyi.project.production.singleWork.mapper;
 
 import com.ruoyi.project.page.pageInfo.domain.PageHouse;
 import com.ruoyi.project.production.singleWork.domain.SingleWork;
+import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,6 +29,14 @@ public interface SingleWorkMapper {
      * @return 单工位数据集合
      */
     public List<SingleWork> selectSingleWorkList(SingleWork singleWork);
+
+    /**
+     * 查询单工位数据列表
+     *
+     * @param singleWorkOrder 单工位数据信息
+     * @return 单工位数据集合
+     */
+    public List<SingleWork> selectSingleWorkList2(SingleWorkOrder singleWorkOrder);
 
     /**
      * 新增单工位数据
@@ -138,4 +147,23 @@ public interface SingleWorkMapper {
      * @return 结果
      */
     List<SingleWork> selectWorkUserInfo(@Param("workId") Integer workId, @Param("companyId") Integer companyId,@Param("sign") Integer sign);
+
+    /**
+     * 根据硬件的编号查询对应的工位配置信息，没次调用只能使用一个参数
+     * @param devCode 计数器硬件id
+     * @param watchCode 看板硬件id
+     * @return 结果
+     */
+    SingleWork selectSingleWorkByDevCode(@Param("devCode") String devCode, @Param("watchCode") String watchCode);
+
+    /**
+     * 查询极光未更新推送的单工位信息
+     * @param workId 工单id
+     * @param pId 车间id
+     * @param jpushTag 极光推送标记
+     * @return 结果
+     */
+    List<SingleWork> selectSingleWorkJPushTagByPId(@Param("workId") Integer workId,
+                                                   @Param("pId") Integer pId,
+                                                   @Param("jpushTag")Integer jpushTag);
 }

@@ -28,6 +28,11 @@
 
     function submitHandler() {
         if ($.validate.form()) {
+			var cName = $.common.trim($("#cName").val());
+			if (cName.indexOf(".")!= -1) {
+				$.modal.alertWarning("名称不能有小数点");
+				return;
+			}
             $.operate.save(prefix + "/add", $('#form-iso-add').serialize());
         }
     }

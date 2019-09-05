@@ -19,13 +19,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="sign"    column="sign"    />
         <result property="cTime"    column="c_time"    />
         <result property="defId"    column="def_id"    />
+        <result property="jpushTag"    column="jpush_tag"    />
         <association property="devName" column="dev_id" select="selectDevName">
             <result property="devName" column="device_name"/>
         </association>
     </resultMap>
 	
 	<sql id="selectWorkstationVo">
-        select id, company_id, line_id, w_name, sop_id, dev_id, dev_code, c_id, c_code, e_id, e_code, sign, c_time, def_id from tab_workstation
+        select id, company_id, line_id, w_name, sop_id, dev_id, dev_code, c_id, c_code, e_id, e_code, sign, c_time, def_id,jpush_tag from tab_workstation
     </sql>
 	
     <select id="selectWorkstationList" parameterType="Workstation" resultMap="WorkstationResult">
@@ -34,6 +35,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              and line_id = #{lineId}
              <if test="wName != null  and wName != '' "> and w_name like concat(#{wName}, '%')</if>
          </where>
+    </select>
+
+    <select id="selectWorkstationList2" parameterType="Workstation" resultMap="WorkstationResult">
+        <include refid="selectWorkstationVo"/>
+        where c_id != 0
+        <if test="lineId != null  and lineId != '' "> and line_id = #{lineId}</if>
+        <if test="wName != null  and wName != '' "> and w_name like concat(#{wName}, '%')</if>
+
     </select>
     
     <select id="selectWorkstationById" parameterType="Integer" resultMap="WorkstationResult">
@@ -57,6 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="sign != null  ">sign,</if>
 			<if test="cTime != null  ">c_time,</if>
 			<if test="defId != null  ">def_id,</if>
+            <if test="jpushTag != null  ">jpush_tag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -72,6 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="sign != null  ">#{sign},</if>
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="defId != null  ">#{defId},</if>
+            <if test="jpushTag != null  ">#{jpushTag},</if>
          </trim>
     </insert>
 	 
@@ -91,6 +102,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="sign != null  ">sign = #{sign},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="defId != null  ">def_id = #{defId},</if>
+            <if test="jpushTag != null  ">jpush_tag = #{jpushTag},</if>
         </trim>
         where id = #{id}
     </update>
@@ -163,5 +175,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--根据公司和产线id查询对应产线已经配置的SOP看板硬件编码-->
     <select id="countLineKBCode" resultType="java.lang.String">
       SELECT c_code FROM tab_workstation where company_id = #{companyId} and line_id = #{lineId} and c_code is not null;
+    </select>
+
+    <!--通过产线id查询极光标记大于0的工位信息-->
+    <select id="selectWorkListJPushTagByLineId" resultMap="WorkstationResult">
+        SELECT * FROM tab_workstation where line_id = #{lineId} and c_id != 0
+        <if test="jpushTag != null">
+            and jpush_tag = #{jpushTag}
+        </if>
     </select>
 </mapper>

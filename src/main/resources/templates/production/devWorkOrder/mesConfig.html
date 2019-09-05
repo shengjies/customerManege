@@ -8,24 +8,23 @@
         <input type="hidden" name="orderCode" id="orderCode" th:value="${workOrder.orderCode}">
         <input type="hidden" name="pbCode" id="pbCode" th:value="${workOrder.productCode}">
         <input type="hidden" name="ruleId" id="ruleId" th:value="${workOrder.ruleId}">
-        <div class="ibox-title" style="text-align: center;padding: 0px;min-height: 20px">
+        <div class="ibox-title" style="padding: 0px;min-height: 20px;margin-left: 20px">
             <span style="font-weight: bold;color: #0a0a0a;font-size: x-large">工单号：</span>
-            <span id="workCode" style="font-weight: bold;color: #0a0a0a;font-size: x-large"
-                  th:utext="${workOrder.workorderNumber}"></span>
-            <a th:if="${workOrder.workorderStatus == 0 &&workOrder.mesBatchList != null && workOrder.workSign == 0 || workOrder.mesRuleDetailList != null && workOrder.workSign == 0}"
-               class="btn btn-primary btn-rounded btn-sm" onclick="addMesBody()" style="float: right">
-                <i class="fa fa-plus"></i> 添加追踪批次信息
-            </a>
+            <span id="workCode" style="font-weight: bold;color: #0a0a0a;font-size: x-large" th:utext="${workOrder.workorderNumber}"></span>
+            <!--<a th:if="${workOrder.workorderStatus == 0 &&workOrder.mesBatchList != null && workOrder.workSign == 0 || workOrder.mesRuleDetailList != null && workOrder.workSign == 0}"-->
+               <!--class="btn btn-primary btn-rounded btn-sm" onclick="addMesBody()" style="float: right">-->
+                <!--<i class="fa fa-plus"></i> 添加追踪批次信息-->
+            <!--</a>-->
         </div>
         <div>
             <div class="panel-body" id="panel-body">
                 <div class="panel-group">
                     <div class="row" id="mes-body">
-                        <div class="col-sm-12" style="text-align: center"
+                        <div class="col-sm-8" style="margin-left: 15px"
                              th:if="${workOrder.mesBatchList == null && workOrder.mesRuleDetailList == null}">
                             <h2><a style="color: red" onclick="gotoCfMesRule()">该工单生产的产品未配置MES追踪规则</a></h2>
                         </div>
-                        <div style="margin-top: 5px" class="col-sm-6" th:if="${workOrder.mesBatchList != null}"
+                        <div style="margin-top: 5px" class="col-sm-8" th:if="${workOrder.mesBatchList != null}"
                              th:each="item:${workOrder.mesBatchList}">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
@@ -47,7 +46,7 @@
                                                 <thead>
                                                 <tr>
                                                     <th width="3%">序号</th>
-                                                    <th width="41%">关联编码</th>
+                                                    <th width="41%">物料编码</th>
                                                     <th width="41%">配料批次</th>
                                                     <th width="15%">批次数量</th>
                                                 </tr>
@@ -61,11 +60,7 @@
                                                         <span class="form-control" name="ruleOrder"
                                                               th:utext="${item2.ruleOrder}"></span>
                                                     </td>
-                                                    <td th:if="${item2.dType == 1}">
-                                                        <span name="materielCode" class="form-control"
-                                                              th:utext="${item2.materielCode}"></span>
-                                                    </td>
-                                                    <td th:if="${item2.dType == 2}">
+                                                    <td>
                                                         <span name="materielCode" class="form-control"
                                                               th:utext="${item2.materielCode}"></span>
                                                     </td>
@@ -77,27 +72,25 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div th:if="${workOrder.workorderStatus == 0}">
-                                            <div class="form-group">
-                                                <div style="text-align: center;margin-top: 20px;">
-                                                    <a class="btn btn-danger btn-sm" onclick="removeMesData(this)"
-                                                       th:if="${workOrder.workSign == 0}"
-                                                       style="float: right;margin-left: 5px">
-                                                        <i class="fa fa-remove"></i> 删除
-                                                    </a>
-                                                    <a class="btn btn-primary btn-sm" onclick="addMesBatch(this)"
-                                                       th:if="${workOrder.workSign == 0}"
-                                                       style="float: right">
-                                                        <i class="fa fa-plus"></i> 保存
-                                                    </a>
-                                                </div>
+                                        <div class="form-group" th:if="${workOrder.workorderStatus == 0}">
+                                            <div style="text-align: center;margin-top: 20px;">
+                                                <a class="btn btn-danger btn-sm" onclick="removeMesData(this)"
+                                                   th:if="${workOrder.workSign == 0}"
+                                                   style="float: right;margin-left: 5px">
+                                                    <i class="fa fa-remove"></i> 删除
+                                                </a>
+                                                <a class="btn btn-primary btn-sm" onclick="addMesBatch(this)"
+                                                   th:if="${workOrder.workSign == 0}"
+                                                   style="float: right">
+                                                    <i class="fa fa-plus"></i> 保存
+                                                </a>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6" th:if="${workOrder.mesRuleDetailList!= null}" style="margin-top: 5px">
+                        <div class="col-sm-8" th:if="${workOrder.mesRuleDetailList!= null}" style="margin-top: 5px">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <span style="font-weight: bold">批次追踪信息</span>
@@ -131,11 +124,7 @@
                                                         <span class="form-control" name="ruleOrder"
                                                               th:utext="${item.ruleOrder}"></span>
                                                     </td>
-                                                    <td th:if="${item.dType == 1}">
-                                                        <span name="materielCode" class="form-control"
-                                                              th:utext="${item.dCode}"></span>
-                                                    </td>
-                                                    <td th:if="${item.dType == 2}">
+                                                    <td>
                                                         <span name="materielCode" class="form-control"
                                                               th:utext="${item.dCode}"></span>
                                                     </td>
@@ -305,30 +294,6 @@
     }
 
     /**
-     * 半成品MES
-     */
-    function showPartMes(val) {
-        var parent = $(val).parent().parent().parent().parent().parent().parent();
-        var mesCode = parent.find("input[name='mesCode']").val(); // 主码信息
-        var partCode = $(val).parent().find("span[name='materielCode']").html(); // 半成品编码
-        var workCode = $("#workCode").html(); // 工单号
-        var url = prefix + "/partCofMes?mesCode=" + mesCode + "&partCode=" + partCode + "&workCode=" + workCode;
-        $.modal.open(partCode + "追踪明细", url);
-    }
-
-    /**
-     * 查看半成品MES明细非修改状态
-     */
-    function showPartMes1(val) {
-        var parent = $(val).parent().parent().parent().parent().parent().parent();
-        var mesCode = parent.find("input[name='mesCode']").val(); // 主码信息
-        var partCode = $(val).parent().find("span[name='materielCode']").html(); // 半成品编码
-        var workCode = $("#workCode").html(); // 工单号
-        var url = prefix + "/partCofMes1?mesCode=" + mesCode + "&partCode=" + partCode + "&workCode=" + workCode;
-        $.modal.open(partCode + "追踪明细", url);
-    }
-
-    /**
      * 保存
      */
     function addMesBatch(val) {
@@ -384,6 +349,8 @@
                     });
                 } else {
                     $.modal.alertError(result.msg);
+                    $.modal.closeLoading();
+                    $.modal.enable();
                 }
             }
         };

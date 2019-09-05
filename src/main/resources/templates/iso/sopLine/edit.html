@@ -5,13 +5,20 @@
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
 	<form class="form-horizontal m" id="form-sopLine-add">
+		<input type="hidden" id="id" name="id" th:value="${sop.id}">
+		<input type="hidden" id="sopId" name="sopId" th:value="${sop.sopId}">
 		<div class="col-sm-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">配置名称：</label>
+				<div class="col-sm-8">
+					<input type="text" id="cnfName" name="cnfName" th:value="${sop.cnfName}" class="form-control">
+				</div>
+			</div>
 			<div class="form-group">
 				<label class="col-sm-3 control-label">产线：</label>
 				<div class="col-sm-8">
-					<select style="width: 100%" id="id" onchange="lineChange(this)" class="form-control" name="id">
-						<option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" selected  th:text="${sopLines[0].lineName}" th:value="${sopLines[0].lineId}"></option>
-						<option th:each="item : ${lineList}"  th:text="${item.lineName}" th:value="${item.id}"></option>
+					<select style="width: 100%" id="lineId" onchange="lineChange(this)" class="form-control" name="lineId">
+						<option th:each="item : ${lineList}"  th:text="${item.lineName}" th:value="${item.id}" th:selected="${sop.lineId == item.id}"></option>
 					</select>
 				</div>
 			</div>
@@ -71,22 +78,45 @@
     var prefix = ctx + "iso/sopLine"
     $("#form-sopLine-add").validate({
         rules:{
-            id:{
+			lineId:{
                 required:true,
             },
+			cnfName:{
+				required:true,
+				remote: {
+					url: ctx + "iso/sop/checkCnfNameUnique",
+					type: "post",
+					dataType: "json",
+					data: {
+						name : function() {
+							return $.common.trim($("#cnfName").val());
+						},
+						id : function() {
+							return $.common.trim($("#id").val());
+						}
+					},
+					dataFilter: function(data, type) {
+						return $.validate.unique(data);
+					}
+				}
+			},
         },
         messages:{
-            id:{
+            lineId:{
                 required:"请选择产线",
             },
+			cnfName:{
+				required:"配置名称必填",
+				remote:"配置名称已存在",
+			},
         }
     });
 
     function submitHandler() {
         if ($.validate.form()) {
             //先验证产线
-            var id = $("#id").find("option:selected").val();
-            if(id <=0){
+            var lineId = $("#lineId").find("option:selected").val();
+            if(lineId <=0){
                 $.modal.alertWarning("请选择产线");
                 return;
             }
@@ -100,27 +130,29 @@
             for(var i =0;i<$(pnSelect).size();i++){
                 pns.push($(pnSelect[i]).val())
             }
-            var sopLineWorks =[];
+            var sopLines =[];
             //获取工位
             $("#add-sop-w-table-body").find("tr").each(function () {
                 var work ={
-                    lineId:id,
-                    sopId:[[${isoId}]],
+                    lineId:lineId,
+                    sopId:$("#sopId").val(),
 					sopTag:0,
                     wId:$(this).find("td").attr("data-w-id"),
                     pageId:$(this).find("td").find("select[name='wId'] option:selected").val()
                 }
-                sopLineWorks.push(work);
+				sopLines.push(work);
             })
             var data={
-                lineId:id,
-                sopId:[[${isoId}]],
-                pns:pns,
+				id:$("#id").val(),
+                lineId:lineId,
+                sopId:$("#sopId").val(),
+				cnfName:$("#cnfName").val(),
+				pnsId:pns,
 				sopTag:0,
-                sopLineWorks:sopLineWorks
+				sopLines:sopLines
             }
             var config = {
-                url: prefix + "/edit",
+				url: "/iso/sop/edit",
                 type: "post",
                 dataType: "json",
                 contentType: 'application/json',
@@ -139,34 +171,59 @@
 
     function lineChange(val) {
         $("#add-sop-w-table-body").find("tr").remove();
-        var id = $(val).find("option:selected").val();
-        if(id > 0){
+        var lineId = $("#lineId").find("option:selected").val();
+        if(lineId > 0){
+			$("#pnId option").remove();
             $("#add-sop-w-table-body select option").remove();
             $("#add-sop-w-table-body select").select2({
                 data:[{id:0,text:'请选择'}]
             });
             //获取对应工位
-            $.post("/production/workstation/findByLineId",{lineId:id,isoId:[[${isoId}]]},function (res) {
+            $.post("/production/workstation/findByLineId",{lineId:lineId,isoId:[[${isoId}]]},function (res) {
                 if(res.code == 0){
-                    var workItem = res.data.work;
-                    var isoItem = res.data.isoList;
+
+                    // 作业指导书
                     var rows=[{id:0,text:'请选择'}];
-                    for(var i =0;i<workItem.length;i++){
-                        var workDetail = '<tr>' +
-                            '<td data-w-id="'+ workItem[i].id+'">'+ workItem[i].wName+'</td>' +
-                            '<td><select style="width: 100%" class="form-control" name="wId">' +
-                            '</select></td>' +
-                            '</tr>';
-                        var row ={
-                            id:isoItem[i].isoId,
-                            text:isoItem[i].cName
-                        }
-                        rows.push(row);
-                        $("#add-sop-w-table-body").append(workDetail);
-                        $("#add-sop-w-table-body select").select2({
-                            data:rows
-                        });
+					var isoItem = res.data.isoList;
+                    var isoItemSize = isoItem.length;
+                    if (isoItemSize > 0) {
+						for(var j = 0;j<isoItemSize;j++){
+							var row ={
+								id:isoItem[j].isoId,
+								text:isoItem[j].cName
+							}
+							rows.push(row);
+						}
                     }
+                    // 工位
+					var workItem = res.data.work;
+                    var workItemSize = workItem.length;
+                    if (workItemSize > 0) {
+						for(var i =0;i<workItem.length;i++){
+							var workDetail = '<tr>' +
+									'<td data-w-id="'+ workItem[i].id+'">'+ workItem[i].wName+'</td>' +
+									'<td><select style="width: 100%" class="form-control" name="wId">' +
+									'</select></td>' +
+									'</tr>';
+
+							$("#add-sop-w-table-body").append(workDetail);
+							$("#add-sop-w-table-body select").select2({
+								data:rows
+							});
+						}
+                    }
+
+                    // 产线改变该产线未配置产品信息
+					var proItem = '<option value="0">请选择</option>';
+					var proList = res.data.proList;
+					var proListSize = proList.length;
+					if (proListSize > 0) {
+					    for (var z = 0;z <proListSize;z++){
+							proItem += '<option value="'+ proList[z].id +'">'+ proList[z].productCode +'</option>';
+						}
+					    $("#pnId").append(proItem);
+					}
+
                 }else{
                     $.modal.alertWarning("操作异常...")
                 }

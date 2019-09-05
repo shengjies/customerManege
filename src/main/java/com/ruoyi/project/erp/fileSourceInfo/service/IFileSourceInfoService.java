@@ -2,6 +2,7 @@ package com.ruoyi.project.erp.fileSourceInfo.service;
 
 import com.ruoyi.project.erp.fileSourceInfo.domain.FileSourceInfo;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -46,5 +47,18 @@ public interface IFileSourceInfoService
 	 * @throws Exception
 	 */
 	public List<FileSourceInfo> selectFileSourceByDCodeAndPCode(String dCode,String pCode) throws Exception;
-	
+
+	/**
+	 * 修改保存文件名
+	 * @param fileSourceInfo 文件信息
+	 * @return 结果
+	 */
+    int saveFileName(FileSourceInfo fileSourceInfo) throws IOException;
+
+	/**
+	 * 校验文件名是否重复
+	 * @param fileSourceInfo
+	 * @return 结果
+	 */
+	String checkFileNameNameUnique(FileSourceInfo fileSourceInfo);
 }

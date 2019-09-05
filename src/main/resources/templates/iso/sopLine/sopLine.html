@@ -12,6 +12,10 @@
 						<input type="hidden" id="isoId" name="sopId" th:value="${isoId}">
 						<ul>
 							<li>
+								配置名称：
+								<input type="text" name="cnfName">
+							</li>
+							<li>
 								产线：
 								<select name="lineId" th:with="lineList=${@productionLine.selectAllProductionLineByCompanyId(#httpServletRequest.getCookies())}">
 									<option value="-1">请选择</option>
@@ -20,7 +24,7 @@
 							</li>
 
 							<li>
-								产品编码：<input type="text" name="pnCode"/>
+								产品编码：<input type="text" name="pCode"/>
 							</li>
 
 							<li>
@@ -36,9 +40,6 @@
 				<a class="btn btn-success" onclick="add()" shiro:hasPermission="iso:sopLine:add">
 					<i class="fa fa-plus"></i> 添加
 				</a>
-				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="iso:sopLine:edit">
-					<i class="fa fa-edit"></i> 修改
-				</a>
 				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="iso:sopLine:remove">
 					<i class="fa fa-remove"></i> 删除
 				</a>
@@ -52,12 +53,11 @@
     <script th:inline="javascript">
         var editFlag = [[${@permission.hasPermi('iso:sopLine:edit')}]];
         var removeFlag = [[${@permission.hasPermi('iso:sopLine:remove')}]];
-        var prefix = ctx + "iso/sopLine";
+		var prefix = ctx + "iso/sop";
 
         $(function() {
             var options = {
                 url: prefix + "/list",
-                createUrl: prefix + "/add/{id}",
                 updateUrl: prefix + "/edit",
                 removeUrl: prefix + "/remove",
 				exportUrl: prefix + "/export",
@@ -73,6 +73,11 @@
 					visible: false
 				},
 				{
+					field : 'cnfName',
+					title : '配置名称',
+					sortable: true,
+				},
+				{
 					field : 'lineId',
 					title : '产线',
 					sortable: true,
@@ -81,25 +86,21 @@
 					}
 				},
 				{
-					field : 'sopId',
-					title : 'SOP',
-					sortable: true,
-					formatter:function (value, row, index) {
-						return row.sopName;
-					}
-				},
-				{
-					field : 'pnCode',
+					field : 'pCode',
 					title : '产品编码',
-					sortable: true
+					sortable: true,
+					width:400,
+					formatter:function (value, row, index) {
+						return $.table.tooltip(value);
+					}
 				},
 		        {
 		            title: '操作',
 		            align: 'center',
 		            formatter: function(value, row, index) {
 		            	var actions = [];
-		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.lineId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.lineId + '\')"><i class="fa fa-remove"></i>删除</a>');
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\''+ row.cnfName +'\',\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
 						return actions.join('');
 		            }
 		        }]
@@ -112,8 +113,8 @@
          * 添加产线配置
          */
         function add() {
-            var IsoId = $("#isoId").val();
-            var url = $.common.isEmpty(IsoId) ? $.table._option.createUrl : $.table._option.createUrl.replace("{id}", IsoId);
+            var isoId = $("#isoId").val();
+			var url = "/iso/sopLine/add?isoId="+ isoId;
             $.modal.open("添加产线配置", url,1000,600);
         }
 
@@ -121,22 +122,11 @@
          * 修改sop产线配置
          * @param sopId SOP id
          */
-        function edit(line) {
-            var url =  $.table._option.updateUrl+"/"+line+"/"+[[${isoId}]];
-            $.modal.open("修改SOP产线配置", url,1000,600);
+        function edit(cnfName,id) {
+			var url =  prefix + "/editSopLine?id=" + id;
+			$.modal.open("修改" + cnfName, url,1000,600);
         }
 
-        /**
-         * 删除sop产线配置
-         * @param sopId SOP id
-         */
-        function remove(lineId) {
-            $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗？", function () {
-                var url =  $.table._option.removeUrl;
-                var data = {lineId: lineId,sopId:[[${isoId}]]};
-                $.operate.submit(url, "post", "json", data);
-            });
-        }
     </script>
 </body>
 </html>

@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-fileSourceInfo-edit">
+        <input id="id" name="id" th:value="${id}"  type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">文件名：</label>
+            <div class="col-sm-8">
+                <input id="fileName" name="fileName" th:value="${fileName}" class="form-control" type="text">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "erp/fileSourceInfo";
+    $("#form-fileSourceInfo-edit").validate({
+        rules:{
+            fileName:{
+                required:true,
+                remote: {
+                    url: prefix + "/checkFileNameNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name : function() {
+                            return $.common.trim($("#loginName").val());
+                        },
+                        id : function() {
+                            return $.common.trim($("#id").val());
+                        }
+                    },
+                    dataFilter: function(data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+        },
+        messages: {
+            "fileName": {
+                required:"文件名必填",
+                remote: "文件名已存在"
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            var fileName = $.common.trim($("#fileName").val());
+            if (fileName.indexOf(".") != -1) {
+                $.modal.alertWarning("文件名不能含有小数点");
+                return;
+            }
+            saveFileName(prefix + "/saveFileName", $('#form-fileSourceInfo-edit').serialize());
+        }
+    }
+
+    function saveFileName(url, data) {
+        var config = {
+            url: url,
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                $.operate.successCallback(result);
+            }
+        };
+        $.ajax(config)
+    }
+</script>
+</body>
+</html>

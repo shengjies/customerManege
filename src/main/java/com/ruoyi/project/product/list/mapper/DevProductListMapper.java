@@ -167,6 +167,15 @@ public interface DevProductListMapper {
     List<DevProductList> selectNotConfigByLineId(@Param("lineId") int lineId, @Param("companyid") int companyid, @Param("sopTag") int sopTag);
 
     /**
+     * 根据单工位未配置的产品信息
+     *
+     * @param wId    单工位id
+     * @param sopTag sop配置标记
+     * @return 结果
+     */
+    List<DevProductList> selectNotConfigByWId(@Param("wId") int wId, @Param("companyid") int companyid, @Param("sopTag") int sopTag);
+
+    /**
      * 根据作业指导书id查询所有配置的产品信息
      *
      * @param isoId     作业指导书id

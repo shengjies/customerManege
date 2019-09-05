@@ -3,7 +3,7 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.project.iso.sopLine.mapper.SopLineMapper">
-    
+
     <resultMap type="SopLine" id="SopLineResult">
         <result property="id"    column="id"    />
         <result property="companyId"    column="company_id"    />
@@ -14,12 +14,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
         <result property="sopTag"    column="sop_tag"    />
-        <association property="lineName" column="line_id" select="selectLineName">
-            <result property="lineName" column="line_name"/>
-        </association>
-        <association property="sopName" column="sop_id" select="selectSopName">
-            <result property="sopName" column="c_name"/>
-        </association>
+        <result property="wId"    column="w_id"    />
+        <result property="pageId"    column="page_id"    />
+        <result property="sId"    column="s_id"    />
     </resultMap>
 
     <resultMap type="SopLine" id="SopLineResult1">
@@ -32,6 +29,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="cId"    column="c_id"    />
         <result property="cTime"    column="c_time"    />
         <result property="sopTag"    column="sop_tag"    />
+        <result property="wId"    column="w_id"    />
+        <result property="pageId"    column="page_id"    />
+        <result property="sId"    column="s_id"    />
         <association property="sopName" column="sop_id" select="selectSopName">
             <result property="sopName" column="c_name"/>
         </association>
@@ -105,6 +105,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cId != null  ">c_id,</if>
 			<if test="cTime != null  ">c_time,</if>
             <if test="sopTag != null  ">sop_tag,</if>
+            <if test="wId != null and wId != '' ">w_id,</if>
+            <if test="pageId != null and pageId != '' ">page_id,</if>
+            <if test="sId != null and sId != '' ">s_id,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -115,13 +118,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cId != null  ">#{cId},</if>
 			<if test="cTime != null  ">#{cTime},</if>
             <if test="sopTag != null  ">#{sopTag},</if>
+            <if test="wId != null and wId != '' ">#{wId},</if>
+            <if test="pageId != null and pageId != '' ">#{pageId},</if>
+            <if test="sId != null and sId != '' ">#{sId},</if>
          </trim>
     </insert>
 
 	<!--根据公司id 产线id SOP id删除对应的配置信息-->
     <delete id="deleteSopLine" >
-      delete from tab_sop_line where company_id = #{companyId} and line_id = #{lineId}
+      delete from tab_sop_line where company_id = #{companyId} and sop_tag = #{sopTag}
+        <if test="lineId != null">and line_id = #{lineId}</if>
         <if test="sopId != null">and sop_id = #{sopId}</if>
+        <if test="wId != null">and w_id = #{wId}</if>
+    </delete>
+
+    <!--通过主表id删除sop配置信息-->
+    <delete id="deleteSopLineBySId">
+        delete from tab_sop_line where s_id = #{sId}
     </delete>
 
     <!--根据公司id 产线id SOP id查询所以的产线SOP 配置细心-->
@@ -129,13 +142,37 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
       SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and sop_id = #{sopId} and sop_tag = #{sopTag};
     </select>
 
-    <!--根据公司id 产线id 产品编号查询对应SOP 配置-->
+    <!--查询对应SOP 配置-->
     <select id="selectSopByCompanyAndLineAndCode" resultMap="SopLineResult1">
-      SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and pn_code=#{code} limit 1;
+      SELECT * FROM tab_sop_line where company_id = #{companyId} and line_id = #{lineId} and pn_code=#{pnCode}
+       and w_id = #{wId} and sop_tag = #{sopTag} limit 1;
     </select>
 
     <!--通过作业指导书id查询sop产线配置列表-->
-    <select id="selectSopLineListBySopId" resultType="com.ruoyi.project.iso.sopLine.domain.SopLine">
+    <select id="selectSopLineListBySopId" resultMap="SopLineResult">
         SELECT * FROM tab_sop_line where company_id = #{companyId} and sop_id = #{sopId};
+    </select>
+
+    <!--通过主表id查询配置过的产品信息-->
+    <select id="selectSopConfigProBySId" resultMap="SopLineResult">
+        select * from tab_sop_line where s_id = #{sId} group by pn_id
+    </select>
+
+    <!--查询所有工位配置-->
+    <select id="selectSopConfigWorkBySId" resultMap="SopLineResult">
+        select * from tab_sop_line where s_id = #{sId} group by w_id
+    </select>
+
+    <!--删除配置明细-->
+    <delete id="deleteSopLineBySIds" parameterType="String">
+        delete from tab_sop_line where s_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过作业指导书页id查询配置列表-->
+    <select id="selectSopLineListByPageId" resultMap="SopLineResult">
+         select * from tab_sop_line where company_id = #{companyId} and page_id = #{pageId}
     </select>
 </mapper>

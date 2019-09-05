@@ -13,6 +13,7 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.iso.iso.domain.Iso;
 import com.ruoyi.project.iso.iso.service.IIsoService;
+import com.ruoyi.project.iso.sop.service.ISopService;
 import com.ruoyi.project.iso.sopLine.service.ISopLineService;
 import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -42,6 +43,9 @@ public class IsoController extends BaseController {
 
     @Autowired
     private ISopLineService sopLineService;
+
+    @Autowired
+    private ISopService sopService;
 
 
     @RequiresPermissions("iso:iso:view")
@@ -139,14 +143,16 @@ public class IsoController extends BaseController {
     public AjaxResult remove(@PathVariable("isoId") Integer isoId,HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
         Iso iso = isoService.selectIsoById(isoId);
-        if (FileConstants.CATEGORY_SOP_FOLDER.equals(iso.getCategory())) { // sop文件夹判断是否配置了产线信息
-            if (sopLineService.selectSopLineListBySopId(user.getCompanyId(),isoId).size() > 0) {
-                return error(1, "存在产线配置,不允许删除");
+        // sop文件夹判断是否被配置过
+        if (FileConstants.CATEGORY_SOP_FOLDER.equals(iso.getCategory())) {
+            if (sopService.selectSopListBySopId(user.getCompanyId(),isoId).size() > 0) {
+                return error(1, "存在ASOP配置,不允许删除");
             }
         }
-        if (FileConstants.CATEGORY_SOP_FILE.equals(iso.getCategory())) { // sop文件夹下的作业指导书
-            if (sopLineService.selectSopLineWorkListBySopId(user.getCompanyId(),isoId).size() > 0) {
-                return error(1, "存在工位配置,不允许删除");
+        // sop文件夹下指导书页是否被配置过
+        if (FileConstants.CATEGORY_SOP_FILE.equals(iso.getCategory())) {
+            if (sopLineService.selectSopLineListByPageId(user.getCompanyId(),isoId).size() > 0) {
+                return error(1, "存在ASOP配置,不允许删除");
             }
         }
         if (isoService.selectIsoByParentId(isoId).size() > 0) {

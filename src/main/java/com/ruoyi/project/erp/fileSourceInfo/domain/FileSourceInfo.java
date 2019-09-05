@@ -24,10 +24,10 @@ public class FileSourceInfo extends BaseEntity
 	/** 保存类型 */
 	// 1、订单 2、采购单 3、产品对账单文件 4、物料对账单文件 5、产品 6、物料
 	// 7、产品出库 8、客户退货 9、物料入库 10、物料退货 11、生产发料 12、生产入库
-	// 13、库存内部调整
+	// 13、库存内部调整  14、报表类型
 	private Integer saveType;
 	/** 保存id */
-	private Integer saveId; //对应保存类型的id
+	private Integer saveId; //对应保存类型的id，当saveType为14的时候 1代表流水线，2代表车间
 	/**
 	 * 文件保存路径
 	 */

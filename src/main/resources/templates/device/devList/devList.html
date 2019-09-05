@@ -98,12 +98,7 @@
 					title : '硬件编号',
 					sortable: true,
 					formatter:function (value, row, index) {
-						// if(configStatus =="" && row.configStatus == 0){
-						// 	return '<a class="btn btn-success btn-xs " href="#" onclick="config(\'' + row.id + '\')">'+value+'</a> '
-						// }else {
-						// 	return value;
-						// }
-						return value;
+						return '<a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="showDevCode(\'' + row.deviceId + '\')"><span>'+ value +'</span></a>'
 					}
 				},
 				{
@@ -220,6 +215,15 @@
 		}
 		function config(id) {
 			$.modal.open("配置硬件",'/device/devList/code?id='+id,360,300);
+		}
+
+		/**
+		 * 查看二维码
+		 * @param code
+		 */
+		function showDevCode(code) {
+			var url = prefix + "/showDevCode?code=" + code;
+			$.modal.open("查看二维码",url,400,380);
 		}
     </script>
 </body>

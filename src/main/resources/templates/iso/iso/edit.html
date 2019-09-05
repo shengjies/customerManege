@@ -34,6 +34,12 @@
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
+				var cName = $.common.trim($("#cName").val());
+	        	var eName = $.common.trim($("#eName").val());
+	        	if (cName.indexOf(".")!= -1 || eName.indexOf(".") != -1) {
+	        	    $.modal.alertWarning("名称不能有小数点");
+	        	    return;
+	        	}
 	            $.operate.save(prefix + "/edit", $('#form-iso-edit').serialize());
 	        }
 	    }

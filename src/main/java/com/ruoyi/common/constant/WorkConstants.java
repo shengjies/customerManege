@@ -142,4 +142,11 @@ public class WorkConstants {
     public final static Integer ECN_STATUS_NO = 0;
     public final static Integer ECN_STATUS_YES = 1;
 
+    /**
+     * 极光推送更新标记
+     * 0、未更新，1、全部更新
+     */
+    public final static Integer JPUSH_NOT_UPDATED = 0;
+    public final static Integer JPUSH_UPDATED = 1;
+
 }

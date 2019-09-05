@@ -95,7 +95,7 @@ public class SingleWorkOrderController extends BaseController {
             SingleWork singleWork = singleWorkService.selectSingleWorkById(singleId);
             List<DevWorkOrder> workOrders = null;
             if (singleWork != null) {
-                // 查询对应车间还未开始的公安单信息
+                // 查询对应车间还未开始的工单信息
                 workOrders = workOrderService.selectAllNotConfigBySwId(singleWork.getParentId(), WorkConstants.WORK_STATUS_NOSTART,
                         WorkConstants.SING_SINGLE, singleId, JwtUtil.getUser().getCompanyId());
             }

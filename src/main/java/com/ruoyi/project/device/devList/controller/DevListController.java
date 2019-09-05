@@ -69,7 +69,7 @@ public class DevListController extends BaseController
     {
     	List<DevList> list = devListService.selectDevListList(devList,request);
         ExcelUtil<DevList> util = new ExcelUtil<DevList>(DevList.class);
-        return util.exportExcel(list, "devList");
+        return util.exportExcel(list, "硬件列表");
     }
 
 	/**
@@ -167,6 +167,15 @@ public class DevListController extends BaseController
 	public String initCode(int id,ModelMap mmap){
 		mmap.put("dev",devListService.selectDevListAndIoById(id));
 		return prefix +"/code";
+	}
+
+	/**
+	 * 查看二维码
+	 */
+	@GetMapping("/showDevCode")
+	public String showDevCode(String code,ModelMap map){
+		map.put("code",code);
+		return prefix + "/devCode";
 	}
 
 	/**

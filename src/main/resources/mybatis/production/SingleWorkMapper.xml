@@ -22,6 +22,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="cTime"    column="c_time"    />
         <result property="parentId"    column="parent_id"    />
         <result property="sopSign"    column="sop_sign"    />
+        <result property="jpushTag"    column="jpush_tag"    />
         <association property="liableOneName" column="liable_one" select="selectOneName">
             <result property="liableOneName" column="user_name"/>
         </association>
@@ -32,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	
 	<sql id="selectSingleWorkVo">
         select id, company_id, workshop_name, im_id,im_code, sign, liable_one, liable_two, dev_id, dev_code, c_time, parent_id,
-         watch_id,watch_code,e_id,e_code,sop_sign from tab_single_work
+         watch_id,watch_code,e_id,e_code,sop_sign,jpush_tag from tab_single_work
     </sql>
 	
     <select id="selectSingleWorkList" parameterType="SingleWork" resultMap="SingleWorkResult">
@@ -52,6 +53,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="cTime != null "> and c_time = #{cTime}</if>
              <if test="parentId != null "> and parent_id = #{parentId}</if>
          </where>
+    </select>
+
+    <!--查询看板更新单工位列表-->
+    <select id="selectSingleWorkList2" parameterType="SingleWorkOrder" resultType="com.ruoyi.project.production.singleWork.domain.SingleWork">
+        SELECT b.id as id,b.workshop_name as workshopName,b.im_code as imCode,b.watch_code as watchCode,b.jpush_tag as jpushTag
+        FROM tab_single_work_order as a,tab_single_work as b where a.single_id = b.id and b.watch_id != 0
+        <if test="workId != null">
+            and a.work_id = #{workId}
+        </if>
+        <if test="singleP != null">
+            and a.single_p = #{singleP}
+        </if>
+        <if test="jpushTag != null">
+            and b.jpush_tag = #{jpushTag}
+        </if>
+        <if test="imCode != null and imCode != '' ">
+            and b.im_code like concat (#{imCode},'%')
+        </if>
     </select>
 
     <!--查询责任人一的名称-->
@@ -86,6 +105,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cTime != null  ">c_time,</if>
             <if test="parentId != null  ">parent_id,</if>
             <if test="sopSign != null  ">sop_sign,</if>
+            <if test="jpushTag != null  ">jpush_tag,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -104,6 +124,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="parentId != null  ">#{parentId},</if>
             <if test="sopSign != null  ">#{sopSign},</if>
+            <if test="jpushTag != null  ">#{jpushTag},</if>
          </trim>
     </insert>
 
@@ -126,6 +147,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="parentId != null  ">parent_id = #{parentId},</if>
             <if test="sopSign != null  ">sop_sign = #{sopSign},</if>
+            <if test="jpushTag != null  ">jpush_tag = #{jpushTag},</if>
         </trim>
         where id = #{id}
     </update>
@@ -144,6 +166,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="parentId != null  ">parent_id = #{parentId},</if>
             <if test="sopSign != null  ">sop_sign = #{sopSign},</if>
+            <if test="jpushTag != null  ">jpush_tag = #{jpushTag},</if>
         </trim>
         where id = #{id}
     </update>
@@ -181,6 +204,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="e_id > 0">and e_id = #{e_id}</if>
         </where>
           limit 1;
+    </select>
+    <!--根据硬件的编号查询对应的工位配置信息，没次调用只能使用一个参数-->
+    <select id="selectSingleWorkByDevCode" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work
+        <where>
+            <if test="devCode != null and devCode != '' ">and dev_code = #{devCode}</if>
+            <if test="watchCode != null and watchCode != '' ">and watch_code = #{watchCode}</if>
+        </where>
+        limit 1;
     </select>
 
     <!--根据车间id查询所以单工位信息-->
@@ -222,5 +254,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT b.liable_one as liableOne FROM tab_single_work_order as a
             left join tab_single_work as b on  a.single_id = b.id
             where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} group by liable_one
+    </select>
+
+    <!--通过工单id查询单工位极光推送信息-->
+    <select id="selectSingleWorkJPushTagByPId" resultType="com.ruoyi.project.production.singleWork.domain.SingleWork">
+        SELECT b.id as id,b.workshop_name as workshopName,b.im_code as imCode,b.watch_code as watchCode,b.jpush_tag as jpushTag
+         FROM tab_single_work_order as a,tab_single_work as b where a.single_id = b.id
+        and a.work_id = #{workId} and a.single_p = #{pId} and b.watch_id != 0
+        <if test="jpushTag != null">
+            and b.jpush_tag = #{jpushTag}
+        </if>
     </select>
 </mapper>

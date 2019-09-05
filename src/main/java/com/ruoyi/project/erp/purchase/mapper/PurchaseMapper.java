@@ -1,11 +1,8 @@
 package com.ruoyi.project.erp.purchase.mapper;
 
-import com.ruoyi.framework.aspectj.lang.annotation.DataSource;
-import com.ruoyi.framework.aspectj.lang.enums.DataSourceType;
 import com.ruoyi.project.erp.purchase.domain.Purchase;
 import com.ruoyi.project.erp.purchase.domain.PurchaseResult;
 import org.apache.ibatis.annotations.Param;
-import sun.java2d.pipe.ValidatePipe;
 
 import java.util.List;
 

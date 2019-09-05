@@ -119,5 +119,35 @@ public class SingleWorkOrderServiceImpl implements ISingleWorkOrderService
 	{
 		return singleWorkOrderMapper.deleteSingleWorkOrderByIds(Convert.toStrArray(ids));
 	}
-	
+
+
+	/******************************************************************************************************
+	 *********************************** app单工位工单进行工单分配 ******************************************
+	 ******************************************************************************************************/
+	@Override
+	public int appSaveShareWork(SingleWorkOrder singleWorkOrder) {
+		String jsCode = singleWorkOrder.getJsCode();
+		SingleWork singleWork = singleWorkMapper.selectSingleWorkByDevCode(jsCode,null);
+		if (singleWork == null) {
+		    throw new BusinessException("硬件不存在或单工位未配置该硬件");
+		}
+		//查询对应的工单信息
+		DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(singleWorkOrder.getWorkId());
+		if(workOrder ==null){
+			throw new BusinessException("操作异常,该工单不存在");
+		}
+		if (!workOrder.getLineId().equals(singleWork.getmParentId())) {
+		    throw new BusinessException("请确保工位属于工单对应的车间");
+		}
+		// 查询上传的硬件是否已经配置过该工单
+		SingleWorkOrder uniqueWork = singleWorkOrderMapper.selectSingleWorkByWorkIdAndSId(singleWorkOrder.getWorkId(),singleWork.getId());
+		if (uniqueWork != null) {
+		    throw new BusinessException("该单工位已经分配过工单勿重复配置");
+		}
+		singleWorkOrder.setWorkCode(workOrder.getWorkorderNumber());
+		singleWorkOrder.setSingleP(singleWork.getParentId());
+		singleWorkOrder.setSingleId(singleWork.getId());
+		singleWorkOrder.setcTime(new Date());
+		return singleWorkOrderMapper.insertSingleWorkOrder(singleWorkOrder);
+	}
 }

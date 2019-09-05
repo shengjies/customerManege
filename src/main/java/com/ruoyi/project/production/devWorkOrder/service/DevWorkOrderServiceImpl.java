@@ -43,6 +43,7 @@ import com.ruoyi.project.product.list.domain.DevProductList;
 import com.ruoyi.project.product.list.mapper.DevProductListMapper;
 import com.ruoyi.project.production.devWorkData.domain.DevWorkData;
 import com.ruoyi.project.production.devWorkData.mapper.DevWorkDataMapper;
+import com.ruoyi.project.production.devWorkOrder.domain.AppWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.domain.Ocr;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
@@ -101,9 +102,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     @Autowired
     private DevProductListMapper productListMapper; // 产品
-
-    @Autowired
-    private WorkOrderChangeMapper orderChangeMapper;
 
     @Autowired
     private EcnLogMapper ecnLogMapper;
@@ -340,16 +338,16 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int editWorkerOrderById(Integer id,Integer uid) {
+    public int editWorkerOrderById(Integer id, Integer uid) {
         User user = null;
         if (uid == null) {
             user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         } else {
             user = userMapper.selectUserInfoById(uid);
         }
-       if (user == null) {
-           throw new BusinessException(UserConstants.NOT_LOGIN);
-       }
+        if (user == null) {
+            throw new BusinessException(UserConstants.NOT_LOGIN);
+        }
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
         /**
          * 更新ECN次数
@@ -428,12 +426,21 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
                 //流水线消息推送
                 JPushMsg(1,devWorkOrder);
+                // 更新工单极光推送为未更新
+                devWorkOrder.setJpushTag(WorkConstants.JPUSH_NOT_UPDATED);
                 // 通过产线id获取各个工位信息
                 List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(), devWorkOrder.getLineId());
                 WorkData workData = null;
                 WorkDayHour workDayHour = null;
                 if (StringUtils.isNotEmpty(workstationList)) {
                     for (Workstation workstation : workstationList) {
+
+                        if (workstation.getcId() != 0) {
+                            // 更新工位极光推送标记
+                            workstation.setJpushTag(WorkConstants.JPUSH_NOT_UPDATED);
+                            workstationMapper.updateWorkstation(workstation);
+                        }
+
                         // 初始化工单数据
                         workData = new WorkData();
                         workData.setWorkId(devWorkOrder.getId());
@@ -519,19 +526,28 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     WorkData workData = null;
                     SingleWork singleWork = null;
                     JPushMsg(2,devWorkOrder);
+                    // 更新工单极光推送为未更新
+                    devWorkOrder.setJpushTag(WorkConstants.JPUSH_NOT_UPDATED);
                     for (SingleWorkOrder singleWorkOrder : singleWorkOrders) {
                         singleWork = singleWorkMapper.selectSingleWorkById(singleWorkOrder.getSingleId());
-                        if (singleWork.getDevId() > 0) {
-                            workData = new WorkData();
-                            workData.setCompanyId(user.getCompanyId());
-                            workData.setWorkId(devWorkOrder.getId());
-                            workData.setLineId(devWorkOrder.getLineId());
-                            workData.setDevId(singleWork.getDevId());
-                            workData.setDevName(devListMapper.selectDevListById(singleWork.getDevId()).getDeviceName());
-                            workData.setIoId(singleWorkOrder.getSingleId());
-                            workData.setCreateTime(new Date());
-                            workData.setScType(WorkConstants.SING_SINGLE);
-                            workDataMapper.insertWorkData(workData);
+                        if (singleWork != null) {
+                            if (singleWork.getWatchId() != 0) {
+                                singleWork.setJpushTag(WorkConstants.JPUSH_NOT_UPDATED);
+                                singleWorkMapper.updateSingleWork1(singleWork);
+                            }
+
+                            if (singleWork.getDevId() > 0) {
+                                workData = new WorkData();
+                                workData.setCompanyId(user.getCompanyId());
+                                workData.setWorkId(devWorkOrder.getId());
+                                workData.setLineId(devWorkOrder.getLineId());
+                                workData.setDevId(singleWork.getDevId());
+                                workData.setDevName(devListMapper.selectDevListById(singleWork.getDevId()).getDeviceName());
+                                workData.setIoId(singleWorkOrder.getSingleId());
+                                workData.setCreateTime(new Date());
+                                workData.setScType(WorkConstants.SING_SINGLE);
+                                workDataMapper.insertWorkData(workData);
+                            }
                         }
                     }
                 }
@@ -671,7 +687,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int submitWorkOrder(Integer id,Integer uid) {
+    public int submitWorkOrder(Integer id, Integer uid) {
         User user = null;
         if (uid == null) {
             user = JwtUtil.getUser();
@@ -740,12 +756,16 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 if (null != productionLine) {
                     workOrder.setManual(productionLine.getManual());
                     workOrder.setParam1(productionLine.getLineName());
+                    workOrder.setDeviceLiable(productionLine.getDeviceLiable());
+                    workOrder.setDeviceLiableTwo(productionLine.getDeviceLiableTow());
                 }
             } else if (workOrder.getWlSign() == 1) {
                 SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
                 if (work != null) {
                     workOrder.setManual(0);
                     workOrder.setParam1(work.getWorkshopName());
+                    workOrder.setDeviceLiable(work.getLiableOne());
+                    workOrder.setDeviceLiableTwo(work.getLiableTwo());
                 }
             }
         }
@@ -907,7 +927,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         change.setCreatePeople(user.getUserName());
         change.setCreateTime(new Date());
         change.setRemark(order.getRemark());
-        orderChangeMapper.insertWorkOrderChange(change);
+        workOrderChangeMapper.insertWorkOrderChange(change);
         return devWorkOrderMapper.updateDevWorkOrder(order);
     }
 
@@ -1522,6 +1542,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     /**
      * 生产配置MES查询MES相关数据
+     *
      * @param id 工单id
      * @return 结果
      */
@@ -1551,6 +1572,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     /**
      * app端查询工单信息
+     *
      * @param workOrder 工单信息
      * @return
      */
@@ -1563,6 +1585,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     /**
      * app端修改工单信息
+     *
      * @param devWorkOrder 工单信息
      * @return 结果
      */
@@ -1612,8 +1635,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     /**
      * app端结束工单操作
-     * @param id 工单id
-     * @param uid 用户id
+     *
+     * @param id         工单id
+     * @param uid        用户id
      * @param workStatus 工单状态
      * @return 结果
      */
@@ -1631,15 +1655,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             one = productionLine.getDeviceLiable();
             tow = productionLine.getDeviceLiableTow();
         } else if (workOrder.getWlSign() == 1) {
-            /**
-             * 判断修改的工单车间是否已经分配了单工位
-             */
-            if (workOrder.getWorkorderStatus().equals(WorkConstants.WORK_STATUS_NOSTART)) {
-                List<SingleWorkOrder> singleWorkOrders = singleWorkOrderMapper.selectSingleWorkByWorkIdAndPid(workOrder.getLineId(), workOrder.getId());
-                if (StringUtils.isNotEmpty(singleWorkOrders)) {
-                    throw new BusinessException("该工单已分配单工位不能修改车间");
-                }
-            }
             SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
             one = work.getLiableOne();
             tow = work.getLiableTwo();
@@ -1655,7 +1670,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 workOrder.setSignHuor(workOrder.getSignHuor() + TimeUtil.getDateDel(workOrder.getSignTime(), new Date()));
             }
         } else {
-            updateWork(user,workOrder);
+            updateWork(user, workOrder);
         }
         return devWorkOrderMapper.updateDevWorkOrder(workOrder);
     }
@@ -1691,11 +1706,12 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     /**
      * app端首页展示今日排单信息
+     *
      * @return 结果
      */
     @Override
     public List<DevWorkOrder> appSelectWorkListTwo() {
-        User user =JwtUtil.getUser();
+        User user = JwtUtil.getUser();
         if (user == null) {
             return Collections.emptyList();
         }
@@ -1704,4 +1720,58 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         return workOrders;
     }
 
+    /**
+     * app端查询MES配置信息
+     *
+     * @param appWork 传递参数
+     * @return 结果
+     */
+    @Override
+    public AppWorkOrder appSelectWorkMes(AppWorkOrder appWork) {
+        AppWorkOrder work = new AppWorkOrder();
+        DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(appWork.getWorkId());
+        if (workOrder == null) {
+            throw new BusinessException("工单已经被删除");
+        }
+        DevProductList product = productListMapper.selectProductByCode(workOrder.getProductCode());
+        if (product == null) {
+            throw new BusinessException("该工单生产的产品被删除");
+        }
+        work.setWorkStatus(workOrder.getWorkorderStatus());
+        work.setWorkSign(workOrder.getWorkSign());
+        work.setRuleId(product.getRuleId());
+        // APP端仓库查询MES
+        if (0 == appWork.getConfigTag()) {
+            List<MesBatch> mesDataList = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getWorkorderNumber());
+            if (StringUtils.isNotEmpty(mesDataList)) {
+                List<MesBatchDetail> mesBatchDetailList = null;
+                for (MesBatch mesBatch : mesDataList) {
+                    mesBatchDetailList = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+                    mesBatch.setMesBatchDetailList(mesBatchDetailList);
+                }
+                work.setMesDataList(mesDataList);
+            } else {
+                MesBatchRule mesRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
+                if (StringUtils.isNotNull(mesRule)) {
+                    List<MesBatchRuleDetail> mesRuleList = mesBatchRuleDetailMapper.selectMesBatchRuleDetailByRuleId(mesRule.getId());
+                    if (StringUtils.isNotEmpty(mesRuleList)) {
+                        work.setMesCode(CodeUtils.getMesCode());
+                        work.setMesRulelList(mesRuleList);
+                    }
+                }
+            }
+            // APP端生产查询MES
+        } else {
+            List<MesBatch> mesDataList = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getWorkorderNumber());
+            if (StringUtils.isNotEmpty(mesDataList)) {
+                List<MesBatchDetail> mesBatchDetailList = null;
+                for (MesBatch mesBatch : mesDataList) {
+                    mesBatchDetailList = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+                    mesBatch.setMesBatchDetailList(mesBatchDetailList);
+                }
+                work.setMesDataList(mesDataList);
+            }
+        }
+        return work;
+    }
 }
